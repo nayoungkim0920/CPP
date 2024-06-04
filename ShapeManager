@@ -194,8 +194,11 @@ public:
 	~ShapeManager();
 
 	void addShape(std::unique_ptr<Shape> shape);
-	void drawShapes() const;
+	void drawShapes();
 	void updateShapes();
+
+	void startDrawing();
+	void stopDrawing();
 
 	void startUpdating();
 	void stopUpdating();
@@ -203,8 +206,10 @@ public:
 private:
 	std::vector<std::unique_ptr<Shape>> shapes_;
 	std::mutex shapesMutex_;
+	std::thread drawThread_;
 	std::thread updateThread_;
-	bool running_;
+	bool isUpdating_;
+	bool isDrawing_;
 };
 
 #endif //SHAPEMANAGER_H
@@ -213,7 +218,7 @@ private:
 #include "ShapeManager.h"
 
 ShapeManager::ShapeManager()
-	: running_(false)
+	: isUpdating_(false), isDrawing_(false)
 {
 	std::cout << "ShapeManager 생성자" << std::endl;
 }
@@ -221,8 +226,6 @@ ShapeManager::ShapeManager()
 ShapeManager::~ShapeManager()
 {
 	std::cout << "ShapeManager 소멸자" << std::endl;
-
-	stopUpdating();
 }
 
 //도형추가
@@ -237,18 +240,26 @@ void ShapeManager::addShape(std::unique_ptr<Shape> shape)
 }
 
 // shapes_ 벡터에 있는 모든 도형을 차례대로 그림
-// 데이터 구조 변경이 없으므로 뮤텍스 필요없음
-void ShapeManager::drawShapes() const
+void ShapeManager::drawShapes()
 {
-	for (const auto& shape : shapes_) {
-		shape->draw();
+
+	while (isDrawing_) {
+		{
+			// 동시에 업데이트를 시도하지 못하도록 함
+			std::lock_guard<std::mutex> lock(shapesMutex_);
+			for (const auto& shape : shapes_) {
+				shape->draw();
+			}
+		}
+		// 1초 마다 한번씩 업데이트
+		std::this_thread::sleep_for(std::chrono::seconds(1));
 	}
 }
 
 // running_가 ture인 동안 도형들을 주기적으로 업데이트
 void ShapeManager::updateShapes()
 {
-	while (running_) {
+	while (isUpdating_) {
 		{
 			// 동시에 업데이트를 시도하지 못하도록 함
 			std::lock_guard<std::mutex> lock(shapesMutex_);
@@ -261,14 +272,32 @@ void ShapeManager::updateShapes()
 	}
 }
 
+void ShapeManager::startDrawing()
+{
+	if (!isDrawing_) {
+		isDrawing_ = true;
+		drawThread_ = std::thread(&ShapeManager::drawShapes, this);
+	}
+}
+
+void ShapeManager::stopDrawing()
+{
+	if (isDrawing_) {
+		isDrawing_ = false;
+		if (drawThread_.joinable()) {
+			drawThread_.join();
+		}
+	}
+}
+
 //실행중이지 않다면 새로운 스레드를 시작
 //ShapeManager객체는 메인 스레드와 별개의 스레드에서 동작함으로 
 //스레드에서 업데이트를 처리하면 메인스레드는 사용자 입력을 처리하거나 
 //다른 작업을 수행하는 동안에도 도형들을 업데이트할 수 있음
 void ShapeManager::startUpdating()
 {
-	if (!running_) {
-		running_ = true;
+	if (!isUpdating_) {
+		isUpdating_ = true;
 		updateThread_ = std::thread(&ShapeManager::updateShapes, this);
 	}
 }
@@ -276,8 +305,8 @@ void ShapeManager::startUpdating()
 //현재 실행 중인 스레드가 모든 작어블 완료한 후에 프로그램이 종료
 void ShapeManager::stopUpdating()
 {
-	if (running_) {
-		running_ = false;
+	if (isUpdating_) {
+		isUpdating_ = false;
 		if (updateThread_.joinable()) {
 			updateThread_.join(); //실행이 완료될 때까지 대기
 		}
@@ -299,14 +328,20 @@ int main() {
 	shapeManager.addShape(std::make_unique<Circle>(10.0));
 	shapeManager.addShape(std::make_unique<Rectangle>(5.0, 3.0));
 
-	// 도형 그리기
+	//도형 그리기
+	shapeManager.startDrawing();
+
+	// 도형 업데이트
 	shapeManager.startUpdating();
 
 	//어떤 입력을 받거나 프로그램이 종료될 때까지 대기
 	std::cout << "Press Enter to exit." << std::endl;
 	std::cin.get(); //프로그램이 실행 완료한 후 즉시 닫히는것을 방지
 
-	// 도형 크리기 중지
+	// 도형 그리기 중지
+	shapeManager.stopDrawing();
+
+	// 도형 업데이트 중지
 	shapeManager.stopUpdating();
 
 	return 0;
@@ -319,15 +354,20 @@ Circle 생성자
 Shape 생성자
 Rectangle 생성자
 Press Enter to exit.
-Udating a circle
+Updating a circle
 Updating a rectangle
-Udating a circle
+Drawing a circle with radius 10
+Drawing a rectangle with width 5 and height 3
+Drawing a circle with radius 10
+Drawing a rectangle with width 5 and height 3
+Updating a circle
 Updating a rectangle
-Udating a circle
+Updating a circle
 Updating a rectangle
-Udating a circle
+Drawing a circle with radius 10
+Drawing a rectangle with width 5 and height 3
+Updating a circle
 Updating a rectangle
-...
 ShapeManager 소멸자
 Circle 소멸자
 Shape 소멸자
