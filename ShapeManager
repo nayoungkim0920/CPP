@@ -58,3 +58,278 @@ ShapeManager
 실행 상태를 나타내는 running 플래그 속성을 가진다.
 도형 추가, 그리기, 업데이트 하는 기능을 가지고
 업데이트 시작/멈추는 기능을 포함한다.
+
+//Shape.h
+#ifndef SHAPE_H
+#define SHAPE_H
+
+#include <iostream>
+
+class Shape {
+public:
+	Shape();
+	virtual ~Shape();
+	virtual void draw() const = 0;
+	virtual void update() = 0;	
+};
+
+#endif //SHAPE_H
+
+//Shape.cpp
+#include "Shape.h"
+// 추상 클래스의 생성자와 소멸자를 정의하는 것은 
+// 일반적으로 권장되지 않는다.
+// 추상 클래스는 인스턴스화될 수 없기 때문에 
+// 생성자와 소멸자가 호출될 필요가 없다.
+Shape::Shape()
+{
+	std::cout << "Shape 생성자" << std::endl;
+}
+
+Shape::~Shape()
+{
+	std::cout << "Shape 소멸자" << std::endl;
+}
+
+//Circle.h
+#ifndef CIRCLE_H
+#define CIRCLE_H
+
+#include "Shape.h"
+
+class Circle : public Shape {
+public:
+	Circle(double radius);
+	~Circle();
+	void draw() const override;
+	void update() override;
+private:
+	double radius_; //원의 반지름
+};
+
+#endif //CIRCLE_H
+
+//Circle.cpp
+#include "Circle.h"
+
+Circle::Circle(double radius)
+	: radius_(radius)
+{
+	std::cout << "Circle 생성자" << std::endl;
+}
+
+Circle::~Circle()
+{
+	std::cout << "Circle 소멸자" << std::endl;
+}
+
+void Circle::draw() const
+{
+	std::cout << "Drawing a circle with radius " << radius_ << std::endl;
+}
+
+void Circle::update()
+{
+	std::cout << "Udating a circle" << std::endl;
+}
+
+//Rectangle.h
+#ifndef RECTANGLE_H
+#define RECTANGLE_H
+
+#include "Shape.h"
+
+class Rectangle :public Shape {
+public :
+	Rectangle(double width, double height);
+	~Rectangle();
+	void draw() const override;
+	void update() override;
+private:
+	double width_;
+	double height_;
+};
+
+#endif //RECTANGLE_H
+
+//Rectangle.cpp
+#include "Rectangle.h"
+
+Rectangle::Rectangle(double width, double height)
+	: width_(width), height_(height)
+{
+	std::cout << "Rectangle 생성자" << std::endl;
+}
+
+Rectangle::~Rectangle()
+{
+	std::cout << "Rectangle 소멸자" << std::endl;
+}
+
+void Rectangle::draw() const
+{
+	std::cout << "Drawing a rectangle with width " << width_ << " and height " << height_ << std::endl;
+}
+
+void Rectangle::update()
+{
+	std::cout << "Updating a rectangle" << std::endl;
+}
+
+//ShapeManager.h
+#ifndef SHAPEMANAGER_H
+#define SHAPEMANAGER_H
+
+#include <vector>
+#include <memory>
+#include <thread>
+#include <mutex>
+#include "Shape.h"
+#include "Circle.h"
+#include "Rectangle.h"
+
+class ShapeManager {
+public:
+	ShapeManager();
+	~ShapeManager();
+
+	void addShape(std::unique_ptr<Shape> shape);
+	void drawShapes() const;
+	void updateShapes();
+
+	void startUpdating();
+	void stopUpdating();
+
+private:
+	std::vector<std::unique_ptr<Shape>> shapes_;
+	std::mutex shapesMutex_;
+	std::thread updateThread_;
+	bool running_;
+};
+
+#endif //SHAPEMANAGER_H
+
+//ShapeManager.cpp
+#include "ShapeManager.h"
+
+ShapeManager::ShapeManager()
+	: running_(false)
+{
+	std::cout << "ShapeManager 생성자" << std::endl;
+}
+
+ShapeManager::~ShapeManager()
+{
+	std::cout << "ShapeManager 소멸자" << std::endl;
+
+	stopUpdating();
+}
+
+//도형추가
+void ShapeManager::addShape(std::unique_ptr<Shape> shape)
+{
+	// 동시에 여러 스레드가 shapes_벡터에 접근못하도록 함
+	{
+		std::lock_guard<std::mutex> lock(shapesMutex_);
+		shapes_.push_back(std::move(shape));
+	} 
+	// 뮤텍스 자동 해제
+}
+
+// shapes_ 벡터에 있는 모든 도형을 차례대로 그림
+// 데이터 구조 변경이 없으므로 뮤텍스 필요없음
+void ShapeManager::drawShapes() const
+{
+	for (const auto& shape : shapes_) {
+		shape->draw();
+	}
+}
+
+// running_가 ture인 동안 도형들을 주기적으로 업데이트
+void ShapeManager::updateShapes()
+{
+	while (running_) {
+		{
+			// 동시에 업데이트를 시도하지 못하도록 함
+			std::lock_guard<std::mutex> lock(shapesMutex_);
+			for (auto& shape : shapes_) {
+				shape->update();
+			}
+		}
+		// 1초 마다 한번씩 업데이트
+		std::this_thread::sleep_for(std::chrono::seconds(1));
+	}
+}
+
+//실행중이지 않다면 새로운 스레드를 시작
+//ShapeManager객체는 메인 스레드와 별개의 스레드에서 동작함으로 
+//스레드에서 업데이트를 처리하면 메인스레드는 사용자 입력을 처리하거나 
+//다른 작업을 수행하는 동안에도 도형들을 업데이트할 수 있음
+void ShapeManager::startUpdating()
+{
+	if (!running_) {
+		running_ = true;
+		updateThread_ = std::thread(&ShapeManager::updateShapes, this);
+	}
+}
+
+//현재 실행 중인 스레드가 모든 작어블 완료한 후에 프로그램이 종료
+void ShapeManager::stopUpdating()
+{
+	if (running_) {
+		running_ = false;
+		if (updateThread_.joinable()) {
+			updateThread_.join(); //실행이 완료될 때까지 대기
+		}
+	}
+}
+
+//main.cpp
+
+#include <iostream>
+#include "ShapeManager.h"
+
+int main() {
+
+	// 객체 생성
+	ShapeManager shapeManager;
+
+	// 도형 추가
+	//void ShapeManager::addShape(std::unique_ptr<Shape> shape)
+	shapeManager.addShape(std::make_unique<Circle>(10.0));
+	shapeManager.addShape(std::make_unique<Rectangle>(5.0, 3.0));
+
+	// 도형 그리기
+	shapeManager.startUpdating();
+
+	//어떤 입력을 받거나 프로그램이 종료될 때까지 대기
+	std::cout << "Press Enter to exit." << std::endl;
+	std::cin.get(); //프로그램이 실행 완료한 후 즉시 닫히는것을 방지
+
+	// 도형 크리기 중지
+	shapeManager.stopUpdating();
+
+	return 0;
+}
+
+//출력
+ShapeManager 생성자
+Shape 생성자
+Circle 생성자
+Shape 생성자
+Rectangle 생성자
+Press Enter to exit.
+Udating a circle
+Updating a rectangle
+Udating a circle
+Updating a rectangle
+Udating a circle
+Updating a rectangle
+Udating a circle
+Updating a rectangle
+...
+ShapeManager 소멸자
+Circle 소멸자
+Shape 소멸자
+Rectangle 소멸자
+Shape 소멸자
