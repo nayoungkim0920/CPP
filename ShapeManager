@@ -1,0 +1,60 @@
+- 프로젝트설명
+여러 도형(Circle, Rectangle)을 관리하고 
+스레드를 사용하여 도형의 속성을 동시다발적으로 업데이트하며
+뮤텍스를 사용하여 데이터 경쟁을 방지한다.
+
+- 프로그램 구조
+ShapeManager
+│
+├── include
+│   ├── Shape.h
+│   ├── Circle.h
+│   ├── Rectangle.h
+│   └── ShapeManager.h
+│
+├── src
+│   ├── Circle.cpp
+│   ├── Rectangle.cpp
+│   ├── ShapeManager.cpp
+│   └── main.cpp
+│
+├── CMakeLists.txt
+
+-클래스다이어그램
++------------------+          +-------------+
+|  ShapeManager    |--------->|   Shape     |
++------------------+          +-------------+
+| - shapes         |          |             |
+| - shapesMutex    |          +-------------+
+| - updateThread   |          | + draw()    |
+| - running        |          | + update()  |
++------------------+          +-------------+
+| + addShape()     |                ^
+| + drawShapes()   |                |
+| + updateShapes() |                |
+| + startUpdating()|                |
+| + stopUpdating() |                |
++------------------+                |
+                        +----------+----------+
+                        |                     |
+                        v                     v
+                   +-------------+     +-------------+
+                   |  Circle     |     | Rectangle   |
+                   +-------------+     +-------------+
+                   | - radius    |     | - width     |
+                   |             |     | - height    |
+                   +-------------+     +-------------+
+                   | + draw()    |     | + draw()    |
+                   | + update()  |     | + update()  |
+                   +-------------+     +-------------+
+
+-클래스설명
+1. Shape : 추상클래스
+2. Circle, Rectangle : Shape 클래스를 상속받아 구체화된 클래스.
+3. ShapeManager : 도형 관리 클래스.
+도형을 저장하기 위한 shape 벡터, 
+동시 접근을 제어하기위한 shapesMutex 뮤텍스,
+업데이트를 처리하기 위한 updateThread 스레드,
+실행 상태를 나타내는 running 플래그 속성을 가진다.
+도형 추가, 그리기, 업데이트 하는 기능을 가지고
+업데이트 시작/멈추는 기능을 포함한다.
