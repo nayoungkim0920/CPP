@@ -1,3 +1,13 @@
+<다중 스레드를 사용한 도형 관리 프로그램 설계 및 구현>
+여러 스레드가 동시에 도형을 추가하고 삭제할 수 있으며, 
+동기화를 위해 std::shared_mutex를 사용한다. 이를 통해 여러 스레드가
+도형 정보를 읽고 쓰는 상황을 안전하게 처리할 수 있다.
+1) ShapeManager : 도형을 관리하고, 도형 목록에 대한 접근을 동기화한다.
+2) EventBus : 이벤트를 관리하고, 구독자들에게 이벤트를 전달한다.
+3) Event : 다양한 이벤트의 기본 클래스이다.
+4) DrawEvent, UpdateEvent : 도형을 그리거나 업데이트하는 이벤트이다.
+5) Shape : 도형의 추상 기본 클래스이며, Circle, Rectangle등의 구체적인 도형 
+클래스를 포함한다.
 +----------------+     +--------------+      +----------------+    +------------------+
 |    EventBus    |     |    Event     |      |     Shape      |    |    ShapeManager  |
 +----------------+     +--------------+      +----------------+    +------------------+
@@ -45,12 +55,113 @@
 | + update(): void      |
 |                       |
 +-----------------------+
-- 이벤트 버스
-소프트웨어 컴포넌트 간 통신을 위한 디자인 패턴 중 하나이다.
-소프트웨어의 다양한 구성 요소 간 통신을 관리하기 위한 중앙 집중식 메커니즘이다.
-특히 이벤트 기반 아키텍처에서 사용되면, 이벤트가 발생하면 다른 구성요소가 해당 이벤트
-를 처리할 수 있다.
-1. 이벤트
-이벤트 버스를 통해 전달되는 메시지 또는 신호이다. 
-사용자가 클릭했다/데이터가 업데이트되었다.라는 이벤트 등이 있다.
 
+<EventBus의 역할>
+이벤트를 관리하는 시스템
+*이벤트(Event)란?
+이벤트는 어떤 특정한 일이 발생했음을 나타내는 신호이다. 
+예로 도형이그려지거나 업데이트되는 일이 있을 수 있다. 
+*구독자(Subscriber)란?
+이벤트가 발생했을 때 그 이벤트에 반응하는 함수나 객체이다.
+예로 도형이 그려질 때 화면에 그려주는 작업을 수행하는 코드가 구독자이다.
+*동작방식
+1)구독관리
+-여러 구독자를 등록(구독)할 수 있다.
+-구독자는 "이벤트가 발생하면 내가 알려줄게"라고 EventBus에게 말한다.
+-EventBus는 이러한 구독자들을 리스트에 저장해둔다.
+2)이벤트 발행
+-어떤 이벤트가 발생했을 때 EventBus는 저장해둔 구독자들에게 그 이벤트가 발생했음을 알림
+-EventBus는 모든 구독자에게 이벤트가 발생했다고 알리며, 구독자들은 이에 따라 자신의
+작업 수
+
+<프로그램>
+1. Event.h
+//Event.h
+#ifndef EVENT_H
+#define EVENT_H
+
+#include <iostream>
+
+class Event {
+public:
+	virtual ~Event() = default;
+};
+
+#endif //EVENT_H
+
+2. EventBus.h
+프로그램 내에서 다양한 이벤트를 관리하고, 이벤트가 발생할 때 구독자에게 알려주는
+역할을 한다.
+//EventBus.h
+#ifndef EVENTBUS_H
+#define EVENTBUS_H
+
+#include <functional>
+#include <vector>
+#include <mutex>
+#include "Event.h"
+
+class EventBus {
+public:
+  //싱글톤 패턴을 사용하여 구현되었다. 
+  //프로그램 내에서 단 하나의 EventBus 인스턴스만 존재할 수 있다. 
+  //이를 통해 어디서나 이벤트를 구독하고 발행할 수 있다.
+	static EventBus& getInstance();
+
+  //이벤트를 구독하는 데 사용. 구독자는 이벤트가 발생했을 때 호출될 콜백함수 등록
+  //등록된 콜백 함수는 이벤트가 발생할 때마다 호출된다.
+	void subscribe(std::function<void(const Event&)> callback);
+
+  //이벤트를 발행하는 데 사용. 등록된 모든 구독자에게 해당 이벤트를 전달한다.
+  //이벤트는 콜백 함수를 통해 각 구독자에게 전달되면 이후 각 구독자는 필요한 작업을
+  //수행할 수 있다.
+	void publish(const Event& event);
+
+private:
+  //이벤트를 구독하는 함수 객체들을 저장하는 벡터
+  //구독한 콜백 함수들이 여기에 저장된다.
+	std::vector<std::function<void(const Event&)>> subscribers;
+
+  //멀티스레드 환경에서 subscribe, publish함수를 안전하게 동시에 사용하기 위한 
+  //동기화를 제공, 여러 스레드가 동시에subscribe, publish함수를 호출할 때 발생할
+  //수 있는 문제 방지
+	std::mutex mutex;
+
+	EventBus() = default; //기본생성자를 사용하여 EventBus객체를 생성하겠다
+                        //명시적생성자가 없는 경우 컴파일러가 자동생성한다
+	EventBus(const EventBus&) = delete; //복사생성자를 삭제하겠다 
+                                      //EventBus 객체를 다른 객체로 복사하는것을
+                                      //허용하지않는다
+	EventBus& operator = (const EventBus&) = delete; //복사할당연산자를 삭제하겠다
+};
+
+#endif //EVENTBUS_H
+
+3. EventBus.cpp
+//EventBus.cpp
+#include "EventBus.h"
+
+//싱글톤 인스턴스 반환
+//싱글톤 패턴은 어플리케이션 전체에서 하나의 인스턴스만을 유지하는 디자인 패턴이다
+EventBus& EventBus::getInstance()
+{
+	static EventBus instance; //단일 인스턴스를 생성
+	return instance; 
+}
+
+//이벤트를 구독하는 콜백 함수를 등록한다
+void EventBus::subscribe(std::function<void(const Event&)> callback)
+{
+	std::lock_guard<std::mutex> lock(mutex);
+	subscribers.push_back(callback); //새로운 콜백함수를 subscribers벡터에추가
+}
+
+//등록된 모든 콜백 함수에 이벤트를 게시하며 뮤텍스를 사용하여 스레드간 동기화보장
+void EventBus::publish(const Event& event)
+{
+	std::lock_guard<std::mutex> lock(mutex);
+  //subscribers벡터에 등록된 각 콜백 함수에 대해 이벤트를 전달한다
+	for (const auto& subscriber : subscribers) {
+		subscriber(event);
+	}
+}
