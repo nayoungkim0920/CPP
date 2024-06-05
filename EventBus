@@ -316,6 +316,16 @@ std::string Rectangle::getColor() const {
     return color;
 }
 
+<결과>
+Shape added event received!
+Shape removed event received!
+Shapes added :
+Name: Rectangle, Color: blue
+Area: 50.00, Perimeter: 30.00
+Shape added event received!
+Shape removed event received!
+No Shapes added yet.
+
 <FLOW CHART>
 +-----------------------+             +-------------------+             +-----------------+
 |        main()         |             |    ShapeManager   |             |     EventBus    |
