@@ -165,3 +165,96 @@ void EventBus::publish(const Event& event)
 		subscriber(event);
 	}
 }
+
+3.EventClasses.h
+다양한 종류의 이벤트를 정의하기 위해 사용
+이벤트 클래스들이 Event클래스를 상속하기 때문에 Event클래스의 정의가 필요하다
+//EventClasses.h
+#ifndef EVENTCLASSES_H
+#define EVENTCLASSES_H
+
+#include "Event.h"
+
+// Example event classes
+class ShapeAddedEvent : public Event {}; //도형추가됨. Event클래스의 기본특성가져옴
+class ShapeRemovedEvent : public Event {}; //도형제거됨. Event클래스의 기본특성가져옴
+
+#endif // EVENTCLASSES_H
+
+4.EventHandler.h
+이벤트 핸들러 함수들을 정의한다
+//EventHandler.h
+#ifndef EVENTHANDLER_H
+#define EVENTHANDLER_H
+
+#include "Event.h"
+
+// Event handler functions
+void onShapeAdded(const Event&);
+void onShapeRemoved(const Event&);
+
+#endif // EVENTHANDLER_H
+
+5.EventHandler.cpp
+선언된 이벤트 핸들러 함수들의 구현을 제공한다
+//EventHandler.cpp
+#include "EventHandler.h"
+
+void onShapeAdded(const Event&) {
+    std::cout << "Shape added event received!" << std::endl;
+}
+
+void onShapeRemoved(const Event&) {
+    std::cout << "Shape removed event received!" << std::endl;
+}
+
+6.main.cpp
+
+//main.cpp
+#include <iostream>
+#include "ShapeManager.h"
+#include "Rectangle.h"
+#include "Circle.h"
+#include "EventBus.h"
+#include "EventHandler.h" // Include event handler functions
+
+int main() {
+    EventBus::getInstance().subscribe(onShapeAdded);
+    EventBus::getInstance().subscribe(onShapeRemoved);
+
+    ShapeManager manager;
+    manager.addShape(std::make_unique<Rectangle>(10, 5, "blue"));
+    manager.printShapes(); 
+    manager.removeShape(0);
+    manager.printShapes();
+
+    return 0;
+}
+
++-----------------------+             +-------------------+             +-----------------+
+|        main()         |             |    ShapeManager   |             |     EventBus    |
++-----------------------+             +-------------------+             +-----------------+
+        |                                      |                                  |
+        |                                      |                                  |
+        V                                      V                                  V
+  Subscribe to                            Manage shapes                        Manage event
+  events (onShapeAdded,                   (addShape,                            subscriptions
+  onShapeRemoved)                           removeShape)                            (subscribe)
+        |                                      |                                  |
+        |                                      |                                  |
+        V                                      V                                  V
+  Publish                                 Print shapes                            |
+  events                                  (printShapes)                           |
+  (ShapeAdded, ShapeRemoved)                |                                  Publish
+        |                                      |                                events
+        |                                      |                                (ShapeAdded,
+        V                                      V                                ShapeRemoved)
++------------------------+        +----------------------+                        |
+|     EventHandlers      |        |      ShapeClasses     |                        |
++------------------------+        +----------------------+                        |
+  onShapeAdded(Event)            Rectangle class                                 |
+  onShapeRemoved(Event)              |       ^                                    |
+                                      |       |                                    |
+                                      |       +-----------> Circle class          |
+                                      |                                            |
+                                      +--------------------------------------------+
