@@ -176,8 +176,29 @@ void EventBus::publish(const Event& event)
 #include "Event.h"
 
 // Example event classes
-class ShapeAddedEvent : public Event {}; //도형추가됨. Event클래스의 기본특성가져옴
-class ShapeRemovedEvent : public Event {}; //도형제거됨. Event클래스의 기본특성가져옴
+class ShapeAddedEvent : public Event {
+public:
+	ShapeAddedEvent(const std::string& name) : shapeName(name) {
+		std::cout << tostring() << std::endl;
+	}
+	std::string tostring() const {
+		return "Shape added Event : " + shapeName;
+	}
+private:
+	std::string shapeName;
+};
+
+class ShapeRemovedEvent : public Event {
+public:
+	ShapeRemovedEvent(const std::string& name) : shapeName(name) {
+		std::cout << tostring() << std::endl;
+	}
+	std::string tostring() const {
+		return "Shape Removed Event : " + shapeName;
+	}
+private:
+	std::string shapeName;
+};
 
 #endif // EVENTCLASSES_H
 
@@ -316,12 +337,103 @@ std::string Rectangle::getColor() const {
     return color;
 }
 
+11.ShapeManager.h
+//ShapeManager.h
+#ifndef SHAPEMANAGER_H
+#define SHAPEMANAGER_H
+
+#include <shared_mutex>
+#include <iomanip>
+#include "Shape.h"
+#include "EventBus.h"
+#include "EventClasses.h"
+
+class ShapeManager {
+public:
+	void addShape(std::unique_ptr<Shape> shape);
+	void printShapes() const;
+	void removeShape(size_t index);
+
+private:
+	std::vector<std::unique_ptr<Shape>> shapes_;
+	mutable std::mutex mutex;
+	mutable std::shared_mutex sharedMutex;
+};
+
+#endif //SHAPEMANAGER_H
+
+12.ShapeManager.cpp
+//ShapeManager.h
+#include "ShapeManager.h"
+
+void ShapeManager::addShape(std::unique_ptr<Shape> shape)
+{
+	{
+		std::lock_guard<std::mutex> lock(mutex);
+		shapes_.push_back(std::move(shape));		
+	}
+
+	//새 도형 추가 이벤트 발행
+	EventBus::getInstance().publish(ShapeAddedEvent(shapes_.back()->name()));
+}
+
+void ShapeManager::printShapes() const
+{
+	std::shared_lock<std::shared_mutex> lock(sharedMutex);
+	if (shapes_.empty()) {
+		std::cout << "No Shapes added yet." << std::endl;
+		return;
+	}
+	std::cout << "Shapes added : " << std::endl;
+	for (const auto& shape : shapes_) {
+		std::cout << "Name: " << shape->name() << ", Color: " << shape->getColor() << std::endl;
+		std::cout << "Area: " << std::fixed << std::setprecision(2) << shape->area() << ", Perimeter: " << std::fixed << std::setprecision(2) << shape->perimeter() << std::endl;
+	}
+}
+
+void ShapeManager::removeShape(size_t index)
+{
+	std::string removed_name;
+	{
+		std::lock_guard<std::mutex> lock(mutex);
+		if (index < shapes_.size()) {
+			removed_name = shapes_.back()->name();
+			shapes_.erase(shapes_.begin() + index);
+		}
+		else {
+			std::cout << "Invalied index." << std::endl;
+			return;
+		}
+	}
+	//도형 제거 이벤트 발행
+	EventBus::getInstance().publish(ShapeRemovedEvent(removed_name));
+}
+<왜 도형 추가/제거 후 이벤트를 발행할까>
+일반적으로 소프트웨어 시스템에서 관찰되는 일반적인 설게 원칙 중 하나이다.
+1. 알림 및 갱신
+다른 부분에서 해당 도형에 대한 정보를 업데이트해야할 때
+GUI에서 해당 도형을 표시하는 부분이 있다면 도형이 제거되었거나 추가되었음을 
+이를 관리하는 객체에게 알려줘야할때가 있다. 이를 통해 인터페이스를 새로 고칠 수 
+있다.
+2. 감시 및 로깅
+이벤트를 구독하는 다른 클래스나 모듈이 있을 수 있다. 이벤트를 수신하는 시스템이나
+클래스가 도형이 제거되었음을 감지하고 로그를 남기거나 추가 작업을 수행할 수 있다.
+3. 관심분리(Separation of Concerns)
+도형을 관리하는 부분과 도형에 대한 다양한 작업을 수행하는 부분을 분리하는 것이 좋다.
+도형관리자는 도형의 추가, 제거 등의 작업을 처리하고, 다른 부분은 이러한 변경 사항에 
+대해 관심을 가질 수 있다. 이렇게 하면 코드가 더 모듈화되고 유지 관리가 쉬워진다.
+4. 확장성 및 유연성
+이벤트를 통해 다양한 동작을 트리거할 수 있다. 도형이 제거되면 다른 도형에 영향을 주는
+특정 작업을 수행 할 수 있다. 이를 통해 시스템이 더 유연하고 확장 가능해 진다.
+
 <결과>
+Shape added Event : Rectangle
 Shape added event received!
 Shape removed event received!
-Shapes added :
+Shapes added
 Name: Rectangle, Color: blue
 Area: 50.00, Perimeter: 30.00
+Shape Removed Event : Rectangle
 Shape added event received!
 Shape removed event received!
 No Shapes added yet.
