@@ -231,6 +231,92 @@ int main() {
     return 0;
 }
 
+7. Circle.h
+//Circle.h
+#ifndef CIRCLE_H
+#define CIRCLE_H
+
+#include "Shape.h"
+#define M_PI 3.141592
+
+class Circle : public Shape {
+public:
+    Circle(double r, const std::string& c) : radius(r), color(c) {}
+    double area() const override;
+    double perimeter() const override;
+    std::string name() const override;
+    std::string getColor() const override;
+private:
+    double radius;
+    std::string color;
+};
+
+8. Circle.cpp
+//Circle.cpp
+#include "Circle.h"
+#include <string>
+
+double Circle::area() const {
+    return M_PI * radius * radius;
+}
+
+double Circle::perimeter() const {
+    return 2 * M_PI * radius;
+}
+
+std::string Circle::name() const {
+    return "Circle";
+}
+
+std::string Circle::getColor() const {
+    return color;
+}
+#endif // CIRCLE_H
+
+9. Rectangle.h
+//Rectangle.h
+#ifndef RECTANGLE_H
+#define RECTANGLE_H
+
+#include "Shape.h"
+
+class Rectangle : public Shape {
+public:
+    Rectangle(double w, double h, const std::string& c) : width(w), height(h), color(c) {}
+    double area() const override;
+    double perimeter() const override;
+    std::string name() const override;
+    std::string getColor() const override;
+private:
+    double width;
+    double height;
+    std::string color;
+};
+
+#endif // RECTANGLE_H
+
+10. Rectangle.cpp
+//Rectangle.cpp
+#include "Rectangle.h"
+#include <string>
+
+double Rectangle::area() const {
+    return width * height;
+}
+
+double Rectangle::perimeter() const {
+    return 2 * (width + height);
+}
+
+std::string Rectangle::name() const {
+    return "Rectangle";
+}
+
+std::string Rectangle::getColor() const {
+    return color;
+}
+
+<FLOW CHART>
 +-----------------------+             +-------------------+             +-----------------+
 |        main()         |             |    ShapeManager   |             |     EventBus    |
 +-----------------------+             +-------------------+             +-----------------+
