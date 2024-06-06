@@ -1,13 +1,77 @@
 <다중 스레드를 사용한 도형 관리 프로그램 설계 및 구현>
+
 여러 스레드가 동시에 도형을 추가하고 삭제할 수 있으며, 
 동기화를 위해 std::shared_mutex를 사용한다. 이를 통해 여러 스레드가
 도형 정보를 읽고 쓰는 상황을 안전하게 처리할 수 있다.
-1) ShapeManager : 도형을 관리하고, 도형 목록에 대한 접근을 동기화한다.
-2) EventBus : 이벤트를 관리하고, 구독자들에게 이벤트를 전달한다.
-3) Event : 다양한 이벤트의 기본 클래스이다.
-4) DrawEvent, UpdateEvent : 도형을 그리거나 업데이트하는 이벤트이다.
-5) Shape : 도형의 추상 기본 클래스이며, Circle, Rectangle등의 구체적인 도형 
-클래스를 포함한다.
+
+-이벤트 기반의 아키텍처의 사용
+  도형의 추가와 제거와 같은 상태 변화를 EventBus를 통해 이벤트로 발행한다.
+  상태변화를 독립적으로 처리할 수 있으며, 새로운 이벤트 핸들러를 쉽게 추가할 수 있다.
+-싱글톤 패턴의 EventBus
+  애플리케이션 내에서 이벤트 관리의 일관성을 유지하기 위해 EventBus를 싱글톤으로 설계
+  어디서나 같은 EventBus인스턴스를 사용하여 이벤트를 발행하고 구독할 수 있다.
+-핸들러의 구독
+  main()함수에서 프로그램이 시작될 때 이벤트 핸들러를 EventBus에 구독한다.
+  도형이 추가되거나 제거될 때 마다 적절한 핸들러가 호출되어 이벤트를 처리할 수 있다.
+-도형관리의 분리
+  ShapeManager클래스는 도형의 추가, 제거, 출력 기능을 캡슐화하여 제공한다.
+  도형이 추가되거나 제거될 때마다 EventBus를 통해 이벤트를 발행하여 다른 컴포넌트들이
+  이 변화를 처리할 수 있도록 한다.
+-싱글톤(Singleton)
+  객체지향프로그램에서 사용되는 디자인 패턴 중 하나로, 클래스의 인스턴스가 오직 하나만
+  생성됨을 보장하는 패턴이다. 싱글톤 패턴을 사용하면 특정 클래스에 대해 단 하나의 객체만
+  존재하도록 하여, 이 객체를 전역적으로 접근할 수 있게 된다.
+  (주의) 전역 상태를 공유하기 때문에 잘못된 사용 시의 의도치않은 부작용이 발생할 수 있다.
+  -시스템 내에서 하나의 인스턴스만 필요한 경우(예: 설정클래스, 로그 관리 클래스 등)
+  -공유 자원을 관리해야 하는 경우(예: 스레드 풀, 데이터베이스 연결 풀 등)
+  -구현방법
+  1) 정적변수와 정적 메서드 사용
+  클래스 내에 인스턴스를 저장할 정적변수 선언 
+  외부에서 객체를 생성하지 못하도록 생성자를 private로 선언
+  인스턴스를 반환하는 정적메서드를 제공
+  2) 이론 초기화(Eager Initialization)
+  - 클래스가 로드될 때 인스턴스를 생성한다.
+  - 멀티스레드환경에서도 안전하다
+  3) 이중검사잠금(Double-Checked Locking)
+  - 멀티스레드환경에서 성능을 고려한 방법으로 인스턴스가 생성된 후에는 동기화 비용이
+  발생하지 않도록 한다.
+
+<동작요약>
+1. main.cpp
+EventBus::getInstace().subscribe(onShapeAdded);
+이벤트 버스의 싱글톤 인스턴스를 얻어와서 onShapeAdded함수를 구독자로 등록한다.
+이 함수는 도형이 추가될 때 호출될 콜백 함수이다.
+2. EventBus.cpp
+subscribers.push_back(onShapeAdded);
+구독자 벡터에 onShapeAdded함수를 추가한다. 
+이 함수는 도형이 추가될 때 호출된 콜백 함수이다.
+3. main.cpp
+manager.addShape(std::make_unique<Rectangle>(10, 5, "blue"));
+도형을 관리하는 매니저 객체에 새로운 직사각형을 추가한다.
+4.ShapeManager.cpp
+shapes_.push_back(std::move(shape));
+매니저가 관리하는 도형 벡터에 새로운 도형을 추가한다.
+EventBus::getInstance().publish(ShapeAddedEvent(shapes_.back()-<name()));
+도형이 추가된 후에 해당 도형의 이름을 포함한 ShapeAddedEvent를 발행한다.
+5.ShapeAddedEvent
+ShapeAddedEvent(const std::string& name) : shapeName(name {
+	std::cout << tostring() << std::endl; 
+}
+도형 이름을 받아서 초기화하고, 초기화된 도형 이름을 출력한다.
+!!도형이름을 출력하는 로직을 넣었지만 도형 추가 후 동작할 로직을 넣어주면 된다.
+
+1) Event.h
+모든 이벤트의 기본 클래스이다. 이 클래스를 상속하여 다양한 이벤트를 정의할 수 있다.
+가상 소멸자를 가지고 있으며, 이를 통해 다양한 이벤트 클래스가 이 클래스를 상속받을 수
+있다.
+2) EventBus.h
+이벤트를 관리하고 이벤트가 발생할 때 구독자에게 알리는 역할을 한다.
+싱글톤 패턴을 사용하여 프로그램 내에서 하나의 인스턴스만 존재하도록 한다.
+getInstance메서드는 싱글톤 인스턴스를 반환한다.
+subscribe메서드는 이벤트를 구독하는 콜백함수를 등록한다.
+publish메서드는 등록된 모든 콜백 함수에 이벤트를 게시한다.
+3)
+
 +----------------+     +--------------+      +----------------+    +------------------+
 |    EventBus    |     |    Event     |      |     Shape      |    |    ShapeManager  |
 +----------------+     +--------------+      +----------------+    +------------------+
@@ -72,7 +136,7 @@
 2)이벤트 발행
 -어떤 이벤트가 발생했을 때 EventBus는 저장해둔 구독자들에게 그 이벤트가 발생했음을 알림
 -EventBus는 모든 구독자에게 이벤트가 발생했다고 알리며, 구독자들은 이에 따라 자신의
-작업 수
+작업 수행
 
 <프로그램>
 1. Event.h
@@ -96,12 +160,12 @@ public:
 #ifndef EVENTBUS_H
 #define EVENTBUS_H
 
-#include <functional>
-#include <vector>
-#include <mutex>
-#include "Event.h"
+#include <functional> //함수 객체를 사용
+#include <vector> //구독자 콜백 저장
+#include <mutex> //멀티스레드환경 안전 접근
+#include "Event.h" //Event 클래스 또는 구조체 사용
 
-class EventBus {
+class EventBus { //EventBus 클래스 정의
 public:
   //싱글톤 패턴을 사용하여 구현되었다. 
   //프로그램 내에서 단 하나의 EventBus 인스턴스만 존재할 수 있다. 
