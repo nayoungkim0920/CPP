@@ -99,7 +99,11 @@ Shape클래스를 상속받아 사각형 도형의 구체적인 정의
 -perimeter() : 도형의 둘레를 계산하여 반환
 -name() : 도형의 이름을 반환
 -getColor() : 도형의 색상을 반환
-
+12.ShapeManager.h
+도형의 추가/삭제, 추가/삭제시 이벤트 발행 정의
+클래스간의 상호 작용을 느슨하게 만들어주는 유용한 방법 중하나이다.(유용)
+13.ShapeManager.cpp
+도형의 추가/삭제, 추가/삭제시 이벤트 발행 구현
 +----------------+     +--------------+      +----------------+    +------------------+
 |    EventBus    |     |    Event     |      |     Shape      |    |    ShapeManager  |
 +----------------+     +--------------+      +----------------+    +------------------+
@@ -505,6 +509,25 @@ void ShapeManager::removeShape(size_t index)
 	//도형 제거 이벤트 발행
 	EventBus::getInstance().publish(ShapeRemovedEvent(removed_name));
 }
+
+13. Shape.h
+//Shape.h
+#ifndef SHAPE_H
+#define SHAPE_H
+
+#include <string>
+
+class Shape {
+public:
+	virtual ~Shape() {}
+    virtual double area() const = 0;
+    virtual double perimeter() const = 0;
+    virtual std::string name() const = 0;
+    virtual std::string getColor() const = 0;
+};
+
+#endif //SHAPE_H
+
 <왜 도형 추가/제거 후 이벤트를 발행할까>
 일반적으로 소프트웨어 시스템에서 관찰되는 일반적인 설게 원칙 중 하나이다.
 1. 알림 및 갱신
