@@ -157,3 +157,306 @@ private:
 	mutable std::shared_mutex mutex;
 };
 #endif //EVENTBUS_H
+
+// EventBus.cpp
+// ----------------------------------------------------------------------------
+// 파일: EventBus.cpp
+//
+// 설명:
+// 이 파일은 EventBus 클래스의 멤버 함수들을 구현합니다. subscribe() 함수는
+// 특정 이벤트 유형에 대한 이벤트 핸들러를 등록하고, publish() 함수는 주어진
+// 이벤트를 발행하여 해당 이벤트 유형에 등록된 모든 핸들러를 호출합니다.
+//
+// 작성자: 김나영
+// 작성일: 2024-06-07
+// ----------------------------------------------------------------------------
+
+#include "EventBus.h"
+
+void EventBus::subscribe(EventType type, EventHandler handler)
+{
+	// mutex를 사용하여 동시에 여러 스레드에서 핸들러를 등록하는 것을 방지
+	std::unique_lock<std::shared_mutex> lock(mutex);
+	//해당 이벤트 유형에 이벤트 핸들러를 추가
+	handlers[type].push_back(handler);
+}
+
+void EventBus::publish(const Event& event)
+{
+	// mutex를 사용하여 동시에 여러 스레드에서 핸들러를 등록하는 것을 방지
+	std::unique_lock<std::shared_mutex> lock(mutex);
+	// 주어진 이벤트 유형에 등록된 모든 이벤트 핸들러 호출
+	for (auto& handler : handlers[event.type]) {
+		handler(event);
+	}
+}
+
+4)EventListener
+// EventListener.h
+// -----------------------------------------------------------------------------
+// 파일: EventListener.h
+//
+// 설명:
+// 이 파일은 이벤트 리스너 클래스인 EventListener를 정의합니다. EventListener는
+// EventBus에서 이벤트를 수신하고 처리합니다.
+//
+// 작성자: 김나영
+// 작성일: 2024-06-07
+// -----------------------------------------------------------------------------
+#ifndef EVENTLISTENER_H
+#define EVENTLISTENER_H
+
+#include "EventBus.h"
+
+class EventListener {
+public:
+	// EventBus에서 이벤트가 추가될 때 호출됩니다.
+	void onAddEvent(const Event& event);
+	// EventBus에서 이벤트가 제거될 때 호출됩니다.
+	void onRemoveEvent(const Event& event);
+};
+
+#endif // EVENLISTENER_H
+
+// -----------------------------------------------------------------------------
+// 파일: EventListener.cpp
+//
+// 설명:
+// 이 파일은 EventListener 클래스의 멤버 함수를 정의합니다. EventListener는
+// EventBus에서 이벤트를 수신하고 처리합니다.
+//
+// 작성자: 김나영
+// 작성일: 2024-06-07
+// -----------------------------------------------------------------------------
+#include "EventListener.h"
+
+void EventListener::onAddEvent(const Event& event)
+{
+	// 이벤트가 추가되었음을 출력합니다.
+	std::cout << "EventListener::onAddEvent->Added : " << event.shapeType << std::endl;
+}
+
+void EventListener::onRemoveEvent(const Event& event)
+{
+	// 이벤트가 제거되었음을 출력합니다.
+	std::cout << "EventListener::onRemoveEvent->Removed : " << event.shapeType << std::endl;
+}
+
+5) Shape.h
+// -----------------------------------------------------------------------------
+// 파일: Shape.h
+//
+// 설명:
+// 이 파일은 추상 클래스인 Shape를 정의합니다. Shape 클래스는 도형의 기본적인
+// 특성을 나타내며, 이 클래스를 상속하여 다양한 종류의 도형을 구현할 수 있습니다.
+//
+// 작성자: 김나영
+// 작성일: 2024-06-07
+// -----------------------------------------------------------------------------
+#ifndef SHAPE_H
+#define SHAPE_H
+
+#include <string>
+
+//도형의 기본적인 특성을 나타낸다.
+class Shape {
+public:
+	// 가상 소멸자, 메모리 누수 방지
+	virtual ~Shape() = default; 
+	// 파생클래스에서 반드시 재정의해야한다.
+	// 도형의 유형을 반환하는 가상 함수, 도형의 유형 반환
+	virtual std::string getType() const = 0;
+};
+
+#endif //SHAPE_H
+
+6)ShapeManager
+// -----------------------------------------------------------------------------
+// 파일: ShapeManager.h
+//
+// 설명:
+// 이 파일은 도형을 관리하는 ShapeManager 클래스를 정의합니다. ShapeManager는
+// 다양한 종류의 도형을 관리하고 이벤트 버스를 통해 해당 도형의 추가 및 제거 이벤트를
+// 발생시킵니다.
+//
+// 작성자: 김나영
+// 작성일: 2024-06-07
+// -----------------------------------------------------------------------------
+#ifndef SHAPEMANAGER_H
+#define SHAPEMANAGER_H
+
+#include <vector>
+#include <memory>
+#include "Shape.h"
+#include "EventBus.h"
+
+class ShapeManager {
+public:
+	// 생성자. EventBus 클래스의 참조를 매개변수로 받는다.
+	// ShapeManager가 이벤트버스와 연결됨을 의미
+	ShapeManager(EventBus& bus);
+
+	// 도형을 추가하는 멤버함수
+	void addShape(std::unique_ptr<Shape> shape);
+	// 도형을 제거하는 멤버함수(제거할 도형의 유형을 문자열 주소)
+	void removeShape(const std::string& type);
+private:
+	// 도형을 저장하는 벡터
+	std::vector<std::unique_ptr<Shape>> shapes;
+	// 이벤트 버스 참조
+	EventBus& eventBus;
+};
+
+#endif //SHAPEMANAGER_H
+
+// -----------------------------------------------------------------------------
+// 파일: ShapeManager.cpp
+// 
+// 설명:
+// 이 파일은 ShapeManager 클래스의 멤버 함수를 정의합니다. ShapeManager는
+// 다양한 종류의 도형을 관리하고 이벤트 버스를 통해 해당 도형의 추가 및 제거 이벤트를
+// 발생시킵니다.
+//
+// 작성자: 김나영
+// 작성일: 2024-06-07
+// -----------------------------------------------------------------------------
+#include "ShapeManager.h"
+
+// ShapeManager는 도형을 관리하고, 도형의 추가와 제거에 따른 이벤트를 
+// 이벤트 버스를 통해 발행하는 역할을 합니다.
+
+ShapeManager::ShapeManager(EventBus& bus) 
+	: eventBus(bus) {
+	std::cout << "ShapeManager 생성자" << std::endl;
+}
+
+ShapeManager::~ShapeManager(){
+	std::cout << "ShapeManager 소멸자" << std::endl;
+}
+
+// 새로운 도형을 추가하는 역할을 합니다.
+void ShapeManager::addShape(std::unique_ptr<Shape> shape)
+{
+	// 추가할 도형의 유형을 가져옵니다.
+	std::string type = shape->getType();
+	// 도형을 벡터에 추가합니다.
+	shapes.push_back(std::move(shape));
+	// 도형 추가 이벤트를 이벤트 버스에 발행합니다.
+	eventBus.publish({ EventType::Add, type });
+}
+
+// 특정 유형의 도형을 제거 하는 역할을 합니다.
+void ShapeManager::removeShape(const std::string& type)
+{
+	// 주어진 도형 유형과 일치하는 도형을 벡터에서 찾습니다.
+	// std::remove_if : 주어진 범위 내에서 특정 조건을 만족하는 요소를
+	// 모두 벡터의 끝족으로 이동시키고, 그중 마지막 요소의 다음 위치 반환
+	// 시작부터 끝까지 탐색, 도형이 주어진 타입과 일치하는지 확인
+	// 만약 없다면 shapes.end(), 있다면 shapes.시작위치 반환
+	auto it = std::remove_if(shapes.begin(), shapes.end(),
+		[&type](const std::unique_ptr<Shape>& shape) {
+			return shape->getType() == type;
+		});
+
+	//제거요소가 있을경우에만 삭제하고 삭제이벤트 발행
+	if (it != shapes.end()) {
+		shapes.erase(it, shapes.end());
+		eventBus.publish({ EventType::Remove, type });
+	}
+}
+
+7)main
+// -----------------------------------------------------------------------------
+// 파일: main.cpp
+// 
+// 설명:
+// 이 파일은 프로그램의 진입점인 main 함수를 포함하고 있습니다. 
+// 이 프로그램은 이벤트 버스를 생성하고, ShapeManager와 EventListener를 초기화한 후에,
+// 사각형과 원을 추가하고 제거하는 간단한 시나리오를 실행합니다.
+//
+// 작성자: 김나영
+// 작성일: 2024-06-07
+// -----------------------------------------------------------------------------
+#include "EventBus.h"
+#include "ShapeManager.h"	
+#include "EventListener.h"
+#include "Rectangle.h"
+#include "Circle.h"
+
+int main() {
+	// 이벤트 버스 객체를 생성합니다.
+	EventBus bus;
+	// ShapeManager와 EventListener객체를 초기화합니다.
+	ShapeManager manager(bus);
+	EventListener listener;
+
+	// 이벤트 버스에서 도형 추가 이벤트를 구독하고,
+	// 해당 이벤트가 발생하면 EventListener의 onAddEvent함수를 호출
+	// [&listener] : 람다캡쳐, 외부에 있는 listener객체를 람다 함수
+	// 내부로 캡쳐하여 사용하겠다는 의미이다.
+	// [capture](parameters) -> return_type { body }
+	bus.subscribe(EventType::Add, [&listener](const Event& event) {
+		listener.onAddEvent(event);
+	});
+
+	bus.subscribe(EventType::Remove, [&listener](const Event& event) {
+		listener.onRemoveEvent(event);
+	});
+
+	manager.addShape(std::make_unique<Rectangle>()); 
+	manager.addShape(std::make_unique<Circle>());
+	manager.removeShape("Rectangle");
+
+	return 0;
+}
+
+8. Circle
+//Circle.h
+#ifndef CIRCLE_H
+#define CIRCLE_H
+
+#include "Shape.h"
+
+class Circle : public Shape {
+public:
+	std::string getType() const override;
+};
+
+#endif //CIRCLE_H
+
+//Circle.cpp
+#include "Circle.h"
+
+std::string Circle::getType() const
+{
+    return "Circle";
+}
+
+9. Rectangle
+//Rectangle.h
+#ifndef RECTANGLE_H
+#define RECTANGLE_H
+
+#include "Shape.h"
+
+class Rectangle : public Shape {
+public:
+	std::string getType() const override;
+};
+
+#endif //RECTANGLE_H
+
+//Rectangle.cpp
+#include "Rectangle.h"
+
+std::string Rectangle::getType() const
+{
+    return "Rectangle";
+}
+
+//결과
+ShapeManager 생성자
+EventListener::onAddEvent->Added : Rectangle
+EventListener::onAddEvent->Added : Circle
+EventListener::onRemoveEvent->Removed : Rectangle
+ShapeManager 소멸자
