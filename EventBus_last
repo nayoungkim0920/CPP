@@ -460,3 +460,54 @@ EventListener::onAddEvent->Added : Rectangle
 EventListener::onAddEvent->Added : Circle
 EventListener::onRemoveEvent->Removed : Rectangle
 ShapeManager 소멸자
+
+<List출력 기능 추가하기>
+1.EventType.h에 EventType 열거형 클래스에 List추가
+enum class EventType {
+	Add,		// 도형 추가
+	Remove,		// 도형 제거
+	List		// 도형 목록 추가
+};
+
+2.EventListener.h에 onListEvent선언 추가
+void onListEvent(const Event& event);
+
+3.EventListener.cpp에 onListEvent구현 추가
+void EventListener::onListEvent(const Event& event)
+{
+	// 목록 이벤트가 호출되었음을 알립니다.
+	std::cout << "EventListener::onListEvent->List : " << event.shapeType << std::endl;
+}
+
+4. ShapeManager.h에 void listSpahes() const;추가
+// 도형 목록을 출력 추가
+void listSaphes() const;
+
+5. ShapeManager.cpp에 listSaphes() 구현
+// 도형 목록 출력 추가
+void ShapeManager::listSaphes() const
+{
+	std::cout << "도형 목록:" << std::endl;
+	for (const auto& shape : shapes) {
+		std::cout << shape->getType() << std::endl;
+	}
+}
+
+6. main.cpp에 이벤트등록, 호출 추가
+bus.subscribe(EventType::List, [&listener](const Event& event) {
+	listener.onListEvent(event);
+});
+
+manager.listSaphes();
+
+//결과
+ShapeManager 생성자
+EventListener::onAddEvent->Added : Rectangle
+EventListener::onAddEvent->Added : Circle
+EventListener::onAddEvent->Added : Rectangle
+EventListener::onAddEvent->Added : Circle
+EventListener::onRemoveEvent->Removed : Rectangle
+도형 목록:
+Circle
+Circle
+ShapeManager 소멸자
