@@ -1,0 +1,146 @@
+
+1) EventType
+-역할 : 이벤트 유형을 정의합니다. 이벤트 기반 시스템에서 발생할 수 있는 다양한 이벤트의
+유형을 명확히 구분합니다.
+-이점 
+ * 각 이벤트를 명확히 구분하여 이벤트 핸들러를 등록하고 호출할 때 사용합니다.
+ * 유지보수 및 확장이 용이합니다. 새로운 이벤트 유형을 추가할 때 이 파일에만 열거형 값
+   을 추가하면 됩니다.
+
+// EventType.h
+// -----------------------------------------------------------------------------
+// 파일: EventType.h
+// 
+// 설명: 
+// 이 파일은 EventBus가 처리할 수 있는 이벤트의 유형을 포함하는 
+// EventType 열거형 클래스를 정의합니다.
+//
+// 작성자: 김나영
+// 작성일: 2024-06-07
+// -----------------------------------------------------------------------------#ifndef EVENTTYPE_H
+#ifndef EVENTTYPE_H
+#define EVENTTYPE_H
+
+// 열거형 클래스: EventType
+// 이 열거형 클래스는 EventBus 내에서 발행되고 구독될 수 있는 이벤트의 
+// 유형을 정의합니다. 각 유형은 발생할 수 있는 서로 다른 종류의 이벤트를 나타냅니다.
+enum class EventType { //서로 다른 유형의 열거형 상수 정의 시 사용
+	Add,		  // 도형 추가
+	Remove		// 도형 제거
+};
+
+#endif // EVENTTYPE_H
+
+2) Event
+-역할 : 이벤트 데이터를 캡슐화합니다. 이벤트 유형과 이벤트와 관련된 구체적인 데이터를 
+포함합니다.
+-이점
+  * 이벤트가 발생할 때 필요한 데이터를 하나의 구조체로 관리할 수 있습니다.
+  * 각 이벤트가 어떤 유형인지와 관련 데이터를 명확히 구분 할 수 있습니다.
+// Event.h
+// -----------------------------------------------------------------------------
+// 파일: Event.h
+// 
+// 설명: 
+// 이 파일은 EventBus가 처리할 수 있는 이벤트를 정의하는 Event 구조체를
+// 포함합니다. Event 구조체는 이벤트의 유형과 관련된 데이터를 포함합니다.
+//
+// 작성자: 김나영
+// 작성일: 2024-06-07
+// -----------------------------------------------------------------------------
+#ifndef EVENT_H
+#define EVENT_H
+
+#include "EventType.h"
+#include <string>
+
+// 구조체: Event
+// 이 구조체는 EventBus에서 처리할 수 있는 이벤트를 나타냅니다. 각 이벤트는
+// 유형과 관련 데이터를 포함합니다.
+struct Event { // 이벤트를 캡슐화하여 관련정보를 한곳에 모아두기 위함이다.
+	EventType type;			// 이벤트의 유형을 나타냅니다 (Add 또는 Remove).
+	std::string shapeType;	// 이벤트와 관련된 도형의 유형을 나타냅니다 (예: "Circle", "Rectangle").
+};
+
+#endif //EVENT_H
+
+3)EventBus
+- 역할 : 이벤트를 발행하고 구독하는 메커니즘을 제공한다. 이벤트 핸들러를 등록하고,
+         이벤트가 발생했을 때 해당 핸들러를 호출한다.
+- 이점 : EventHandler라는 별칭으로 정의하여 가독성을 높이고, 코드 중복을 줄입니다.
+         유연성: 다양한 형태의 함수 객체를 이벤트 핸들러로 사용할 수 있다.
+                 (람다,함수,멤버함수,일반함수 등)
+         가독성 : std::function<void(const Event&)> 대신 EventHandler를 사용하여
+                 코드가 더 간결하고 읽기 쉬워진다.
+         핸들러관리
+           std::unordered_map<EventType, std::vector<EventHandler>> handlers;
+           이벤트 유형별로 여러 이벤트 핸들러를 관리합니다.
+           효율적인 검색 : 해시 테이블을 사용하여 이벤트 유형에 대한 빠른 검색 제공
+           다중핸들러지원 : 벡터를 사용하여 특정 이벤트 유형에 대해 여러 개의 핸들러
+           를 저장하고, 순차적으로 호출할 수 있다.
+           유연성 : 벡터를 사용하여 동적으로 핸들러를 추가하거나 제거할 수 있다.
+          동시성제어
+            mutable std::shared_mutex mutex : 핸들러 맵에 대한 동시 접근 제어
+            동시성 문제 방지 : 여러 스레드가 동시에 이벤트 핸들러를 등록하거나 호출할
+            때 발생할 수 있는 동시성 문제를 방지합니다.
+            읽기-쓰기 잠금 : shared_mutex를 사용하여 읽기 작업이 여러 스레드에서 동시
+            에 일어날 수 있도록 하고, 쓰기 작업은 단일 스레드에서만 일어나도록 합니다.
+// EventBus.h
+// -----------------------------------------------------------------------------
+// 파일: EventBus.h
+// 
+// 설명: 
+// 이 파일은 이벤트를 발행(publish)하고 구독(subscribe)할 수 있는 EventBus
+// 클래스를 정의합니다. EventBus는 이벤트 기반 시스템의 중심 역할을 합니다.
+//
+// 작성자: 김나영
+// 작성일: 2024-06-07
+// -----------------------------------------------------------------------------
+#ifndef EVENTBUS_H
+#define EVENTBUS_H
+
+#include <iostream>
+#include <vector>
+#include <functional>
+#include <unordered_map>
+#include <shared_mutex>
+#include "Event.h"
+
+// 클래스: EventBus
+// 이 클래스는 이벤트의 발행(Publish)과 구독(subscribe)을 관리합니다.
+// 이벤트 핸들러를 등록하고, 이벤트가 발생했을 때 해당 핸들러를 호출합니다.
+class EventBus {
+public:
+	// 타입 정의: EventHandler
+	// 이벤트를 처리하는 함수 객체를 나타냅니다. 
+	// 이 함수는 const Event&를 인자로 받아야 합니다.
+	// using : typedef키워드 대체, 템플릿 별칭 정의 시 사용
+	// 클래스 내부에서 타입 정의 시 해당 타입을 클래스 외부에서도 사용 가능
+	// const Event&를 인자로 받고 반환 타입이 void인 모든 함수,람다,함수 포인터,
+	// 기타 호출 가능한 객체를 담을 수 있다.
+	using EventHandler = std::function<void(const Event&)>;
+
+	// 함수 : subscribe
+	// 주어진 이벤트 유형에 대해 이벤트 핸들러를 등록합니다.
+	// 매개변수:
+	// - type: 등록할 이벤트 유형.
+	// - handler : 이벤트가 발생했을 때 호출될 핸들러 함수.
+	void subscribe(EventType type, EventHandler handler);
+	// 함수 : publish
+	// 주어진 이벤트를 발행합니다. 이 이벤트 유형에 등록된 모든 핸들러를 호출합니다.
+	// 매개변수:
+	// - event : 발행할 이벤트.
+	void publish(const Event& event);
+
+private:
+	// 멤버 변수 : handlers
+	// 이벤트 유형별로 등록된 이벤트 핸들러들을 저장하는 맵
+	// unordered_map : 해시맵으로 키-값 쌍을 저장하는 연관 컨테이너
+	// EventType : 키로 사용되는 열거형 클래스, 이벤트 유형
+	// std::vector<EventHandler> : 등록된 이벤트 핸들러
+	std::unordered_map<EventType, std::vector<EventHandler>> handlers;
+	// 멤버 변수 : mutex
+	// 핸들러 맵에 대한 동시 접근을 제어하기 위한 mutex.
+	mutable std::shared_mutex mutex;
+};
+#endif //EVENTBUS_H
