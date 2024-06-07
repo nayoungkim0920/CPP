@@ -511,3 +511,74 @@ EventListener::onRemoveEvent->Removed : Rectangle
 Circle
 Circle
 ShapeManager 소멸자
+
+<면적구하는멤버함수추가하기>
+1. Shape.h에 순수가상함수추가
+virtual double area() const = 0;
+
+2. Circle.h에 생성자, 멤버함수 정의 및 멤버변수 정의
+public:
+Circle(double radius);
+double area() const override;
+private:
+double radius_;
+
+3.Circle.cpp에 구현하기
+Circle::Circle(double radius)
+    : radius_(radius){}
+
+// 도형의 넓이를 반환하는 함수 구현
+double Circle::area() const
+{
+    return M_PI * radius_ * radius_;
+}
+
+4.Rectangle.h 생성자, 멤버함수 정의 및 멤버변수 정의
+public:
+   Rectangle(double width, double height);
+   double area() const override;
+private:
+   double width_;
+   double height_;
+
+5.Rectangle.cpp 구현하기
+Rectangle::Rectangle(double width, double height)
+    : width_(width), height_(height) {}
+
+double Rectangle::area() const
+{
+    return width_ * height_;
+}
+
+6.ShapeManager.cpp의 listShapes() 멤버함수에 넓이 출력 추가하기
+// 도형 목록 출력 추가
+void ShapeManager::listSaphes() const
+{
+	std::cout << "도형 목록:" << std::endl;
+	for (const auto& shape : shapes) {
+		std::cout << shape->getType() << std::endl;
+		std::cout << shape->area()<< std::endl;
+	}
+}
+
+7.main.cpp 수정하기
+manager.addShape(std::make_unique<Rectangle>(3,4)); 
+manager.addShape(std::make_unique<Circle>(2));
+manager.addShape(std::make_unique<Rectangle>(5,6));
+manager.addShape(std::make_unique<Circle>(6));
+manager.removeShape("Rectangle");
+manager.listSaphes();
+
+//결과
+ShapeManager 생성자
+EventListener::onAddEvent->Added : Rectangle
+EventListener::onAddEvent->Added : Circle
+EventListener::onAddEvent->Added : Rectangle
+EventListener::onAddEvent->Added : Circle
+EventListener::onRemoveEvent->Removed : Rectangle
+도형 목록:
+Circle
+12.5664
+Circle
+113.097
+ShapeManager 소멸자
