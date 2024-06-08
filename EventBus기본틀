@@ -3,7 +3,7 @@ EventBus : 이벤트기반 아키텍쳐
 2. 리스너(또는 핸들러) : 특정 이벤트를 수신하고 처리하는 객체
 3. 이벤트 버스 클래스 : 이벤트를 등록하고, 이벤틀 발생 시 적절한 리스터에게 전달하는 역할
 
-1)이벤트클래스
+1)이벤트클래스(추상클래스)
 모든 이벤트의 기본이 되는 Event클래스를 정의한다.
 //Event.h
 #ifndef EVENT_H
@@ -68,79 +68,199 @@ public:
 
 2)특정이벤트클래스
 이벤트의 구체적인 유형을 정의
-chass MyEvent : public Event {
+//MyEvent.h
+//헤더 가드 : 이 파일이 여러 곳에서 중복해서 포함되지 않도록 하는 역할을 한다.
+#ifndef MYEVENT_H
+#define MYEVENT_H
+
+#include "Event.h"
+
+//Event class를 상속받음으로써 Event class의 모든 멤버 변수와 멤버 함수를 상속
+//받게 된다. 이는 Event class의 모든 기능을 사용할 수 있음을 의미한다.
+//이런 상속 관계를 통해 코드의 재사용성이 높아지고, 계층 구조를 구성하여 클래스
+//간의 관계를 명확하게 표현할 수 있다. Event class를 확장하여 추가적인 데이터나
+//동작을 포함 할 수 있도록 설계된 것이다.
+//유연적으로 새로운 이벤트 유형을 쉽게 추가할 수 있다.
+//다형성을 활용해 여러 종류의 이벤트를 통합적으로 다룰 수 있다.
+//일관된 방식으로 다양한 유형의 이벤트를 처리 할 수 있다.
+class MyEvent :public Event {
 public:
-  MyEvent(int data) : data(data) {}
-  int getData() const { return data; }
-  const char* getName() const override { return "MyEvent"; }
-private:
-  int data;
-};
-
-3)리스너 인터페이스
-특정 이벤트를 처리하는 인터페이스를 정의한다.
-class EventListener {
-public:
-  virtual ~EventListener() = default;
-  virtual void onEvent(const Event& event) = 0;
-};
-
-4)이벤트버스클래스
-이벤트를 등록하고 전달하는 역할을 하는 클래스
-#include <vector>
-#include <unordered_map>
-#include <functional>
-#include <typeindex>
-
-class EventBus{
-public:
-  template<typename EventType>
-  void subscribe(std::function<void(const EventType&)> listener){
-    auto& listeners = listenersMap[std::type_index(typeid(eventType))];
-    listeners.push_back([listener](const Event& event) {
-      listener(static_cast<const EventType&(event));
-    });
-  }
-
-  void publish(const Event& event){
-    auto it = listenersMap.find(sted::type_index(typeid(event)));
-    if(it != listenersMap.enD()){
-      for(auto& listener : it->second) {
-        listener(event);
-      }
-    }
-  }
+	MyEvent(int data); //확장
+	int getData() const; //확장
+	const char* getName() const override; //상속
 
 private:
-  std::unordered_map<std::type_index, std::vector<std::function<void(const Event&)>>> listenersMap;
+	int data_; //확장
 };
 
-5) 사용예제
-#include <iostream>
+//헤더 가드의 닫음을 나타낸다. 이것으로 파일의 끝을 알리고 중복 포함을 방지한다.
+#endif //MYEVENT_H
 
-class MyEventListener : public EventListener {
-public:
-  void onEvent(const Event& event) override{
-    if(event.getName() == std::string("MyEvent")){
-      const MyEvent& myEvent = static_cast<const MyEvent&>(event);
-      std::cout << "Received MyEvent with data: " << myEvent.getData() << std::endl;
-    }
-  }
-};
+//MyEvent.cpp
+#include "MyEvent.h"
 
-int main(){
-  EventBus bus;
-  MyEventListener listener;
+//생성자 구현. 멤버 이니셜라이저 리스트를 사용하여 멤버 변수 초기화
+MyEvent::MyEvent(int data) : data_(data) {}
 
-  bus.subscribe<MyEvent>([&listener](const MyEvent& event){
-    listener.onEvent(event);
-  });
-
-  MyEvent event(2);
-j bus.publish(event);
-
-  return 0;
+//멤버변수를 반환만합니다.
+int MyEvent::getData() const
+{
+	return data_;
 }
 
-//결과
+//객체의 내부 상태를 변경하지 않음을 보장한다.
+//객체 이름을 반환합니다.
+const char* MyEvent::getName() const
+{
+	return "MyEvent";
+}
+
+3)리스너클래스(추상클래스)
+//EventListener.h
+#ifndef EVENTLISTENER_H
+#define EVENTLISTENER_H
+
+#include "Event.h"
+#include "MyEvent.h"
+
+class EventListener {
+public:
+	virtual ~EventListener() = default;
+	virtual void onEvent(const Event& event) = 0;
+};
+
+#endif // EVENTLISTENER_H
+
+//MyEventListener.cpp
+#include "MyEventListener.h"
+
+void MyEventListener::onEvent(const Event& event)
+{
+	if (event.getName() == std::string("MyEvent")) {
+		const MyEvent& myEvent = static_cast<const MyEvent&>(event);
+		std::cout << "Received MyEvent with data: " << myEvent.getData() << std::endl;
+	}
+}
+
+4)EventBus
+//EventBus.h
+#ifndef EVENTBUS_H
+#define EVENTBUS_H
+
+#include <functional> //함수객체사용
+#include <unordered_map> //이벤트 처리 함수들을 관리하기 위한 자료 구조 사용
+#include <typeindex> //std::type_index 사용
+#include "Event.h"
+
+class EventBus {
+public:
+	//특정 이벤트 유형에 대한 리스너를 등록
+	//이벤트 버스는 여러 종류의 이벤트를 처리해야 하므로 이벤트 유형에 따라 서로
+        //다른 리스너 함수를 등록할 필요가 있다. 이러한 다양한 이벤트 유형에 대응하기
+        //위해 템플릿을 사용하여 subscribe함수를 정의한다.
+	template<typename EventType>	
+	void subscribe(std::function<void(const EventType&)> listener);
+	//이벤트 발행
+	void publish(const Event& event);
+private:
+	//이벤트 유형별로 이벤트 처리 함수들을 관리하기 위한 자료 구조
+	std::unordered_map<std::type_index, std::vector<std::function<void(const Event&)>>> listenersMap;
+};
+
+//subscribe함수의 템플릿 정의
+//특정 이벤트 유형에 대한 리스너를 등록하는 함수. 이벤트 발생 시 해당 리스너를 호출한다.
+//std::function을 사용하여 이벤트 유형에 따라 다른 타입의 리스너를 등록할 수 있다.
+//람다함수를 사용하여 이벤트를 특정 유형으로 캐스팅하여 적절한 리스너를 호출한다.
+template<typename EventType>
+inline void EventBus::subscribe(std::function<void(const EventType&)> listener)
+{
+	auto& listeners = listenersMap[std::type_index(typeid(EventType))];
+	listeners.push_back([listener](const Event& event) {
+		listener(static_cast<const EventType&>(event));
+	});
+}
+
+#endif // EVENTBUS_H
+
+<unordered_map>
+C++표준 라이브러리인 STL(Standard Template Library)에 포함된 컨테이너 중 하나이다.
+해시 맵(Hash Map)이라고도 불리며, 키와 값을 쌍으로 저장하며 키를 사용하여 값을 검색
+하는 자료 구조이다.
+1)빠른 검색 속도 : 해시 함수를 사용하여 요소를 검색하기 때문에 평균적으로 매우 빠른 검색
+속도를 제공한다. 알고리즘의 시간복잡도는 O(1)이다.
+2)키-값 쌍 저장 : 각 요소는 키와 값의 쌍으로 저장된다. 이를 통해 주어진 키에 대한 값
+에 빠르게 접근할 수 있다.
+3)순서가없음: 요소들을 삽입한 순서대로 저장하지 않으며, 키의 해시 값에 따라 내부적으로
+저장된다.
+4)중복된 키 허용 안함 : 각 키는 유일해야하며, 중복된 키를 삽입하면 새로운 값으로 대체
+5)메모리사용량: 일반적으로 해시 맵은 메모리를 많이 사용하며 , 공간을 위해 추가적인
+메모리를 요구할 수 있다.
+
+<템플릿>
+템플릿을 사용하면 특정한 유형에 대해 이 함수를 여러 번 정의할 필요 없이 재사용 할 수 
+있다. 즉 EventType에 따라 다른 유형의 이벤트를 처리하는 함수를 생성하는 템플릿이 된다.
+템플릿을 사용하여 suscribe함수를 정의하면 코드의 재사용성과 유연성이 향상된다. 이를 통해
+이벤트 버스는 여러 종류의 이벤트를 처리할 수 있으며, 각3각의 이벤트 유형에 대해 서로 
+다른 리스너함수를 등록할 수 있다.
+
+<inline>
+코드의 성능을 향상 시키고 함수 호출 오버헤드를 줄이는데 사용된다.
+1.성능 개선 함수를 인라인으로 처리하면 함수 호출 오버헤드가 줄어들어 성능을 향상 시킬
+수 있다. 작은 함수나 자주 호출되는 함수를 인라인으로 처리하면 성능이 개선될 수 있다.
+2. 헤더파일에 함수정의 포함: 일반적으로 클래스 템플릿이나 인라인 함수의 정의는 헤더파일
+에 포함된다. 이 때 inline 키워드를 사용하여 함수를 인라인으로 처리하면 여러 소스 파일
+에서 해당 함수를 사용할 때 링크 오류가 발생하지 않는다.
+3. 함수 호출 오버헤드 제거: 함수를 인라인으로 처리하면 함수 호출이 아니라 암수의 본문
+이 직접 실행되므로 함수 호출 오버헤드가 제거된다.
+
+//EventBus.cpp
+#include "EventBus.h"
+
+void EventBus::publish(const Event& event)
+{
+	auto it = listenersMap.find(std::type_index(typeid(event)));
+	if (it != listenersMap.end()) {
+		for (const auto& listener : it->second) {
+			listener(event);
+		}
+	}
+}
+
+5)main
+//main.cpp
+#include <iostream>
+#include "Event.h"
+#include "MyEvent.h"
+#include "EventListener.h"
+#include "MyEventListener.h"
+#include "EventBus.h"
+
+int main() {
+    // 이벤트를 처리할 리스너 객체 생성
+    MyEventListener myListener;
+
+    // 이벤트 버스 객체 생성
+    EventBus eventBus;
+
+    // 이벤트 버스에 리스너 등록
+    // std::placeholders::_1 : std::bind와 함께 사용
+    // 함수나 멤버 함수를 래핑하여 새로운 함수 객체를 생성할 때 사용
+	eventBus.subscribe<MyEvent>(
+	    std::bind(
+	        &MyEventListener::onEvent, 
+	        &myListener, 
+	        std::placeholders::_1
+	    )
+	);
+
+    // 이벤트 생성
+    MyEvent myEvent(42);
+
+    // 이벤트 발행
+    eventBus.publish(myEvent);
+
+    return 0;
+}
+
+6)결과
 Received MyEvent with data: 42
