@@ -1,0 +1,91 @@
+EventBus : 이벤트기반 아키텍쳐
+1. 이벤트 클래스 : 다양한 이벤트 유형을 정의하는 기본 클래스
+2. 리스너(또는 핸들러) : 특정 이벤트를 수신하고 처리하는 객체
+3. 이벤트 버스 클래스 : 이벤트를 등록하고, 이벤틀 발생 시 적절한 리스터에게 전달하는 역할
+
+1)이벤트클래스
+모든 이벤트의 기본이 되는 Event클래스를 정의한다.
+class Event {
+public:
+  virtual ~Event() = default;
+  virtual const char* getName() const = 0;
+};
+
+2)특정이벤트클래스
+이벤트의 구체적인 유형을 정의
+chass MyEvent : public Event {
+public:
+  MyEvent(int data) : data(data) {}
+  int getData() const { return data; }
+  const char* getName() const override { return "MyEvent"; }
+private:
+  int data;
+};
+
+3)리스너 인터페이스
+특정 이벤트를 처리하는 인터페이스를 정의한다.
+class EventListener {
+public:
+  virtual ~EventListener() = default;
+  virtual void onEvent(const Event& event) = 0;
+};
+
+4)이벤트버스클래스
+이벤트를 등록하고 전달하는 역할을 하는 클래스
+#include <vector>
+#include <unordered_map>
+#include <functional>
+#include <typeindex>
+
+class EventBus{
+public:
+  template<typename EventType>
+  void subscribe(std::function<void(const EventType&)> listener){
+    auto& listeners = listenersMap[std::type_index(typeid(eventType))];
+    listeners.push_back([listener](const Event& event) {
+      listener(static_cast<const EventType&(event));
+    });
+  }
+
+  void publish(const Event& event){
+    auto it = listenersMap.find(sted::type_index(typeid(event)));
+    if(it != listenersMap.enD()){
+      for(auto& listener : it->second) {
+        listener(event);
+      }
+    }
+  }
+
+private:
+  std::unordered_map<std::type_index, std::vector<std::function<void(const Event&)>>> listenersMap;
+};
+
+5) 사용예제
+#include <iostream>
+
+class MyEventListener : public EventListener {
+public:
+  void onEvent(const Event& event) override{
+    if(event.getName() == std::string("MyEvent")){
+      const MyEvent& myEvent = static_cast<const MyEvent&>(event);
+      std::cout << "Received MyEvent with data: " << myEvent.getData() << std::endl;
+    }
+  }
+};
+
+int main(){
+  EventBus bus;
+  MyEventListener listener;
+
+  bus.subscribe<MyEvent>([&listener](const MyEvent& event){
+    listener.onEvent(event);
+  });
+
+  MyEvent event(2);
+j bus.publish(event);
+
+  return 0;
+}
+
+//결과
+Received MyEvent with data: 42
