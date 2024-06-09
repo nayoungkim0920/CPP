@@ -92,47 +92,49 @@ myListener는 onEvent함수를 통해 이벤트를 처리하고 데이터를 출
 - 이제 이벤트 버스는 게임에서 공격이 발생했을 때 AttackEventListener에게 이를 알리고
 해당 동작을 실행하도록 할 것이다.
 
-         +-------------------+                 +-------------------+
-         |                   |                 |                   |
-         |    MyEvent.h      |                 |  MyEventListener |
-         |                   |                 |                   |
-         +-------------------+                 +-------------------+
-                  |                                       |
-                  |                                       |
-                  |                                       |
-                  |                                       |
-                  |                                       |
-                  |                                       |
-                  |                                       |
-                  |                                       |
-         +--------v-------------------------+         +---v-----------------+
-         |                                  |         |                    |
-         |            Event.h               |         |    EventBus.h      |
-         |                                  |         |                    |
-         +----------------------------------+         +--------------------+
-                  |                                       |
-                  |                                       |
-                  |                                       |
-                  |                                       |
-                  |                                       |
-                  |                                       |
-                  |                                       |
-                  |                                       |
-         +--------v--------------------------------------v-----------------+
-         |                                                                     |
-         |                               EventBus.cpp                          |
-         |                                                                     |
-         +---------------------------------------------------------------------+
-                                      |
-                                      |
-                                      |
-                                      |
-                                      |
-                                      |
-                                      |
-                                      |
-                        +-------------v--------------+
-                        |                            |
-                        |          main.cpp          |
-                        |                            |
-                        +----------------------------+
+<템플릿 예시>
+1. 함수 템플릿 : 특정한 타입에 의존하지 않고 여러가지 타입에 대해 동작하는 함수를 작성
+할 때 사용된다.
+Template<typename T>
+void swap(T& a, T& b){
+	T temp = a;
+	a = b;
+ 	b = temp;
+}
+
+double a = 3.14;
+double b = 4.28;
+swap<double>(a,b);
+
+2. 클래스 템플릿 : 특정한 타입에 의존하지 않고 여러 가지 타입에 대해 동작하는 클래스
+를 작성할 때 사용된다.
+template<typename T>
+class Stack{
+public:
+ //...
+private:
+ std::vector<T> elements;
+};
+
+Stack<int> intStack;
+
+3. 메타 프로그래밍 : Factorial 구조체를 사용할 때에는 구조체의 이름 뒤에 사용할
+값을 괄호 안에 명시한다.
+예를 들어, 5!를 계산
+template<int N>
+struct Factorial{
+	static const int value = N * Factorial<N-1>::value;
+}
+
+template<>
+struct Factorial<0>{
+	static vonst int value = 1;
+}
+
+int Factorialof5 = Factorial<5>::value; //120
+
+4. 템플릿 함수 객체
+-LessThan 구조체를 사용하여 두 변수의 대소 비교를 수행할 때에는 객체를 생성하고 
+호출 연산자를 사용한다.
+LessThan<int> lessThan;
+bool result = lessThan<int>(a,b);
