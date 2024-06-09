@@ -1,0 +1,138 @@
+<왜 템플릿 함수를 사용하였는가?>
+코드의 재사용성과 유연성을 극대화하기 위해서이다.
+1. 다양한 이벤트 타입 처리
+이벤트 시스템에서는 다양한 타입의 이벤트가 발생할 수 있다. 
+각 이벤트 타입마다 다른 리스너가 필요하다. 
+템플릿을 사용하면 EventType을 일반화 할 수 있어, 다양한 이벤트 타입에 대해
+단일 함수 정의로 처리할 수 있다.
+-소스
+template<typename EventType>
+void subscribe(std::function<void(const EventType&)> listener);
+이 선언만으로 다양한 이벤트 타입에 대해 별도의 함수를 만들 필요없이
+이 템플릿 함수 하나로 모든 타입의 이벤트를 처리할 수 있다.
+(MouseEvent, KeyboardEvent 등)
+-소스설명
+subscribe함수는 이벤트를 처리할 리스너(이벤트핸들러)를 그저 등록하는 역할을 한다.
+template<typename EventType> 이 선언은 함수가 템플릿 함수임을 나타낸다.
+EventType이라는 템플릿 매개변수를 사용하여 여러 타입의 이벤트를 처리할 수 있음을 
+나타낸다.
+템플릿 함수는 호출될 때마다 타입이 결정되며, 여기서 EventType이 그 타입 매개변수이다.
+void subscribe(std::function<void(const EventType&)> listener);
+subscribe함수는 반환값이 없는 void타입이며 매개변수로는 
+std::function<void(const EventType&)> listener를 받는다.
+std::function<void(const EventType&)>는 EventType타입의 객체를 인자로 받아서
+아무것도 반환하지 않는 함수 객체이다. 이는 리스너(이벤트 핸들로)를 표현한다.
+예를 들어 마우스클릭이 발생했을 때 실행될 함수를 정의한다.
+void onMouseEvent(const MouseEvent& event){
+  //마우스 이벤트 처리하는 코드
+}
+subscribe<MouseEvent>(onMouseEvent);
+
+-소스
+template<typename EventType>
+inline void EventBus::subscribe(std::function<void(const EventType&)> listener)
+{
+	auto& listeners = listenersMap[std::type_index(typeid(EventType))];
+	listeners.push_back([listener](const Event& event) {
+		listener(static_cast<const EventType&>(event));
+	});
+}
+-소스설명
+template<typename EventType> 이부분은 템플릿 함수 정의를 나타낸다.
+inline void EventBus::subscribe(std::function<void(const EventType&)> listener)
+이부분은 EventBus클래스의 subscribe멤버 함수로서, 
+특정 타입의 이벤트를 처리할 리스너를 인자로 받는다. 
+inline 키워드는 함수호출 오버헤드를 줄이기 위해 사용된다. 
+auto& listeners = listenersMap[std::type_index(typeid(EventType))];
+listeners는 참조 타입 변수로, 타입을 자동으로 추론합니다.
+listenersMap[std::type_index(typeid(EventType))]
+listenersMap은 이벤트 타입과 해당 타입의 리스너 목록을 매핑하는 맵이다.
+EventType의 타입정보를 키로 사용한다.
+listeners.push_back([listener](const Event& event){
+  listener(static_cast<const EventType&>(event));
+});
+listeners목록에 새로운 리스너를 추가한다.
+람다표현식을 사용하여 리스너를 정의한다. 람다는 listener를 캡쳐 한다.
+listener(static_cast<const EventType&>(event))
+람다 내부에서 event를 EventType타입으로 캐스팅하여 listener를 호출한다.
+이는 이벤트가 올바른 타입으로 리스너에 전달 되도록 보장한다.
+
+<전체적인 동작 흐름>
+1. 리스너 등록
+eventBus.subscribe<MyEvent>(...)를 통해 MyEvent타입의 이벤트에 대한 
+myListener를 등록합니다.
+2. 이벤트 생성
+MyEvent myEvent(42)를 통해 데이터를 포함한 이벤트 객체를 생성합니다.
+3. 이벤트 발행
+eventBus.publish(myEvent)를 호출하여 이벤트를 발행합니다.
+publish함수는 listenersMap에서 해당 이벤트 타입에 대한 리스너목록을 찾아 각각의
+리스너를 호출합니다.
+myListener는 onEvent함수를 통해 이벤트를 처리하고 데이터를 출력합니다.
+
+<이벤트 추가/이벤트리스너추가>
+게임에서 캐릭터가 공격을 받았을 때, 해당 공격에 대응하는 동작을 처리할 때
+1. 이벤트 추가
+- 먼저, 이벤트를 정의 하고 추가해야한다. 예를 들어 공격받음이라는 이벤트를 추가할 수 있다.
+- 새로운 이벤트를 정의하기위해 Event 클래스를 상속하는 AttackEvent 클래스를 만든다.
+- AttackEvent 클래스에는 공격에 관련된 데이터를 저장할 수 있도록 멤버 변수를 추가할 
+수 있다. 예를 들어, 공격을 받은 플레이어의 ID나 공격력 등의 정보를 포함할 수 있다. 
+2. 이벤트리스너추가
+- 다음으로는 공격에 대응하는 동작을 처리할 수 있는 이벤트 리스너를 추가해야한다.
+- 이 경우, 공격을 받았을 때 실행되는 동작을 처리할 수 있는 AttackEventListener 클래스
+를 만든다.
+- AttackEventListener클래스는 Eventlistener클래스를 상속하고, onEvent함수를 구현하여
+공격 이벤트에 대한 처리를 수행한다.
+- onEvent함수 내에서는 공격을 받은 플레이어의 상태를 업데이트하거나 화면에 효과를 표시하는
+등의 동작을 수행할 수 있다.
+3. 이벤트와 이벤트리스너등록
+- 마지막으로 이벤트와 이벤트리스너를 이벤트버스에 등록하여 이벤트가 발생했을 때 적절한 
+리스너가 호출되도록 설정ㅈ한다.
+- 이벤트 버스의 subscribe함수를 사용하여 AttackEvent에 대응하는 AttackEventListener
+를 등록한다.
+- 이제 이벤트 버스는 게임에서 공격이 발생했을 때 AttackEventListener에게 이를 알리고
+해당 동작을 실행하도록 할 것이다.
+
+         +-------------------+                 +-------------------+
+         |                   |                 |                   |
+         |    MyEvent.h      |                 |  MyEventListener |
+         |                   |                 |                   |
+         +-------------------+                 +-------------------+
+                  |                                       |
+                  |                                       |
+                  |                                       |
+                  |                                       |
+                  |                                       |
+                  |                                       |
+                  |                                       |
+                  |                                       |
+         +--------v-------------------------+         +---v-----------------+
+         |                                  |         |                    |
+         |            Event.h               |         |    EventBus.h      |
+         |                                  |         |                    |
+         +----------------------------------+         +--------------------+
+                  |                                       |
+                  |                                       |
+                  |                                       |
+                  |                                       |
+                  |                                       |
+                  |                                       |
+                  |                                       |
+                  |                                       |
+         +--------v--------------------------------------v-----------------+
+         |                                                                     |
+         |                               EventBus.cpp                          |
+         |                                                                     |
+         +---------------------------------------------------------------------+
+                                      |
+                                      |
+                                      |
+                                      |
+                                      |
+                                      |
+                                      |
+                                      |
+                        +-------------v--------------+
+                        |                            |
+                        |          main.cpp          |
+                        |                            |
+                        +----------------------------+
