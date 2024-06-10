@@ -306,6 +306,31 @@ void processInput(EventBus& eventBus) {
 	}
 }
 
+//main.cpp
+#include <iostream>
+#include <thread>
+#include "EventBus.h"
+#include "EventListener.h"
+#include "InputProcessor.h"
+
+int main() {
+    EventBus eventBus;
+
+    eventBus.subscribe(EventType::LOGIN, EventListener::logLoginEvent);
+    eventBus.subscribe(EventType::LOGIN, EventListener::updateUIOnLogin);
+    eventBus.subscribe(EventType::LOGOUT, EventListener::logLogoutEvent);
+    eventBus.subscribe(EventType::LOGOUT, EventListener::updateUIOnLogout);
+    eventBus.subscribe(EventType::FILE_UPLOAD, EventListener::handleFileUpload);
+    eventBus.subscribe(EventType::FILE_DOWNLOAD, EventListener::handleFileDownload);
+
+    std::thread inputThread(processInput, std::ref(eventBus));
+
+    inputThread.join();
+
+    return 0;
+}
+
+
 <결과>
 Enter a command (login, logout, upload, download, exit): login
 Enter username: nayoung
