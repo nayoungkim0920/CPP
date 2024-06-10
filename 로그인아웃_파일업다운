@@ -1,0 +1,326 @@
+<클래스 다이어그램>
+1. EventType
+-이벤트 타입을 정의하는 열거형(enum class)
+-이벤트 타입
++--------------------+
+|     EventType      |
++--------------------+
+| +LOGIN             |
+| +LOGOUT            |
+| +FILE_UPLOAD       |
+| +FILE_DOWNLOAD     |
++--------------------+
+2. EventBus
+-이벤트 구독 및 발행을 관리하는 클래스
+-listeners : 이벤트 타입별로 콜백함수를 저장하는 맵
+-nutex_ : 스레드 안전성을 보장하기 위한 뮤텍스
+-subscribe() : 특정 이벤트 타입에 콜백 함수를 등록하는 함수
+-publish() : 특정 이벤트 타입에 대해 등록된 모든 콜백 함수를 호출하는 함수
++--------------------+
+|     EventBus       |
++--------------------+
+| -listeners         |
+| -mutex_            |
++--------------------+
+| +subscribe()       |
+| +publish()         |
++--------------------+
+3. EventListener
+-다양한 이벤트에 대한 콜백 함수를 제공하는 클래스
+-logLoginEvent() : 로그인 이벤트를 로그로 기록하는 함수
+-updateUIOnLogin() : 로그인 이벤트에 따라 UI를 업데이트하는 함수
+-logLogoutEvent() : 로그아웃 이벤트를 로그로 기록하는 함수
+-updateUIOnLogout() : 로그아웃 이벤트에 따라 UI를 업데이트하는 함수
+-handleFileUpload() : 파일 업로드 이벤트를 처리하는 함수
+-handleFileDownload() : 파일 다운로드 이벤트를 처리하는 함수
++--------------------+
+|   EventListener    |
++--------------------+
+| +logLoginEvent()   |
+| +updateUIOnLogin() |
+| +logLogoutEvent()  |
+| +updateUIOnLogout()|
+| +handleFileUpload()|
+| +handleFileDownload()|
++--------------------+
+4. Main  Function
+-EventBus인스턴스를 생성하고, 이벤트를 구독하고, 사용자 입력을 처리하는 스레드를
+생성하여 이벤트를 발행한다.
+
+<관계도>
++--------------------+
+|     EventType      |
++--------------------+
+| +LOGIN             |
+| +LOGOUT            |
+| +FILE_UPLOAD       |
+| +FILE_DOWNLOAD     |
++--------------------+
+
+                1
+                |
+                |
++--------------------+      *       +--------------------+
+|     EventBus       |<------------>|   EventListener    |
++--------------------+              +--------------------+
+| -listeners         |              | +logLoginEvent()   |
+| -mutex_            |              | +updateUIOnLogin() |
++--------------------+              | +logLogoutEvent()  |
+| +subscribe()       |              | +updateUIOnLogout()|
+| +publish()         |              | +handleFileUpload()|
++--------------------+              | +handleFileDownload()|
+                                    +--------------------+
+1. EventType과 EventBus
+EventBus는 EventType을 사용하여 이벤트를 구분하고관리한다.
+이것은 의존관계(Dependency)로 나타낼 수 있다.
+
+2. EventBus와 EventListener
+EventBus는 여러 개의 EventListener를 구독할 수 있다.
+1 대 다 관계(One to Many)로 나타낼 수 있다.
+
+<코드>
+//EventType.h
+#ifndef EVENTTYPE_H
+#define EVENTTYPE_H
+
+enum class EventType {
+	LOGIN,
+	LOGOUT,
+	FILE_UPLOAD,
+	FILE_DOWNLOAD
+};
+
+#endif // EVENTTYPE_H
+
+//EventBus.h
+#ifndef EVENTBUS_H
+#define EVENTBUS_H
+
+#include <functional>
+#include <any>
+#include <mutex>
+#include "EventType.h"
+
+class EventBus {
+public:
+	typedef std::function<void(const std::any&)> EventCallback;
+
+	void subscribe(EventType eventType, EventCallback callback);
+
+	void publish(EventType eventType, const std::any& eventData);
+
+private:
+	std::unordered_map<EventType, std::vector<EventCallback>> listeners;
+	std::mutex mutex_;
+};
+
+#endif // EVENTBUS_H
+
+//EventBus.cpp
+#include "EventBus.h"
+
+void EventBus::subscribe(EventType eventType, EventCallback callback)
+{
+	std::lock_guard<std::mutex> lock(mutex_);
+	listeners[eventType].push_back(callback);
+}
+
+void EventBus::publish(EventType eventType, const std::any& eventData)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (listeners.find(eventType) != listeners.end()) {
+        for (const auto& callback : listeners[eventType]) {
+            callback(eventData);
+        }
+    }
+}
+
+//EventListener.h
+#ifndef EVENTLISTENER_H
+#define EVENTLISTENER_H
+
+#include <any>
+#include <string>
+#include <iostream>
+
+class EventListener {
+public:
+	static void logLoginEvent(const std::any& eventData);
+	static void updateUIOnLogin(const std::any& eventData);
+	static void logLogoutEvent(const std::any& eventData);
+	static void updateUIOnLogout(const std::any& eventData);
+	static void handleFileUpload(const std::any& eventData);
+	static void handleFileDownload(const std::any& eventData);
+};
+
+#endif // EVENTLISTENER_H
+
+//EventListener.cpp
+#include "EventListener.h"
+
+void EventListener::logLoginEvent(const std::any& eventData)
+{
+	std::string data = std::any_cast<std::string>(eventData);
+	std::cout << "Logging Login Event: " << data << std::endl;
+}
+
+void EventListener::updateUIOnLogin(const std::any& eventData)
+{
+	std::string data = std::any_cast<std::string>(eventData);
+	std::cout << "Updating UI for Login Event: " << data << std::endl;
+}
+
+void EventListener::logLogoutEvent(const std::any& eventData) {
+    std::string data = std::any_cast<std::string>(eventData);
+    std::cout << "Logging Logout Event: " << data << std::endl;
+}
+
+void EventListener::updateUIOnLogout(const std::any& eventData) {
+    std::string data = std::any_cast<std::string>(eventData);
+    std::cout << "Updating UI for Logout Event: " << data << std::endl;
+}
+
+void EventListener::handleFileUpload(const std::any& eventData) {
+    std::pair<std::string, int> data = std::any_cast<std::pair<std::string, int>>(eventData);
+    std::cout << "Handling File Upload: File " << data.first << " of size " << data.second << " bytes uploaded." << std::endl;
+}
+
+void EventListener::handleFileDownload(const std::any& eventData) {
+    std::pair<std::string, int> data = std::any_cast<std::pair<std::string, int>>(eventData);
+    std::cout << "Handling File Download: File " << data.first << " of size " << data.second << " bytes downloaded." << std::endl;
+}
+
+
+//InputProcessor.h
+#pragma once
+
+#include <iostream>
+#include <string>
+#include "EventBus.h"
+
+void processInput(EventBus& eventBus);
+
+//InputProcessor.cpp
+#include "InputProcessor.h"
+
+void processInput(EventBus& eventBus) {
+	std::string command;
+	while (true) {
+		std::cout << "Enter a command ("
+				  << "login, logout, upload, download, exit): ";
+		std::cin >> command;
+
+		if (command == "login") {
+			std::string user;
+			std::cout << "Enter username: ";
+			std::cin >> user;
+			eventBus.publish(EventType::LOGIN,
+							 user + " has logged in");
+		}
+		else if (command == "logout") {
+			std::string user;
+			std::cout << "Enter username: ";
+			std::cin >> user;
+			eventBus.publish(EventType::LOGOUT,
+							 user + " has logged out");
+		}
+		else if (command == "upload") {
+			std::string filename;
+			int filesize;
+			std::cout << "Enter filename: ";
+			std::cin >> filename;
+			std::cout << "Enter filesize: ";
+			std::cin >> filesize;
+			eventBus.publish(EventType::FILE_UPLOAD,
+							 std::make_pair(filename, filesize));
+		}
+		else if (command == "download") {
+			std::string filename;
+			int filesize;
+			std::cout << "Enter filename: ";
+			std::cin >> filename;
+			std::cout << "Enter filesize: ";
+			std::cin >> filesize;
+			eventBus.publish(EventType::FILE_DOWNLOAD,
+							 std::make_pair(filename, filesize));
+		}
+		else if (command == "exit") {
+			break;
+		}
+		else {
+			std::cout << "Unknown command!" << std::endl;
+		}
+	}
+}
+
+//InputProcessor.cpp
+#include "InputProcessor.h"
+
+void processInput(EventBus& eventBus) {
+	std::string command;
+	while (true) {
+		std::cout << "Enter a command ("
+				  << "login, logout, upload, download, exit): ";
+		std::cin >> command;
+
+		if (command == "login") {
+			std::string user;
+			std::cout << "Enter username: ";
+			std::cin >> user;
+			eventBus.publish(EventType::LOGIN,
+							 user + " has logged in");
+		}
+		else if (command == "logout") {
+			std::string user;
+			std::cout << "Enter username: ";
+			std::cin >> user;
+			eventBus.publish(EventType::LOGOUT,
+							 user + " has logged out");
+		}
+		else if (command == "upload") {
+			std::string filename;
+			int filesize;
+			std::cout << "Enter filename: ";
+			std::cin >> filename;
+			std::cout << "Enter filesize: ";
+			std::cin >> filesize;
+			eventBus.publish(EventType::FILE_UPLOAD,
+							 std::make_pair(filename, filesize));
+		}
+		else if (command == "download") {
+			std::string filename;
+			int filesize;
+			std::cout << "Enter filename: ";
+			std::cin >> filename;
+			std::cout << "Enter filesize: ";
+			std::cin >> filesize;
+			eventBus.publish(EventType::FILE_DOWNLOAD,
+							 std::make_pair(filename, filesize));
+		}
+		else if (command == "exit") {
+			break;
+		}
+		else {
+			std::cout << "Unknown command!" << std::endl;
+		}
+	}
+}
+
+<결과>
+Enter a command (login, logout, upload, download, exit): login
+Enter username: nayoung
+Logging Login Event: nayoung has logged in
+Updating UI for Login Event: nayoung has logged in
+Enter a command (login, logout, upload, download, exit): logout
+Enter username: nayoung
+Logging Logout Event: nayoung has logged out
+Updating UI for Logout Event: nayoung has logged out
+Enter a command (login, logout, upload, download, exit): upload
+Enter filename: abc.txt
+Enter filesize: 100
+Handling File Upload: File abc.txt of size 100 bytes uploaded.
+Enter a command (login, logout, upload, download, exit): download
+Enter filename: abc.txt
+Enter filesize: 100
+Handling File Download: File abc.txt of size 100 bytes downloaded.
+Enter a command (login, logout, upload, download, exit): exit
