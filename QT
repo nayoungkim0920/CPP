@@ -247,3 +247,55 @@ int main(int argc, char* argv[]) {
     // 어플리케이션 실행
     return app.exec();
 }
+
+<visual studio 2022에서 ui파일 적용하기>
+1. 프로젝트 루트에 main.ui파일 넣기
+"C:\myLab\Project8\Project8\main.ui"
+2. 터미널에서 main.ui.h만들기
+uic main.ui -o main.ui.h
+3. include 하기
+#include "main.ui.h"
+4. 실행하기
+//main.cpp
+#include <qapplication>
+#include "main.ui.h"
+
+int main(int argc, char* argv[])
+{
+    QApplication app(argc, argv);
+    QMainWindow mainWindow;
+    Ui::MainWindow ui;
+    ui.setupUi(&mainWindow);
+    mainWindow.show();
+    return app.exec();
+}
+
+5. 버튼추가하기
+-main.ui를 QT Creator로 열고 pushButton_2를 추가합니다.
+-저장하고 터미널에서 main.ui.h 생성
+-소스 수정 후 실행!
+#include <QApplication>
+#include <QMainWindow>
+#include <QMessageBox>
+#include "main.ui.h"
+
+int main(int argc, char* argv[])
+{
+    QApplication app(argc, argv);
+    QMainWindow mainWindow;
+    Ui::MainWindow ui;
+    ui.setupUi(&mainWindow);
+
+    // 버튼 클릭 시 알림창을 띄우는 슬롯을 연결합니다.
+    QObject::connect(ui.pushButton, &QPushButton::clicked, [&]() {
+        QMessageBox::information(&mainWindow, "Notification", "Button Clicked!");
+        });
+
+    // 추가한 버튼 클릭 시 알림창을 띄우는 슬롯을 연결합니다.
+    QObject::connect(ui.pushButton_2, &QPushButton::clicked, [&]() {
+        QMessageBox::information(&mainWindow, "Notification", "Button Clicked!");
+        });
+
+    mainWindow.show();
+    return app.exec();
+}
