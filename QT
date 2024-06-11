@@ -57,9 +57,11 @@ cmake -G "Visual Studio 17 2022" ..
 -이미지의 세부 사항을 부각시키고 시각적으로 뚜렷하게 만들어준다.
 -사진을 개선하거나 선명도를 높이는데 사용될 수 있다. 
 -메뉴 : Load Image, Apply Filter, Save Image
-
-#include <QApplication>
-#include <QFileDialog>
+-신호-슬롯 매터니즘을 사용하여 버튼 클릭 이벤트를 처리하고, 이미지가 로드 되거나
+필터가 적용될 때 UI를 업데이트 한다.
+//main.cpp
+#include <QApplication> 
+#include <QFileDialog> 
 #include <QImage>
 #include <QLabel>
 #include <QPushButton>
@@ -67,38 +69,54 @@ cmake -G "Visual Studio 17 2022" ..
 #include <QObject>
 #include <opencv2/opencv.hpp> //이미지 처리와 컴퓨터 비전에 사용
 
-class ImageProcessor : public QObject {
+//이미지 로드, 필터 적용, 저장 기능을 제공하는 클래스
+//QObject상속받아 Qt의 신호-슬롯 메터니즘을 사용할 수 있게 한다.
+class ImageProcessor : public QObject { 
     Q_OBJECT //매크로
 
 public:
+    //암시적 형변환 허용안함
     explicit ImageProcessor(QObject* parent = nullptr) : QObject(parent) {}
 
+//Qt슬롯 함수 정의, 보통 이벤트나 시그널을 받아서 특정 작업을 수행하는 함수
 public slots:
+    //이미지를 로드하는 작업 담당
     void loadImage(const QString& filename) {
+        //OpenCV사용
         cv::Mat img = cv::imread(filename.toStdString());
         if (!img.empty()) {
-            image = img.clone();
+            image = img.clone(); //이미지복제
             cv::cvtColor(img, img, cv::COLOR_BGR2RGB);
+            //RGB색상을 8비트로 표현하는 형식 사용
             QImage qImg(img.data, img.cols, img.rows, img.step, QImage::Format_RGB888);
-            emit imageLoaded(qImg);
+            //imageLoaded 시그널 발생. 이 시그널을 받는 곳에서 이미지를 화면에 표시
+            emit imageLoaded(qImg); 
         }
     }
-
+    //이미지에 필터를 적용하고, 그 결과를 QImage형식으로 변환하여
+    //filterApplied 시그널을 발생시키는 역할을 한다.
     void applyFilter() {
         if (image.empty()) return;
 
-        cv::Mat result;
+        cv::Mat result; //결과 이미지를 저장할 변수를 선언
+        //이미지를 강화하는 역할을 함
         cv::Mat filter = (cv::Mat_<float>(3, 3) << 0, -1, 0, -1, 5, -1, 0, -1, 0);
+        //OpenCV의 filter2D함수를 사용하여 이미지에 필터 적용
+        //필터 깊이 -1, 사용할 필터
         cv::filter2D(image, result, -1, filter);
-
+        //Qt에서 사용되는 형식에 맞추기 위해서
         cv::cvtColor(result, result, cv::COLOR_BGR2RGB);
         QImage qImg(result.data, result.cols, result.rows, result.step, QImage::Format_RGB888);
+        //filterApplied 시그널을 발생시켜 필터가 적용된 이미지를 전달한다.
+        //이 시그널을 받는 곳에서는 이미지를 화면에 표시하거나 다른 작업을 수행
+        //할 수 있다.
         emit filterApplied(qImg);
     }
 
     void saveImage(const QString& filename) {
         if (image.empty()) return;
         cv::imwrite(filename.toStdString(), image);
+        //imageSaved시그널을 발생시킨다.
         emit imageSaved();
     }
 
@@ -111,10 +129,11 @@ private:
     cv::Mat image;
 };
 
+//Qt를 사용하여 GUI를 구성하고 이미지 처리를 수행하는 간단한 애플리케이션
 int main(int argc, char* argv[]) {
-    QApplication app(argc, argv);
+    QApplication app(argc, argv); //애플리케이션의 진입점
 
-    QWidget window;
+    QWidget window; //주 창을 나타내는 QWidget객체를 생성
     window.setWindowTitle("Image Processor");
 
     QPushButton loadButton("Load Image");
@@ -130,6 +149,7 @@ int main(int argc, char* argv[]) {
 
     ImageProcessor imageProcessor;
 
+    //버튼 클릭 시그널과 ImageProcessor클래스의 슬롯함수 연결
     QObject::connect(&loadButton, &QPushButton::clicked, [&]() {
         QString filename = QFileDialog::getOpenFileName(&window, "Open Image", "", "Image Files (*.png *.jpg *.bmp)");
         if (!filename.isEmpty()) {
