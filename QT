@@ -2,4 +2,163 @@
 2. Custom Installation > 6.7.1 선택
 3. Visual studio > 확장 > 확장관리 > qt검색 > Qt visual Studio Tools 설치
 4. 도구 > 옵션 > qt version > "C:\Qt\6.7.1\msvc2019_64\bin\qmake.exe" 등록
-5. Qt Quick Application 새프로젝트만들기
+5. CMakeLists.txt (이미지처리를 구현할것으므로 OpenCV설정도 같이해준다) 
+cmake_minimum_required(VERSION 3.14)
+project(Project7)
+
+# Qt 설정
+set(CMAKE_PREFIX_PATH "C:/Qt/6.7.1/msvc2019_64")
+
+find_package(Qt6 REQUIRED COMPONENTS Widgets Core Gui)
+
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTORCC ON)
+
+# OpenCV 설정
+set(OpenCV_DIR "C:/opencv/build")
+find_package(OpenCV REQUIRED)
+
+# 실행 파일 추가
+add_executable(Project7 main.cpp)
+
+# Qt 라이브러리 링크
+target_link_libraries(Project7 Qt6::Widgets Qt6::Core Qt6::Gui)
+
+# OpenCV 라이브러리 링크
+target_link_libraries(Project7 ${OpenCV_LIBS})
+
+# 실행 파일 출력 디렉토리 설정
+set_target_properties(Project7 PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/Debug"
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/Release"
+)
+
+# Debug 및 Release 구성에 맞는 OpenCV DLL 복사 스크립트
+add_custom_command(TARGET Project7 POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "${OpenCV_DIR}/x64/vc16/bin/opencv_world490${CMAKE_BUILD_TYPE}.dll"
+    $<TARGET_FILE_DIR:Project7>
+)
+
+6.PowerShell에서 빌드
+cd C:\myLab\Project7\Project7
+mkdir build2
+cd build2
+cmake -G "Visual Studio 17 2022" ..
+
+7. "C:\myLab\Project7\Project7\build2\Project7.sln"솔션을
+열고 프로젝트를 시작프로그램으로 설정한 후 실행!
+
+<간단한 샤프닝필터 이미지 프로세싱 프로그램>
+-중앙 픽셀을 강조하고 주변 픽셀의 값에 가중치를 부여하여 이미지의 경계를 뚜렷하게 함
+-경계 검출이나 이미지의 엣지를 강조하는데 사용된다. 
+-이미지의 세부 사항을 부각시키고 시각적으로 뚜렷하게 만들어준다.
+-사진을 개선하거나 선명도를 높이는데 사용될 수 있다. 
+-메뉴 : Load Image, Apply Filter, Save Image
+
+#include <QApplication>
+#include <QFileDialog>
+#include <QImage>
+#include <QLabel>
+#include <QPushButton>
+#include <QVBoxLayout>
+#include <QObject>
+#include <opencv2/opencv.hpp>
+
+class ImageProcessor : public QObject {
+    Q_OBJECT
+
+public:
+    explicit ImageProcessor(QObject* parent = nullptr) : QObject(parent) {}
+
+public slots:
+    void loadImage(const QString& filename) {
+        cv::Mat img = cv::imread(filename.toStdString());
+        if (!img.empty()) {
+            image = img.clone();
+            cv::cvtColor(img, img, cv::COLOR_BGR2RGB);
+            QImage qImg(img.data, img.cols, img.rows, img.step, QImage::Format_RGB888);
+            emit imageLoaded(qImg);
+        }
+    }
+
+    void applyFilter() {
+        if (image.empty()) return;
+
+        cv::Mat result;
+        cv::Mat filter = (cv::Mat_<float>(3, 3) << 0, -1, 0, -1, 5, -1, 0, -1, 0);
+        cv::filter2D(image, result, -1, filter);
+
+        cv::cvtColor(result, result, cv::COLOR_BGR2RGB);
+        QImage qImg(result.data, result.cols, result.rows, result.step, QImage::Format_RGB888);
+        emit filterApplied(qImg);
+    }
+
+    void saveImage(const QString& filename) {
+        if (image.empty()) return;
+        cv::imwrite(filename.toStdString(), image);
+        emit imageSaved();
+    }
+
+signals:
+    void imageLoaded(const QImage& image);
+    void filterApplied(const QImage& image);
+    void imageSaved();
+
+private:
+    cv::Mat image;
+};
+
+int main(int argc, char* argv[]) {
+    QApplication app(argc, argv);
+
+    QWidget window;
+    window.setWindowTitle("Image Processor");
+
+    QPushButton loadButton("Load Image");
+    QPushButton applyButton("Apply Filter");
+    QPushButton saveButton("Save Image");
+    QLabel imageLabel;
+
+    QVBoxLayout layout;
+    layout.addWidget(&loadButton);
+    layout.addWidget(&applyButton);
+    layout.addWidget(&saveButton);
+    layout.addWidget(&imageLabel);
+
+    ImageProcessor imageProcessor;
+
+    QObject::connect(&loadButton, &QPushButton::clicked, [&]() {
+        QString filename = QFileDialog::getOpenFileName(&window, "Open Image", "", "Image Files (*.png *.jpg *.bmp)");
+        if (!filename.isEmpty()) {
+            imageProcessor.loadImage(filename);
+        }
+        });
+
+    QObject::connect(&applyButton, &QPushButton::clicked, [&]() {
+        imageProcessor.applyFilter();
+        });
+
+    QObject::connect(&saveButton, &QPushButton::clicked, [&]() {
+        QString filename = QFileDialog::getSaveFileName(&window, "Save Image", "", "Image Files (*.png *.jpg *.bmp)");
+        if (!filename.isEmpty()) {
+            imageProcessor.saveImage(filename);
+        }
+        });
+
+    QObject::connect(&imageProcessor, &ImageProcessor::imageLoaded, [&](const QImage& image) {
+        imageLabel.setPixmap(QPixmap::fromImage(image));
+        });
+
+    QObject::connect(&imageProcessor, &ImageProcessor::filterApplied, [&](const QImage& image) {
+        imageLabel.setPixmap(QPixmap::fromImage(image));
+        });
+
+    window.setLayout(&layout);
+    window.show();
+
+    return app.exec();
+}
+
+#include "main.moc"
