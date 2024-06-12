@@ -89,3 +89,9 @@ add_custom_command(TARGET Project9 POST_BUILD
     "${OpenCV_DIR}/x64/vc16/bin/opencv_world490${CMAKE_BUILD_TYPE}.dll"
     $<TARGET_FILE_DIR:Project9>
 )
+
+<빌드>
+mkdir build
+cd build
+cmake ..
+cmake --build .
