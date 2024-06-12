@@ -297,8 +297,8 @@ int main(int argc, char* argv[])
 #include <QApplication>
 #include <QMainWindow>
 #include <QMessageBox>
-#include "main.ui.h"
-
+#include "main.ui.h" //Qt디자이너로 만든 UI파일에서 자동 생성된 헤더 파일을 포함
+                     //이 파일에는 UI요소에 대한 정의가 포함되어 있다.
 int main(int argc, char* argv[])
 {
     QApplication app(argc, argv);
@@ -316,6 +316,6 @@ int main(int argc, char* argv[])
         QMessageBox::information(&mainWindow, "Notification", "Button Clicked!");
         });
 
-    mainWindow.show();
-    return app.exec();
+    mainWindow.show(); //메인 윈도우를 화면에 표시
+    return app.exec(); //애플리케이션의 이벤트 루프 시
 }
