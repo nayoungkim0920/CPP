@@ -47,6 +47,7 @@ cd C:\myLab\Project7\Project7
 mkdir build2
 cd build2
 cmake -G "Visual Studio 17 2022" ..
+(OpenCV 에러가날경우 OpenCV도 cmake로 빌드해준다)
 
 7. "C:\myLab\Project7\Project7\build2\Project7.sln"솔션을
 열고 프로젝트를 시작프로그램으로 설정한 후 실행!
