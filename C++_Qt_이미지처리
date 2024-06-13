@@ -1,0 +1,272 @@
+<C++, Qt, OpenCV로 이미지 출력하기>
+1. Visual Studio 2022로 프로젝트를 만든다.
+2. CMake
+//CMakeLists.txt
+cmake_minimum_required(VERSION 3.14)
+project(Project1)
+
+# Qt 설정
+set(CMAKE_PREFIX_PATH "C:/Qt/6.7.1/msvc2019_64")
+
+# Qt 패키지 찾기
+find_package(Qt6 REQUIRED COMPONENTS Widgets Core Gui)
+
+# OpenCV 설정
+set(OpenCV_DIR "C:/opencv/sources/build")
+find_package(OpenCV REQUIRED)
+
+if (OpenCV_FOUND)
+    message(STATUS "OpenCV found: ${OpenCV_VERSION}")
+else()
+    message(FATAL_ERROR "OpenCV not found")
+endif()
+
+# MOC, UIC, RCC 파일을 자동으로 처리
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTORCC ON)
+
+# 실행 파일 추가
+add_executable(Project1 
+    main.cpp
+    MainWindow.cpp
+    MainWindow.h
+    MainWindow.ui
+)
+
+# Qt 및 OpenCV 라이브러리 링크
+target_link_libraries(Project1 
+    Qt6::Widgets 
+    Qt6::Core 
+    Qt6::Gui 
+    ${OpenCV_LIBS}
+)
+
+# 실행 파일 출력 디렉토리 설정
+set_target_properties(Project1 PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/Debug"
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/Release"
+)
+
+# 디버그와 릴리스 구성에 따라 OpenCV DLL 복사
+add_custom_command(TARGET Project1 POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/x64/vc16/bin/opencv_world490d.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/x64/vc16/bin/opencv_world490.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/sources/build/bin/Debug/opencv_imgcodecs490d.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/sources/build/bin/Release/opencv_imgcodecs490.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/sources/build/bin/Debug/opencv_core490d.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/sources/build/bin/Release/opencv_core490.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/sources/build/bin/Debug/opencv_imgproc490d.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/sources/build/bin/Release/opencv_imgproc490.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMENT "Copying OpenCV DLLs to output directory"
+)
+
+3. MainWindow.ui 변환
+uic MainWindow.ui -o ui_MainWindow.h
+
+3. 파일구성
+Project1/
+├── CMakeLists.txt
+├── main.cpp
+├── MainWindow.cpp
+├── MainWindow.h
+├── MainWindow.ui
+├── ui_MainWindow.h
+└── build/
+    ├── Debug/
+    │   ├── Project1.exe
+    │   ├── opencv_core490d.dll
+    │   ├── opencv_imgcodecs490d.dll
+    │   ├── opencv_imgproc490d.dll
+    │   ├── opencv_world490d.dll
+    │   └── (Other Qt and OpenCV DLLs for Debug)
+    └── Release/
+        ├── Project1.exe
+        ├── opencv_core490.dll
+        ├── opencv_imgcodecs490.dll
+        ├── opencv_imgproc490.dll
+        ├── opencv_world490.dll
+        └── (Other Qt and OpenCV DLLs for Release)
+
+4. 소스
+//MainWindow.ui
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QLabel" name="imageLabel"/>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar"/>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
+
+//ui_MainWindow.h(자동생성)
+/********************************************************************************
+** Form generated from reading UI file 'MainWindow.ui'
+**
+** Created by: Qt User Interface Compiler version 6.7.1
+**
+** WARNING! All changes made in this file will be lost when recompiling UI file!
+********************************************************************************/
+
+#ifndef UI_MAINWINDOW_H
+#define UI_MAINWINDOW_H
+
+#include <QtCore/QVariant>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QMainWindow>
+#include <QtWidgets/QMenuBar>
+#include <QtWidgets/QStatusBar>
+#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QWidget>
+
+QT_BEGIN_NAMESPACE
+
+class Ui_MainWindow
+{
+public:
+    QWidget *centralwidget;
+    QVBoxLayout *verticalLayout;
+    QLabel *imageLabel;
+    QMenuBar *menubar;
+    QStatusBar *statusbar;
+
+    void setupUi(QMainWindow *MainWindow)
+    {
+        if (MainWindow->objectName().isEmpty())
+            MainWindow->setObjectName("MainWindow");
+        MainWindow->resize(800, 600);
+        centralwidget = new QWidget(MainWindow);
+        centralwidget->setObjectName("centralwidget");
+        verticalLayout = new QVBoxLayout(centralwidget);
+        verticalLayout->setObjectName("verticalLayout");
+        imageLabel = new QLabel(centralwidget);
+        imageLabel->setObjectName("imageLabel");
+
+        verticalLayout->addWidget(imageLabel);
+
+        MainWindow->setCentralWidget(centralwidget);
+        menubar = new QMenuBar(MainWindow);
+        menubar->setObjectName("menubar");
+        MainWindow->setMenuBar(menubar);
+        statusbar = new QStatusBar(MainWindow);
+        statusbar->setObjectName("statusbar");
+        MainWindow->setStatusBar(statusbar);
+
+        retranslateUi(MainWindow);
+
+        QMetaObject::connectSlotsByName(MainWindow);
+    } // setupUi
+
+    void retranslateUi(QMainWindow *MainWindow)
+    {
+        MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "MainWindow", nullptr));
+    } // retranslateUi
+
+};
+
+namespace Ui {
+    class MainWindow: public Ui_MainWindow {};
+} // namespace Ui
+
+QT_END_NAMESPACE
+
+#endif // UI_MAINWINDOW_H
+
+//MainWindow.h
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
+
+#include <QMainWindow>
+#include <QLabel>
+
+QT_BEGIN_NAMESPACE
+namespace Ui { class MainWindow; }
+QT_END_NAMESPACE
+
+class MainWindow : public QMainWindow
+{
+    Q_OBJECT
+
+public:
+    MainWindow(QWidget* parent = nullptr);
+    ~MainWindow();
+
+private:
+    Ui::MainWindow* ui;
+    QLabel* imageLabel;
+};
+
+#endif // MAINWINDOW_H
+
+//MainWindow.cpp
+#include "MainWindow.h"
+#include "ui_MainWindow.h"
+#include <opencv2/opencv.hpp>
+#include <QPixmap>
+#include <QImage>
+
+MainWindow::MainWindow(QWidget* parent)
+    : QMainWindow(parent)
+    , ui(new Ui::MainWindow)
+{
+    ui->setupUi(this);
+
+    // OpenCV로 이미지 로드
+    cv::Mat img = cv::imread("C:/images/rudy.jpg"); // 여기에 이미지 경로를 입력하세요
+    if (img.empty()) {
+        qWarning("Image loading failed");
+        return;
+    }
+
+    // OpenCV 이미지를 QImage로 변환
+    QImage qimg(img.data, img.cols, img.rows, img.step, QImage::Format_BGR888);
+
+    // QLabel에 QImage 설정
+    ui->imageLabel->setPixmap(QPixmap::fromImage(qimg));
+}
+
+MainWindow::~MainWindow()
+{
+    delete ui;
+}
+
+//Main.cpp
+#include "MainWindow.h"
+#include <QApplication>
+
+int main(int argc, char* argv[])
+{
+    QApplication a(argc, argv);
+    MainWindow w;
+    w.show();
+    return a.exec();
+}
