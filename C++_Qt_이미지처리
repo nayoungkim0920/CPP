@@ -1,4 +1,5 @@
-<C++, Qt, OpenCV로 이미지 출력하기>
+<C++, Qt, OpenCV>
+1단계 : 이미지출력
 1. Visual Studio 2022로 프로젝트를 만든다.
 2. CMake
 //CMakeLists.txt
@@ -258,6 +259,329 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+//Main.cpp
+#include "MainWindow.h"
+#include <QApplication>
+
+int main(int argc, char* argv[])
+{
+    QApplication a(argc, argv);
+    MainWindow w;
+    w.show();
+    return a.exec();
+}
+
+2단계 : 파일다이알로그를 사용하여 이미지 불러오기/ 이미지 저장하기
+1. MainWIndow.ui 변경
+2. ui_MainWindow.h 생성
+uic MainWindow.ui -o ui_MainWindow.h
+3. 소스
+//MainWindow.ui
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string>Image Display</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionOpen"/>
+    <addaction name="actionSave"/>
+   </widget>
+   <addaction name="menuFile"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QToolBar" name="mainToolBar">
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
+  <action name="actionOpen">
+   <property name="text">
+    <string>Open</string>
+   </property>
+  </action>
+  <action name="actionSave">
+   <property name="text">
+    <string>Save</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
+
+2. ui_MainWindow.h생성
+/********************************************************************************
+** Form generated from reading UI file 'MainWindow.ui'
+**
+** Created by: Qt User Interface Compiler version 6.7.1
+**
+** WARNING! All changes made in this file will be lost when recompiling UI file!
+********************************************************************************/
+
+#ifndef UI_MAINWINDOW_H
+#define UI_MAINWINDOW_H
+
+#include <QtCore/QVariant>
+#include <QtGui/QAction>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QMainWindow>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QMenuBar>
+#include <QtWidgets/QStatusBar>
+#include <QtWidgets/QToolBar>
+#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QWidget>
+
+QT_BEGIN_NAMESPACE
+
+class Ui_MainWindow
+{
+public:
+    QAction *actionOpen;
+    QAction *actionSave;
+    QWidget *centralwidget;
+    QVBoxLayout *verticalLayout;
+    QLabel *label;
+    QMenuBar *menubar;
+    QMenu *menuFile;
+    QStatusBar *statusbar;
+    QToolBar *mainToolBar;
+
+    void setupUi(QMainWindow *MainWindow)
+    {
+        if (MainWindow->objectName().isEmpty())
+            MainWindow->setObjectName("MainWindow");
+        MainWindow->resize(800, 600);
+        actionOpen = new QAction(MainWindow);
+        actionOpen->setObjectName("actionOpen");
+        actionSave = new QAction(MainWindow);
+        actionSave->setObjectName("actionSave");
+        centralwidget = new QWidget(MainWindow);
+        centralwidget->setObjectName("centralwidget");
+        verticalLayout = new QVBoxLayout(centralwidget);
+        verticalLayout->setObjectName("verticalLayout");
+        label = new QLabel(centralwidget);
+        label->setObjectName("label");
+        label->setAlignment(Qt::AlignCenter);
+
+        verticalLayout->addWidget(label);
+
+        MainWindow->setCentralWidget(centralwidget);
+        menubar = new QMenuBar(MainWindow);
+        menubar->setObjectName("menubar");
+        menubar->setGeometry(QRect(0, 0, 800, 26));
+        menuFile = new QMenu(menubar);
+        menuFile->setObjectName("menuFile");
+        MainWindow->setMenuBar(menubar);
+        statusbar = new QStatusBar(MainWindow);
+        statusbar->setObjectName("statusbar");
+        MainWindow->setStatusBar(statusbar);
+        mainToolBar = new QToolBar(MainWindow);
+        mainToolBar->setObjectName("mainToolBar");
+        MainWindow->addToolBar(Qt::ToolBarArea::TopToolBarArea, mainToolBar);
+
+        menubar->addAction(menuFile->menuAction());
+        menuFile->addAction(actionOpen);
+        menuFile->addAction(actionSave);
+
+        retranslateUi(MainWindow);
+
+        QMetaObject::connectSlotsByName(MainWindow);
+    } // setupUi
+
+    void retranslateUi(QMainWindow *MainWindow)
+    {
+        actionOpen->setText(QCoreApplication::translate("MainWindow", "Open", nullptr));
+        actionSave->setText(QCoreApplication::translate("MainWindow", "Save", nullptr));
+        label->setText(QCoreApplication::translate("MainWindow", "Image Display", nullptr));
+        menuFile->setTitle(QCoreApplication::translate("MainWindow", "File", nullptr));
+        (void)MainWindow;
+    } // retranslateUi
+
+};
+
+namespace Ui {
+    class MainWindow: public Ui_MainWindow {};
+} // namespace Ui
+
+QT_END_NAMESPACE
+
+#endif // UI_MAINWINDOW_H
+
+3. 소스
+//MainWindow.h
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
+
+#include <QMainWindow>
+#include <QString>
+#include <QLabel>
+#include <QImage>
+#include <QPixmap>
+#include <QFileDialog>
+#include <QMessageBox>
+#include <opencv2/opencv.hpp>
+//MainWindow.h
+#include "ui_MainWindow.h"
+
+QT_BEGIN_NAMESPACE
+namespace Ui { class MainWindow; }
+QT_END_NAMESPACE
+
+class MainWindow : public QMainWindow
+{
+    Q_OBJECT
+
+public:
+    explicit MainWindow(QWidget* parent = nullptr);
+    ~MainWindow();
+
+private slots:
+    void openFile();
+    void saveFile();
+
+private:
+    Ui::MainWindow* ui;
+};
+
+#endif // MAINWINDOW_H
+
+
+//MainWindow.cpp
+#include "MainWindow.h"
+
+//생성자
+MainWindow::MainWindow(QWidget* parent)
+    : QMainWindow(parent)
+    , ui(new Ui::MainWindow)
+{
+    ui->setupUi(this); //UI초기화
+
+    ui->label = new QLabel(this);
+    setCentralWidget(ui->label);
+
+    //메뉴와 액션 슬롯 연결
+    connect(ui->actionOpen, 
+        &QAction::triggered, 
+        this, 
+        &MainWindow::openFile);
+
+    //메뉴와 액션 슬롯 연결
+    connect(ui->actionSave,
+        &QAction::triggered,
+        this,
+        &MainWindow::saveFile);
+}
+
+MainWindow::~MainWindow()
+{
+    delete ui;
+}
+
+void MainWindow::openFile() {
+    try {
+        //파일 선택 다이알로그 열기
+        QString fileName = QFileDialog::getOpenFileName(
+            this,
+            tr("Open Image"),
+            "",
+            tr("Image Files(*.png * .jpg * .bmp * .jpeg);;"
+                "All Files(*)"));
+
+        if (!fileName.isEmpty()) {
+            //OpenCV를 이용해 이미지 파일 로드
+            cv::Mat cvImage = cv::imread(fileName.toStdString());
+
+            if (!cvImage.empty()) {
+                //OpenCV의 Mat객체를 QImage로 변환
+                QImage qImage(
+                    cvImage.data,
+                    cvImage.cols,
+                    cvImage.rows,
+                    cvImage.step,
+                    QImage::Format_BGR888);
+                //QLabel에 이미지 표시
+                ui->label->setPixmap(QPixmap::fromImage(qImage));
+                ui->label->adjustSize();
+            }
+            else {
+                QMessageBox::critical(
+                    this,
+                    tr("Error"),
+                    tr("Failed to open image file"));
+            }
+        }
+    }
+    catch (const std::exception& e) {
+        qDebug() << "Exception caught: " << e.what();
+    }
+    catch (...) {
+        qDebug() << "Unknown exception cauht";
+    }
+}
+
+void MainWindow::saveFile() {
+
+    //현재 이미지를 저장할 경로 선택
+    QString filePath = QFileDialog::getSaveFileName(
+        this,
+        tr("Save Image"),
+        "",
+        tr("Images(*.png *.jpg *.bmp)"));
+
+    if (!filePath.isEmpty()) {
+        //현재 QLabel에 표시된 이미지를 QPixmap으로 가져옴
+        QPixmap pixmap = ui->label->pixmap(Qt::ReturnByValue);
+        
+        //이미지를 선택한 경로에 저장
+        if (!pixmap.isNull()) {
+            pixmap.save(filePath);
+            qDebug() << "Image saved to: " << filePath;
+        }
+        else {
+            qDebug() << "Failed to save image. QPixmap is null.";
+        }
+    }
+}
+
 
 //Main.cpp
 #include "MainWindow.h"
