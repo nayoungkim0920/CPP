@@ -1,5 +1,5 @@
 <C++, Qt, OpenCV>
-1단계 : 이미지출력
+1단계 : 이미지 불러오기, 이미지 저장하기
 1. Visual Studio 2022로 프로젝트를 만든다.
 2. CMake
 //CMakeLists.txt
@@ -594,3 +594,256 @@ static int WinMain(int argc, char* argv[])
     w.show();
     return a.exec();
 }
+
+2. 이미지 회전, 확대, 축소 기능 추가
+Project1/
+│
+├── MainWindow.h      // 메인 윈도우 헤더 파일
+├── MainWindow.cpp    // 메인 윈도우 소스 파일
+│
+├── ImageProcessor.h   // 이미지 프로세서 헤더 파일
+├── ImageProcessor.cpp // 이미지 프로세서 소스 파일
+│
+├── main.cpp           // 메인 함수가 있는 소스 파일
+│
+├── MainWindow.ui 
+└── ui_MainWindow.h
+
+<MVC(모델-뷰-컨트롤러)패턴>
+-모델
+데이터와 데이터를 처리하는 부분 담당
+주로 비즈니스 로직이나 데이터베이스와의 상호작용을 처리
+ImageProcessor 클래스 : 이미지 파일을 열고 저장, 이미지 회전/확대/축소 등 작업 수행
+-뷰
+사용자에게 데이터를 표시하고 사용자의 입력을 받는 역할
+주로 GUI 요소를 관리하며, 사용자와의 상호작용을 처리
+MainWindow 클래스 : 이미지를 화면에 표시하고 사용자가 파일을 열거나 저장,
+이미지를 회전/확대/축소 작업을 UI를 통해 제어
+-컨트롤러
+모델과 뷰 사이의 중개자 역할
+사용자의 입력을 받아 모델에 데이터 처리 요청, 모델에서 처리된 결과 받아 뷰에 반영
+MainWindow 클래스 : 사용자가 파일을 열거나 저장하거나 이미지 회전/확대/축소 요청받아
+ImageProcessor클래스의 적절한 메서드 호출 처리
+-장점
+단일책임원칙(Single Responsibility Principle)을 따라 각 구성 요소가 독립적이고
+재사용 가능하게 설계된다.
+유지보수성이 높아지며, 하나의 부분이 변경되어도 다른 부분에 영향을 미치ㅣ 않도록 
+설계된다.
+코드의 재사용이 증가하며, 구현이 간결해 진다.
+테스트 용이성이 높아져 테스트가 쉬워진다.
+
+1)UI 수정(메뉴바로구성)
+//MainWindow.ui
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string>Image Display</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="buttonLayout">
+      <item>
+       <widget class="QPushButton" name="rotateButton">
+        <property name="text">
+         <string>Rotate Image</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="zoomInButton">
+        <property name="text">
+         <string>Zoom In</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="zoomOutButton">
+        <property name="text">
+         <string>Zoom Out</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionOpen"/>
+    <addaction name="actionSave"/>
+   </widget>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionOpen">
+   <property name="text">
+    <string>Open</string>
+   </property>
+  </action>
+  <action name="actionSave">
+   <property name="text">
+    <string>Save</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
+
+2)헤더파일생성
+uic MainWindow.ui -o ui_MainWindow.h
+//ui_MainWindow.h
+/********************************************************************************
+** Form generated from reading UI file 'MainWindow.ui'
+**
+** Created by: Qt User Interface Compiler version 6.7.1
+**
+** WARNING! All changes made in this file will be lost when recompiling UI file!
+********************************************************************************/
+
+#ifndef UI_MAINWINDOW_H
+#define UI_MAINWINDOW_H
+
+#include <QtCore/QVariant>
+#include <QtGui/QAction>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QMainWindow>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QMenuBar>
+#include <QtWidgets/QStatusBar>
+#include <QtWidgets/QToolBar>
+#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QWidget>
+
+QT_BEGIN_NAMESPACE
+
+class Ui_MainWindow
+{
+public:
+    QAction *actionOpen;
+    QAction *actionSave;
+    QAction *actionRotate;
+    QAction *actionZoomIn;
+    QAction *actionZoomOut;
+    QWidget *centralwidget;
+    QVBoxLayout *verticalLayout;
+    QLabel *label;
+    QMenuBar *menubar;
+    QMenu *menuFile;
+    QMenu *menuEdit;
+    QStatusBar *statusbar;
+    QToolBar *mainToolBar;
+
+    void setupUi(QMainWindow *MainWindow)
+    {
+        if (MainWindow->objectName().isEmpty())
+            MainWindow->setObjectName("MainWindow");
+        MainWindow->resize(800, 600);
+        actionOpen = new QAction(MainWindow);
+        actionOpen->setObjectName("actionOpen");
+        actionSave = new QAction(MainWindow);
+        actionSave->setObjectName("actionSave");
+        actionRotate = new QAction(MainWindow);
+        actionRotate->setObjectName("actionRotate");
+        actionZoomIn = new QAction(MainWindow);
+        actionZoomIn->setObjectName("actionZoomIn");
+        actionZoomOut = new QAction(MainWindow);
+        actionZoomOut->setObjectName("actionZoomOut");
+        centralwidget = new QWidget(MainWindow);
+        centralwidget->setObjectName("centralwidget");
+        verticalLayout = new QVBoxLayout(centralwidget);
+        verticalLayout->setObjectName("verticalLayout");
+        label = new QLabel(centralwidget);
+        label->setObjectName("label");
+        label->setAlignment(Qt::AlignCenter);
+
+        verticalLayout->addWidget(label);
+
+        MainWindow->setCentralWidget(centralwidget);
+        menubar = new QMenuBar(MainWindow);
+        menubar->setObjectName("menubar");
+        menubar->setGeometry(QRect(0, 0, 800, 26));
+        menuFile = new QMenu(menubar);
+        menuFile->setObjectName("menuFile");
+        menuEdit = new QMenu(menubar);
+        menuEdit->setObjectName("menuEdit");
+        MainWindow->setMenuBar(menubar);
+        statusbar = new QStatusBar(MainWindow);
+        statusbar->setObjectName("statusbar");
+        MainWindow->setStatusBar(statusbar);
+        mainToolBar = new QToolBar(MainWindow);
+        mainToolBar->setObjectName("mainToolBar");
+        MainWindow->addToolBar(Qt::ToolBarArea::TopToolBarArea, mainToolBar);
+
+        menubar->addAction(menuFile->menuAction());
+        menubar->addAction(menuEdit->menuAction());
+        menuFile->addAction(actionOpen);
+        menuFile->addAction(actionSave);
+        menuEdit->addAction(actionRotate);
+        menuEdit->addAction(actionZoomIn);
+        menuEdit->addAction(actionZoomOut);
+        mainToolBar->addAction(actionRotate);
+        mainToolBar->addAction(actionZoomIn);
+        mainToolBar->addAction(actionZoomOut);
+
+        retranslateUi(MainWindow);
+
+        QMetaObject::connectSlotsByName(MainWindow);
+    } // setupUi
+
+    void retranslateUi(QMainWindow *MainWindow)
+    {
+        actionOpen->setText(QCoreApplication::translate("MainWindow", "Open", nullptr));
+        actionSave->setText(QCoreApplication::translate("MainWindow", "Save", nullptr));
+        actionRotate->setText(QCoreApplication::translate("MainWindow", "Rotate", nullptr));
+        actionZoomIn->setText(QCoreApplication::translate("MainWindow", "Zoom In", nullptr));
+        actionZoomOut->setText(QCoreApplication::translate("MainWindow", "Zoom Out", nullptr));
+        label->setText(QCoreApplication::translate("MainWindow", "Image Display", nullptr));
+        menuFile->setTitle(QCoreApplication::translate("MainWindow", "File", nullptr));
+        menuEdit->setTitle(QCoreApplication::translate("MainWindow", "Edit", nullptr));
+        (void)MainWindow;
+    } // retranslateUi
+
+};
+
+namespace Ui {
+    class MainWindow: public Ui_MainWindow {};
+} // namespace Ui
+
+QT_END_NAMESPACE
+
+#endif // UI_MAINWINDOW_H
+
+3) 소스 수정
