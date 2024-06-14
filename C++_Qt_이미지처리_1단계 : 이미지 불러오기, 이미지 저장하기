@@ -82,6 +82,8 @@ Project1/
 ├── MainWindow.ui
 ├── ui_MainWindow.h
 └── build/
+    ├── moc_ImageProcessor.cpp
+    ├── Project1.sln
     ├── Debug/
     │   ├── Project1.exe
     │   ├── opencv_core490d.dll
