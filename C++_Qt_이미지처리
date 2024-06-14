@@ -587,7 +587,7 @@ void MainWindow::saveFile() {
 #include "MainWindow.h"
 #include <QApplication>
 
-int main(int argc, char* argv[])
+static int WinMain(int argc, char* argv[])
 {
     QApplication a(argc, argv);
     MainWindow w;
