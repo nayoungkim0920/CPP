@@ -1,0 +1,17 @@
+3단계:병렬처리_뮤텍스_스레드
+
+1. Intel® oneAPI Threading Building Blocks (oneTBB) 
+- Intel이 개발한 고성능 병렬 프로그래밍 라이브러리
+다중 스레드 프로그래밍을 쉽게 할 수 있도록 설계되었으며, 다양한 병렬 알고리즘을 효율적으로
+실행할 수 있는 기능 제공
+- 다운로드 
+https://www.intel.com/content/www/us/en/developer/articles/tool/oneapi-standalone-components.html#onetbb
+- 압축풀고 설치
+w_tbb_oneapi_p_2021.12.0.500_offline.exe
+- PC설치위치 
+C:\Program Files (x86)\Intel\oneAPI\tbb\2021.12
+
+2. OpenMP
+솔루션 탐색기 > 속성 > 구성 속성 > C/C++ > 언어에서 "OpenMP 지원" 옵션을 "예 (/openmp)"로 설정
+
+3. 
