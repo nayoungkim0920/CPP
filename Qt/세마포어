@@ -1,0 +1,117 @@
+<세마포어(Semaphore)>
+병렬 컴퓨팅에서 동시에 접근할 수 있는 자원의 수를 제어하는데 사용되는 동기화 도구이다.
+주로 공유된 자원에 대한 접근을 조절하고, 스레드 간의 상호 배제(Mutual Exclusion)를 
+구현하는데 쓰인다. 뮤텍스와 비슷하지만, 뮤텍스가 단일 스레드만 접근을 허용하는 반면 
+여러 스레드가 접근할 수 있는 허요 가능한 수를 지정할 수 있다.
+
+- 기본개념
+1. 카운터 변수
+냅적으로 정수형 변수를 사용하여 허용 가능한 접근 가능 수를 나타낸다. 이변수는 음수가 
+되수 있다.
+
+2. 주요 연산
+1) Wait(P)연산
+세마포어의 값을 감소시키고, 이 때 값이 음수가 되면 대기 상태로 전환된다. 
+자원을 가져오기 위해 대기하거나, 자원을 사용하기 위해 잠시 대기할 때 사용된다.
+2)Signal(V)연산
+세마포어의 값을 증가시키고, 이때 값이 0이상이되면 대기 중인 스레드 중 하나를 깨우는
+동작을 한다. 이 연산은 자원을 해제하고 다른 스레드가 자원을 사용할 수 있도록 할 때 사용
+한다.
+
+3. 종류
+1) 바이너리 세마포어 
+값이 0 또는 1 인 세마포어로 뮤텍스와 유사하게 상호 배제를 구현하는 데 사용된다.
+2) 일반 세마포어
+값이 양의 정수인 세마포어로 허용가능한 접근 가능 수를 제어하는 데 사용된다.
+
+4. 활용예시
+1) 자원관리
+공유된 자원에 여러 스레드가 접근할 때, 특정 수의 스레드만 접근할 수 있도록 제어할 수
+있다. 예를 들어, 특정 파일을 여러 스레드가 동시에 읽거나 쓸 때 세마포어를 사용하여
+동시 접근을 제한 할 수 있다.
+2) 순차적 접근 제어
+특정 자원에 대해 연산이 순차적으로 수행되어야 하는 경우 세마포어를 사용하는 접근 순서
+를 제어할 수 있다.
+3) 동기화
+여러 스레드가 동시에 접근할 수 있는 큐나 버퍼와 같은 자료 구조에서 세마포어를 사용하여
+접근을 동기화하고, 데이터 일관성을 유지할 수 있다.
+
+5. 주의사항
+1) Deadlock
+잘못된 세마포어 사용은 데드락을 발생시킬 수 있다. 세마포어를 적절히 해제하지 않고 
+블록되어 있는 스레드가 발생할 수 있다.
+2) 성능저하
+세마포어 연산은 원자적 연산이 아니기 때문에 과도한 사용이나 잘못된 사용은 성능저하를
+초래할 수 있다.
+
+6. 사용방법
+#include <QCoreApplication>
+#include <QThread>
+#include <QSemaphore>
+#include <QDebug>
+
+//공유자원
+int sharedResource = 0;
+
+//세마포어 객체
+QSemaphore semaphore(1); // 초기값을 1로 설정하여 하나의 스레드만 접근 가능하도록 함
+
+//스레드 클래스
+class WorkerThread : public QThread
+{
+  public:
+    explicit WorkerThread(int id) : id(id) {}
+  protected:
+    void run() override {
+      for(int i = 0; i < 3; ++i){
+        //세마포어 획득(P연산)
+        semaphore.aquire();
+        //공유자원에 접근
+        qDebug() << "Thread: << id << "is accessing the resource";
+        ++sharedResource;
+        qDebug() << "Shared resource value: " << sharedResource;
+
+        //잠시대기
+        msleep(10);
+
+        //세마포어 해제(V연산)
+        semaphore.release();
+      }
+    }
+private:
+  int id;
+};
+
+int main(int argc, char *argv[]){
+  QCoreApplication a(argc, argv);
+
+  WorkerThread therad1(1);
+  WorkerThread thread2(2);
+
+  //두개의 스레드 시작
+  thread1.start();
+  thread2.start();
+
+  //스레드가 종료될 때까지 대기\
+  thread1.wait();
+  thread2.wait();
+
+  qDebug() << "final vlaue of shared resource: " << sharedResource;
+
+  return a.exe();
+}
+
+//결과
+Thread 1 is accessing the resource
+Shared resource value: 1
+Thread 2 is accessing the resource
+Shared resource value: 2
+Thread 1 is accessing the resource
+Shared resource value: 3
+Thread 2 is accessing the resource
+Shared resource value: 4
+Thread 1 is accessing the resource
+Shared resource value: 5
+Thread 2 is accessing the resource
+Shared resource value: 6
+Final value of shared resource: 6
