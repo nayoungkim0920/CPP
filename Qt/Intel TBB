@@ -1,7 +1,9 @@
 <Intel TBB(Threading Building Blocks)>
+
 Intel에서 제공하는 C++병렬 프로그래밍 라이브러리 이다. 
 멀티코어 프로세서의 성능을 극대화하기 위해 설계되었으며, 개발자가 병렬 프로그래밍을 더 
 쉽게 할 수 있도록 도와준다.
+
 - 주요 특징
 1. 태스크 기반 병렬화
 스레드가 아닌 태스크를 중심으로 병렬화를 수행한다. 
@@ -12,3 +14,53 @@ Intel에서 제공하는 C++병렬 프로그래밍 라이브러리 이다.
 병렬 루프, 병렬 정렬, 병렬 감소 등의 데이터 병렬 알고리즘을 지원한다.
 4. 파이프라인 및 플로우 그래프
 복잡한 병렬 작업 흐름을 구현하기 위한 파이프라인과 플로우 그래프를 지원한다.
+
+- 설치방법
+1. 다운로드 
+https://www.intel.com/content/www/us/en/developer/articles/tool/oneapi-standalone-components.html#onetbb
+2. 압축풀고 설치
+w_tbb_oneapi_p_2021.12.0.500_offline.exe
+3. 설치위치 
+C:\Program Files (x86)\Intel\oneAPI\tbb\2021.12
+4. 환경변수
+TBB_DIR : C:\Program Files (x86)\Intel\oneAPI\tbb\2021.12\bin
+TBB_ROOT : C:\Program Files (x86)\Intel\oneAPI\tbb\2021.12\bin
+Path : C:\Program Files (x86)\Intel\oneAPI\tbb\2021.12\bin
+
+- 사용예제
+1. 병렬 for 루프
+#include <iostream>
+#include <tbb/tbb.h> //C:\Program Files (x86)\Intel\oneAPI\tbb\2021.12\include\tbb
+
+void ParallelForExample(){
+  tbb::parallel_for(0, 10, [](int i){
+    std::cout << "Thread " << tbb::this_task_arena::current_thread_index() <
+      << " processing iteration " << i << std::endl;
+  });
+}
+
+int main(){
+  ParallelForExample();
+  return 0;
+}
+
+2. 병렬 reduce
+#include <iostream>
+#include <vector>
+#include <numeric>
+#include <tbb/tbb.h>
+
+int main(){
+  //100개의 요소를 가진 벡터생성, 각 요소 1로 초기화
+  std::vector<int> vec(100, 1);
+
+  int sum = tbb::parallel_reduce( //병렬로 요소 처리, 결과 합산기능제공
+    //병렬처리 범위 지정
+    tbb::blocked_range<std::vector<int>::iterator>(vec.begin(), vec.end()),
+    0, //합산초기값
+    [](const tbb::blocked_range<std::vector<int>::iterator>& r, int init({
+          return std::accumulate(r.begin(), r.end(), init);
+          },
+          std::plus<int>()//병렬처리된 각 부분 결과를 효율적으로 하나의 최종결과로 합침
+    );
+}
