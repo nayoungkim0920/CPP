@@ -352,7 +352,7 @@ void MainWindow::rotateImage()
 void MainWindow::zoomInImage()
 {
     if (!currentImage.empty()) {
-        scaleFactor *= 1.25;
+        scaleFactor = 1.25;
         auto future = imageProcessor->zoomImage(currentImage,
             scaleFactor);
         future.waitForFinished();
@@ -367,7 +367,7 @@ void MainWindow::zoomInImage()
 void MainWindow::zoomOutImage()
 {
     if (!currentImage.empty()) {
-        scaleFactor *= 0.8;
+        scaleFactor = 0.8;
         auto future = imageProcessor->zoomImage(currentImage,
             scaleFactor);
         future.waitForFinished();
