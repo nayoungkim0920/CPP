@@ -1,0 +1,70 @@
+<OpenMP(Open multi processing)>
+
+- 설치방법
+Visual Studio에서 기본적으로 지원한다.
+프로젝트 속성 > C/C++ > 언어 > OpenMP 지원 > 예
+
+- 장점
+1. 코드 수정 최소화
+기존의 직렬 코드를 크게 수정하지 않고도 병렬화를 추가할 수 있다.
+2. 이식성
+다양한 플랫폼에서 사용가능하며, 대부분의 현대 컴파일러가 지원한다.
+3. 성능향상
+멀티코어 및 멀티프로세서 시스템에서 병렬처리를 통해 성능을 크게 향상시킬 수 있다.
+4. 유연성
+다양한 병렬화 패턴을 쉽게 구현할 수 있으며, 코드 가독성이 높다.
+
+- 단점
+1. 스레드 관리
+많은 스레드를 사용하면 스레드 관리 오버헤드가 증가할 수 있다.
+2. 데이터 경합
+여러 스레드가 동일한 데이터에 접근할 때 데이터 경합이 발생할 수 있으며, 이를 해결하기
+위해 추가적인 동기화가 필요하다.
+3. 스케일링 한계
+모든 코드가 병렬화에 적합한 것은 아니며, 병렬화 이득이 제한적일 수 있다.
+4. 메모리 사용량 증가
+스레드별로 복사된 데이터가 많아지면 메모리 사용량이 증가할 수 있다.
+
+- 사용방법
+1. 병렬 영역(Parallel Region)
+#include <iostream>
+#include <omp.h>
+
+int main(){
+  #pragma omp parallel
+  {
+    int thread_id = omp_get_thread_num();
+    std::cout << "Hello, world! from thread " << thread_id << std::endl;
+  }
+  return 0;
+}
+
+2. 병렬 루프(Parallel Loop)
+#include <iostream>
+#include <omp.h> 
+
+int main(){
+  #pragma omp parallel for
+  for(int i = 0; i<10; ++i){
+    int thread_id = omp_get_thread_num();
+    std::cout << "Thread " << thread_id << " processing iteration " << i 
+    << std::endl;
+  }
+}
+
+3. 데이터 공유 및 개인 데이터(Data Sharing)
+//reduction(+:sum) 지시문을 통해 모든 스레드가 sum값을 더할 수 있도록 한다.
+#include <iostream>
+#include <omp.h>
+
+int main(){
+  int sum = 0;
+
+  #pragma omp parallel for reduction(+:sum)
+  for(int i = 0; i < 10; ++i){
+    sum += i;
+  }
+
+  std::cout << "Sum: " << sum << std::endl;
+  return 0;
+}
