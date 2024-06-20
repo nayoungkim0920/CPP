@@ -1,5 +1,10 @@
 <IPP>
-
+IPP로 OpenCV로 이미지처리하는 부분으로 변경 하고 싶었으나
+ippiRotate_8u_C3R, ippiResize_8u_C3R 함수가 ippi.h에서 대체없이 완전제거되어 
+OpenCV로 구현
+-인텔 통합 성능 프리미티브(인텔IPP)개발자 가이드 및 참조 
+https://www.intel.com/content/www/us/en/docs/ipp/developer-guide-reference/2021-11/getrotatetransform.html
+ipp_developer-guide-reference_2021.11-790148-814849.pdf
 
 <CMake IPP설정 추가>
 //CMakeLists.txt
@@ -15,7 +20,7 @@ find_package(OpenCV REQUIRED)
 
 # Intel oneAPI IPP 추가
 set(IPP_INCLUDE_DIR "C:/Program Files (x86)/Intel/oneAPI/ipp/2021.11/include")
-set(IPP_LIB_DIR "C:/Program Files (x86)/Intel/oneAPI/ipp/latest/lib")
+set(IPP_LIB_DIR "C:/Program Files (x86)/Intel/oneAPI/ipp/2021.11/lib")
 
 # 추가 포함 디렉터리 설정
 include_directories(${IPP_INCLUDE_DIR})
@@ -44,6 +49,10 @@ target_link_libraries(Project1
     "${IPP_LIB_DIR}/ippvmmt.lib"
     "${IPP_LIB_DIR}/ippsmt.lib"
     "${IPP_LIB_DIR}/ippcoremt.lib"
+    "${IPP_LIB_DIR}/ippcore.lib"
+    "${IPP_LIB_DIR}/ippi.lib"
+    "${IPP_LIB_DIR}/ipps.lib"
+    "${IPP_LIB_DIR}/ippcvmt.lib"
 )
 
 # 실행 파일 출력 디렉토리 설정
@@ -99,6 +108,3 @@ qt6_wrap_cpp(MOC_FILES
 # 생성된 MOC 파일을 소스에 추가
 target_sources(Project1 PRIVATE ${MOC_FILES})
 
-<오류>
-ippiRotate_8u_C3R
-ippiResize_8u_C3R
