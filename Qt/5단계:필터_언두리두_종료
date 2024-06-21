@@ -1,0 +1,362 @@
+<그레이스케일/가우시안블러/케니엣지검출,언두/리두,종료기능추가>
+
+1.ImageProcessor.h
+
+1) 객체 지향 설계
+ImageProessor클래스를 사용하여 이미지 처리 기능을 캡슐화하고, 관련된 데이터와 메섣를
+한 곳에 모아 관리한다.
+2)Qt통합
+QtObject를 상속받아 Qt의 신호와 슬롯 메커니즘을 사용할 수 있고 UI와의 통신을 
+쉽게 할 수 있다.
+3)스레드안전
+QMutex와 QMutexLocker를 사용하여 멀티스레드 환경에서의 데이터 접근을 안전하게 보호
+4)비동기작업
+QtConcurrent::run을 사용하여 이미지 처리 작업을 비동기로 수행.
+UI의 응답성을 유지할 수 있다.
+5)실행 취소 및 재실행
+undoStack과 redoStack을 사용하여 실행 취소 및 재실행 기능 제공. 이를 통해 사용자는
+실수나 변경 사항을 쉽게 되돌릴 수 있다.
+
+//ImageProcessor.h
+#ifndef IMAGEPROCESSOR_H
+#define IMAGEPROCESSOR_H
+
+#include <stack> //std::stack
+#include <QObject> //Qt의 Object 클래스 사용
+#include <QDebug> //디버깅 메시지 출력
+#include <QMutex> //다중스레드환경에서 데이터접근 보호
+#include <QMutexLocker>
+#include <QtConcurrent/QtConcurrent> //비동기 작업 수행
+#include <opencv2/core.hpp> //이미지처리
+#include <opencv2/opencv.hpp>
+#include <opencv2/imgproc.hpp>
+//#include <ipp.h>
+//#include <ipp/ippi.h>
+//#include <ipp/ippcc.h>
+//#include <opencv2/cuda>
+
+//QObject를 상속받아 Qt의 신호/슬롯 메커니즘 사용
+class ImageProcessor : public QObject
+{
+    Q_OBJECT //Qt의 메타-객체 시스템 활성화
+
+public:
+    explicit ImageProcessor(QObject* parent = nullptr);
+    ~ImageProcessor();
+
+    bool openImage(const std::string& fileName, cv::Mat& image);
+    bool saveImage(const std::string& fileName, const cv::Mat& image);
+    //QFuture<bool> : 비동기작업지원
+    QFuture<bool> rotateImage(cv::Mat& image);
+    QFuture<bool> zoomImage(cv::Mat& image, double scaleFactor);
+    QFuture<bool> convertToGrayscale(cv::Mat& image);
+    QFuture<bool> applyGaussianBlur(cv::Mat& image, int kernelSize);
+    QFuture<bool> detectEdges(cv::Mat& image);
+
+    bool canUndo() const; //실행취소 가능여부
+    bool canRedo() const; //재실행 가능여부
+    bool undo(); //실행취소 수행
+    bool redo(); //재실행 수행
+
+    //마지막으로 처리된 이미지를 반환하는 메서드
+    const cv::Mat& getLastProcessedImage() const;
+
+signals: //이벤트 발생을 알림
+    //이미지가 처리된 후 신호를 발생시키는 시그널.
+    //UI에서 이 신호를 받아 이미지를 업데이트
+    void imageProcessed(const cv::Mat& processedImage);
+
+//slots: //이벤트를 처리하는 함수 지칭
+
+private: //클래스 내부에서만 접근할 수 있는 멤버
+    cv::Mat lastProcessedImage; //마지막으로 처리된 이미지를 저장
+    QMutex mutex; //멀티스레드환경에서 데이터 접근을 보호하기 위한 뮤텍스
+    std::stack<cv::Mat> undoStack; //실행취소 스택
+    std::stack<cv::Mat> redoStack; //재실행 스택
+    //현재상태를 스택에 저장하고 나중에 실핻 취소 및 재실행할 수 있도록 한다.
+    void pushToUndoStack(const cv::Mat& image); 
+    void pushToRedoStack(const cv::Mat& image);
+};
+
+#endif // IMAGEPROCESSOR_H
+
+2.ImageProcessor.cpp
+//ImageProcessor.cpp
+#include "ImageProcessor.h"
+
+ImageProcessor::ImageProcessor(QObject* parent) : QObject(parent)
+{
+}
+
+ImageProcessor::~ImageProcessor()
+{
+}
+
+bool ImageProcessor::openImage(const std::string& fileName, cv::Mat& image)
+{
+    image = cv::imread(fileName);
+    if (image.empty()) {
+        qDebug() << "Failed to open image: " << QString::fromStdString(fileName);
+        return false;
+    }
+    return true;
+}
+
+bool ImageProcessor::saveImage(const std::string& fileName, const cv::Mat& image)
+{
+    if (!cv::imwrite(fileName, image)) {
+        qDebug() << "Failed to save image: " << QString::fromStdString(fileName);
+        return false;
+    }
+    return true;
+}
+
+QFuture<bool> ImageProcessor::rotateImage(cv::Mat& image) {
+
+    return QtConcurrent::run([this, &image]()->bool {
+
+        QMutexLocker locker(&mutex);
+
+        pushToUndoStack(image);
+
+        try {
+
+            if (image.empty()) {
+                qDebug() << "Input image is empty.";
+                return false;
+            }
+
+            //이미지 회전
+            cv::Mat rotatedImage;
+            cv::rotate(image, rotatedImage, cv::ROTATE_90_CLOCKWISE);
+
+            image = rotatedImage.clone();
+            lastProcessedImage = image.clone();
+
+            emit imageProcessed(image);
+
+        }
+        catch (const cv::Exception& e) {
+            qDebug() << "Exception occured while rotating image:"
+                << e.what();
+            return false;
+        }
+        
+    });
+
+}
+
+QFuture<bool> ImageProcessor::zoomImage(cv::Mat& image, double scaleFactor)
+{
+    return QtConcurrent::run([this, &image, scaleFactor]() -> bool {
+        
+        QMutexLocker locker(&mutex);
+
+        pushToUndoStack(image);
+        
+        try {
+            
+            if (image.empty()) {
+                qDebug() << "입력 이미지가 비어 있습니다.";
+                return false;
+            }
+
+            if (scaleFactor <= 0) {
+                qDebug() << "잘못된 확대/축소 배율입니다.";
+                return false;
+            }            
+
+            int newWidth = static_cast<int>(image.cols * scaleFactor);
+            int newHeight = static_cast<int>(image.rows * scaleFactor);
+
+            cv::Mat zoomedImage;
+            cv::resize(image, zoomedImage, cv::Size(newWidth, newHeight), 0, 0, cv::INTER_LINEAR);
+            
+            image = zoomedImage.clone(); // 이미지를 복사하여 업데이트
+            lastProcessedImage = image.clone();
+
+            emit imageProcessed(image); // 이미지 처리 완료 시그널 발생
+
+            return true;
+        }
+        catch (const cv::Exception& e) {
+            qDebug() << "이미지 확대/축소 중 예외가 발생했습니다:" << e.what();
+            return false;
+        }
+        });
+}
+
+QFuture<bool> ImageProcessor::convertToGrayscale(cv::Mat& image)
+{
+    return QtConcurrent::run([this, &image]() -> bool {
+
+        QMutexLocker locker(&mutex);
+
+        pushToUndoStack(image);
+
+        try {
+            if (image.empty()) {
+                qDebug() << "Input image is empty.";
+                return false;
+            }
+
+            cv::Mat grayImage;
+
+            // BGR 이미지를 RGB 채널로 분리
+            std::vector<cv::Mat> channels;
+            cv::split(image, channels);
+
+            // RGB 채널을 그레이스케일로 변환
+            cv::Mat gray;
+            cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);
+
+            // 그레이스케일 이미지를 RGB 형식으로 변환
+            cv::Mat merged;
+            cv::merge(std::vector<cv::Mat>{gray, gray, gray}, merged);
+
+            // 원본 이미지에 그레이스케일 이미지 적용
+            image = merged.clone();
+            lastProcessedImage = image.clone();
+
+            emit imageProcessed(image); // 이미지 처리가 완료되었음을 시그널로 알림
+            return true;
+        }
+        catch (const cv::Exception& e) {
+            qDebug() << "Exception occurred while converting to grayscale:" << e.what();
+            return false;
+        }
+        });
+}
+
+QFuture<bool> ImageProcessor::applyGaussianBlur(cv::Mat& image, int kernelSize)
+{
+    return QtConcurrent::run([this, &image, kernelSize]() -> bool {
+        
+        QMutexLocker locker(&mutex);
+
+        pushToUndoStack(image);
+
+        try {
+            if (image.empty()) {
+                qDebug() << "Input image is empty.";
+                return false;
+            }
+
+            if (kernelSize % 2 == 0 || kernelSize < 1) {
+                qDebug() << "Invalid kernel size for Gaussian blur.";
+                return false;
+            }
+
+            cv::Mat blurredImage;
+            cv::GaussianBlur(image, blurredImage, cv::Size(kernelSize, kernelSize), 0, 0);
+
+            image = blurredImage.clone();
+            lastProcessedImage = image.clone();
+
+            emit imageProcessed(image);
+
+            return true;
+        }
+        catch (const cv::Exception& e) {
+            qDebug() << "Exception occurred while applying Gaussian blur:"
+                << e.what();
+            return false;
+        }
+    });
+}
+
+//Canny
+QFuture<bool> ImageProcessor::detectEdges(cv::Mat& image)
+{
+    return QtConcurrent::run([this, &image]() -> bool {
+
+        QMutexLocker locker(&mutex);
+
+        pushToUndoStack(image);
+
+        try {
+            if (image.empty()) {
+                qDebug() << "Input image is empty.";
+                return false;
+            }
+
+            cv::Mat grayImage;
+            cv::cvtColor(image, grayImage, cv::COLOR_BGR2GRAY);
+
+            cv::Mat edges;
+            cv::Canny(grayImage, edges, 50, 150);
+
+            cv::Mat outputImage;
+            image.copyTo(outputImage);
+            outputImage.setTo(cv::Scalar(0, 255, 0), edges); // Green edges
+
+            image = outputImage.clone();
+            lastProcessedImage = image.clone();
+
+            emit imageProcessed(image);
+            return true;
+        }
+        catch (const cv::Exception& e) {
+            qDebug() << "Exception occurred while detecting edges:" << e.what();
+            return false;
+        }
+        });
+}
+
+bool ImageProcessor::canUndo() const
+{
+    return !undoStack.empty();
+}
+
+bool ImageProcessor::canRedo() const
+{
+    return !redoStack.empty();
+}
+
+//실행취소
+bool ImageProcessor::undo()
+{
+    if (!canUndo())
+        return false;
+
+    cv::Mat imageToRestore = undoStack.top();
+    redoStack.push(lastProcessedImage);
+    lastProcessedImage = imageToRestore.clone();
+    undoStack.pop();
+
+    emit imageProcessed(lastProcessedImage);
+
+    return true;
+}
+
+//재실행
+bool ImageProcessor::redo()
+{
+    if (!canRedo())
+        return false;
+
+    cv::Mat imageToRestore = redoStack.top();
+    undoStack.push(lastProcessedImage);
+    lastProcessedImage = imageToRestore.clone();
+    redoStack.pop();
+
+    emit imageProcessed(lastProcessedImage);
+
+    return true;
+}
+
+const cv::Mat& ImageProcessor::getLastProcessedImage() const
+{
+    return lastProcessedImage;
+}
+
+void ImageProcessor::pushToUndoStack(const cv::Mat& image)
+{
+    undoStack.push(image.clone());
+}
+
+void ImageProcessor::pushToRedoStack(const cv::Mat& image)
+{
+    redoStack.push(image.clone());
+}
+
