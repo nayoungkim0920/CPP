@@ -214,14 +214,14 @@ QFuture<bool> ImageProcessor::convertToGrayscale(cv::Mat& image)
                 return false;
             }
 
-            cv::Mat grayImage;
-
-            // BGR 이미지를 RGB 채널로 분리
+            //이미지의 채널을 저장할 벡터 선언
             std::vector<cv::Mat> channels;
+            //이미지를 채널별로 분리, BGR 이미지를 세 개의 채널로 나눈다.
             cv::split(image, channels);
 
-            // RGB 채널을 그레이스케일로 변환
+            // 그레이스케일 이미지를 저장할 변수
             cv::Mat gray;
+            // 컬러이미지를 그레이스케일로 변환
             cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);
 
             // 그레이스케일 이미지를 RGB 형식으로 변환
@@ -242,6 +242,7 @@ QFuture<bool> ImageProcessor::convertToGrayscale(cv::Mat& image)
         });
 }
 
+
 QFuture<bool> ImageProcessor::applyGaussianBlur(cv::Mat& image, int kernelSize)
 {
     return QtConcurrent::run([this, &image, kernelSize]() -> bool {
@@ -256,6 +257,9 @@ QFuture<bool> ImageProcessor::applyGaussianBlur(cv::Mat& image, int kernelSize)
                 return false;
             }
 
+            //커널 크기 유효성 검사 
+            //가우시안 블러의 커널 크기가 홀수인지, 그리고 1 이상인지 검사
+            //짝수 크기는 유효하지 않다.
             if (kernelSize % 2 == 0 || kernelSize < 1) {
                 qDebug() << "Invalid kernel size for Gaussian blur.";
                 return false;
@@ -279,7 +283,8 @@ QFuture<bool> ImageProcessor::applyGaussianBlur(cv::Mat& image, int kernelSize)
     });
 }
 
-//Canny
+//Canny edge
+//주어진 이미지에서 엣지(가장자리)를 검출하는 비동기 작업을 수행
 QFuture<bool> ImageProcessor::detectEdges(cv::Mat& image)
 {
     return QtConcurrent::run([this, &image]() -> bool {
@@ -294,19 +299,27 @@ QFuture<bool> ImageProcessor::detectEdges(cv::Mat& image)
                 return false;
             }
 
-            cv::Mat grayImage;
-            cv::cvtColor(image, grayImage, cv::COLOR_BGR2GRAY);
+            //회색조이미지
+            cv::Mat gray = converToGrayScale(image);
 
-            cv::Mat edges;
-            cv::Canny(grayImage, edges, 50, 150);
+            //엣지 검출
+            cv::Mat edges; //엣지감지결과
+            //50:하위 임계값(threshold1)
+            //엣지후보로 고려되기 위한 최소 강도 
+            //임계값보다 낮은 강도의 엣지는 제거된다.
+            //150:상위 임계값(threshold2)
+            //강한 엣지로 간주되는 임계값
+            //두 임계값 사이의 강도를 가진 엣지는 연결되어
+            //하나의 엣지로 유지된다
+            cv::Canny(gray, edges, 50, 150);
 
             cv::Mat outputImage;
-            image.copyTo(outputImage);
+            gray.copyTo(outputImage); //회색조이미지를 복사
             outputImage.setTo(cv::Scalar(0, 255, 0), edges); // Green edges
-
+            
             image = outputImage.clone();
             lastProcessedImage = image.clone();
-
+            
             emit imageProcessed(image);
             return true;
         }
