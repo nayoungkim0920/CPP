@@ -111,12 +111,15 @@ bool ImageProcessor::saveImage(const std::string& fileName, const cv::Mat& image
     return true;
 }
 
+//이미지를 90도 회전시키는 비동기 작업 수행
 QFuture<bool> ImageProcessor::rotateImage(cv::Mat& image) {
 
     return QtConcurrent::run([this, &image]()->bool {
 
+        //여러 스레드가 동시에 image 객체에 접근하지 못하게 함
         QMutexLocker locker(&mutex);
 
+        //작업시작전에 원본 이미지를 실행 취소 스택에 저장
         pushToUndoStack(image);
 
         try {
@@ -126,15 +129,18 @@ QFuture<bool> ImageProcessor::rotateImage(cv::Mat& image) {
                 return false;
             }
 
-            //이미지 회전
+            //OpenCV로 이미지 회전
             cv::Mat rotatedImage;
             cv::rotate(image, rotatedImage, cv::ROTATE_90_CLOCKWISE);
 
+            //회전된 이미지를 저장
             image = rotatedImage.clone();
             lastProcessedImage = image.clone();
 
+            //시그널 발생
             emit imageProcessed(image);
 
+            return true;
         }
         catch (const cv::Exception& e) {
             qDebug() << "Exception occured while rotating image:"
@@ -146,8 +152,11 @@ QFuture<bool> ImageProcessor::rotateImage(cv::Mat& image) {
 
 }
 
+//이미지를 지정된 배율로 확대 축소하는 비동기 작업 수행
 QFuture<bool> ImageProcessor::zoomImage(cv::Mat& image, double scaleFactor)
-{
+{    
+    //QtConcurrent::run을 사용하여 비동기 작업을 시작하고,
+    //작업결과를 QFuture<bool>로 반환
     return QtConcurrent::run([this, &image, scaleFactor]() -> bool {
         
         QMutexLocker locker(&mutex);
@@ -166,10 +175,15 @@ QFuture<bool> ImageProcessor::zoomImage(cv::Mat& image, double scaleFactor)
                 return false;
             }            
 
+            //새로운 이미지 크기 계산
             int newWidth = static_cast<int>(image.cols * scaleFactor);
             int newHeight = static_cast<int>(image.rows * scaleFactor);
 
+            //이미지를 새로운 크기로 리사이즈한다.
             cv::Mat zoomedImage;
+            //cv::INTER_LINEAR : 새 픽셀 위치에 가장 가까운 4개의 원본 픽셀을 찾아
+            //각 픽셀의 거리 가중치를 곱해 평균을 낸다.
+            //0,0 : 가로,세로방향 스케일링 요소, 자동계산
             cv::resize(image, zoomedImage, cv::Size(newWidth, newHeight), 0, 0, cv::INTER_LINEAR);
             
             image = zoomedImage.clone(); // 이미지를 복사하여 업데이트
