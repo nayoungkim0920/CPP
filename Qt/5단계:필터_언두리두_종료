@@ -18,16 +18,17 @@ undoStack과 redoStack을 사용하여 실행 취소 및 재실행 기능 제공
 실수나 변경 사항을 쉽게 되돌릴 수 있다.
 
 //ImageProcessor.h
+//ImageProcessor.h
 #ifndef IMAGEPROCESSOR_H
 #define IMAGEPROCESSOR_H
 
-#include <stack> //std::stack
-#include <QObject> //Qt의 Object 클래스 사용
-#include <QDebug> //디버깅 메시지 출력
-#include <QMutex> //다중스레드환경에서 데이터접근 보호
+#include <stack>
+#include <QObject>
+#include <QDebug>
+#include <QMutex>
 #include <QMutexLocker>
-#include <QtConcurrent/QtConcurrent> //비동기 작업 수행
-#include <opencv2/core.hpp> //이미지처리
+#include <QtConcurrent/QtConcurrent>
+#include <opencv2/core.hpp>
 #include <opencv2/opencv.hpp>
 #include <opencv2/imgproc.hpp>
 //#include <ipp.h>
@@ -35,10 +36,9 @@ undoStack과 redoStack을 사용하여 실행 취소 및 재실행 기능 제공
 //#include <ipp/ippcc.h>
 //#include <opencv2/cuda>
 
-//QObject를 상속받아 Qt의 신호/슬롯 메커니즘 사용
 class ImageProcessor : public QObject
 {
-    Q_OBJECT //Qt의 메타-객체 시스템 활성화
+    Q_OBJECT
 
 public:
     explicit ImageProcessor(QObject* parent = nullptr);
@@ -46,36 +46,34 @@ public:
 
     bool openImage(const std::string& fileName, cv::Mat& image);
     bool saveImage(const std::string& fileName, const cv::Mat& image);
-    //QFuture<bool> : 비동기작업지원
     QFuture<bool> rotateImage(cv::Mat& image);
     QFuture<bool> zoomImage(cv::Mat& image, double scaleFactor);
-    QFuture<bool> convertToGrayscale(cv::Mat& image);
+    QFuture<bool> convertToGrayscaleAsync(cv::Mat& image);
     QFuture<bool> applyGaussianBlur(cv::Mat& image, int kernelSize);
     QFuture<bool> detectEdges(cv::Mat& image);
 
-    bool canUndo() const; //실행취소 가능여부
-    bool canRedo() const; //재실행 가능여부
-    bool undo(); //실행취소 수행
-    bool redo(); //재실행 수행
+    bool canUndo() const;
+    bool canRedo() const;
+    void undo();
+    void redo();
 
-    //마지막으로 처리된 이미지를 반환하는 메서드
     const cv::Mat& getLastProcessedImage() const;
 
 signals: //이벤트 발생을 알림
-    //이미지가 처리된 후 신호를 발생시키는 시그널.
-    //UI에서 이 신호를 받아 이미지를 업데이트
     void imageProcessed(const cv::Mat& processedImage);
 
 //slots: //이벤트를 처리하는 함수 지칭
 
-private: //클래스 내부에서만 접근할 수 있는 멤버
-    cv::Mat lastProcessedImage; //마지막으로 처리된 이미지를 저장
-    QMutex mutex; //멀티스레드환경에서 데이터 접근을 보호하기 위한 뮤텍스
-    std::stack<cv::Mat> undoStack; //실행취소 스택
-    std::stack<cv::Mat> redoStack; //재실행 스택
-    //현재상태를 스택에 저장하고 나중에 실핻 취소 및 재실행할 수 있도록 한다.
-    void pushToUndoStack(const cv::Mat& image); 
+private: 
+    cv::Mat lastProcessedImage;
+    QMutex mutex;
+    std::stack<cv::Mat> undoStack;
+    std::stack<cv::Mat> redoStack;
+
+    void pushToUndoStack(const cv::Mat& image);
     void pushToRedoStack(const cv::Mat& image);
+
+    cv::Mat converToGrayScale(const cv::Mat& image);
 };
 
 #endif // IMAGEPROCESSOR_H
@@ -341,35 +339,47 @@ bool ImageProcessor::canRedo() const
 }
 
 //실행취소
-bool ImageProcessor::undo()
+void ImageProcessor::undo()
 {
-    if (!canUndo())
-        return false;
+    try {
 
-    cv::Mat imageToRestore = undoStack.top();
-    redoStack.push(lastProcessedImage);
-    lastProcessedImage = imageToRestore.clone();
-    undoStack.pop();
+        if (!canUndo())
+            throw std::runtime_error("Cannot redo: undo stack is empty");
 
-    emit imageProcessed(lastProcessedImage);
+        cv::Mat imageToRestore = undoStack.top();
+        redoStack.push(lastProcessedImage);
+        lastProcessedImage = imageToRestore.clone();
+        undoStack.pop();
 
-    return true;
+        emit imageProcessed(lastProcessedImage);
+
+    }
+    catch (const std::exception& e) {
+        qDebug() << "Exception occurred in ImageProcessor::undo(): "
+            << e.what();
+    }
 }
 
 //재실행
-bool ImageProcessor::redo()
+void ImageProcessor::redo()
 {
-    if (!canRedo())
-        return false;
+    try {
 
-    cv::Mat imageToRestore = redoStack.top();
-    undoStack.push(lastProcessedImage);
-    lastProcessedImage = imageToRestore.clone();
-    redoStack.pop();
+        if (!canRedo())
+            throw std::runtime_error("Cannot redo: redo stack is empty");
 
-    emit imageProcessed(lastProcessedImage);
+        cv::Mat imageToRestore = redoStack.top();
+        undoStack.push(lastProcessedImage);
+        lastProcessedImage = imageToRestore.clone();
+        redoStack.pop();
 
-    return true;
+        emit imageProcessed(lastProcessedImage);
+
+    }
+    catch (const std::exception& e) {
+        qDebug() << "Exception occurred in ImageProcessor::redo(): " 
+            << e.what();
+    }
 }
 
 const cv::Mat& ImageProcessor::getLastProcessedImage() const
@@ -385,5 +395,237 @@ void ImageProcessor::pushToUndoStack(const cv::Mat& image)
 void ImageProcessor::pushToRedoStack(const cv::Mat& image)
 {
     redoStack.push(image.clone());
+}
+
+3.MainWndow.h
+//MainWindow.h
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
+
+#include <QMainWindow>
+#include <QImage>
+#include <QPixmap>
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QInputDialog>
+#include <opencv2/opencv.hpp>
+#include "ImageProcessor.h"
+#include "ui_MainWindow.h"
+
+QT_BEGIN_NAMESPACE
+namespace Ui { class MainWindow; }
+QT_END_NAMESPACE
+
+class MainWindow : public QMainWindow
+{
+    Q_OBJECT
+
+public:
+    MainWindow(QWidget* parent = nullptr);
+    ~MainWindow();
+
+private slots:
+    void openFile();
+    void saveFile();
+    void rotateImage();
+    void zoomInImage();
+    void zoomOutImage();
+    void convertToGrayscale();
+    void applyGaussianBlur();
+    void detectEdges();
+    void exitApplication();
+    void redoAction();
+    void undoAction();
+    void displayImage(const cv::Mat& image);
+
+private:
+    Ui::MainWindow* ui;
+    cv::Mat currentImage;
+    ImageProcessor* imageProcessor;
+    double scaleFactor;
+
+    
+    void connectActions();
+    void connectImageProcessor();
+    void setInitialWindowGeometry();
+};
+
+#endif // MAINWINDOW_H
+
+4.MainWindow.cpp
+//MainWindow.cpp
+#include "MainWindow.h"
+
+MainWindow::MainWindow(QWidget* parent)
+    : QMainWindow(parent)
+    , ui(new Ui::MainWindow)
+    , imageProcessor(new ImageProcessor)
+    , scaleFactor(1.0)
+{
+    ui->setupUi(this);
+
+    connectActions();
+
+    connectImageProcessor();
+
+    setInitialWindowGeometry();
+}
+
+MainWindow::~MainWindow()
+{
+    delete ui;
+    delete imageProcessor;
+}
+
+void MainWindow::openFile()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Image"), "", tr("Image Files (*.png *.jpg *.bmp *.jpeg);;All Files (*)"));
+    if (!fileName.isEmpty()) {
+        cv::Mat loadedImage;
+        if (imageProcessor->openImage(fileName.toStdString(), loadedImage)) {
+            currentImage = loadedImage.clone(); // Clone loaded image
+            displayImage(currentImage);
+        }
+        else {
+            QMessageBox::critical(this, tr("Error"), tr("Failed to open image file"));
+        }
+    }
+}
+
+void MainWindow::saveFile()
+{
+    if (!currentImage.empty()) {
+        QString filePath = QFileDialog::getSaveFileName(this, tr("Save Image"), "", tr("Images (*.png *.jpg *.bmp)"));
+        if (!filePath.isEmpty()) {
+            if (!imageProcessor->saveImage(filePath.toStdString(), currentImage)) {
+                QMessageBox::critical(this, tr("Error"), tr("Failed to save image"));
+            }
+        }
+    }
+    else {
+        QMessageBox::critical(this, tr("Error"), tr("No image to save"));
+    }
+}
+
+void MainWindow::rotateImage()
+{
+    if (!currentImage.empty()) {
+        auto future = imageProcessor->rotateImage(currentImage);
+        future.waitForFinished();
+    }
+}
+
+void MainWindow::zoomInImage()
+{
+    if (!currentImage.empty()) {
+        scaleFactor = 1.25;
+        auto future = imageProcessor->zoomImage(currentImage,
+            scaleFactor);
+        future.waitForFinished();
+    }
+}
+
+void MainWindow::zoomOutImage()
+{
+    if (!currentImage.empty()) {
+        scaleFactor = 0.8;
+        auto future = imageProcessor->zoomImage(currentImage,
+            scaleFactor);
+        future.waitForFinished();
+    }
+}
+
+void MainWindow::convertToGrayscale()
+{
+    if (!currentImage.empty()) {
+        auto future = imageProcessor->convertToGrayscaleAsync(currentImage);
+        future.waitForFinished();
+    }
+}
+
+void MainWindow::applyGaussianBlur()
+{
+    if (!currentImage.empty()) {
+        bool ok;
+        int kernelSize = QInputDialog::getInt(this, tr("Gaussian Blur"), tr("Enter kernel size (odd number):"), 5, 1, 101, 2, &ok);
+        if (ok) {
+            auto future = imageProcessor->applyGaussianBlur(currentImage, kernelSize);
+            future.waitForFinished(); 
+        }
+    }
+}
+
+void MainWindow::detectEdges()
+{
+    if (!currentImage.empty()) {
+        auto future = imageProcessor->detectEdges(currentImage);
+        future.waitForFinished();
+    }
+}
+
+void MainWindow::exitApplication()
+{
+    QApplication::quit();
+}
+
+void MainWindow::redoAction()
+{
+    if (imageProcessor->canRedo()) {
+        imageProcessor->redo();
+    }
+}
+
+void MainWindow::undoAction()
+{
+    if (imageProcessor->canUndo()) {
+        imageProcessor->undo();
+    }
+}
+
+
+void MainWindow::displayImage(const cv::Mat& image)
+{
+    QImage qImage(image.data,
+        image.cols,
+        image.rows,
+        static_cast<int>(image.step),
+        QImage::Format_BGR888);
+    ui->label->setPixmap(QPixmap::fromImage(qImage));
+    ui->label->adjustSize();
+}
+
+
+void MainWindow::connectActions()
+{
+    connect(ui->actionOpen, &QAction::triggered, this, &MainWindow::openFile);
+    connect(ui->actionSave, &QAction::triggered, this, &MainWindow::saveFile);
+    connect(ui->actionExit, &QAction::triggered, this, &MainWindow::exitApplication);
+
+    connect(ui->actionRotate, &QAction::triggered, this, &MainWindow::rotateImage);
+    connect(ui->actionZoomIn, &QAction::triggered, this, &MainWindow::zoomInImage);
+    connect(ui->actionZoomOut, &QAction::triggered, this, &MainWindow::zoomOutImage);
+    connect(ui->actionRedo, &QAction::triggered, this, &MainWindow::redoAction);
+    connect(ui->actionUndo, &QAction::triggered, this, &MainWindow::undoAction);
+
+    connect(ui->actionGrayscale, &QAction::triggered, this, &MainWindow::convertToGrayscale);
+    connect(ui->actionGaussianBlur, &QAction::triggered, this, &MainWindow::applyGaussianBlur);
+    connect(ui->actionDetectEdges, &QAction::triggered, this, &MainWindow::detectEdges);
+
+    
+}
+
+void MainWindow::connectImageProcessor()
+{
+    // Connect ImageProcessor's signal to displayImage slot
+    connect(imageProcessor, &ImageProcessor::imageProcessed, this, &MainWindow::displayImage);
+}
+
+void MainWindow::setInitialWindowGeometry()
+{
+    const int initialWidth = 800;
+    const int initialHeight = 600;
+    const int initialX = 100;
+    const int initialY = 100;
+    this->setGeometry(initialX, initialY, initialWidth, initialHeight);
 }
 
