@@ -60,7 +60,16 @@ cv::medianBlur(image, bluredImag, 5);
 객체검출, 영상 세그맨테이션 트래킹 등 다양한 컴퓨터 비전 작업에서 사용된다.
 -cv::Sobel(입력이미지,출력이미지, 출력이미지깊이(CV_165/CV_64F),
             X방향의 미분 차수/Y방향의 미분 차수, 커널 크기(1,3,5,7));
+//Sobel필터 적용
+cv::sobelX, sobelY;
 //1,0 x방향필터적용.수평방향의 엣지감지.주변픽셀의 값을 왼쪽과 오른쪽으로 비교하여 변화의 크기 계산
 cv::Sobel(image, sobelX, cv_165, 1,0,3); //CV_165부호 있는 16비트(short)정수로 저장
 //0,1 y방향필터적용.주변피기셀의 값을 위아래로비교하여 변화의 크기 계산
 cv::Sobel(image, sobely, cv_165, 0,1,3); //3 커널의 크기 3x3크기의 Sobel커널 사용
+//각 방향의 그라디언트 계산
+cv::Mat sobelAbsX, sobelAbsY;
+cv::convertScaleAbs(sobelX, sobelAbsX);
+cv::convertScaleAbs(sobelY, sobelAbsY);
+//x방향과 y방향의 sobel결과를 합친 엣지 강도 이미지
+cv::Mat edgeImage;
+cv::addWeighted(sobelAbsX, 0.5, sobelAbsY, 0.5, 0, edgeImage);
