@@ -1,9 +1,47 @@
 -설치하기
-C:\opencv
+1)OpenCV
+C:\opencv(sources/build)
 C:\opencv_contrib
+
+2) IPP/TBB
 C:\Program Files (x86)\Intel\oneAPI
+
+3) cuDNN
 C:\Program Files\NVIDIA\CUDNN\v9.1
+
+4) CUDA Toolkit
 C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.1
+
+5) OpenMP(Visual Studio 20022)
+프로젝트속성 > C/C++ > 언어 > OpenMP 지원 > 예
+
+6 )시스템환경변수설정
+CUDA_HOME
+C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.1
+CUDA_PATH
+C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.1
+CUDA_PATH_V12_1
+C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.1
+CUDNN_HOME
+C:\Program Files\NVIDIA\CUDNN\v9.1\bin\12.4
+OpenCV_DIR
+C:/opencv/sources/build
+OPENCV_ENABLE_TBB
+ON
+Path
+C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.1\bin
+C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.1\libnvvp
+C:\Program Files\NVIDIA\CUDNN\v9.1\bin\12.4
+C:\opencv\sources\build\bin
+C:\opencv\build\x64\vc16\bin
+C:\Qt\6.7.1\msvc2019_64\bin
+C:\opencv\sources\build
+C:\Program Files (x86)\Intel\oneAPI\tbb\2021.12\bin
+C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.1\bin
+TBB_DIR
+C:\Program Files (x86)\Intel\oneAPI\tbb\2021.12\bin
+TBB_ROOT
+C:\Program Files (x86)\Intel\oneAPI\tbb\2021.12\bin
 
 -OpenCV 설정 및 제너레이트(Release/Debug)
 1)Release
