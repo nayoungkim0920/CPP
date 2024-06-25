@@ -1,6 +1,6 @@
 -설치하기
 1)OpenCV
-C:\opencv(sources/build)
+C:\opencv(sources, build)
 C:\opencv_contrib
 
 2) IPP/TBB
@@ -25,17 +25,17 @@ C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.1
 CUDNN_HOME
 C:\Program Files\NVIDIA\CUDNN\v9.1\bin\12.4
 OpenCV_DIR
-C:/opencv/sources/build
+C:/opencv/build
 OPENCV_ENABLE_TBB
 ON
 Path
 C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.1\bin
 C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.1\libnvvp
 C:\Program Files\NVIDIA\CUDNN\v9.1\bin\12.4
-C:\opencv\sources\build\bin
+C:\opencv\build\bin
 C:\opencv\build\x64\vc16\bin
 C:\Qt\6.7.1\msvc2019_64\bin
-C:\opencv\sources\build
+C:\opencv\build
 C:\Program Files (x86)\Intel\oneAPI\tbb\2021.12\bin
 C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.1\bin
 TBB_DIR
@@ -45,11 +45,11 @@ C:\Program Files (x86)\Intel\oneAPI\tbb\2021.12\bin
 
 -OpenCV 설정 및 제너레이트(Release/Debug)
 1)Release
-cmake -D CMAKE_BUILD_TYPE=Release -D CMAKE_INSTALL_PREFIX=C:\opencv\install -D OPENCV_EXTRA_MODULES_PATH=C:\opencv_contrib\modules -D BUILD_opencv_aruco=ON -D WITH_TBB=ON -D WITH_OPENMP=ON -D WITH_ONETBB=ON -D WITH_CUDA=ON -D CUDA_TOOLKIT_ROOT_DIR="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1" -D CUDA_ARCH_BIN=8.6 -D CUDA_ARCH_PTX=8.6 -D OPENCV_DNN_CUDA=ON .. 
+cmake -S c:/opencv/sources -B c:/opencv/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=C:/opencv/install -DWITH_CUDA=ON -DCUDNN_INCLUDE_DIR="C:/Program Files/NVIDIA/CUDNN/v9.1/include/12.4" -DCUDNN_LIB_DIR="C:/Program Files/NVIDIA/CUDNN/v9.1/lib/12.4/x64" -DCUDNN_LIBRARY="C:/Program Files/NVIDIA/CUDNN/v9.1/lib/12.4/x64/cudnn.lib" -DCUDA_TOOLKIT_ROOT_DIR="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1" -DOPENCV_DNN_CUDA=ON -DOPENCV_EXTRA_MODULES_PATH=C:/opencv_contrib/modules -DWITH_NVCUVID=OFF -DBLA_VENDOR=None -DLAPACK_FOUND=OFF -DBLAS_FOUND=OFF -DWITH_JAVA=OFF -DWITH_VTK=OFF -DWITH_OPENBLAS=OFF -DWITH_OPENJPEG=OFF -DWITH_GFLAGS=OFF -DWITH_GLOG=OFF -DCUDA_ARCH_BIN="7.5" c:/opencv/sources
 cmake --build . --config Release
 
 2)Debug
-cmake -D CMAKE_BUILD_TYPE=Release -D CMAKE_INSTALL_PREFIX=C:\opencv\install -D OPENCV_EXTRA_MODULES_PATH=C:\opencv_contrib\modules -D BUILD_opencv_aruco=ON -D WITH_TBB=ON -D WITH_OPENMP=ON -D WITH_ONETBB=ON -D WITH_CUDA=ON -D CUDA_TOOLKIT_ROOT_DIR="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1" -D CUDA_ARCH_BIN=8.6 -D CUDA_ARCH_PTX=8.6 -D OPENCV_DNN_CUDA=ON ..
+cmake -S c:/opencv/sources -B c:/opencv/build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=C:/opencv/install -DWITH_CUDA=ON -DCUDNN_INCLUDE_DIR="C:/Program Files/NVIDIA/CUDNN/v9.1/include/12.4" -DCUDNN_LIB_DIR="C:/Program Files/NVIDIA/CUDNN/v9.1/lib/12.4/x64" -DCUDNN_LIBRARY="C:/Program Files/NVIDIA/CUDNN/v9.1/lib/12.4/x64/cudnn.lib" -DCUDA_TOOLKIT_ROOT_DIR="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1" -DOPENCV_DNN_CUDA=ON -DOPENCV_EXTRA_MODULES_PATH=C:/opencv_contrib/modules -DWITH_NVCUVID=OFF -DBLA_VENDOR=None -DLAPACK_FOUND=OFF -DBLAS_FOUND=OFF -DWITH_JAVA=OFF -DWITH_VTK=OFF -DWITH_OPENBLAS=OFF -DWITH_OPENJPEG=OFF -DWITH_GFLAGS=OFF -DWITH_GLOG=OFF -DCUDA_ARCH_BIN="7.5" c:/opencv/sources
 cmake --build . --config Debug
 
 3)CMakeListx.txt
