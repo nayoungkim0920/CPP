@@ -1,8 +1,7 @@
-<OpenCV에서 CUDA설정하기>
-
 -설치하기
-"C:\opencv"
-"C:\opencv_contrib"
+C:\opencv
+C:\opencv_contrib
+C:\Program Files (x86)\Intel\oneAPI
 C:\Program Files\NVIDIA\CUDNN\v9.1
 C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.1
 
