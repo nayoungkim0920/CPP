@@ -45,21 +45,11 @@ C:\Program Files (x86)\Intel\oneAPI\tbb\2021.12\bin
 
 -OpenCV 설정 및 제너레이트(Release/Debug)
 1)Release
+cmake -DCMAKE_BUILD_TYPE=Release -DOPENCV_EXTRA_MODULES_PATH="C:/opencv_contrib/modules" -DBUILD_opencv_cudaarithm=ON -DWITH_CUDA=ON -DCUDA_TOOLKIT_ROOT_DIR="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1" -DCUDA_ARCH_BIN="7.5" -DCUDNN_LIB_DIR="C:/Program Files/NVIDIA/CUDNN/v9.1/lib/12.4/x64" -DCUDNN_LIBRARY="C:/Program Files/NVIDIA/CUDNN/v9.1/lib/12.4/x64/cudnn.lib" -DCUDNN_INCLUDE_DIR="C:/Program Files/NVIDIA/CUDNN/v9.1/include/12.4" -DOPENCV_DNN_CUDA=ON C:/opencv/sources
 cmake --build . --config Release
-cmake --build . --config Release
-
 2)Debug
-cmake -DCMAKE_BUILD_TYPE=Debug -DOPENCV_EXTRA_MODULES_PATH="C:/opencv_contrib/modules" -DWITH_CUDA=ON -DCUDA_TOOLKIT_ROOT_DIR="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1" -DCUDNN_LIB_DIR="C:/Program Files/NVIDIA/CUDNN/v9.1/lib/12.4/x64" -DCUDNN_LIBRARY="C:/Program Files/NVIDIA/CUDNN/v9.1/lib/12.4/x64/cudnn.lib" -DCUDNN_INCLUDE_DIR="C:/Program Files/NVIDIA/CUDNN/v9.1/include/12.4" -DCUDA_ARCH_BIN="7.5" -DOPENCV_DNN_CUDA=ON -DOPENCV_ENABLE_NONFREE=ON -DBUILD_opencv_cudaarithm=ON -DWITH_TBB=ON -DWITH_OPENMP=ON -DWITH_ONETBB=ON C:/opencv/sources
-cmake --build . --config Debug
-
-cmake -DCMAKE_BUILD_TYPE=Debug -DOPENCV_EXTRA_MODULES_PATH="C:/opencv_contrib/modules" -DWITH_CUDA=ON -DCUDA_TOOLKIT_ROOT_DIR="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1" -DCUDNN_ROOT="C:/Program Files/NVIDIA/CUDNN/v9.1" -DCUDNN_LIBRARY="C:/Program Files/NVIDIA/CUDNN/v9.1/lib/12.4/x64/cudnn.lib" -DCUDNN_INCLUDE_DIR="C:/Program Files/NVIDIA/CUDNN/v9.1/include/12.4" -DCUDA_ARCH_BIN="7.5" -DOPENCV_DNN_CUDA=ON -DOPENCV_ENABLE_NONFREE=ON -DBUILD_opencv_cudaarithm=ON -DWITH_TBB=ON -DWITH_OPENMP=ON -DWITH_ONETBB=ON C:/opencv/sources
-
-C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.1\include\crt/host_config.h(153): fatal error C1189: #error:  --
- unsupported Microsoft Visual Studio version! Only the versions between 2017 and 2022 (inclusive) are supported! The nv
-cc flag '-allow-unsupported-compiler' can be used to override this version check; however, using an unsupported host co
-mpiler may cause compilation failure or incorrect run time execution. Use at your own risk. [C:\opencv\build\modules\wo
-rld\opencv_world.vcxproj] 
-cmake -DCMAKE_BUILD_TYPE=Debug -DOPENCV_EXTRA_MODULES_PATH="C:/opencv_contrib/modules" -DWITH_CUDA=ON -DCUDA_TOOLKIT_ROOT_DIR="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1" -DCUDNN_ROOT="C:/Program Files/NVIDIA/CUDNN/v9.1" -DCUDNN_LIBRARY="C:/Program Files/NVIDIA/CUDNN/v9.1/lib/12.4/x64/cudnn.lib" -DCUDNN_INCLUDE_DIR="C:/Program Files/NVIDIA/CUDNN/v9.1/include/12.4" -DCUDA_ARCH_BIN="8.6" -DOPENCV_DNN_CUDA=ON -DOPENCV_ENABLE_NONFREE=ON -DBUILD_opencv_cudaarithm=ON -DWITH_TBB=ON -DWITH_OPENMP=ON -DWITH_ONETBB=ON C:/opencv/sources
+cmake -DCMAKE_BUILD_TYPE=Debug -DOPENCV_EXTRA_MODULES_PATH="C:/opencv_contrib/modules" -DBUILD_opencv_cudaarithm=ON -DWITH_CUDA=ON -DCUDA_TOOLKIT_ROOT_DIR="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1" -DCUDA_ARCH_BIN="7.5" -DCUDNN_LIB_DIR="C:/Program Files/NVIDIA/CUDNN/v9.1/lib/12.4/x64" -DCUDNN_LIBRARY="C:/Program Files/NVIDIA/CUDNN/v9.1/lib/12.4/x64/cudnn.lib" -DCUDNN_INCLUDE_DIR="C:/Program Files/NVIDIA/CUDNN/v9.1/include/12.4" -DOPENCV_DNN_CUDA=ON C:/opencv/sources
+cmake --build .
 
 3)CMakeListx.txt
 cmake_minimum_required(VERSION 3.14)
