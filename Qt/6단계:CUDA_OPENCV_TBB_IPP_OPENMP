@@ -45,11 +45,11 @@ C:\Program Files (x86)\Intel\oneAPI\tbb\2021.12\bin
 
 -OpenCV 설정 및 제너레이트(Release/Debug)
 1)Release
-cmake -DCMAKE_BUILD_TYPE=Release -DOPENCV_EXTRA_MODULES_PATH="C:/opencv_contrib/modules" -DBUILD_opencv_cudaarithm=ON -DWITH_CUDA=ON -DCUDA_TOOLKIT_ROOT_DIR="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.8" -DCUDA_ARCH_BIN="7.5" -DCUDNN_LIB_DIR="C:/Program Files/NVIDIA/CUDNN/v9.1/lib/12.4/x64" -DCUDNN_LIBRARY="C:/Program Files/NVIDIA/CUDNN/v9.1/lib/12.4/x64/cudnn.lib" -DCUDNN_INCLUDE_DIR="C:/Program Files/NVIDIA/CUDNN/v9.1/include/12.4" -DOPENCV_DNN_CUDA=ON C:/opencv/sources
+cmake -DCMAKE_BUILD_TYPE=Release -DOPENCV_EXTRA_MODULES_PATH="C:/opencv_contrib/modules" -DBUILD_opencv_cudaarithm=ON -DWITH_CUDA=ON -DCUDA_TOOLKIT_ROOT_DIR="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1" -DCUDA_ARCH_BIN="7.5" -DCUDNN_LIB_DIR="C:/Program Files/NVIDIA/CUDNN/v9.1/lib/12.4/x64" -DCUDNN_LIBRARY="C:/Program Files/NVIDIA/CUDNN/v9.1/lib/12.4/x64/cudnn.lib" -DCUDNN_INCLUDE_DIR="C:/Program Files/NVIDIA/CUDNN/v9.1/include/12.4" -DOPENCV_DNN_CUDA=ON -DWITH_TBB=ON -DWITH_OPENMP=ON -DWITH_ONETBB=ON C:/opencv/sources
 cmake --build . --config Release
 2)Debug
-cmake -DCMAKE_BUILD_TYPE=Debug -DOPENCV_EXTRA_MODULES_PATH="C:/opencv_contrib/modules" -DBUILD_opencv_cudaarithm=ON -DWITH_CUDA=ON -DCUDA_TOOLKIT_ROOT_DIR="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.8" -DCUDA_ARCH_BIN="7.5" -DCUDNN_LIB_DIR="C:/Program Files/NVIDIA/CUDNN/v9.1/lib/12.4/x64" -DCUDNN_LIBRARY="C:/Program Files/NVIDIA/CUDNN/v9.1/lib/12.4/x64/cudnn.lib" -DCUDNN_INCLUDE_DIR="C:/Program Files/NVIDIA/CUDNN/v9.1/include/12.4" -DOPENCV_DNN_CUDA=ON C:/opencv/sources
-cmake --build .
+cmake -DCMAKE_BUILD_TYPE=Debug -DOPENCV_EXTRA_MODULES_PATH="C:/opencv_contrib/modules" -DBUILD_opencv_cudaarithm=ON -DWITH_CUDA=ON -DCUDA_TOOLKIT_ROOT_DIR="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1" -DCUDA_ARCH_BIN="7.5" -DCUDNN_LIB_DIR="C:/Program Files/NVIDIA/CUDNN/v9.1/lib/12.4/x64" -DCUDNN_LIBRARY="C:/Program Files/NVIDIA/CUDNN/v9.1/lib/12.4/x64/cudnn.lib" -DCUDNN_INCLUDE_DIR="C:/Program Files/NVIDIA/CUDNN/v9.1/include/12.4" -DOPENCV_DNN_CUDA=ON -DWITH_TBB=ON -DWITH_OPENMP=ON -DWITH_ONETBB=ON C:/opencv/sources
+cmake --build . --config Debug
 
 3)CMakeListx.txt
 cmake_minimum_required(VERSION 3.14)
@@ -58,22 +58,27 @@ project(Project1)
 # Qt, OpenCV, CUDA 설정
 set(CMAKE_PREFIX_PATH "C:/Qt/6.7.1/msvc2019_64" "C:/opencv/build")
 find_package(Qt6 REQUIRED COMPONENTS Widgets Core Gui)
-find_package(OpenCV REQUIRED COMPONENTS core imgproc highgui)  # 필요한 CUDA 모듈 추가  cudawarping cudaimgproc
-find_package(CUDA REQUIRED)
+find_package(OpenCV REQUIRED COMPONENTS core imgproc highgui)
+
+# CUDA 설정
+set(CUDA_TOOLKIT_ROOT_DIR "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1")
+find_package(CUDA 12.1 REQUIRED)
 
 # Intel oneAPI IPP 추가
 set(IPP_INCLUDE_DIR "C:/Program Files (x86)/Intel/oneAPI/ipp/2021.11/include")
 set(IPP_LIB_DIR "C:/Program Files (x86)/Intel/oneAPI/ipp/2021.11/lib")
 
-# CUDA 및 cuDNN 경로 설정
-set(CUDA_TOOLKIT_ROOT_DIR "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1")
-set(CUDNN_ROOT_DIR "C:/Program Files/NVIDIA/CUDNN/v9.1")
+# Intel oneAPI TBB 추가
+set(TBB_INCLUDE_DIR "C:/Program Files (x86)/Intel/oneAPI/tbb/2021.12/include")
+set(TBB_LIB_DIR "C:/Program Files (x86)/Intel/oneAPI/tbb/2021.12/lib")
 
 # 추가 포함 디렉터리 설정
 include_directories(
     ${IPP_INCLUDE_DIR}
-    ${CUDA_INCLUDE_DIRS}
-    ${CUDNN_INCLUDE_DIRS}
+    ${TBB_INCLUDE_DIR}
+    ${CUDA_INCLUDE_DIRS}  # CUDA의 인클루드 디렉토리 추가
+    ${OpenCV_INCLUDE_DIRS}  # OpenCV의 인클루드 디렉토리도 추가할 수 있습니다.
+    # ${CUDNN_INCLUDE_DIRS}  # 만약 cuDNN을 사용할 경우 인클루드 디렉토리도 추가해야 합니다.
 )
 
 # CUDA 파일 설정
@@ -115,10 +120,17 @@ target_link_libraries(Project1
     "${IPP_LIB_DIR}/ippcvmt.lib"
 )
 
+# Intel oneAPI TBB 라이브러리 링크
+target_link_libraries(Project1
+    "${TBB_LIB_DIR}/tbb.lib"
+    "${TBB_LIB_DIR}/tbbmalloc.lib"
+    "${TBB_LIB_DIR}/tbbmalloc_proxy.lib"
+)
+
 # CUDA 및 cuDNN 라이브러리 링크
 target_link_libraries(Project1
     ${CUDA_LIBRARIES}
-    ${CUDNN_LIBRARIES}
+    # ${CUDNN_LIBRARIES}  # cuDNN을 사용할 경우 추가합니다.
     ${CUDA_cudart_LIBRARY}
     ${CUDA_cublas_LIBRARY}
     ${CUDA_curand_LIBRARY}
@@ -126,11 +138,14 @@ target_link_libraries(Project1
 
 # 병렬 처리 백엔드 설정
 if(WIN32)
-    # TBB, OpenMP는 자동으로 사용되므로 별도 설정 필요 없음
     # ONETBB 설정
-    set(OPENCV_ENABLE_ONETBB ON)  # ONETBB를 사용하도록 설정
+    set(OPENCV_ENABLE_ONETBB ON)
     if(OPENCV_ENABLE_ONETBB)
         target_compile_definitions(Project1 PRIVATE CV_ENABLE_ONETBB)
+        target_link_libraries(Project1
+            #"${IPP_LIB_DIR}/libiomp5md.lib"  # ONETBB를 위한 라이브러리 링크
+            "${TBB_LIB_DIR}/tbb.lib"  # ONETBB를 위한 TBB 라이브러리 재사용
+        )
     endif()
 endif()
 
@@ -177,10 +192,8 @@ add_custom_command(TARGET Project1 POST_BUILD
     COMMENT "Copying OpenCV Release DLLs to output directory"
 )
 
-# IPP 헤더 파일 포함
+# IPP 및 TBB 헤더 파일 포함
 target_include_directories(Project1 PRIVATE
     ${IPP_INCLUDE_DIR}
+    ${TBB_INCLUDE_DIR}
 )
-
-
-
