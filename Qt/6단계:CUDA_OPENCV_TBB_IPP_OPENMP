@@ -54,6 +54,11 @@ cmake --build . --config Debug
 3)Visual Studio 
 2022버전으로 cmake, build시 cuda지원불가로 2019버전설치 후 cmake, build
 vs_community__f2cf4f3974864621ace5757560120cd1.exe
+- 설치시나 visual studio에서 
+도구> 도구 및 기능 가져오기 > 개발자용 워크로드 > C++를 사용한 데스크톱 개발 >
+MSVC c143 - VS 2022 C++ x64/x86 빌드 도구 등을 체크한 후 설치한다.
+(visual studio 종료하고 설치한다.)
+- 설정, 생성, 빌드
 cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE=Debug -DOPENCV_EXTRA_MODULES_PATH="C:/opencv_contrib/modules" -DBUILD_opencv_cudaarithm=ON -DWITH_CUDA=ON -DCUDA_TOOLKIT_ROOT_DIR="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1" -DCUDA_ARCH_BIN="7.5" -DCUDNN_LIB_DIR="C:/Program Files/NVIDIA/CUDNN/v9.1/lib/12.4/x64" -DCUDNN_LIBRARY="C:/Program Files/NVIDIA/CUDNN/v9.1/lib/12.4/x64/cudnn.lib" -DCUDNN_INCLUDE_DIR="C:/Program Files/NVIDIA/CUDNN/v9.1/include/12.4" -DOPENCV_DNN_CUDA=ON -DWITH_TBB=ON -DWITH_OPENMP=ON -DWITH_ONETBB=ON C:/opencv/sources
 cmake --build . --config Debug
 cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE=Release -DOPENCV_EXTRA_MODULES_PATH="C:/opencv_contrib/modules" -DBUILD_opencv_cudaarithm=ON -DWITH_CUDA=ON -DCUDA_TOOLKIT_ROOT_DIR="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1" -DCUDA_ARCH_BIN="7.5" -DCUDNN_LIB_DIR="C:/Program Files/NVIDIA/CUDNN/v9.1/lib/12.4/x64" -DCUDNN_LIBRARY="C:/Program Files/NVIDIA/CUDNN/v9.1/lib/12.4/x64/cudnn.lib" -DCUDNN_INCLUDE_DIR="C:/Program Files/NVIDIA/CUDNN/v9.1/include/12.4" -DOPENCV_DNN_CUDA=ON -DWITH_TBB=ON -DWITH_OPENMP=ON -DWITH_ONETBB=ON C:/opencv/sources
