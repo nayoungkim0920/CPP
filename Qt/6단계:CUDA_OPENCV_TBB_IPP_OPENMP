@@ -51,6 +51,10 @@ cmake --build . --config Release
 cmake -DCMAKE_BUILD_TYPE=Debug -DOPENCV_EXTRA_MODULES_PATH="C:/opencv_contrib/modules" -DBUILD_opencv_cudaarithm=ON -DWITH_CUDA=ON -DCUDA_TOOLKIT_ROOT_DIR="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1" -DCUDA_ARCH_BIN="7.5" -DCUDNN_LIB_DIR="C:/Program Files/NVIDIA/CUDNN/v9.1/lib/12.4/x64" -DCUDNN_LIBRARY="C:/Program Files/NVIDIA/CUDNN/v9.1/lib/12.4/x64/cudnn.lib" -DCUDNN_INCLUDE_DIR="C:/Program Files/NVIDIA/CUDNN/v9.1/include/12.4" -DOPENCV_DNN_CUDA=ON -DWITH_TBB=ON -DWITH_OPENMP=ON -DWITH_ONETBB=ON C:/opencv/sources
 cmake --build . --config Debug
 
+3)Visual Studio 
+2022버전으로 cmake, build시 cuda지원불가로 2019버전설치 후 cmake, build
+vs_community__f2cf4f3974864621ace5757560120cd1.exe
+
 3)CMakeListx.txt
 cmake_minimum_required(VERSION 3.14)
 project(Project1)
