@@ -2,7 +2,7 @@
 OpenCV : 4.10.0
 CUDA : 12.1 (vs 2017 ~ 2019만 지원)
 cuDNN : 9.1
-VisualStudion : 2019
+VisualStudio : 2019
 
 -설치하기
 1)OpenCV
@@ -14,6 +14,10 @@ C:\Program Files (x86)\Intel\oneAPI
 
 3) cuDNN
 C:\Program Files\NVIDIA\CUDNN\v9.1
+cudnn-windows-x86_64-9.2.0.82_cuda12-archive.zip
+C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.1에
+include, lib, bin 덮어씌우기
+//Video_Codec_SDK_12.2.72.zip
 
 4) CUDA Toolkit
 C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.1
@@ -62,6 +66,13 @@ cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE="Debug" -B "c:/opencv
 cmake --build . --config Debug
 
 cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE="Release" -B "c:/opencv/build" -S "c:/opencv/sources" -DCMAKE_INSTALL_PREFIX="C:/opencv/install" -DWITH_CUDA=ON -DCUDA_TOOLKIT_ROOT_DIR="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1" -DCMAKE_CUDA_COMPILER="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1/bin/nvcc.exe" -DOPENCV_EXTRA_MODULES_PATH="C:/opencv_contrib/modules" -DWITH_NVCUVID=OFF -DWITH_NVCUVENC=OFF -DBUILD_opencv_cudaimgproc=ON "c:/opencv/sources"
+cmake --build . --config Release
+
+--비디오코덱
+cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE="Debug" -B "c:/opencv/build" -S "c:/opencv/sources" -DCMAKE_INSTALL_PREFIX="C:/opencv/install" -DWITH_CUDA=ON -DCUDA_TOOLKIT_ROOT_DIR="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1" -DCMAKE_CUDA_COMPILER="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1/bin/nvcc.exe" -DOPENCV_EXTRA_MODULES_PATH="C:/opencv_contrib/modules" -DWITH_NVCUVID=OFF -DWITH_NVCUVENC=OFF -DBUILD_opencv_cudaimgproc=ON -D WITH_NVCUVID=ON -D Video_Codec_SDK_ROOT_DIR="C:/Video_Codec_SDK"  "c:/opencv/sources" 
+cmake --build . --config Debug
+
+cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE="Release" -B "c:/opencv/build" -S "c:/opencv/sources" -DCMAKE_INSTALL_PREFIX="C:/opencv/install" -DWITH_CUDA=ON -DCUDA_TOOLKIT_ROOT_DIR="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1" -DCMAKE_CUDA_COMPILER="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1/bin/nvcc.exe" -DOPENCV_EXTRA_MODULES_PATH="C:/opencv_contrib/modules" -DWITH_NVCUVID=OFF -DWITH_NVCUVENC=OFF -DBUILD_opencv_cudaimgproc=ON -D WITH_NVCUVID=ON -D Video_Codec_SDK_ROOT_DIR="C:/Video_Codec_SDK"  "c:/opencv/sources" 
 cmake --build . --config Release
 
 3)CMakeListx.txt
