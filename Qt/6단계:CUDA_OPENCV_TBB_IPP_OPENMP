@@ -49,15 +49,6 @@ C:\Program Files (x86)\Intel\oneAPI\tbb\2021.12\bin
 TBB_ROOT
 C:\Program Files (x86)\Intel\oneAPI\tbb\2021.12\bin
 
--OpenCV 설정 및 제너레이트(Release/Debug)
-1)Release
-cmake -DCMAKE_BUILD_TYPE=Release -DOPENCV_EXTRA_MODULES_PATH="C:/opencv_contrib/modules" -DBUILD_opencv_cudaarithm=ON -DWITH_CUDA=ON -DCUDA_TOOLKIT_ROOT_DIR="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1" -DCUDA_ARCH_BIN="7.5" -DCUDNN_LIB_DIR="C:/Program Files/NVIDIA/CUDNN/v9.1/lib/12.4/x64" -DCUDNN_LIBRARY="C:/Program Files/NVIDIA/CUDNN/v9.1/lib/12.4/x64/cudnn.lib" -DCUDNN_INCLUDE_DIR="C:/Program Files/NVIDIA/CUDNN/v9.1/include/12.4" -DOPENCV_DNN_CUDA=ON -DWITH_TBB=ON -DWITH_OPENMP=ON -DWITH_ONETBB=ON C:/opencv/sources
-cmake --build . --config Release
-2)Debug
-cmake -DCMAKE_BUILD_TYPE=Debug -DOPENCV_EXTRA_MODULES_PATH="C:/opencv_contrib/modules" -DBUILD_opencv_cudaarithm=ON -DWITH_CUDA=ON -DCUDA_TOOLKIT_ROOT_DIR="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1" -DCUDA_ARCH_BIN="7.5" -DCUDNN_LIB_DIR="C:/Program Files/NVIDIA/CUDNN/v9.1/lib/12.4/x64" -DCUDNN_LIBRARY="C:/Program Files/NVIDIA/CUDNN/v9.1/lib/12.4/x64/cudnn.lib" -DCUDNN_INCLUDE_DIR="C:/Program Files/NVIDIA/CUDNN/v9.1/include/12.4" -DOPENCV_DNN_CUDA=ON -DWITH_TBB=ON -DWITH_OPENMP=ON -DWITH_ONETBB=ON C:/opencv/sources
-cmake --build . --config Debug
-cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE=Debug -DOPENCV_EXTRA_MODULES_PATH="C:/opencv_contrib/modules" -DBUILD_opencv_cudaarithm=ON -DWITH_CUDA=ON -DCUDA_TOOLKIT_ROOT_DIR="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1" -DCUDA_ARCH_BIN="7.5" -DCUDNN_INCLUDE_DIR="C:/Program Files/NVIDIA/CUDNN/v9.1/include/12.4" -DCUDNN_LIBRARY="C:/Program Files/NVIDIA/CUDNN/v9.1/lib/12.4/x64/cudnn.lib" -DOPENCV_DNN_CUDA=ON -DWITH_TBB=ON -DWITH_OPENMP=ON -DWITH_ONETBB=ON -DOPENCV_ENABLE_NONFREE=ON -DBUILD_opencv_world=ON -DCUDA_VERBOSE_BUILD=ON -DBUILD_opencv_cudev=ON -DBUILD_opencv_cudaimgproc=ON -DCUDA_NVCC_FLAGS="-ccbin=cl" C:/opencv/sources
-
 3)Visual Studio 
 2022버전으로 cmake, build시 cuda지원불가로 2019버전설치 후 cmake, build
 vs_community__f2cf4f3974864621ace5757560120cd1.exe
@@ -66,7 +57,7 @@ vs_community__f2cf4f3974864621ace5757560120cd1.exe
 MSVC c143 - VS 2022 C++ x64/x86 빌드 도구 등을 체크한 후 설치한다.
 (visual studio 종료하고 설치한다.)
 
-- 설정, 생성, 빌드
+- OpenCV Cuda 설정, 생성, 빌드
 cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE="Debug" -B "c:/opencv/build" -S "c:/opencv/sources" -DCMAKE_INSTALL_PREFIX="C:/opencv/install" -DWITH_CUDA=ON -DCUDA_TOOLKIT_ROOT_DIR="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1" -DCMAKE_CUDA_COMPILER="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1/bin/nvcc.exe" -DOPENCV_EXTRA_MODULES_PATH="C:/opencv_contrib/modules" -DWITH_NVCUVID=OFF -DWITH_NVCUVENC=OFF -DBUILD_opencv_cudaimgproc=ON "c:/opencv/sources" 
 cmake --build . --config Debug
 
@@ -195,6 +186,10 @@ add_custom_command(TARGET Project1 POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
     "C:/opencv/build/bin/Debug/opencv_cudaarithm4100d.dll" "$<TARGET_FILE_DIR:Project1>"
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/bin/Debug/opencv_cudaimgproc4100d.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/bin/Debug/opencv_cudafilters4100d.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
     "C:/opencv/build/bin/Debug/opencv_imgcodecs4100d.dll" "$<TARGET_FILE_DIR:Project1>"
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
     "C:/opencv/build/bin/Debug/opencv_core4100d.dll" "$<TARGET_FILE_DIR:Project1>"
@@ -207,6 +202,10 @@ add_custom_command(TARGET Project1 POST_BUILD
 add_custom_command(TARGET Project1 POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
     "C:/opencv/build/bin/Release/opencv_cudaarithm4100.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/bin/Release/opencv_cudaimgproc4100.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/bin/Release/opencv_cudafilters4100.dll" "$<TARGET_FILE_DIR:Project1>"
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
     "C:/opencv/build/bin/Release/opencv_imgcodecs4100.dll" "$<TARGET_FILE_DIR:Project1>"
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
