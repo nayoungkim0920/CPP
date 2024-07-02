@@ -1,22 +1,36 @@
+GitHub에서 MyProject 생성
+https://github.com/nayoungkim0920/MyProject.git
+
 1. 프로젝트 올리기
 c:\myLab\Project1>git init
+
 2. 원격 리포지토리 설정
 git remote add origin https://github.com/nayoungkim0920/MyProject.git
 (리포지토리 목록 확인)
 c:\myLab\Project1>git remote -v
 origin  https://github.com/nayoungkim0920/Project1.git (fetch)
 origin  https://github.com/nayoungkim0920/Project1.git (push)
-3. 기존 원격 리포지토리 URL수저
+
+3. 기존 원격 리포지토리 URL수정
 git remote set-url origin https://github.com/nayoungkim0920/MyProject.git
 (원격리포지토리UR확인)
 c:\myLab\Project1>git remote -v
 origin  https://github.com/nayoungkim0920/MyProject.git (fetch)
 origin  https://github.com/nayoungkim0920/MyProject.git (push)
+
 4. 변경 사항 스테이징 및 커밋
 git add .
 git commit -m "커밋 메시지"
 c:\myLab\Project1>git commit -m "커밋 메시지"
 [MyProjects 366b904] 而ㅻ컠 硫붿떆吏
+(한글깨짐)
+git config --global core.quotepath false
+git config --global gui.encoding utf-8
+git config --global i18n.commit.encoding utf-8
+git config --global i18n.logoutputencoding utf-8
+--안됨
+PS C:\mylab\project1> $OutputEncoding = [Console]::OutputEncoding = [Text.Encoding]::UTF8
+
 5.원격리포지토리에 변경사항 푸시
 git push origin main
 Enumerating objects: 90, done.
@@ -28,5 +42,12 @@ Total 90 (delta 32), reused 0 (delta 0), pack-reused 0 (from 0)
 remote: Resolving deltas: 100% (32/32), done.
 To https://github.com/nayoungkim0920/MyProject.git
  * [new branch]      main -> main
+
 6.파일푸시
-git push -u origin main
+cd c:\myLab\Project1
+git remote add origin https://github.com/nayoungkim0920/MyProject.git
+git add .
+git commit -m "커밋 메시지"
+
+7.변경사항을 로컬로 가져오기
+
