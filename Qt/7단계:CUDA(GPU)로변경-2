@@ -1,5 +1,5 @@
 <7단계:CUDA(GPU)로변경-2>
--수정
+-수정(CPU->GPU)
 Undo
 Redo 
 displayImage
