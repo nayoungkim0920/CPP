@@ -49,5 +49,8 @@ git remote add origin https://github.com/nayoungkim0920/MyProject.git
 git add .
 git commit -m "커밋 메시지"
 
-7.변경사항을 로컬로 가져오기
+7.푸시 
+커밋한 변경 사항을 원격 저장소로 푸시한다.
 
+8.풀
+원격 저장소에서 최신 병경 사항을 가져온다.
