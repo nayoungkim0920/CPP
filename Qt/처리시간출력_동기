@@ -1,0 +1,41 @@
+<상태바에 처리시간 출력>
+동기
+1) MainWindow.ui 추가
+ <widget class="QStatusBar" name="statusbar"/>
+
+2) ui_MainWindow.h 변환
+uic MainWindow.ui -o ui_MainWindow.h
+
+3) MainWindow.h
+private:
+void setStatusMessage(const QString& message);
+
+4) MainWindow.cpp
+void MainWindow::setStatusMessage(const QString& message)
+{
+    statusBar()->showMessage(message);
+}
+
+//템플릿만 수정
+template<typename Func, typename ...Args>
+inline void MainWindow::applyImageProcessing(Func func, Args&& ...args)
+{
+    if (!currentImage.empty()) {
+
+        QElapsedTimer timer;
+        timer.start();
+
+        auto future = (imageProcessor->*func)(std::forward<Args>(args)...);
+        future.waitForFinished();
+
+        qint64 elapsedTime = timer.elapsed();
+        setStatusMessage(QString("Processing time :%1 ms").arg(elapsedTime));
+
+        if (!future.result()) {
+            qDebug() << "Failed to apply" << Q_FUNC_INFO;
+        }
+    }
+    else {
+        qDebug() << "No image to process.";
+    }
+}
