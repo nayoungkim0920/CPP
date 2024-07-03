@@ -15,9 +15,6 @@ void MainWindow::convertToGrayscale()
 {
     //반복적인 구문
     if (!currentImage.empty()) {
-        qDebug() << "convertToGrayscale() currentImage type : " << currentImage.type();
-        qDebug() << "convertToGrayscale() currentImage channels : " << currentImage.channels();
-
         auto future = imageProcessor->convertToGrayscaleAsync(currentImage);
         future.waitForFinished();
 
