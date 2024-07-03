@@ -1,0 +1,120 @@
+1.템플릿
+C++의 제네릭 프로그래밍을 지원하는 기능으로 다양한 데이터 타입에 대한 유연한 코드를
+작성할 수 있게 해준다. 함수 템플릿은 여러 타입의 인수를 받을 수있는 함수를 작성할 때
+유용하다.아래의 applyImageProcessing함수는 이미지 처리 작업을 추상화하여 다양한 이미지
+처리 함수를 하나의 공통된 인터페이스로 호출할 수 있게 설계되었다. 이로 인해 코드 중복을
+줄이고 가독성을 높일 수 있다.
+템플릿의 목적은 다양한 데이터 타입에 대해 동작할 수 있는 일반적인 코드를 작성하는 것이다.
+
+2. applyImageProcessing함수
+이미지가 유효한지 확인 후, 이미지 처리 함수를 호출하고 결과를 기다리는 구조
+
+3. 예시
+(기존)
+void MainWindow::convertToGrayscale()
+{
+    //반복적인 구문
+    if (!currentImage.empty()) {
+        qDebug() << "convertToGrayscale() currentImage type : " << currentImage.type();
+        qDebug() << "convertToGrayscale() currentImage channels : " << currentImage.channels();
+
+        auto future = imageProcessor->convertToGrayscaleAsync(currentImage);
+        future.waitForFinished();
+
+        if (!future.result()) {
+            qDebug() << "Failed to apply convertToGrayscale.";
+        }
+    }
+}
+
+(변경)
+void MainWindow::convertToGrayscale()
+{
+    applyImageProcessing(&ImageProcessor::convertToGrayscaleAsync, currentImage);
+}
+
+//MainWindow.h
+private:
+    template<typename Func, typename... Args>
+    inline void applyImageProcessing(Func func, Args&&... args);
+
+//MainWindow.cpp
+void MainWindow::rotateImage()
+{
+    applyImageProcessing(&ImageProcessor::rotateImage, currentImage);
+}
+
+void MainWindow::zoomInImage()
+{
+    applyImageProcessing(&ImageProcessor::zoominImage, currentImage, scaleFactor=1.25);
+}
+
+void MainWindow::zoomOutImage()
+{
+    applyImageProcessing(&ImageProcessor::zoomoutImage, currentImage, scaleFactor = 0.8);
+}
+
+void MainWindow::convertToGrayscale()
+{
+    applyImageProcessing(&ImageProcessor::convertToGrayscaleAsync, currentImage);
+}
+
+void MainWindow::applyGaussianBlur()
+{
+    bool ok;
+    int kernelSize = QInputDialog::getInt(this,
+        tr("Gaussian Blur"),
+        tr("Enter kernel size (odd nubmber):"),
+        5, 1, 101, 2, &ok);
+
+    if (ok) {
+        applyImageProcessing(&ImageProcessor::applyGaussianBlur, currentImage, kernelSize);
+    }
+}
+
+void MainWindow::cannyEdges()
+{
+    applyImageProcessing(&ImageProcessor::cannyEdges, currentImage);
+}
+
+void MainWindow::medianFilter()
+{
+    applyImageProcessing(&ImageProcessor::medianFilter, currentImage);
+}
+
+void MainWindow::laplacianFilter()
+{
+    applyImageProcessing(&ImageProcessor::laplacianFilter, currentImage);
+}
+
+void MainWindow::bilateralFilter()
+{
+    applyImageProcessing(&ImageProcessor::bilateralFilter, currentImage);
+}
+
+template<typename Func, typename ...Args>
+inline void MainWindow::applyImageProcessing(Func func, Args&& ...args)
+{
+    if (!currentImage.empty()) {
+        auto future = (imageProcessor->*func)(std::forward<Args>(args)...);
+        future.waitForFinished();
+        if (!future.result()) {
+            qDebug() << "Failed to apply" << Q_FUNC_INFO;
+        }
+    }
+    else {
+        qDebug() << "No image to process.";
+    }
+}
+
+//ImageProcessor.cpp
+QFuture<bool> ImageProcessor::rotateImage(cv::Mat& image)
+QFuture<bool> ImageProcessor::zoomoutImage(cv::Mat& image, double scaleFactor)
+QFuture<bool> ImageProcessor::zoominImage(cv::Mat& image, double scaleFactor)
+QFuture<bool> ImageProcessor::convertToGrayscaleAsync(cv::Mat& image)
+QFuture<bool> ImageProcessor::applyGaussianBlur(cv::Mat& image, int kernelSize)
+QFuture<bool> ImageProcessor::cannyEdges(cv::Mat& image)
+QFuture<bool> ImageProcessor::medianFilter(cv::Mat& image)
+QFuture<bool> ImageProcessor::laplacianFilter(cv::Mat& image)
+QFuture<bool> ImageProcessor::bilateralFilter(cv::Mat& image)
+
