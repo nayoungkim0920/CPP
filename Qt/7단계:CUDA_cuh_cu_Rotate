@@ -280,7 +280,7 @@ QFuture<bool> ImageProcessor::rotateImage(cv::Mat& image)
             // 이미지를 CUDA를 이용하여 회전
             callRotateImageCUDA(image);
 
-            // 처리시간 계산 (임시로 시간 측정을 넣었습니다)
+            // 처리시간 계산 
             double startTime = getCurrentTimeMs();
             // 여기서는 단순히 CUDA 커널 호출 후 대기하는 것으로 가정
 
