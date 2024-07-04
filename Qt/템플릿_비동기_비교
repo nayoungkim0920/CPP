@@ -1,3 +1,18 @@
+<대규모 이미지 처리>
+QtConcurrent::run
+1. 비동기 처리 
+이미지 처리 작업을 백그라운드 스레드에서 비동기 적으로 실행한다. 이는 GUI스게드가
+차단되지 않고 사용자 인터페이스의 응답성을 유지하는 데 도움이 된다.
+2. 직접적 접근
+이미지 처리 함수를 직접 호출 할 수 있다. 코드가 명확하고 직관적이며, 이미지 처리 함수의 
+실행 흐름을 명확히 이해할 수 있도록 한다.
+3. 간결함과 명확성
+비교적 간결하며, 이미지 처리 함수를 직접적으로 호출하므로 추가적인 추상화나 함수 포인터
+사용을 필요로 하지 않는다.
+4. 성능
+대규모 이미지 처리에서 성능면에서도 더 효율적이다. 함수 호출 및 결과 처리 오버헤드를
+줄일 수 있기 때문이다.
+
 <템플릿>
 
 void MainWindow::rotateImage()
@@ -42,3 +57,142 @@ void MainWindow::rotateImage()
 않음. 대용량 이미지나 시간이 오래 걸리는 작업에서도 UI가 응답 상태를 유지할 수 있음.
 -단점: 각 함수마다 비동기 처리를 위하 코드를 추가해야 하므로 코드의 중복이 발생할 
 수 있음.
+
+<비동기식으로 변경한후 코드가 유사하게반복되어 템플릿으로 변경>
+(변경전)
+void MainWindow::rotateImage()
+{
+    QtConcurrent::run([this]() {
+        if (!currentImage.empty()) {
+            imageProcessor->rotateImage(currentImage);
+        }
+    });
+    //applyImageProcessing(&ImageProcessor::rotateImage, currentImage);
+}
+
+void MainWindow::zoomInImage()
+{
+    QtConcurrent::run([this]() {
+        if (!currentImage.empty()) {
+            imageProcessor->zoominImage(currentImage, scaleFactor = 1.25);
+        }
+    });
+    //applyImageProcessing(&ImageProcessor::zoominImage, currentImage, scaleFactor=1.25);
+}
+
+void MainWindow::zoomOutImage()
+{
+    QtConcurrent::run([this]() {
+        if (!currentImage.empty()) {
+            imageProcessor->zoomoutImage(currentImage, scaleFactor = 0.8);
+        }
+        });
+    //applyImageProcessing(&ImageProcessor::zoomoutImage, currentImage, scaleFactor = 0.8);
+}
+
+void MainWindow::grayScale()
+{
+    QtConcurrent::run([this]() {
+        if (!currentImage.empty()) {
+            imageProcessor->grayScale(currentImage);
+        }
+        });
+    //applyImageProcessing(&ImageProcessor::grayScale, currentImage);
+}
+
+void MainWindow::gaussianBlur()
+{
+    bool ok;
+    int kernelSize = QInputDialog::getInt(this,
+        tr("Gaussian Blur"),
+        tr("Enter kernel size (odd nubmber):"),
+        5, 1, 101, 2, &ok);
+
+    if (ok) {
+        QtConcurrent::run([this, kernelSize]() {
+            if (!currentImage.empty()) {
+                imageProcessor->gaussianBlur(currentImage, kernelSize);
+            }
+            });
+        //applyImageProcessing(&ImageProcessor::gaussianBlur, currentImage, kernelSize);
+    }
+}
+
+void MainWindow::cannyEdges()
+{
+    QtConcurrent::run([this]() {
+        if (!currentImage.empty()) {
+            imageProcessor->cannyEdges(currentImage);
+        }
+        });
+    //applyImageProcessing(&ImageProcessor::cannyEdges, currentImage);
+}
+
+void MainWindow::medianFilter()
+{
+    QtConcurrent::run([this]() {
+        if (!currentImage.empty()) {
+            imageProcessor->medianFilter(currentImage);
+        }
+        });
+    //applyImageProcessing(&ImageProcessor::medianFilter, currentImage);
+}
+
+void MainWindow::laplacianFilter()
+{
+    QtConcurrent::run([this]() {
+        if (!currentImage.empty()) {
+            imageProcessor->laplacianFilter(currentImage);
+        }
+        });
+    //applyImageProcessing(&ImageProcessor::laplacianFilter, currentImage);
+}
+
+void MainWindow::bilateralFilter()
+{
+    QtConcurrent::run([this]() {
+        if (!currentImage.empty()) {
+            imageProcessor->bilateralFilter(currentImage);
+        }
+        });
+    //applyImageProcessing(&ImageProcessor::bilateralFilter, currentImage);
+}
+
+void MainWindow::sobelFilter()
+{
+    QtConcurrent::run([this]() {
+        if (!currentImage.empty()) {
+            imageProcessor->sobelFilter(currentImage);
+        }
+        });
+    //applyImageProcessing(&ImageProcessor::)
+}
+
+(템플릿으로 변경하기)
+-기존코드(비동기)
+QtConcurrent::run([this]() {
+    if (!currentImage.empty()) {
+        imageProcessor->rotateImage(currentImage);
+    }
+});
+
+-템플릿 생성
+//MainWindow.h
+private:
+template<typename Func, typename... Args>
+    inline void applyImageProcessing(Func func, Args&&... args);
+
+//MainWindow.cpp
+template<typename Func, typename ...Args>
+inline void MainWindow::applyImageProcessing(Func func, Args && ...args)
+{
+    QtConcurrent::run([this, func, args...]() {
+        if (!currentImage.empty()) {
+            std::invoke(func, imageProcessor, std::forward<Args>(args)...);
+            //(imageProcessor->*func)(std::forward<Args>(args)...);  // 멤버 함수 포인터 호출
+            // 또는 func(std::forward<Args>(args)...);  // 단순 함수 포인터 호출
+        }
+    });
+}
+(에러)
+매개변수의 갯수가 다를 경우 invoke로 구현이 불가함
