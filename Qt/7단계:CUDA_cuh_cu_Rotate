@@ -100,12 +100,12 @@ void callRotateImageCUDA(cv::Mat& inputImage) {
 
 3) imageProcessing.o파일 생성하기
 (Debug)
-PS C:\myLab\Project1\Project1> nvcc -arch=sm_61 -I"C:\opencv\build\include" -Xcompiler "/utf-8 /MDd /D_ITERATOR_DEBUG_LEVEL=2" -c imageProcessing.cu -o imageProcessing.o
+PS C:\myLab\Project1\Project1> nvcc -arch=sm_86 -I"C:\opencv\build\include" -Xcompiler "/utf-8 /MDd /D_ITERATOR_DEBUG_LEVEL=2" -c imageProcessing.cu -o imageProcessing.o
 imageProcessing.cu
 tmpxft_000009d4_00000000-10_imageProcessing.cudafe1.cpp
 
 (Release)
-PS C:\myLab\Project1\Project1> nvcc -arch=sm_61 -I"C:\opencv\build\include" -Xcompiler "/utf-8 /MD /D_ITERATOR_DEBUG_LEVEL=0" -c imageProcessing.cu -o imageProcessing.o
+PS C:\myLab\Project1\Project1> nvcc -arch=sm_86 -I"C:\opencv\build\include" -Xcompiler "/utf-8 /MD /D_ITERATOR_DEBUG_LEVEL=0" -c imageProcessing.cu -o imageProcessing.o
 imageProcessing.cu
 tmpxft_00004e34_00000000-10_imageProcessing.cudafe1.cpp
 
