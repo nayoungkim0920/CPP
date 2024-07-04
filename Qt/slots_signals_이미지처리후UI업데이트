@@ -1,0 +1,99 @@
+<이미지 처리 후 UI업데이트>
+-Qt이 시그널-슬롯 메커니즘을 사용하여 이미지 처리 로직과 UI 업데이트를 분리함으로써 
+코드의 유지보수성과 가독성을 높인다.
+
+ImageProcessor.h
+signals: //시그널 선언
+void imageProcessed(const cv::Mat& processedImage, double processingTimeMs, QString processName);
+
+(build 후 생성됨)
+moc_ImageProcessor.cpp //Meta-Object Compiler에 의해 생성 시그널 활성화 역
+// SIGNAL 0
+void ImageProcessor::imageProcessed(const cv::Mat & _t1, double _t2, QString _t3)
+{
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))), const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t2))), const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t3))) };
+    QMetaObject::activate(this, &staticMetaObject, 0, _a);
+}
+
+//imageProcessed 시그널을 처리하기 위한 슬롯
+//슬롯은 시그널을 받아서 그에 따른 작업을 수행한다.
+//Qt의 시그널-슬롯 메터니즘은 클래스 간의 통신을 쉽게 할 수 있도록 설계되어 있다.
+//한 클래스에서 시그널을 선언하고 발생시키고, 다른 클래스에서 그 시그널을 받아 처리하는 
+//슬롯을 정의하는 것이 가능하다. 이 기능을 통해 서로 다른 객체 간의 통신을 구현할 수 있다.
+MainWindow.h
+private slots:
+void handleImageProcessed(const cv::Mat& processedImage, double processingTimeMs, QString processName);
+
+MainWindow.cpp
+//ImageProcessor객체의 시그널과 MainWindow객체의 슬롯 연결
+void MainWindow::connectImageProcessor()
+{
+    // Connect ImageProcessor's signal to displayImage slot
+    connect(imageProcessor, &ImageProcessor::imageProcessed, this, &MainWindow::handleImageProcessed);
+}
+
+//imageProcessed 시그널을 처리하는 슬롯
+void MainWindow::handleImageProcessed(const cv::Mat& processedImage, double processingTimeMs, QString processName)
+{
+    // 처리된 이미지 출력
+    displayImage(processedImage);
+
+    // 상태 표시줄에 처리 시간 출력
+    statusBar()->showMessage(
+        QString("%1 processed in %2 ms").arg(processName).arg(processingTimeMs));
+
+}
+
+//이미지를 UI에 표시하는 함수
+void MainWindow::displayImage(const cv::Mat& image)
+{
+    //비동기적으로 이미지를 UI에 표시, 람다함수를 사용하여 UI업데이트 수
+    QMetaObject::invokeMethod(this, [this, image]() {
+
+        qDebug() << "displayImage() channels : " << image.channels();
+        
+        //최신의이미지로갱신
+        currentImage = image;
+
+        // 이미지 타입이 그레이스케일(CV_8UC1)인지 확인합니다.
+        if (image.type() == CV_8UC1) {
+            qDebug() << "displayImage() type : graysclae CV_8UC1 Format_Grayscale8";
+            //cv::Mat -> QImage
+            QImage qImage(image.data,
+                image.cols,
+                image.rows,
+                static_cast<int>(image.step),
+                QImage::Format_Grayscale8);
+            ui->label->setPixmap(QPixmap::fromImage(qImage));
+            ui->label->adjustSize();
+        }
+        else if(image.type() == CV_8UC3) {
+          //CV_8UC3 :OpenCV에서 8-bit unsigned integer로 구성된 BGR 이미지의미
+            qDebug() << "displayImage() type : Format_BGR888";
+            QImage qImage(image.data,
+                image.cols,
+                image.rows,
+                static_cast<int>(image.step),
+                QImage::Format_BGR888); //BGR색상 포맷을 사용하는 24-bit이미지 
+            //QLabel위젯에 QImage를 표시하기위해 QPixmap로 변환한 후 설정 
+            ui->label->setPixmap(QPixmap::fromImage(qImage));
+            //QLabel 위젯의 크기를 이미지 크기에 맞게 조정
+            ui->label->adjustSize();
+        }
+        else{
+          qDebug() << "displayImage() type : Unknown image format";
+        }
+
+        });
+
+}
+
+ImageProessor.cpp
+(이미지처리 후 호출)
+//imageProcessed시그널 발생 
+emit imageProcessed(image, processingTime, functionName);
+
+(결과)
+시그널-슬롯 메커니즘을 사용하여 이미지 처리와 UI업데이트를 분리하면, 코드의 유지보수성과
+가독성을 크게 향상시킬 수 있다. 이미지 처리 로직은 ImageProcessor클래스에 집중되고
+UI 업데이트는 MainWindow클래스에서 처리되기때문에 각 클래스의 역활이 명확해진다.
