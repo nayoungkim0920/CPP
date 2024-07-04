@@ -1,0 +1,3 @@
+
+
+nvcc -arch=sm_61 -c imageProcessing.cu -o imageProcessing.o
