@@ -109,7 +109,7 @@ PS C:\myLab\Project1\Project1> nvcc -arch=sm_61 -I"C:\opencv\build\include" -Xco
 imageProcessing.cu
 tmpxft_00004e34_00000000-10_imageProcessing.cudafe1.cpp
 
-4) CMakeLists.txt 설정 추가하기
+4) CMakeLists.txt 설정 추가하기(cmake -G "Visual Studio 16 2019" ..)
 cmake_minimum_required(VERSION 3.14)
 project(Project1)
 
