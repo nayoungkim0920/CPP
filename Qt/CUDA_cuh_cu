@@ -1,3 +1,2 @@
+nvcc -arch=sm_61 -I"C:\opencv\build\include" -c imageProcessing.cu -o imageProcessing.o
 
-
-nvcc -arch=sm_61 -c imageProcessing.cu -o imageProcessing.o
