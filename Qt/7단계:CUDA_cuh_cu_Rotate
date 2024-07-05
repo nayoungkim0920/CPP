@@ -2,75 +2,71 @@
 
 1. 회전
 1) ImageProcessing.cuh
-#ifndef IMAGEPROCESSING_CUH
-#define IMAGEPROCESSING_CUH
+//imageProcessing.cuh
+#ifndef IMAGE_PROCESSING_CUH_
+#define IMAGE_PROCESSING_CUH_
 
 #include <opencv2/core.hpp>
+#include <cuda_runtime.h>
+#include <iostream>
 
-#ifdef __cplusplus
+// CUDA 함수 호출 선언
 extern "C" {
-#endif
-
-	void callRotateImageCUDA(cv::Mat& image);
-
-#ifdef __cplusplus
+    void callRotateImageCUDA(cv::Mat& inputImage);
 }
-#endif
 
-#endif // IMAGEPROCESSING_CUH
+// CUDA 커널 선언
+__global__ void rotateImageKernel(const unsigned char* input, unsigned char* output, int cols, int rows, int channels);
+
+#endif // IMAGE_PROCESSING_CUH_
 
 2)imageProcessing.cu
+//imageProecssing.cu
 #include "imageProcessing.cuh"
-#include <opencv2/core/cuda.hpp>
 
-// 전역 함수 정의
-__device__ bool rotatePixel(int x, int y, int cols, int rows, int channels, const uchar* input, uchar* output) {
+__device__ void rotatePixel(int x, int y, int cols, int rows, int channels, const unsigned char* input, unsigned char* output) {
     if (x < cols && y < rows) {
         for (int c = 0; c < channels; ++c) {
             output[(x * rows + (rows - 1 - y)) * channels + c] = input[(y * cols + x) * channels + c];
         }
-        return true;
     }
-    return false;
 }
 
-// CUDA 커널
-__global__ void rotateImageCUDA(const uchar* input, uchar* output, int cols, int rows, int channels) {
+__global__ void rotateImageKernel(const unsigned char* input, unsigned char* output, int cols, int rows, int channels) {
     int x = blockIdx.x * blockDim.x + threadIdx.x;
     int y = blockIdx.y * blockDim.y + threadIdx.y;
 
-    if (rotatePixel(x, y, cols, rows, channels, input, output)) {
-        // 처리할 내용이 있으면 추가
+    if (x < cols && y < rows) {
+        rotatePixel(x, y, cols, rows, channels, input, output);
     }
 }
 
-
-void callRotateImageCUDA(cv::Mat& inputImage) {
+extern "C" void callRotateImageCUDA(cv::Mat & inputImage) {
     int cols = inputImage.cols;
     int rows = inputImage.rows;
     int channels = inputImage.channels();
 
-    uchar* d_inputImage;
-    uchar* d_outputImage;
+    uchar* d_inputImage = nullptr;
+    uchar* d_outputImage = nullptr;
     size_t imageSize = cols * rows * channels * sizeof(uchar);
 
     cudaError_t err;
     err = cudaMalloc(&d_inputImage, imageSize);
     if (err != cudaSuccess) {
-        fprintf(stderr, "CUDA malloc error: %s\n", cudaGetErrorString(err));
+        std::cerr << "CUDA malloc error: " << cudaGetErrorString(err) << std::endl;
         return;
     }
 
     err = cudaMalloc(&d_outputImage, imageSize);
     if (err != cudaSuccess) {
-        fprintf(stderr, "CUDA malloc error: %s\n", cudaGetErrorString(err));
+        std::cerr << "CUDA malloc error: " << cudaGetErrorString(err) << std::endl;
         cudaFree(d_inputImage);
         return;
     }
 
     err = cudaMemcpy(d_inputImage, inputImage.data, imageSize, cudaMemcpyHostToDevice);
     if (err != cudaSuccess) {
-        fprintf(stderr, "CUDA memcpy error: %s\n", cudaGetErrorString(err));
+        std::cerr << "CUDA memcpy error: " << cudaGetErrorString(err) << std::endl;
         cudaFree(d_inputImage);
         cudaFree(d_outputImage);
         return;
@@ -79,19 +75,22 @@ void callRotateImageCUDA(cv::Mat& inputImage) {
     dim3 threadsPerBlock(16, 16);
     dim3 numBlocks((cols + threadsPerBlock.x - 1) / threadsPerBlock.x, (rows + threadsPerBlock.y - 1) / threadsPerBlock.y);
 
-    rotateImageCUDA << <numBlocks, threadsPerBlock >> > (d_inputImage, d_outputImage, cols, rows, channels);
+    //host를 kernel과분리하여 imageProcessing.cpp로만들었으나 아래를 지원하지않아 다시 .cu파일에 병합함
+    rotateImageKernel << <numBlocks, threadsPerBlock >> > (d_inputImage, d_outputImage, cols, rows, channels);
 
     err = cudaGetLastError();
     if (err != cudaSuccess) {
-        fprintf(stderr, "CUDA kernel launch error: %s\n", cudaGetErrorString(err));
+        std::cerr << "CUDA kernel launch error: " << cudaGetErrorString(err) << std::endl;
         cudaFree(d_inputImage);
         cudaFree(d_outputImage);
         return;
     }
 
+    cudaDeviceSynchronize();
+
     err = cudaMemcpy(inputImage.data, d_outputImage, imageSize, cudaMemcpyDeviceToHost);
     if (err != cudaSuccess) {
-        fprintf(stderr, "CUDA memcpy error: %s\n", cudaGetErrorString(err));
+        std::cerr << "CUDA memcpy error: " << cudaGetErrorString(err) << std::endl;
     }
 
     cudaFree(d_inputImage);
@@ -264,7 +263,7 @@ endif()
 QFuture<bool> ImageProcessor::rotateImage(cv::Mat& image)
 {
     // 함수 이름을 문자열로 저장
-    const QString functionName = "rotateImage";
+    const char* functionName = __func__;
 
     return QtConcurrent::run([this, &image, functionName]() -> bool {
 
@@ -277,16 +276,43 @@ QFuture<bool> ImageProcessor::rotateImage(cv::Mat& image)
                 return false;
             }
 
+            pushToUndoStack(image);
+
+            // 처리시간 계산
+            double startTime = getCurrentTimeMs();
+
             // 이미지를 CUDA를 이용하여 회전
+            // imageProcessing.cuh/imagProessing.cu            
             callRotateImageCUDA(image);
 
-            // 처리시간 계산 
-            double startTime = getCurrentTimeMs();
-            // 여기서는 단순히 CUDA 커널 호출 후 대기하는 것으로 가정
+            // CUDA 내장함수로  구현
+            // #include <opencv2/cudawarping.hpp>
+            //double angle = 90.0; // 회전할 각도 (예: 90도)
+
+            // 이미지를 GPU 메모리에 업로드
+            //cv::cuda::GpuMat gpuImage;
+            //gpuImage.upload(image);
+
+            // 회전 중심을 이미지의 중앙으로 설정
+            //cv::Point2f center(gpuImage.cols / 2.0f, gpuImage.rows / 2.0f);
+
+            // 회전 매트릭스 계산
+            //cv::Mat rotationMatrix = cv::getRotationMatrix2D(center, angle, 1.0);
+
+            // GPU에서 회전 수행
+            //cv::cuda::GpuMat gpuRotatedImage;
+            //cv::cuda::warpAffine(gpuImage, gpuRotatedImage, rotationMatrix, gpuImage.size());
+
+            // 결과 이미지를 CPU 메모리로 다운로드
+            //gpuRotatedImage.download(image);
+
+            // 이미지 처리 끝
 
             // 이미지 처리 시간 측정
             double endTime = getCurrentTimeMs();
             double processingTime = endTime - startTime;
+
+            lastProcessedImage = image.clone();
 
             // 이미지 업데이트 및 시그널 발생
             emit imageProcessed(image, processingTime, functionName);
