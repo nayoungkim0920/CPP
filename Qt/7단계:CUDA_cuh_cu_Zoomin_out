@@ -1,0 +1,370 @@
+1. imageProcessing.cuh
+//imageProcessing.cuh
+#ifndef IMAGE_PROCESSING_CUH_
+#define IMAGE_PROCESSING_CUH_
+
+#include <opencv2/core.hpp>
+#include <cuda_runtime.h>
+#include <iostream>
+
+// CUDA 함수 호출 선언
+extern "C" {
+    void callRotateImageCUDA(cv::Mat& inputImage);
+    void callZoomOutImageCUDA(cv::Mat& inputImage, int newWidth, int newHeight);
+    void callZoomInImageCUDA(cv::Mat& inputImage, int newWidth, int newHeight);
+}
+
+// CUDA 커널 선언
+__global__ void rotateImageKernel(const unsigned char* input, unsigned char* output, int cols, int rows, int channels);
+__global__ void zoomOutImageKernel(const unsigned char* input, unsigned char* output, int oldWidth, int oldHeight, int newWidth, int newHeight, int channels);
+__global__ void zoomInImageKernel(const unsigned char* input, unsigned char* output, int oldWidth, int oldHeight, int newWidth, int newHeight, int channels);
+
+#endif // IMAGE_PROCESSING_CUH_
+
+2. imageProecssing.cu
+//imageProecssing.cu
+#include "imageProcessing.cuh"
+
+__device__ void rotatePixel(int x, int y, int cols, int rows, int channels, const unsigned char* input, unsigned char* output) {
+    if (x < cols && y < rows) {
+        for (int c = 0; c < channels; ++c) {
+            output[(x * rows + (rows - 1 - y)) * channels + c] = input[(y * cols + x) * channels + c];
+        }
+    }
+}
+
+__global__ void rotateImageKernel(const unsigned char* input, unsigned char* output, int cols, int rows, int channels) {
+    int x = blockIdx.x * blockDim.x + threadIdx.x;
+    int y = blockIdx.y * blockDim.y + threadIdx.y;
+
+    if (x < cols && y < rows) {
+        rotatePixel(x, y, cols, rows, channels, input, output);
+    }
+}
+
+__global__ void zoomOutImageKernel(const unsigned char* input, unsigned char* output, int oldWidth, int oldHeight, int newWidth, int newHeight, int channels) {
+    int x = blockIdx.x * blockDim.x + threadIdx.x;
+    int y = blockIdx.y * blockDim.y + threadIdx.y;
+
+    if (x < newWidth && y < newHeight) {
+        float x_ratio = oldWidth / (float)newWidth;
+        float y_ratio = oldHeight / (float)newHeight;
+        int px = floor(x * x_ratio);
+        int py = floor(y * y_ratio);
+
+        for (int c = 0; c < channels; ++c) {
+            output[(y * newWidth + x) * channels + c] = input[(py * oldWidth + px) * channels + c];
+        }
+    }
+}
+
+__global__ void zoomInImageKernel(const unsigned char* input, unsigned char* output, int oldWidth, int oldHeight, int newWidth, int newHeight, int channels) {
+    int x = blockIdx.x * blockDim.x + threadIdx.x;
+    int y = blockIdx.y * blockDim.y + threadIdx.y;
+
+    if (x < newWidth && y < newHeight) {
+        float x_ratio = oldWidth / (float)newWidth;
+        float y_ratio = oldHeight / (float)newHeight;
+        int px = floor(x * x_ratio);
+        int py = floor(y * y_ratio);
+
+        for (int c = 0; c < channels; ++c) {
+            output[(y * newWidth + x) * channels + c] = input[(py * oldWidth + px) * channels + c];
+        }
+    }
+}
+
+
+extern "C" void callRotateImageCUDA(cv::Mat & inputImage) {
+    int cols = inputImage.cols;
+    int rows = inputImage.rows;
+    int channels = inputImage.channels();
+
+    uchar* d_inputImage = nullptr;
+    uchar* d_outputImage = nullptr;
+    size_t imageSize = cols * rows * channels * sizeof(uchar);
+
+    cudaError_t err;
+    err = cudaMalloc(&d_inputImage, imageSize);
+    if (err != cudaSuccess) {
+        std::cerr << "CUDA malloc error: " << cudaGetErrorString(err) << std::endl;
+        return;
+    }
+
+    err = cudaMalloc(&d_outputImage, imageSize);
+    if (err != cudaSuccess) {
+        std::cerr << "CUDA malloc error: " << cudaGetErrorString(err) << std::endl;
+        cudaFree(d_inputImage);
+        return;
+    }
+
+    err = cudaMemcpy(d_inputImage, inputImage.data, imageSize, cudaMemcpyHostToDevice);
+    if (err != cudaSuccess) {
+        std::cerr << "CUDA memcpy error: " << cudaGetErrorString(err) << std::endl;
+        cudaFree(d_inputImage);
+        cudaFree(d_outputImage);
+        return;
+    }
+
+    dim3 threadsPerBlock(16, 16);
+    dim3 numBlocks((cols + threadsPerBlock.x - 1) / threadsPerBlock.x, (rows + threadsPerBlock.y - 1) / threadsPerBlock.y);
+
+    //host를 kernel과분리하여 imageProcessing.cpp로만들었으나 아래를 지원하지않아 다시 .cu파일에 병합함
+    rotateImageKernel << <numBlocks, threadsPerBlock >> > (d_inputImage, d_outputImage, cols, rows, channels);
+
+    err = cudaGetLastError();
+    if (err != cudaSuccess) {
+        std::cerr << "CUDA kernel launch error: " << cudaGetErrorString(err) << std::endl;
+        cudaFree(d_inputImage);
+        cudaFree(d_outputImage);
+        return;
+    }
+
+    cudaDeviceSynchronize();
+
+    err = cudaMemcpy(inputImage.data, d_outputImage, imageSize, cudaMemcpyDeviceToHost);
+    if (err != cudaSuccess) {
+        std::cerr << "CUDA memcpy error: " << cudaGetErrorString(err) << std::endl;
+    }
+
+    cudaFree(d_inputImage);
+    cudaFree(d_outputImage);
+}
+
+extern "C" void callZoomOutImageCUDA(cv::Mat & inputImage, int newWidth, int newHeight) {
+    int oldWidth = inputImage.cols;
+    int oldHeight = inputImage.rows;
+    int channels = inputImage.channels();
+
+    uchar* d_inputImage = nullptr;
+    uchar* d_outputImage = nullptr;
+    size_t oldImageSize = oldWidth * oldHeight * channels * sizeof(uchar);
+    size_t newImageSize = newWidth * newHeight * channels * sizeof(uchar);
+
+    cudaError_t err;
+    err = cudaMalloc(&d_inputImage, oldImageSize);
+    if (err != cudaSuccess) {
+        std::cerr << "CUDA malloc error: " << cudaGetErrorString(err) << std::endl;
+        return;
+    }
+
+    err = cudaMalloc(&d_outputImage, newImageSize);
+    if (err != cudaSuccess) {
+        std::cerr << "CUDA malloc error: " << cudaGetErrorString(err) << std::endl;
+        cudaFree(d_inputImage);
+        return;
+    }
+
+    err = cudaMemcpy(d_inputImage, inputImage.data, oldImageSize, cudaMemcpyHostToDevice);
+    if (err != cudaSuccess) {
+        std::cerr << "CUDA memcpy error: " << cudaGetErrorString(err) << std::endl;
+        cudaFree(d_inputImage);
+        cudaFree(d_outputImage);
+        return;
+    }
+
+    dim3 threadsPerBlock(16, 16);
+    dim3 numBlocks((newWidth + threadsPerBlock.x - 1) / threadsPerBlock.x, (newHeight + threadsPerBlock.y - 1) / threadsPerBlock.y);
+
+    zoomOutImageKernel << <numBlocks, threadsPerBlock >> > (d_inputImage, d_outputImage, oldWidth, oldHeight, newWidth, newHeight, channels);
+
+    err = cudaGetLastError();
+    if (err != cudaSuccess) {
+        std::cerr << "CUDA kernel launch error: " << cudaGetErrorString(err) << std::endl;
+        cudaFree(d_inputImage);
+        cudaFree(d_outputImage);
+        return;
+    }
+
+    cudaDeviceSynchronize();
+
+    cv::Mat outputImage(newHeight, newWidth, inputImage.type());
+    err = cudaMemcpy(outputImage.data, d_outputImage, newImageSize, cudaMemcpyDeviceToHost);
+    if (err != cudaSuccess) {
+        std::cerr << "CUDA memcpy error: " << cudaGetErrorString(err) << std::endl;
+    }
+    else {
+        inputImage = outputImage;
+    }
+
+    cudaFree(d_inputImage);
+    cudaFree(d_outputImage);
+}
+
+extern "C" void callZoomInImageCUDA(cv::Mat & inputImage, int newWidth, int newHeight) {
+    int oldWidth = inputImage.cols;
+    int oldHeight = inputImage.rows;
+    int channels = inputImage.channels();
+
+    uchar* d_inputImage = nullptr;
+    uchar* d_outputImage = nullptr;
+    size_t oldImageSize = oldWidth * oldHeight * channels * sizeof(uchar);
+    size_t newImageSize = newWidth * newHeight * channels * sizeof(uchar);
+
+    cudaError_t err;
+    err = cudaMalloc(&d_inputImage, oldImageSize);
+    if (err != cudaSuccess) {
+        std::cerr << "CUDA malloc error: " << cudaGetErrorString(err) << std::endl;
+        return;
+    }
+
+    err = cudaMalloc(&d_outputImage, newImageSize);
+    if (err != cudaSuccess) {
+        std::cerr << "CUDA malloc error: " << cudaGetErrorString(err) << std::endl;
+        cudaFree(d_inputImage);
+        return;
+    }
+
+    err = cudaMemcpy(d_inputImage, inputImage.data, oldImageSize, cudaMemcpyHostToDevice);
+    if (err != cudaSuccess) {
+        std::cerr << "CUDA memcpy error: " << cudaGetErrorString(err) << std::endl;
+        cudaFree(d_inputImage);
+        cudaFree(d_outputImage);
+        return;
+    }
+
+    dim3 threadsPerBlock(16, 16);
+    dim3 numBlocks((newWidth + threadsPerBlock.x - 1) / threadsPerBlock.x, (newHeight + threadsPerBlock.y - 1) / threadsPerBlock.y);
+
+    zoomOutImageKernel << <numBlocks, threadsPerBlock >> > (d_inputImage, d_outputImage, oldWidth, oldHeight, newWidth, newHeight, channels);
+
+    err = cudaGetLastError();
+    if (err != cudaSuccess) {
+        std::cerr << "CUDA kernel launch error: " << cudaGetErrorString(err) << std::endl;
+        cudaFree(d_inputImage);
+        cudaFree(d_outputImage);
+        return;
+    }
+
+    cudaDeviceSynchronize();
+
+    cv::Mat outputImage(newHeight, newWidth, inputImage.type());
+    err = cudaMemcpy(outputImage.data, d_outputImage, newImageSize, cudaMemcpyDeviceToHost);
+    if (err != cudaSuccess) {
+        std::cerr << "CUDA memcpy error: " << cudaGetErrorString(err) << std::endl;
+    }
+    else {
+        inputImage = outputImage;
+    }
+
+    cudaFree(d_inputImage);
+    cudaFree(d_outputImage);
+}
+
+3. imageProcessor.cpp
+QFuture<bool> ImageProcessor::zoomoutImage(cv::Mat& image, double scaleFactor)
+{
+    //함수 이름을 문자열로 저장
+    const char* functionName = __func__;
+
+    return QtConcurrent::run([this, &image, scaleFactor, functionName]() -> bool {
+
+        QMutexLocker locker(&mutex);
+
+        try {            
+
+            if (image.empty()) {
+                qDebug() << "Input image is empty.";
+                return false;
+            }
+
+            if (scaleFactor <= 0) {
+                qDebug() << "잘못된 축소 배율입니다.";
+                return false;
+            }
+
+            pushToUndoStack(image);
+
+            // 처리시간계산 시작
+            double startTime = getCurrentTimeMs();
+
+            int newWidth = static_cast<int>(image.cols * scaleFactor);
+            int newHeight = static_cast<int>(image.rows * scaleFactor);
+
+            //openCV
+            //cv::Mat zoomedImage;
+            //cv::resize(image, zoomedImage, cv::Size(newWidth, newHeight), 0, 0, cv::INTER_LINEAR);
+
+            //cuda내장함수
+            //cv::cuda::GpuMat d_image, zoomedImage;
+            //d_image.upload(image);
+
+            //cv::cuda::resize(d_image, zoomedImage,
+            //    cv::Size(newWidth, newHeight),
+            //    0, 0, cv::INTER_LINEAR);
+
+            //CUDA
+            callZoomOutImageCUDA(image, newWidth, newHeight);
+
+            // 처리시간계산 종료
+            double endTime = getCurrentTimeMs();
+            double processingTime = endTime - startTime;
+
+            //zoomedImage.download(image); //cuda내장함수
+            //image = zoomedImage.clone(); //openCV
+            lastProcessedImage = image.clone();
+
+            emit imageProcessed(image, processingTime, functionName); // 이미지 처리 완료 시그널 발생
+
+            return true;
+        }
+        catch (const cv::Exception& e) {
+            qDebug() << "이미지 축소 중 예외가 발생했습니다:" << e.what();
+            return false;
+        }
+        });
+}
+
+QFuture<bool> ImageProcessor::zoominImage(cv::Mat& image, double scaleFactor)
+{
+    //함수 이름을 문자열로 저장
+    const char* functionName = __func__;
+
+    return QtConcurrent::run([this, &image, scaleFactor, functionName]() -> bool {
+
+        QMutexLocker locker(&mutex);
+
+        try {
+
+            if (image.empty()) {
+                qDebug() << "Input image is empty.";
+                return false;
+            }
+
+            if (scaleFactor <= 0) {
+                qDebug() << "잘못된 확대 배율입니다.";
+                return false;
+            }
+
+            pushToUndoStack(image);
+
+            // 처리시간계산 시작
+            double startTime = getCurrentTimeMs();
+
+            int newWidth = static_cast<int>(image.cols * scaleFactor);
+            int newHeight = static_cast<int>(image.rows * scaleFactor);
+
+            //openCV
+            //cv::Mat zoomedImage;
+            //cv::resize(image, zoomedImage, cv::Size(newWidth, newHeight), 0, 0, cv::INTER_LINEAR);
+
+            //CUDA kernel
+            callZoomInImageCUDA(image, newWidth, newHeight);
+
+            // 처리시간계산 종료
+            double endTime = getCurrentTimeMs();
+            double processingTime = endTime - startTime;
+
+            //image = zoomedImage.clone(); // 이미지를 복사하여 업데이트
+            lastProcessedImage = image.clone();
+
+            emit imageProcessed(image, processingTime, functionName); // 이미지 처리 완료 시그널 발생
+
+            return true;
+        }
+        catch (const cv::Exception& e) {
+            qDebug() << "이미지 확대 중 예외가 발생했습니다:" << e.what();
+            return false;
+        }
+        });
+}
