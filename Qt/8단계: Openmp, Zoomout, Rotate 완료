@@ -1,0 +1,812 @@
+1. MainWindow.cpp
+void MainWindow::openFile()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Image"), "", tr("Image Files (*.png *.jpg *.bmp *.jpeg);;All Files (*)"));
+    if (!fileName.isEmpty()) {
+        cv::Mat loadedImage;
+        if (imageProcessor->openImage(fileName.toStdString(), loadedImage)) {
+
+            //이미지크기를 400*300 변경
+            cv::resize(loadedImage, loadedImage, cv::Size(400, 300));
+
+            currentImageOpenCV = loadedImage.clone();
+            currentImageIPP = loadedImage.clone();
+            currentImageCUDA = loadedImage.clone();
+            currentImageCUDAKernel = loadedImage.clone();
+
+            initialImageOpenCV = currentImageOpenCV.clone();
+            initialImageIPP = currentImageIPP.clone();
+            initialImageCUDA = currentImageCUDA.clone();
+            initialImageCUDAKernel = currentImageCUDAKernel.clone();
+
+            displayImage(initialImageOpenCV, ui->label_opencv);
+            displayImage(initialImageIPP, ui->label_ipp);
+            displayImage(initialImageCUDA, ui->label_cuda);
+            displayImage(initialImageCUDAKernel, ui->label_cudakernel);
+        }
+        else {
+            QMessageBox::critical(this, tr("Error"), tr("Failed to open image file"));
+        }
+    }
+}
+
+void MainWindow::rotateImage()
+{
+    QtConcurrent::run([this]() {
+        if (!currentImageOpenCV.empty()) {
+            imageProcessor->rotateImage(currentImageOpenCV
+                , currentImageIPP
+                , currentImageCUDA
+                , currentImageCUDAKernel);
+        }
+        });
+    ////applyImageProcessing(&ImageProcessor::rotateImage, currentImage);
+}
+
+void MainWindow::zoomOutImage()
+{
+    QtConcurrent::run([this]() {
+        if (!currentImageOpenCV.empty()) {
+            imageProcessor->zoomOutImage(currentImageOpenCV
+                , currentImageIPP
+                , currentImageCUDA
+                , currentImageCUDAKernel
+                , scaleFactor = 0.8);
+        }
+        });
+    //applyImageProcessing(&ImageProcessor::zoomoutImage, currentImage, scaleFactor = 0.8);
+}
+void MainWindow::displayImage(cv::Mat image, QLabel* label)
+{
+    QMetaObject::invokeMethod(this, [this, image, label]() {
+        qDebug() << "displayImage() channels: " << image.channels();
+
+        // 이미지 타입에 따라 QImage를 생성합니다.
+        QImage qImage;
+        if (image.type() == CV_8UC1) {
+            qDebug() << "displayImage() type: grayscale CV_8UC1 Format_Grayscale8";
+            qImage = QImage(image.data,
+                image.cols,
+                image.rows,
+                static_cast<int>(image.step),
+                QImage::Format_Grayscale8);
+        }
+        else if (image.type() == CV_8UC3) {
+            qDebug() << "displayImage() type: BGR CV_8UC3 Format_RGB888";
+            qImage = QImage(image.data,
+                image.cols,
+                image.rows,
+                static_cast<int>(image.step),
+                QImage::Format_RGB888).rgbSwapped();
+        }
+        else {
+            qDebug() << "displayImage() type: not supported";
+            return; // 지원하지 않는 이미지 타입은 처리하지 않음
+        }
+
+        // QLabel 위젯에 QPixmap으로 이미지를 설정합니다.
+        QPixmap pixmap = QPixmap::fromImage(qImage);
+        label->setPixmap(pixmap);
+        label->setScaledContents(false);
+        label->adjustSize();
+        });
+}
+
+2.imageProcessor.h
+    ProcessingResult zoomOpenCV(cv::Mat& image, double newWidth, double newHeight);
+    ProcessingResult zoomIPP(cv::Mat& image, double newWidth, double newHeight);
+    ProcessingResult zoomCUDA(cv::Mat& image, double newWidth, double newHeight);
+    ProcessingResult zoomCUDAKernel(cv::Mat& image, double newWidth, double newHeight);
+
+    ProcessingResult rotateOpenCV(cv::Mat& image);
+    ProcessingResult rotateIPP(cv::Mat& image);
+    ProcessingResult rotateCUDA(cv::Mat& image);
+    ProcessingResult rotateCUDAKernel(cv::Mat& image);
+
+3.imageProcessor.cpp
+QFuture<bool> ImageProcessor::rotateImage(cv::Mat& imageOpenCV
+                                        , cv::Mat& imageIPP
+                                        , cv::Mat& imageCUDA
+                                        , cv::Mat& imageCUDAKernel)
+{
+    //함수 이름을 문자열로 저장
+    const char* functionName = __func__;
+
+    return QtConcurrent::run([this
+        , &imageOpenCV
+        , &imageIPP
+        , &imageCUDA
+        , &imageCUDAKernel
+        , functionName]() -> bool {
+
+        QMutexLocker locker(&mutex);
+
+        try {
+
+            if (imageOpenCV.empty()) {
+                qDebug() << "Input image is empty.";
+                return false;
+            }
+
+            pushToUndoStackOpenCV(imageOpenCV.clone());
+            pushToUndoStackIPP(imageIPP.clone());
+            pushToUndoStackCUDA(imageCUDA.clone());
+            pushToUndoStackCUDAKernel(imageCUDAKernel.clone());
+
+            QVector<ProcessingResult> results;
+
+            ProcessingResult outputOpenCV = rotateOpenCV(imageOpenCV);
+            lastProcessedImageOpenCV = outputOpenCV.processedImage.clone();
+            results.append(outputOpenCV);
+
+            ProcessingResult outputIPP = rotateIPP(imageIPP);
+            lastProcessedImageIPP = outputIPP.processedImage.clone();
+            results.append(outputIPP);
+
+            ProcessingResult outputCUDA = rotateCUDA(imageCUDA);
+            lastProcessedImageCUDA = outputCUDA.processedImage.clone();
+            results.append(outputCUDA);
+
+            ProcessingResult outputCUDAKernel = rotateCUDAKernel(imageCUDAKernel);
+            lastProcessedImageCUDAKernel = outputCUDAKernel.processedImage.clone();
+            results.append(outputCUDAKernel);
+
+            // 이미지 업데이트 및 시그널 발생
+            emit imageProcessed(results);
+
+            return true;
+        }
+        catch (const cv::Exception& e) {
+            qDebug() << "Exception occurred while rotating image:" << e.what();
+            return false;
+        }
+        });
+}
+
+QFuture<bool> ImageProcessor::zoomOutImage(cv::Mat& imageOpenCV
+                                            , cv::Mat& imageIPP
+                                            , cv::Mat& imageCUDA
+                                            , cv::Mat& imageCUDAKernel
+                                            , double scaleFactor)
+{
+    //함수 이름을 문자열로 저장
+    const char* functionName = __func__;
+
+    return QtConcurrent::run([this
+                            , &imageOpenCV
+                            , &imageIPP
+                            , &imageCUDA
+                            , &imageCUDAKernel
+                            , scaleFactor
+                            , functionName]() -> bool {
+
+            QMutexLocker locker(&mutex);
+
+            try {
+
+                if (imageOpenCV.empty()) {
+                    qDebug() << "Input image is empty.";
+                    return false;
+                }
+
+                if (scaleFactor <= 0) {
+                    qDebug() << "Invalid scaling factor.";
+                    return false;
+                }
+
+                pushToUndoStackOpenCV(imageOpenCV.clone());
+                pushToUndoStackIPP(imageIPP.clone());
+                pushToUndoStackCUDA(imageCUDA.clone());
+                pushToUndoStackCUDAKernel(imageCUDAKernel.clone());
+
+                QVector<ProcessingResult> results;
+
+                double newWidth = static_cast<int>(imageOpenCV.cols * scaleFactor);
+                double newHeight = static_cast<int>(imageOpenCV.rows * scaleFactor);
+
+                ProcessingResult outputOpenCV = zoomOpenCV(imageOpenCV, newWidth, newHeight);
+                lastProcessedImageOpenCV = outputOpenCV.processedImage.clone();
+                results.append(outputOpenCV);
+
+                ProcessingResult outputIPP = zoomIPP(imageIPP, newWidth, newHeight);
+                lastProcessedImageIPP = outputIPP.processedImage.clone();
+                results.append(outputIPP);
+
+                ProcessingResult outputCUDA = zoomCUDA(imageCUDA, newWidth, newHeight);
+                lastProcessedImageCUDA = outputCUDA.processedImage.clone();
+                results.append(outputCUDA);
+
+                ProcessingResult outputCUDAKernel = zoomCUDAKernel(imageCUDAKernel, newWidth, newHeight);
+                lastProcessedImageCUDAKernel = outputCUDAKernel.processedImage.clone();
+                results.append(outputCUDAKernel);
+
+                emit imageProcessed(results); // 이미지 처리 완료 시그널 발생
+
+                return true;
+            }
+            catch (const cv::Exception& e) {
+                qDebug() << "이미지 축소 중 예외가 발생했습니다:" << e.what();
+                return false;
+            }
+        });
+}
+
+QFuture<bool> ImageProcessor::zoomInImage(cv::Mat& imageOpenCV
+                                        , cv::Mat& imageIPP
+                                        , cv::Mat& imageCUDA
+                                        , cv::Mat& imageCUDAKernel
+                                        , double scaleFactor)
+{
+    //함수 이름을 문자열로 저장
+    const char* functionName = __func__;
+
+    return QtConcurrent::run([this
+                            , &imageOpenCV
+                            , &imageIPP
+                            , &imageCUDA
+                            , &imageCUDAKernel
+                            , scaleFactor
+                            , functionName]() -> bool {
+
+        QMutexLocker locker(&mutex);
+
+        try {
+
+            if (imageOpenCV.empty()) {
+                qDebug() << "Input image is empty.";
+                return false;
+            }
+
+            if (scaleFactor <= 0) {
+                qDebug() << "잘못된 확대 배율입니다.";
+                return false;
+            }
+
+            pushToUndoStackOpenCV(imageOpenCV.clone());
+            pushToUndoStackIPP(imageIPP.clone());
+            pushToUndoStackCUDA(imageCUDA.clone());
+            pushToUndoStackCUDAKernel(imageCUDAKernel.clone());
+
+            QVector<ProcessingResult> results;
+
+            double newWidth = static_cast<int>(imageOpenCV.cols * scaleFactor);
+            double newHeight = static_cast<int>(imageOpenCV.rows * scaleFactor);
+
+            ProcessingResult outputOpenCV = zoomOpenCV(imageOpenCV, newWidth, newHeight);
+            lastProcessedImageOpenCV = outputOpenCV.processedImage.clone();
+            results.append(outputOpenCV);
+
+            ProcessingResult outputIPP = zoomIPP(imageIPP, newWidth, newHeight);
+            lastProcessedImageIPP = outputIPP.processedImage.clone();
+            results.append(outputIPP);
+
+            ProcessingResult outputCUDA = zoomCUDA(imageCUDA, newWidth, newHeight);
+            lastProcessedImageCUDA = outputCUDA.processedImage.clone();
+            results.append(outputCUDA);
+
+            ProcessingResult outputCUDAKernel = zoomCUDAKernel(imageCUDAKernel, newWidth, newHeight);
+            lastProcessedImageCUDAKernel = outputCUDAKernel.processedImage.clone();
+            results.append(outputCUDAKernel);
+
+            emit imageProcessed(results); // 이미지 처리 완료 시그널 발생
+
+            return true;
+        }
+        catch (const cv::Exception& e) {
+            qDebug() << "이미지 확대 중 예외가 발생했습니다:" << e.what();
+            return false;
+        }
+        });
+}
+ImageProcessor::ProcessingResult ImageProcessor::zoomOpenCV(cv::Mat& image, double newWidth, double newHeight)
+{
+    ProcessingResult result;
+
+    result.functionName = "zoomIn";
+    result.processName = "OpenCV";
+
+    double startTime = cv::getTickCount(); // 시작 시간 측정
+
+    cv::Mat zoomInImage;
+    cv::resize(image, zoomInImage, cv::Size(newWidth, newHeight), 0, 0, cv::INTER_LINEAR);
+
+    double endTime = cv::getTickCount(); // 종료 시간 측정
+    double elapsedTimeMs = (endTime - startTime) / cv::getTickFrequency() * 1000.0; // 시간 계산
+
+    result.processedImage = zoomInImage;
+    result.processingTime = elapsedTimeMs;
+
+    return result;
+}
+
+ImageProcessor::ProcessingResult ImageProcessor::zoomIPP(cv::Mat& image, double newWidth, double newHeight) {
+    ProcessingResult result;
+    result.functionName = "zoomIn";
+    result.processName = "IPP";
+
+    double startTime = cv::getTickCount(); // 시작 시간 측정
+
+    cv::Mat zoomedImage;
+    zoomedImage.create(static_cast<int>(newHeight), static_cast<int>(newWidth), image.type());
+
+    Ipp8u* pSrcData = reinterpret_cast<Ipp8u*>(image.data);
+    Ipp8u* pDstData = reinterpret_cast<Ipp8u*>(zoomedImage.data);
+
+    IppiSize srcSize = { image.cols, image.rows };
+    IppiSize dstSize = { static_cast<int>(newWidth), static_cast<int>(newHeight) };
+    IppiPoint dstOffset = { 0, 0 };
+
+    int specSize = 0;
+    int initSize = 0;
+    int bufSize = 0;
+    std::vector<Ipp8u> pBuffer;
+    IppiResizeSpec_32f* pSpec = nullptr;
+
+    // Get the sizes of the spec and initialization buffers
+    IppStatus status = ippiResizeGetSize_8u(srcSize, dstSize, ippNearest, 0, &specSize, &initSize);
+    if (status != ippStsNoErr) {
+        std::cerr << "Error: ippiResizeGetSize_8u failed with status code " << status << std::endl;
+        return result;
+    }
+
+    // Allocate the spec and initialization buffers
+    pSpec = (IppiResizeSpec_32f*)(ippMalloc(specSize));
+    if (!pSpec) {
+        std::cerr << "Error: Memory allocation failed for pSpec" << std::endl;
+        return result;
+    }
+
+    pBuffer.resize(initSize);
+    if (pBuffer.empty()) {
+        std::cerr << "Error: Memory allocation failed for pBuffer" << std::endl;
+        ippFree(pSpec);
+        return result;
+    }
+
+    // Initialize the resize specification
+    status = ippiResizeNearestInit_8u(srcSize, dstSize, pSpec);
+    if (status != ippStsNoErr) {
+        std::cerr << "Error: ippiResizeNearestInit_8u failed with status code " << status << std::endl;
+        ippFree(pSpec);
+        return result;
+    }
+
+    // Get the size of the working buffer
+    status = ippiResizeGetBufferSize_8u(pSpec, dstSize, image.channels(), &bufSize);
+    if (status != ippStsNoErr) {
+        std::cerr << "Error: ippiResizeGetBufferSize_8u failed with status code " << status << std::endl;
+        ippFree(pSpec);
+        return result;
+    }
+
+    pBuffer.resize(bufSize);
+    if (pBuffer.empty()) {
+        std::cerr << "Error: Memory allocation failed for pBuffer" << std::endl;
+        ippFree(pSpec);
+        return result;
+    }
+
+    // Perform the resize operation
+    if (image.channels() == 1) {
+        status = ippiResizeNearest_8u_C1R(pSrcData, image.step[0], pDstData, zoomedImage.step[0], dstOffset, dstSize, pSpec, pBuffer.data());
+    }
+    else if (image.channels() == 3) {
+        status = ippiResizeNearest_8u_C3R(pSrcData, image.step[0], pDstData, zoomedImage.step[0], dstOffset, dstSize, pSpec, pBuffer.data());
+    }
+    else {
+        std::cerr << "Error: Unsupported number of channels" << std::endl;
+        ippFree(pSpec);
+        return result;
+    }
+
+    if (status != ippStsNoErr) {
+        std::cerr << "Error: ippiResizeNearest_8u failed with status code " << status << std::endl;
+        ippFree(pSpec);
+        return result;
+    }
+
+    double endTime = cv::getTickCount(); // 종료 시간 측정
+    double elapsedTimeMs = (endTime - startTime) / cv::getTickFrequency() * 1000.0; // 시간 계산
+
+    result.processedImage = zoomedImage.clone(); // 처리된 이미지 복사
+    result.processingTime = elapsedTimeMs; // 처리 시간 설정
+
+    // 메모리 해제
+    ippFree(pSpec);
+
+    return result;
+}
+
+ImageProcessor::ProcessingResult ImageProcessor::zoomCUDA(cv::Mat& image, double newWidth, double newHeight)
+{
+    ProcessingResult result;
+    result.functionName = "zoomIn";
+    result.processName = "CUDA";
+
+    double startTime = cv::getTickCount(); // 시작 시간 측정
+
+    // GPU 메모리로 이미지 업로드
+    cv::cuda::GpuMat d_image;
+    d_image.upload(image);
+
+    // 결과 이미지를 저장할 GPU 메모리 할당
+    cv::cuda::GpuMat d_zoomInImage;
+
+    // 이미지 크기 조정
+    cv::cuda::resize(d_image, d_zoomInImage, cv::Size(static_cast<int>(newWidth), static_cast<int>(newHeight)), 0, 0, cv::INTER_LINEAR);
+
+    // CPU 메모리로 결과 이미지 다운로드
+    cv::Mat zoomedImage;
+    d_zoomInImage.download(zoomedImage);
+
+    double endTime = cv::getTickCount(); // 종료 시간 측정
+    double elapsedTimeMs = (endTime - startTime) / cv::getTickFrequency() * 1000.0; // 시간 계산
+
+    result.processedImage = zoomedImage.clone(); // 처리된 이미지 복사
+    result.processingTime = elapsedTimeMs; // 처리 시간 설정
+
+    return result;
+}
+
+ImageProcessor::ProcessingResult ImageProcessor::zoomCUDAKernel(cv::Mat& image, double newWidth, double newHeight)
+{
+    ProcessingResult result;
+    result.functionName = "zoomIn";
+    result.processName = "CUDAKernel";
+
+    double startTime = cv::getTickCount(); // 시작 시간 측정
+
+    callResizeImageCUDA(image, newWidth, newHeight);
+
+    double endTime = cv::getTickCount(); // 종료 시간 측정
+    double elapsedTimeMs = (endTime - startTime) / cv::getTickFrequency() * 1000.0; // 시간 계산
+
+    result.processedImage = image.clone(); // 처리된 이미지 복사
+    result.processingTime = elapsedTimeMs; // 처리 시간 설정
+
+    return result;
+}
+
+ImageProcessor::ProcessingResult ImageProcessor::rotateOpenCV(cv::Mat& image)
+{
+    ProcessingResult result;
+    result.functionName = "rotate";
+    result.processName = "OpenCV";
+
+    double startTime = cv::getTickCount(); // 시작 시간 측정
+
+    cv::Mat rotatedImage;
+    cv::rotate(image, rotatedImage, cv::ROTATE_90_CLOCKWISE);
+
+    double endTime = cv::getTickCount(); // 종료 시간 측정
+    double elapsedTimeMs = (endTime - startTime) / cv::getTickFrequency() * 1000.0; // 시간 계산
+
+    result.processedImage = rotatedImage.clone(); // 처리된 이미지 복사
+    result.processingTime = elapsedTimeMs; // 처리 시간 설정
+
+    return result;
+}
+
+ImageProcessor::ProcessingResult ImageProcessor::rotateIPP(cv::Mat& image)
+{
+    ProcessingResult result;
+    result.functionName = "rotate";
+    result.processName = "IPP";
+
+    double startTime = cv::getTickCount();
+
+    // 입력 이미지의 크기
+    IppiSize srcSize = { image.cols, image.rows };
+
+    // 출력 이미지의 크기 설정: 오른쪽으로 회전된 이미지의 크기와 같도록 설정
+    IppiSize dstSize = { image.rows, image.cols };
+
+    // IPP에서 사용할 아핀 변환 계수
+    double angle = 270.0;  // 90도 시계 방향으로 회전
+    double xShift = static_cast<double>(srcSize.width);  // x 축 이동량: 이미지의 너비
+    double yShift = 0.0;  // y 축 이동량: 0
+
+    // 아핀 변환 계수 계산
+    double coeffs[2][3];
+    IppStatus status = ippiGetRotateTransform(angle, xShift, yShift, coeffs);
+    if (status != ippStsNoErr) {
+        std::cerr << "ippiGetRotateTransform error: " << status << std::endl;
+        result.processedImage = image.clone();
+        result.processingTime = 0.0;
+        return result;
+    }
+
+    // IPP를 위한 필요한 변수들
+    IppiWarpSpec* pSpec = nullptr;
+    Ipp8u* pBuffer = nullptr;
+    int specSize = 0, initSize = 0, bufSize = 0;
+    const Ipp32u numChannels = 3;
+    IppiBorderType borderType = ippBorderConst;
+    IppiWarpDirection direction = ippWarpForward;
+    Ipp64f pBorderValue[numChannels];
+    for (int i = 0; i < numChannels; ++i) pBorderValue[i] = 255.0;
+
+    // Spec 및 Init buffer 사이즈 설정
+    status = ippiWarpAffineGetSize(srcSize, dstSize, ipp8u, coeffs, ippLinear, direction, borderType, &specSize, &initSize);
+    if (status != ippStsNoErr) {
+        std::cerr << "ippiWarpAffineGetSize error: " << status << std::endl;
+        result.processedImage = image.clone();
+        result.processingTime = 0.0;
+        return result;
+    }
+
+    // Memory allocation
+    pSpec = (IppiWarpSpec*)ippsMalloc_8u(specSize);
+    if (pSpec == nullptr) {
+        std::cerr << "Memory allocation error for pSpec" << std::endl;
+        result.processedImage = image.clone();
+        result.processingTime = 0.0;
+        return result;
+    }
+
+    // Filter initialization
+    status = ippiWarpAffineLinearInit(srcSize, dstSize, ipp8u, coeffs, direction, numChannels, borderType, pBorderValue, 0, pSpec);
+    if (status != ippStsNoErr) {
+        std::cerr << "ippiWarpAffineLinearInit error: " << status << std::endl;
+        ippsFree(pSpec);
+        result.processedImage = image.clone();
+        result.processingTime = 0.0;
+        return result;
+    }
+
+    // work buffer size
+    status = ippiWarpGetBufferSize(pSpec, dstSize, &bufSize);
+    if (status != ippStsNoErr) {
+        std::cerr << "ippiWarpGetBufferSize error: " << status << std::endl;
+        ippsFree(pSpec);
+        result.processedImage = image.clone();
+        result.processingTime = 0.0;
+        return result;
+    }
+
+    pBuffer = ippsMalloc_8u(bufSize);
+    if (pBuffer == nullptr) {
+        std::cerr << "Memory allocation error for pBuffer" << std::endl;
+        ippsFree(pSpec);
+        result.processedImage = image.clone();
+        result.processingTime = 0.0;
+        return result;
+    }
+
+    // 회전된 이미지를 저장할 Mat 생성
+    cv::Mat rotatedImage(dstSize.width, dstSize.height, image.type());
+
+    // dstOffset 정의 (오른쪽으로 90도 회전 시)
+    IppiPoint dstOffset = { 0, 0 };
+
+    // IPP를 이용하여 이미지 회전
+    status = ippiWarpAffineLinear_8u_C3R(image.data, srcSize.width * 3, rotatedImage.data, dstSize.width * 3, dstOffset, dstSize, pSpec, pBuffer);
+    if (status != ippStsNoErr) {
+        std::cerr << "ippiWarpAffineLinear_8u_C3R error: " << status << std::endl;
+        ippsFree(pSpec);
+        ippsFree(pBuffer);
+        result.processedImage = image.clone();
+        result.processingTime = 0.0;
+        return result;
+    }
+
+    // 메모리 해제
+    ippsFree(pSpec);
+    ippsFree(pBuffer);
+
+    double endTime = cv::getTickCount(); // 종료 시간 측정
+    double elapsedTimeMs = (endTime - startTime) / cv::getTickFrequency() * 1000.0; // 시간 계산
+
+    result.processedImage = rotatedImage.clone();
+    result.processingTime = elapsedTimeMs; // 처리 시간 설정
+
+    return result;
+}
+
+
+
+ImageProcessor::ProcessingResult ImageProcessor::rotateCUDA(cv::Mat& image)
+{
+    ProcessingResult result;
+    result.functionName = "rotate";
+    result.processName = "CUDA";
+
+    double startTime = cv::getTickCount(); // 시작 시간 측정
+
+    // #include <opencv2/cudawarping.hpp>
+    double angle = 90.0; // 회전할 각도 (예: 90도)
+
+    // 이미지를 GPU 메모리에 업로드
+    cv::cuda::GpuMat gpuImage;
+    gpuImage.upload(image);
+
+    // 회전 중심을 이미지의 중앙으로 설정
+    cv::Point2f center(gpuImage.cols / 2.0f, gpuImage.rows / 2.0f);
+
+    // 회전 매트릭스 계산
+    cv::Mat rotationMatrix = cv::getRotationMatrix2D(center, angle, 1.0);
+
+    // GPU에서 회전 수행
+    cv::cuda::GpuMat gpuRotatedImage;
+    cv::cuda::warpAffine(gpuImage, gpuRotatedImage, rotationMatrix, gpuImage.size());
+
+    // 결과 이미지를 CPU 메모리로 다운로드
+    cv::Mat rotatedImage;
+    gpuRotatedImage.download(rotatedImage);
+
+    double endTime = cv::getTickCount(); // 종료 시간 측정
+    double elapsedTimeMs = (endTime - startTime) / cv::getTickFrequency() * 1000.0; // 시간 계산
+
+    result.processedImage = rotatedImage.clone(); // 처리된 이미지 복사
+    result.processingTime = elapsedTimeMs; // 처리 시간 설정
+
+    return result;
+}
+
+ImageProcessor::ProcessingResult ImageProcessor::rotateCUDAKernel(cv::Mat& image)
+{
+    ProcessingResult result;
+    result.functionName = "rotate";
+    result.processName = "CUDAKernel";
+
+    double startTime = cv::getTickCount(); // 시작 시간 측정
+
+    callRotateImageCUDA(image);
+
+    double endTime = cv::getTickCount(); // 종료 시간 측정
+    double elapsedTimeMs = (endTime - startTime) / cv::getTickFrequency() * 1000.0; // 시간 계산
+
+    result.processedImage = image.clone(); // 처리된 이미지 복사
+    result.processingTime = elapsedTimeMs; // 처리 시간 설정
+
+    return result;
+}
+
+4. CMakeLists.txt(OpenMP)
+cmake_minimum_required(VERSION 3.14)
+project(Project1 LANGUAGES CXX CUDA)
+
+# Qt, OpenCV, CUDA 설정
+set(CMAKE_PREFIX_PATH "C:/Qt/6.7.1/msvc2019_64" "C:/opencv/build")
+find_package(Qt6 REQUIRED COMPONENTS Widgets Core Gui)
+find_package(OpenCV REQUIRED COMPONENTS core imgproc highgui cudaarithm cudafilters cudawarping cudacodec cudafeatures2d cudaimgproc)
+find_package(CUDA REQUIRED)
+
+# IPP 설정
+set(IPP_ROOT "C:/Program Files (x86)/Intel/oneAPI/ipp/2021.11")  # IPP 라이브러리 설치 경로
+include_directories("${IPP_ROOT}/include")
+link_directories("${IPP_ROOT}/lib")  # IPP 라이브러리 lib 경로
+
+# 추가 포함 디렉터리 설정
+include_directories(
+    ${CUDA_INCLUDE_DIRS}
+    ${OpenCV_INCLUDE_DIRS}
+    ${IPP_ROOT}/include
+)
+
+# CUDA 파일 설정
+set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} -std=c++14 --expt-relaxed-constexpr -gencode arch=compute_86,code=sm_86)
+
+# Qt 래핑 파일 생성
+qt6_wrap_cpp(MOC_FILES
+    MainWindow.h
+    ImageProcessor.h
+)
+
+# CUDA 파일 컴파일 및 라이브러리 생성
+cuda_add_library(image_processing
+    imageProcessing.cu
+)
+
+# IPP 라이브러리 링크
+target_link_libraries(image_processing
+    ippcc.lib
+    ippcore.lib
+    ippvm.lib
+    ipps.lib
+    ippi.lib
+)
+
+# 실행 파일 추가
+add_executable(Project1
+    main.cpp
+    MainWindow.cpp
+    MainWindow.h
+    MainWindow.ui
+    ImageProcessor.cpp
+    ImageProcessor.h
+    ${MOC_FILES}
+)
+
+# 라이브러리 링크
+target_link_libraries(Project1
+    Qt6::Widgets
+    Qt6::Core
+    Qt6::Gui
+    ${OpenCV_LIBS}
+    image_processing
+    ${CUDA_LIBRARIES}
+    ${CUDNN_LIBRARIES}
+)
+
+# 실행 파일 출력 디렉토리 설정
+set_target_properties(Project1 PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/Debug"
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/Release"
+)
+
+# 디버그 빌드에서의 OpenCV opencv_world DLL 복사
+add_custom_command(TARGET Project1 POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/x64/vc16/bin/opencv_world4100d.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMENT "Copying OpenCV Debug opencv_world DLL to output directory"
+)
+
+# 릴리스 빌드에서의 OpenCV opencv_world DLL 복사
+add_custom_command(TARGET Project1 POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/x64/vc16/bin/opencv_world4100.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMENT "Copying OpenCV Release opencv_world DLL to output directory"
+)
+
+# 디버그 빌드에서의 OpenCV DLL 복사
+add_custom_command(TARGET Project1 POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/bin/Debug/opencv_cudaarithm4100d.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/bin/Debug/opencv_cudaimgproc4100d.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/bin/Debug/opencv_cudafilters4100d.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/bin/Debug/opencv_imgcodecs4100d.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/bin/Debug/opencv_core4100d.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/bin/Debug/opencv_imgproc4100d.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMENT "Copying OpenCV Debug DLLs to output directory"
+)
+
+# 릴리스 빌드에서의 OpenCV DLL 복사
+add_custom_command(TARGET Project1 POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/bin/Release/opencv_cudaarithm4100.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/bin/Release/opencv_cudaimgproc4100.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/bin/Release/opencv_cudafilters4100.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/bin/Release/opencv_imgcodecs4100.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/bin/Release/opencv_core4100.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/bin/Release/opencv_imgproc4100.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMENT "Copying OpenCV Release DLLs to output directory"
+)
+
+# 파일 인코딩 설정 추가
+add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
+
+# OpenMP 설정
+find_package(OpenMP REQUIRED)
+if(OpenMP_CXX_FOUND)
+    target_link_libraries(Project1 
+    OpenMP::OpenMP_CXX)
+endif()
+
+if (MSVC)
+    set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Project1)
+
+    # Debug 빌드
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MDd")
+    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /MDd")
+
+    # Release 빌드
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MD")
+    set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /MD")
+
+    # 반복자 디버그 레벨 설정
+    add_compile_definitions(
+        $<$<CONFIG:Debug>:_ITERATOR_DEBUG_LEVEL=2>
+        $<$<CONFIG:Release>:_ITERATOR_DEBUG_LEVEL=0>
+    )
+endif()
