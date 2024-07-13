@@ -1,0 +1,233 @@
+<수정사항>
+1. bilateralFilter NPP(NVIDIA Performance Primitives) 구현
+2. npp CMakeLists.txt 설정추가
+
+<코드>
+1. imageProcessor.cpp
+ImageProcessor::ProcessingResult ImageProcessor::bilateralFilterIPP(cv::Mat& inputImage)
+{
+    // NPP
+    /* 
+    ProcessingResult result;
+    double startTime = cv::getTickCount(); // 시작 시간 측정
+
+    // 입력 이미지를 GPU 메모리로 복사
+    Npp8u* d_inputImage;
+    size_t inputImagePitch;
+    cudaMallocPitch((void**)&d_inputImage, &inputImagePitch, inputImage.cols * sizeof(Npp8u) * inputImage.channels(), inputImage.rows);
+    cudaMemcpy2D(d_inputImage, inputImagePitch, inputImage.data, inputImage.step, inputImage.cols * sizeof(Npp8u) * inputImage.channels(), inputImage.rows, cudaMemcpyHostToDevice);
+
+    // 출력 이미지를 GPU 메모리로 할당
+    cv::Mat outputImage(inputImage.size(), inputImage.type());
+    Npp8u* d_outputImage;
+    size_t outputImagePitch;
+    cudaMallocPitch((void**)&d_outputImage, &outputImagePitch, outputImage.cols * sizeof(Npp8u) * outputImage.channels(), outputImage.rows);
+
+    // 양방향 필터 파라미터 설정
+    NppiSize oSrcSize = { inputImage.cols, inputImage.rows };
+    NppiPoint oSrcOffset = { 0, 0 };
+    Npp32f nValSquareSigma = 75.0f;
+    Npp32f nPosSquareSigma = 75.0f;
+    int nRadius = 9;
+    NppiBorderType eBorderType = NPP_BORDER_REPLICATE;
+
+    // 이미지 채널 수에 따라 함수 선택
+    if (inputImage.channels() == 1) {
+        NppStatus status = nppiFilterBilateralGaussBorder_8u_C1R(d_inputImage, static_cast<int>(inputImagePitch), oSrcSize, oSrcOffset,
+            d_outputImage, static_cast<int>(outputImagePitch), oSrcSize,
+            nRadius, 1, nValSquareSigma, nPosSquareSigma, eBorderType);
+        if (status != NPP_SUCCESS) {
+            std::cerr << "Error applying bilateral filter: " << status << std::endl;
+        }
+    }
+    else if (inputImage.channels() == 3) {
+        NppStatus status = nppiFilterBilateralGaussBorder_8u_C3R(d_inputImage, static_cast<int>(inputImagePitch), oSrcSize, oSrcOffset,
+            d_outputImage, static_cast<int>(outputImagePitch), oSrcSize,
+            nRadius, 3, nValSquareSigma, nPosSquareSigma, eBorderType);
+        if (status != NPP_SUCCESS) {
+            std::cerr << "Error applying bilateral filter: " << status << std::endl;
+        }
+    }
+    else {
+        std::cerr << "Unsupported number of channels: " << inputImage.channels() << std::endl;
+    }
+
+    // 처리된 이미지를 호스트로 복사
+    cudaMemcpy2D(outputImage.data, outputImage.step, d_outputImage, outputImagePitch, outputImage.cols * sizeof(Npp8u) * outputImage.channels(), outputImage.rows, cudaMemcpyDeviceToHost);
+
+    double endTime = cv::getTickCount(); // 종료 시간 측정
+    double elapsedTimeMs = (endTime - startTime) / cv::getTickFrequency() * 1000.0; // 시간 계산
+
+    result = setResult(result, inputImage, outputImage, "bilateralFilter", "NPP", elapsedTimeMs);
+
+    // 메모리 해제
+    cudaFree(d_inputImage);
+    cudaFree(d_outputImage);
+
+    return result;
+    */
+
+    // IPP
+    ProcessingResult result;
+    double startTime = cv::getTickCount(); // 시작 시간 측정
+
+    // IPP 구조체와 버퍼 크기 계산
+    IppiSize roiSize = {inputImage.cols, inputImage.rows};
+    int kernelSize = 9; // 필터 크기
+    IppDataType dataType = ipp8u; // 데이터 타입 (8비트 무채색 이미지)
+    int numChannels = 3; // 채널 수
+    IppiDistanceMethodType distMethod = ippDistNormL2; // 거리 방법
+    int specSize = 0, bufferSize = 0;
+
+    ippiFilterBilateralGetBufferSize(ippiFilterBilateralGauss, roiSize, kernelSize, dataType, numChannels, distMethod, &specSize, &bufferSize);
+
+    // 메모리 할당
+    IppiFilterBilateralSpec* pSpec = (IppiFilterBilateralSpec*)ippMalloc(specSize);
+    Ipp8u* pBuffer = (Ipp8u*)ippMalloc(bufferSize);
+
+    // 필터 초기화
+    IppStatus status = ippiFilterBilateralInit(ippiFilterBilateralGauss, roiSize, kernelSize, dataType, numChannels, distMethod, 75, 75, pSpec);
+    if (status != ippStsNoErr) {
+        std::cerr << "Error initializing bilateral filter: " << status << std::endl;
+        ippFree(pSpec);
+        ippFree(pBuffer);
+        return result;
+    }
+
+    // 출력 이미지 버퍼 할당
+    cv::Mat outputImage(inputImage.size(), inputImage.type());
+
+    // 양방향 필터 적용
+    status = ippiFilterBilateral_8u_C3R(inputImage.ptr<Ipp8u>(), inputImage.step, outputImage.ptr<Ipp8u>(), outputImage.step, roiSize, ippBorderRepl, NULL, pSpec, pBuffer);
+    if (status != ippStsNoErr) {
+        std::cerr << "Error applying bilateral filter: " << status << std::endl;
+    }
+
+    double endTime = cv::getTickCount(); // 종료 시간 측정
+    double elapsedTimeMs = (endTime - startTime) / cv::getTickFrequency() * 1000.0; // 시간 계산
+
+    result = setResult(result, inputImage, outputImage, "bilateralFilter", "IPP", elapsedTimeMs);
+
+    // 메모리 해제
+    ippFree(pSpec);
+    ippFree(pBuffer);
+
+    return result;
+}
+
+2. CMakeLists.txt
+cmake_minimum_required(VERSION 3.14)
+project(Project1 LANGUAGES CXX CUDA)
+
+# Qt, OpenCV, CUDA 설정
+set(CMAKE_PREFIX_PATH "C:/Qt/6.7.1/msvc2019_64" "C:/opencv/build")
+find_package(Qt6 REQUIRED COMPONENTS Widgets Core Gui)
+find_package(OpenCV REQUIRED COMPONENTS core imgproc highgui cudaarithm cudafilters cudawarping cudacodec cudafeatures2d cudaimgproc)
+find_package(CUDA REQUIRED)
+
+# CUDA 경로 설정
+set(CUDA_TOOLKIT_ROOT_DIR "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.5")
+find_package(CUDA REQUIRED)
+
+# IPP 설정
+set(IPP_ROOT "C:/Program Files (x86)/Intel/oneAPI/ipp/2021.11")  # IPP 라이브러리 설치 경로
+include_directories("${IPP_ROOT}/include")
+link_directories("${IPP_ROOT}/lib")  # IPP 라이브러리 lib 경로
+
+# 추가 포함 디렉터리 설정
+include_directories(
+    ${CUDA_INCLUDE_DIRS}
+    ${OpenCV_INCLUDE_DIRS}
+    "${CUDA_TOOLKIT_ROOT_DIR}/include"  # CUDA Toolkit include 폴더 추가
+    ${IPP_ROOT}/include  # IPP include 폴더 추가
+)
+
+# CUDA 파일 설정
+set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} -std=c++14 --expt-relaxed-constexpr -gencode arch=compute_86,code=sm_86)
+
+# Qt 래핑 파일 생성
+qt6_wrap_cpp(MOC_FILES
+    MainWindow.h
+    ImageProcessor.h
+)
+
+# CUDA 파일 컴파일 및 라이브러리 생성
+cuda_add_library(image_processing
+    imageProcessing.cu
+)
+
+# IPP 라이브러리 링크
+target_link_libraries(image_processing
+    ippcc.lib
+    ippcore.lib
+    ippvm.lib
+    ipps.lib
+    ippi.lib
+    ippcv.lib
+    nppial
+    nppicc
+    nppidei
+    nppif
+    nppig
+    nppim
+    nppist
+    nppisu
+    nppitc
+    npps
+)
+
+# 실행 파일 추가
+add_executable(Project1
+    main.cpp
+    MainWindow.cpp
+    MainWindow.h
+    MainWindow.ui
+    ImageProcessor.cpp
+    ImageProcessor.h
+    ${MOC_FILES}
+)
+
+# 라이브러리 링크
+target_link_libraries(Project1
+    Qt6::Widgets
+    Qt6::Core
+    Qt6::Gui
+    ${OpenCV_LIBS}
+    image_processing
+    ${CUDA_LIBRARIES}
+    ${CUDNN_LIBRARIES}
+)
+
+# 실행 파일 출력 디렉토리 설정
+set_target_properties(Project1 PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/Debug"
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/Release"
+)
+
+# 파일 인코딩 설정 추가
+add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
+
+# OpenMP 설정
+find_package(OpenMP REQUIRED)
+if(OpenMP_CXX_FOUND)
+    target_link_libraries(Project1 
+    OpenMP::OpenMP_CXX)
+endif()
+
+if (MSVC)
+    set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Project1)
+
+    # Debug 빌드
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MDd")
+    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /MDd")
+
+    # Release 빌드
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MD")
+    set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /MD")
+
+    # 반복자 디버그 레벨 설정
+    add_compile_definitions(
+        $<$<CONFIG:Debug>:_ITERATOR_DEBUG_LEVEL=2>
+        $<$<CONFIG:Release>:_ITERATOR_DEBUG_LEVEL=0>
+    )
+endif()
