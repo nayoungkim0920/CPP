@@ -3,6 +3,7 @@
 OpenCV, IPP, CUDA, CUDAKernel, NPP, GStreamer로 구현
 
 2. 구현된것까지 디버깅
+rotate, zoom in/out, canny edges, grayScale
 
 <코드>
 1. imageProcessor.h
