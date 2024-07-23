@@ -1,0 +1,11 @@
+<수정사항>
+1. 공통함수DLL(Library) 구현
+-imageProcessingLib.h
+-imageProcessingLib.cpp
+"C:\myLab\Project1\Project1\build\Debug\image_processing.lib"
+
+2. medianFilter
+OpenCV, IPP, NPP, CUDA, CUDAKernel, GStreamer 구현완료
+
+<코드>
+1.
