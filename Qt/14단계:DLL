@@ -1,0 +1,554 @@
+<수정작업>
+1. DLL
+imageProcessingLib.dll, imageProcessingLib.lib
+2. CMakeLists.txt
+
+<코드>
+1.imageProcessingLib.h
+#ifndef IMAGEPROCESSINGLIB_H
+#define IMAGEPROCESSINGLIB_H
+
+#include <opencv2/opencv.hpp>
+#include <cuda_runtime.h>
+#include <npp.h>
+#include <nppi.h>
+#include <gst/gst.h>
+#include <ipp.h>
+#include <ipp/ippi.h>
+#include <QString>
+#include <nppi_filtering_functions.h>
+#include <iostream>
+#include <unordered_map>
+#include "pch.h"
+
+// EXPORT 매크로 정의 (Windows용)
+#ifdef IMAGEPROCESSINGLIB_EXPORTS
+#define IMAGEPROCESSINGLIB_API __declspec(dllexport)
+#else
+#define IMAGEPROCESSINGLIB_API __declspec(dllimport)
+#endif
+
+// C++ 인터페이스 함수 선언
+//IMAGEPROCESSINGLIB_API void calculateGrayScaleBufferSize(const NppiSize& oSizeROI, const NppiSize& oMaskSize, Npp32u& nBufferSize);
+//IMAGEPROCESSINGLIB_API void calculateBufferSize(const NppiSize& oSizeROI, const NppiSize& oMaskSize, Npp32u& nBufferSize);
+IMAGEPROCESSINGLIB_API void checkNPPError(NppStatus status);
+IMAGEPROCESSINGLIB_API void printImagePixels(cv::Mat& image, int numPixels);
+IMAGEPROCESSINGLIB_API Npp8u* matToNppImage(cv::Mat& mat, NppiSize& size, int& nppSize);
+IMAGEPROCESSINGLIB_API cv::Mat nppImageToMat(Npp8u* pNppImage, NppiSize size, int nppSize);
+IMAGEPROCESSINGLIB_API QString getImageTypeString(int type);
+IMAGEPROCESSINGLIB_API void checkNPPStatus(NppStatus status, const std::string& context);
+IMAGEPROCESSINGLIB_API void checkCudaError(const char* msg);
+IMAGEPROCESSINGLIB_API void checkDeviceProperties();
+IMAGEPROCESSINGLIB_API GstBuffer* matToGstBuffer(cv::Mat& mat);
+IMAGEPROCESSINGLIB_API cv::Mat gstBufferToMat(GstBuffer* buffer, GstCaps* caps);
+IMAGEPROCESSINGLIB_API void drawEdgesOnColorImage(cv::Mat& image, const cv::Mat& edges);
+IMAGEPROCESSINGLIB_API void drawEdgesOnGrayImage(cv::Mat& image, const cv::Mat& edges);
+IMAGEPROCESSINGLIB_API void printNppParameters(const std::string& label, NppiSize oSizeROI, NppiSize oMaskSize, NppiPoint oAnchor, const Npp8u* pSrc, const Npp8u* pDst, const Npp8u* pBuffer);
+IMAGEPROCESSINGLIB_API void printBufferSize(const std::string& prefix, Npp32u bufferSize);
+
+#endif // IMAGEPROCESSINGLIB_H
+
+2.imageProcessingLib.cpp
+// imageProcessingLib.cpp
+#include "imageProcessingLib.h"
+#include "pch.h"
+// 그레이스케일 이미지 버퍼 크기 계산
+
+
+
+// 에러 체크 함수
+void checkCudaError(const char* msg) {
+    cudaError_t err = cudaGetLastError();
+    if (err != cudaSuccess) {
+        std::cerr << msg << ": " << cudaGetErrorString(err) << std::endl;
+        exit(EXIT_FAILURE);
+    }
+}
+
+// NPP 오류 처리 함수
+void checkNPPError(NppStatus status) {
+    if (status != NPP_SUCCESS) {
+        std::cerr << "NPP 오류: " << status << std::endl;
+        exit(EXIT_FAILURE);
+    }
+}
+
+//void checkNppError(NppStatus status, const std::string& errorMessage) {
+//    if (status != NPP_SUCCESS) {
+//        std::cerr << errorMessage << " Error code: " << status << std::endl;
+//        throw std::runtime_error(errorMessage);
+//    }
+//}
+
+void printImagePixels(cv::Mat& image, int numPixels) { //0:전체
+    int count = 0;
+
+    // 이미지의 크기를 가져옵니다.
+    int rows = image.rows;
+    int cols = image.cols;
+
+    // 이미지가 비어있거나 픽셀 수가 0보다 작으면 반환합니다.
+    if (rows == 0 || cols == 0) {
+        std::cerr << "이미지 크기가 잘못되었거나 이미지가 비어 있습니다." << std::endl;
+        return;
+    }
+
+    // numPixels가 0인 경우 전체 픽셀을 출력하도록 설정합니다.
+    if (numPixels <= 0) {
+        numPixels = rows * cols;
+    }
+
+    // 각 픽셀을 출력합니다.
+    for (int y = 0; y < rows && count < numPixels; ++y) {
+        for (int x = 0; x < cols && count < numPixels; ++x) {
+            // 픽셀 값을 가져옵니다.
+            if (image.channels() == 3) {
+                cv::Vec3b pixel = image.at<cv::Vec3b>(y, x);
+                std::cout << "Pixel (" << x << ", " << y << "): "
+                    << "B=" << static_cast<int>(pixel[0]) << ", "
+                    << "G=" << static_cast<int>(pixel[1]) << ", "
+                    << "R=" << static_cast<int>(pixel[2]) << std::endl;
+            }
+            else if (image.channels() == 1) {
+                uchar pixel = image.at<uchar>(y, x);
+                std::cout << "Pixel (" << x << ", " << y << "): "
+                    << "Gray=" << static_cast<int>(pixel) << std::endl;
+            }
+
+            count++;
+        }
+    }
+
+    if (count == 0) {
+        std::cerr << "픽셀을 출력할 수 없습니다." << std::endl;
+    }
+}
+
+// cv::Mat을 NPP 이미지로 변환
+Npp8u* matToNppImage(cv::Mat& mat, NppiSize& size, int& nppSize) {
+    nppSize = mat.cols * mat.rows * mat.elemSize();
+    Npp8u* pNppImage = new Npp8u[nppSize];
+    memcpy(pNppImage, mat.data, nppSize);
+    size.width = mat.cols;
+    size.height = mat.rows;
+    return pNppImage;
+}
+
+// NPP 이미지에서 cv::Mat으로 변환
+cv::Mat nppImageToMat(Npp8u* pNppImage, NppiSize size, int nppSize) {
+    cv::Mat mat(size.height, size.width, CV_8UC3, pNppImage);
+    return mat;
+}
+
+std::unordered_map<int, QString> typeToStringMap = {
+    {CV_8UC1, "CV_8UC1 8-bit single-channel (grayscale)"},
+    {CV_8UC2, "CV_8UC2 8-bit 2-channel"},
+    {CV_8UC3, "CV_8UC3 8-bit 3-channel (BGR)"},
+    {CV_8UC4, "CV_8UC4 8-bit 4-channel"},
+    {CV_16UC1, "CV_16UC1 16-bit single-channel"},
+    {CV_16UC3, "CV_16UC3 16-bit 3-channel"},
+    {CV_32FC1, "CV_32FC1 32-bit single-channel (float)"},
+    {CV_32FC3, "CV_32FC3 32-bit 3-channel (float)"},
+    {CV_16SC1, "CV_16SC1 16-bit 1-channel"},
+    {CV_16SC3, "CV_16SC3 16-bit 3-channel"}
+    // 추가적인 이미지 타입에 대한 설명을 필요에 따라 추가할 수 있습니다.
+};
+
+// 정적 메서드 구현
+QString getImageTypeString(int type) {
+    if (typeToStringMap.find(type) != typeToStringMap.end()) {
+        return typeToStringMap[type];
+    }
+    else {
+        return "Unknown type";
+    }
+}
+
+void checkNPPStatus(NppStatus status, const std::string& context) {
+    if (status != NPP_SUCCESS) {
+        std::cerr << "NPP error in " << context << ": " << status << std::endl;
+        switch (status) {
+        case NPP_CUDA_KERNEL_EXECUTION_ERROR:
+            std::cerr << "CUDA kernel execution error." << std::endl;
+            break;
+        case NPP_BAD_ARGUMENT_ERROR:
+            std::cerr << "Bad argument error." << std::endl;
+            break;
+        case NPP_MEMORY_ALLOCATION_ERR:
+            std::cerr << "Memory allocation error." << std::endl;
+            break;
+        default:
+            std::cerr << "Unknown error: " << status << std::endl;
+            break;
+        }
+    }
+}
+
+void checkDeviceProperties() {
+    int deviceCount;
+    cudaError_t cudaErr = cudaGetDeviceCount(&deviceCount);
+    if (cudaErr != cudaSuccess) {
+        std::cerr << "Failed to get device count: " << cudaGetErrorString(cudaErr) << std::endl;
+        return;
+    }
+
+    for (int i = 0; i < deviceCount; ++i) {
+        cudaDeviceProp deviceProp;
+        cudaErr = cudaGetDeviceProperties(&deviceProp, i);
+        if (cudaErr != cudaSuccess) {
+            std::cerr << "Failed to get device properties: " << cudaGetErrorString(cudaErr) << std::endl;
+            return;
+        }
+
+        std::cout << "Device " << i << ": " << deviceProp.name << std::endl;
+        std::cout << "  Compute Capability: " << deviceProp.major << "." << deviceProp.minor << std::endl;
+        std::cout << "  Total Global Memory: " << deviceProp.totalGlobalMem / (1024 * 1024) << " MB" << std::endl;
+        std::cout << "  Max Threads Per Block: " << deviceProp.maxThreadsPerBlock << std::endl;
+        std::cout << "  Max Grid Size: (" << deviceProp.maxGridSize[0] << ", " << deviceProp.maxGridSize[1] << ", " << deviceProp.maxGridSize[2] << ")" << std::endl;
+    }
+}
+
+cv::Mat gstBufferToMat(GstBuffer* buffer, GstCaps* caps) {
+    GstMapInfo map;
+    gst_buffer_map(buffer, &map, GST_MAP_READ);
+
+    gint width, height;
+    const gchar* format;
+    GstStructure* structure = gst_caps_get_structure(caps, 0);
+
+    gst_structure_get_int(structure, "width", &width);
+    gst_structure_get_int(structure, "height", &height);
+
+    format = gst_structure_get_string(structure, "format");
+    if (!format) {
+        std::cerr << "비디오 포맷을 가져오는 데 실패했습니다." << std::endl;
+        gst_buffer_unmap(buffer, &map);
+        return cv::Mat();
+    }
+
+    cv::Mat mat;
+    if (strcmp(format, "BGR") == 0) {
+        mat = cv::Mat(height, width, CV_8UC3, map.data, map.size / height).clone();
+    }
+    else if (strcmp(format, "GRAY8") == 0) {
+        mat = cv::Mat(height, width, CV_8UC1, map.data, map.size / height).clone();
+    }
+    else {
+        std::cerr << "지원하지 않는 비디오 포맷입니다: " << format << std::endl;
+    }
+
+    gst_buffer_unmap(buffer, &map);
+    return mat;
+}
+
+// cv::Mat을 GstBuffer로 변환
+GstBuffer* matToGstBuffer(cv::Mat& mat) {
+    GstBuffer* buffer = gst_buffer_new_allocate(nullptr, mat.total() * mat.elemSize(), nullptr);
+    GstMapInfo map;
+    gst_buffer_map(buffer, &map, GST_MAP_WRITE);
+    std::memcpy(map.data, mat.data, mat.total() * mat.elemSize());
+    gst_buffer_unmap(buffer, &map);
+    return buffer;
+}
+
+void drawEdgesOnColorImage(cv::Mat& image, const cv::Mat& edges) {
+    // 엣지 이미지를 컬러 이미지에 초록색으로 오버레이
+    for (int y = 0; y < edges.rows; ++y) {
+        for (int x = 0; x < edges.cols; ++x) {
+            if (edges.at<uchar>(y, x) == 255) {
+                image.at<cv::Vec3b>(y, x)[0] = 0;   // Blue channel
+                image.at<cv::Vec3b>(y, x)[1] = 255; // Green channel
+                image.at<cv::Vec3b>(y, x)[2] = 0;   // Red channel
+            }
+        }
+    }
+}
+
+void drawEdgesOnGrayImage(cv::Mat& image, const cv::Mat& edges) {
+    // 엣지 이미지를 그레이스케일 이미지에 흰색으로 오버레이
+    for (int y = 0; y < edges.rows; ++y) {
+        for (int x = 0; x < edges.cols; ++x) {
+            if (edges.at<uchar>(y, x) == 255) {
+                image.at<uchar>(y, x) = 255;
+            }
+            else {
+                image.at<uchar>(y, x) = 0;
+            }
+        }
+    }
+}
+
+// NPP 파라미터 출력 함수
+void printNppParameters(const std::string& label, NppiSize oSizeROI, NppiSize oMaskSize, NppiPoint oAnchor, const Npp8u* pSrc, const Npp8u* pDst, const Npp8u* pBuffer) {
+    std::cout << label << " Parameters:" << std::endl;
+    std::cout << "ROI Size: (" << oSizeROI.width << ", " << oSizeROI.height << ")" << std::endl;
+    std::cout << "Mask Size: (" << oMaskSize.width << ", " << oMaskSize.height << ")" << std::endl;
+    std::cout << "Anchor: (" << oAnchor.x << ", " << oAnchor.y << ")" << std::endl;
+    std::cout << "Source Pointer: " << static_cast<void*>(const_cast<Npp8u*>(pSrc)) << std::endl;
+    std::cout << "Destination Pointer: " << static_cast<void*>(const_cast<Npp8u*>(pDst)) << std::endl;
+    std::cout << "Buffer Pointer: " << static_cast<void*>(const_cast<Npp8u*>(pBuffer)) << std::endl;
+}
+
+void printBufferSize(const std::string& prefix, Npp32u bufferSize) {
+    std::cout << prefix << " Buffer Size: " << bufferSize << std::endl;
+}
+
+3.CMakeLists.txt
+1) Project1
+cmake_minimum_required(VERSION 3.14)
+project(Project1 LANGUAGES CXX CUDA)
+
+# Qt, OpenCV, CUDA 설정
+set(CMAKE_PREFIX_PATH "C:/Qt/6.7.1/msvc2019_64" "C:/opencv/build")
+find_package(Qt6 REQUIRED COMPONENTS Widgets Core Gui)
+find_package(OpenCV REQUIRED COMPONENTS core imgproc highgui cudaarithm cudafilters cudawarping cudacodec cudafeatures2d cudaimgproc)
+find_package(CUDA REQUIRED)
+
+# IPP 설정
+set(IPP_ROOT "C:/Program Files (x86)/Intel/oneAPI/ipp/2021.11")
+include_directories("${IPP_ROOT}/include")
+link_directories("${IPP_ROOT}/lib")
+
+# GStreamer 설정
+set(GSTREAMER_ROOT "C:/gstreamer/1.0/msvc_x86_64")
+include_directories(
+    "${GSTREAMER_ROOT}/include/gstreamer-1.0"
+    "${GSTREAMER_ROOT}/include/glib-2.0"
+    "${GSTREAMER_ROOT}/lib/glib-2.0/include"
+)
+link_directories("${GSTREAMER_ROOT}/lib")
+
+# 추가 포함 디렉터리 설정
+include_directories(
+    ${CUDA_INCLUDE_DIRS}
+    ${OpenCV_INCLUDE_DIRS}
+    "${CUDA_TOOLKIT_ROOT_DIR}/include"
+    ${IPP_ROOT}/include
+    "${GSTREAMER_ROOT}/include/gstreamer-1.0"
+    "${GSTREAMER_ROOT}/lib/gstreamer-1.0/include"
+    "C:/myLab/Project1/Project1/imageProcessingLib"  # 헤더 파일 포함
+)
+
+# CUDA 파일 설정
+set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} -std=c++14 --expt-relaxed-constexpr -gencode arch=compute_86,code=sm_86)
+
+# Qt 래핑 파일 생성
+qt6_wrap_cpp(MOC_FILES
+    MainWindow.h
+    ImageProcessor.h
+)
+
+# CUDA 파일 컴파일 및 라이브러리 생성
+cuda_add_library(image_processing
+    imageProcessing.cu
+)
+
+# 라이브러리 디렉토리 설정
+link_directories("${CMAKE_BINARY_DIR}")  # 라이브러리 디렉토리 설정
+
+# 라이브러리 링크
+target_link_libraries(image_processing
+    ippcc.lib
+    ippcore.lib
+    ippvm.lib
+    ipps.lib
+    ippi.lib
+    ippcv.lib
+    nppial
+    nppicc
+    nppidei
+    nppif
+    nppig
+    nppim
+    nppist
+    nppisu
+    nppitc
+    npps
+    imageProcessingLib
+)
+
+# GStreamer 라이브러리 추가
+list(APPEND GSTREAMER_LIBRARIES
+    gstreamer-1.0.lib
+    gobject-2.0.lib
+    glib-2.0.lib
+    gstapp-1.0.lib
+    gstbase-1.0.lib
+    gstvideo-1.0.lib
+)
+
+# 실행 파일 추가
+add_executable(Project1
+    main.cpp
+    MainWindow.cpp
+    MainWindow.h
+    MainWindow.ui
+    ImageProcessor.cpp
+    ImageProcessor.h
+    ${MOC_FILES}
+)
+
+# 라이브러리 링크
+target_link_libraries(Project1
+    Qt6::Widgets
+    Qt6::Core
+    Qt6::Gui
+    ${OpenCV_LIBS}
+    image_processing
+    imageProcessingLib
+    ${CUDA_LIBRARIES}
+    ${CUDNN_LIBRARIES}
+    ${GSTREAMER_LIBRARIES}
+)
+
+# 실행 파일 출력 디렉토리 설정
+set_target_properties(Project1 PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/Debug"
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/Release"
+)
+
+# DLL 복사
+add_custom_command(TARGET Project1 POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/myLab/Project1/Project1/imageProcessingLib/build/bin/Debug/imageProcessingLib.dll" "$<TARGET_FILE_DIR:Project1>"
+)
+add_custom_command(TARGET Project1 POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/myLab/Project1/Project1/imageProcessingLib/build/lib/Debug/imageProcessingLib.lib" "$<TARGET_FILE_DIR:Project1>"
+)
+# 디버그 빌드에서의 OpenCV opencv_world DLL 복사
+add_custom_command(TARGET Project1 POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/x64/vc16/bin/opencv_world4100d.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMENT "Copying OpenCV Debug opencv_world DLL to output directory"
+)
+
+# 릴리스 빌드에서의 OpenCV opencv_world DLL 복사
+add_custom_command(TARGET Project1 POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/x64/vc16/bin/opencv_world4100.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMENT "Copying OpenCV Release opencv_world DLL to output directory"
+)
+
+# 디버그 빌드에서의 OpenCV DLL 복사
+add_custom_command(TARGET Project1 POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/bin/Debug/opencv_cudaarithm4100d.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/bin/Debug/opencv_cudaimgproc4100d.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/bin/Debug/opencv_cudafilters4100d.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/bin/Debug/opencv_imgcodecs4100d.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/bin/Debug/opencv_core4100d.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/bin/Debug/opencv_imgproc4100d.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMENT "Copying OpenCV Debug DLLs to output directory"
+)
+
+# 릴리스 빌드에서의 OpenCV DLL 복사
+add_custom_command(TARGET Project1 POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/bin/Release/opencv_cudaarithm4100.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/bin/Release/opencv_cudaimgproc4100.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/bin/Release/opencv_cudafilters4100.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/bin/Release/opencv_imgcodecs4100.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/bin/Release/opencv_core4100.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/bin/Release/opencv_imgproc4100.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMENT "Copying OpenCV Release DLLs to output directory"
+)
+
+# 파일 인코딩 설정 추가
+add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
+
+# OpenMP 설정
+find_package(OpenMP REQUIRED)
+if(OpenMP_CXX_FOUND)
+    target_link_libraries(Project1 OpenMP::OpenMP_CXX)
+endif()
+
+if (MSVC)
+    set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Project1)
+
+    # Debug 빌드
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MDd")
+    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /MDd")
+
+    # Release 빌드
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MD")
+    set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /MD")
+
+    # 반복자 디버그 레벨 설정
+    add_compile_definitions(
+        $<$<CONFIG:Debug>:_ITERATOR_DEBUG_LEVEL=2>
+        $<$<CONFIG:Release>:_ITERATOR_DEBUG_LEVEL=0>
+    )
+endif()
+
+2)imageProcessingLib 
+cmake_minimum_required(VERSION 3.14)
+project(imageProcessingLib LANGUAGES CXX)
+
+# 필요한 패키지 찾기
+find_package(OpenCV REQUIRED)
+find_package(CUDA REQUIRED)
+find_package(Qt6 REQUIRED COMPONENTS Core)  # Qt6 Core 모듈 추가
+
+# NPP 및 IPP 라이브러리 설정
+set(NPP_ROOT "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.5")
+set(IPP_ROOT "C:/Program Files (x86)/Intel/oneAPI/ipp/2021.11")
+
+# GStreamer 설정
+set(GSTREAMER_ROOT "C:/gstreamer/1.0/msvc_x86_64")
+
+# 라이브러리의 소스 파일 추가
+add_library(imageProcessingLib SHARED
+    imageProcessingLib.cpp
+    imageProcessingLib.h
+)
+
+# 필요한 디렉토리 설정
+target_include_directories(imageProcessingLib PRIVATE
+    ${OpenCV_INCLUDE_DIRS}
+    ${CUDA_INCLUDE_DIRS}
+    ${NPP_ROOT}/include
+    ${IPP_ROOT}/include
+    ${GSTREAMER_ROOT}/include/gstreamer-1.0
+    ${GSTREAMER_ROOT}/include/glib-2.0
+    ${GSTREAMER_ROOT}/lib/glib-2.0/include
+    ${Qt6_INCLUDE_DIRS}  # Qt6 포함 디렉토리 추가
+)
+
+# 라이브러리 링크
+target_link_libraries(imageProcessingLib
+    ${OpenCV_LIBS}
+    ${CUDA_LIBRARIES}
+    ${NPP_ROOT}/lib/x64/nppc.lib
+    ${NPP_ROOT}/lib/x64/npps.lib
+    ${IPP_ROOT}/lib/ippcore.lib
+    ${IPP_ROOT}/lib/ippvm.lib
+    ${IPP_ROOT}/lib/ippcc.lib
+    ${GSTREAMER_ROOT}/lib/gstreamer-1.0.lib
+    ${GSTREAMER_ROOT}/lib/gobject-2.0.lib
+    ${GSTREAMER_ROOT}/lib/glib-2.0.lib
+    ${GSTREAMER_ROOT}/lib/gstapp-1.0.lib
+    ${GSTREAMER_ROOT}/lib/gstbase-1.0.lib
+    ${GSTREAMER_ROOT}/lib/gstvideo-1.0.lib
+    Qt6::Core  # Qt6 Core 라이브러리 링크
+)
+
+# 라이브러리의 출력 디렉토리 설정
+set_target_properties(imageProcessingLib PROPERTIES
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"  # 정적 라이브러리의 .lib 파일
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"  # 동적 라이브러리의 .dll 파일
+)
+
+# C++ 표준 설정
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
