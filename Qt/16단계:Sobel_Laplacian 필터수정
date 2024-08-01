@@ -1,0 +1,733 @@
+<수정사항>
+1. Sobel Filter
+- Color/Grayscale
+OpenCV, IPP, NPP, CUDA, CUDAKernel, GStreamer 수정완료
+
+2. Laplacian filter
+- Color/Grayscale
+OpenCV, IPP, NPP 수정완료
+
+<코드>
+1. imageProcessorOpenCV.cpp
+cv::Mat ImageProcessorOpenCV::sobelFilter(cv::Mat& inputImage)
+{
+    cv::Mat grayImage;
+    if (inputImage.channels() == 1)
+        grayImage = inputImage.clone();
+    else
+        grayImage = grayScale(inputImage);
+
+    // 소벨 필터 적용
+    cv::Mat gradX, gradY, absGradX, absGradY, outputImage;
+
+    // X 및 Y 방향의 소벨 필터 적용
+    cv::Sobel(grayImage, gradX, CV_16S, 1, 0
+        , 3 //kernel size
+        , 1, 0, cv::BORDER_DEFAULT);
+    cv::Sobel(grayImage, gradY, CV_16S, 0, 1, 3, 1, 0, cv::BORDER_DEFAULT);
+
+    // 절대값으로 변환
+    cv::convertScaleAbs(gradX, absGradX);
+    cv::convertScaleAbs(gradY, absGradY);
+
+    // X 및 Y 방향의 그래디언트 합성
+    cv::addWeighted(absGradX, 0.5, absGradY, 0.5, 0, outputImage);
+
+    if (inputImage.channels() == 3) {
+        // 컬러 이미지에 소벨 필터 결과를 오버레이
+        cv::Mat coloredEdgeImage;
+        cv::cvtColor(outputImage, coloredEdgeImage, cv::COLOR_GRAY2BGR);
+        cv::addWeighted(inputImage, 0.5, coloredEdgeImage, 0.5, 0, outputImage);
+    }
+
+    return outputImage;
+}
+
+cv::Mat ImageProcessorOpenCV::laplacianFilter(cv::Mat& inputImage)
+{
+    std::cout << __func__ << std::endl;
+
+    cv::Mat grayImage;
+    if (inputImage.channels() == 1)
+        grayImage = inputImage.clone();
+    else if(inputImage.channels() == 3)
+        grayImage = grayScale(inputImage);
+    else {
+        std::cerr   << __func__ 
+                    << " : Unsupported number of channels : " 
+                    << inputImage.channels() << std::endl;
+
+        return cv::Mat(); // 빈 이미지 반환
+    }
+
+    cv::Mat laplacianImage;
+    cv::Mat outputImage;
+
+    // Use CV_16S to prevent overflow in edge detection
+    cv::Laplacian(grayImage, outputImage, CV_16S, 3);
+    // Convert to CV_8U
+    cv::convertScaleAbs(outputImage, outputImage);
+
+    if (inputImage.channels() == 3) {
+        // 컬러 이미지에 소벨 필터 결과를 오버레이
+        cv::Mat coloredEdgeImage;
+        cv::cvtColor(outputImage, coloredEdgeImage, cv::COLOR_GRAY2BGR);
+        cv::addWeighted(inputImage, 0.5, coloredEdgeImage, 0.5, 0, outputImage);
+    }
+
+    return outputImage;
+}
+
+2. imageProcessorIPP.cpp
+cv::Mat ImageProcessorIPP::sobelFilter(cv::Mat& inputImage)
+{
+    cv::Mat grayImage;
+    if (inputImage.channels() == 1)
+        grayImage = inputImage.clone();
+    else
+        grayImage = grayScale(inputImage);
+
+    cv::Mat outputImage = cv::Mat::zeros(grayImage.size(), CV_16SC1);
+
+    // IPP 관련 변수
+    IppiSize roiSize = { grayImage.cols, grayImage.rows };
+    IppiMaskSize mask = ippMskSize3x3; // 3x3 소벨 커널 사용
+    IppNormType normType = ippNormL1;
+    int bufferSize = 0;
+    IppStatus status;
+
+    // 버퍼 크기 계산
+    status = ippiFilterSobelGetBufferSize(roiSize, mask, normType, ipp8u, ipp16s, 1, &bufferSize);
+    if (status != ippStsNoErr) {
+        std::cerr << "버퍼 크기 계산 오류: " << status << std::endl;
+        return cv::Mat();
+    }
+
+    // 버퍼 할당
+    Ipp8u* pBuffer = ippsMalloc_8u(bufferSize);
+    if (!pBuffer) {
+        std::cerr << "버퍼 할당 오류." << std::endl;
+        return cv::Mat();
+    }
+
+    // 소벨 필터 적용
+    status = ippiFilterSobel_8u16s_C1R(
+        grayImage.data,
+        static_cast<int>(grayImage.step),
+        reinterpret_cast<Ipp16s*>(outputImage.data),
+        static_cast<int>(outputImage.step),
+        roiSize,
+        mask,
+        normType,
+        ippBorderRepl,
+        0,
+        pBuffer
+    );
+
+    // 버퍼 해제
+    ippsFree(pBuffer);
+
+    if (status != ippStsNoErr) {
+        std::cerr << "소벨 필터 적용 오류: " << status << std::endl;
+        return cv::Mat();
+    }
+
+    // 절대값으로 변환하고 8비트로 스케일링하여 시각화
+    cv::convertScaleAbs(outputImage, outputImage);
+
+    // 컬러 이미지인 경우, 결과를 원본 컬러 이미지 위에 오버레이
+    if (inputImage.channels() == 3) {
+        std::vector<cv::Mat> channels(3);
+        cv::split(inputImage, channels);
+
+        // 각 채널에 소벨 결과 오버레이 (원본 컬러 이미지와 합성)
+        for (auto& channel : channels) {
+            cv::addWeighted(channel, 0.5, outputImage, 0.5, 0, channel);
+        }
+
+        cv::merge(channels, outputImage);
+    }
+
+    return outputImage;
+}
+
+cv::Mat ImageProcessorIPP::laplacianFilter(cv::Mat& inputImage)
+{
+    std::cout << __func__ << std::endl;
+
+    int numChannels = inputImage.channels();
+    cv::Mat grayImage;
+
+    if (numChannels == 1) {
+        grayImage = inputImage.clone();
+    }
+    else if (numChannels == 3) {
+        grayImage = grayScale(inputImage);
+    }
+    else {
+        std::cerr << __func__ << " : Unsupported number of channels: " << numChannels << std::endl;
+        return cv::Mat(); // 빈 이미지 반환
+    }
+
+    // Helper function to apply Laplacian filter to a single channel
+    auto applyFilterToChannel = [](const cv::Mat& inputChannel, cv::Mat& outputChannel) {
+        IppiSize roiSize = { inputChannel.cols, inputChannel.rows };
+        int step = inputChannel.step;
+        Ipp8u* pSrc = inputChannel.data;
+
+        outputChannel.create(inputChannel.size(), CV_16S);
+        Ipp16s* pDst = reinterpret_cast<Ipp16s*>(outputChannel.data);
+        int dstStep = outputChannel.step;
+
+        int bufferSize = 0;
+        IppStatus status = ippiFilterLaplacianGetBufferSize_8u16s_C1R(roiSize, ippMskSize3x3, &bufferSize);
+        if (status != ippStsNoErr) {
+            std::cerr << "Failed to get buffer size with status: " << status << std::endl;
+            return false;
+        }
+
+        Ipp8u* pBuffer = ippsMalloc_8u(bufferSize);
+        status = ippiFilterLaplacianBorder_8u16s_C1R(
+            pSrc, step, pDst, dstStep, roiSize, ippMskSize3x3, ippBorderRepl, 0, pBuffer
+        );
+
+        ippsFree(pBuffer);
+
+        if (status != ippStsNoErr) {
+            std::cerr << "IPP Laplacian filter failed with status: " << status << std::endl;
+            return false;
+        }
+
+        return true;
+    };
+
+    cv::Mat outputImage;
+
+    if (numChannels == 1) {
+        // Apply filter to grayscale image
+        bool success = applyFilterToChannel(inputImage, outputImage);
+        if (!success) {
+            return cv::Mat();
+        }
+        outputImage.convertTo(outputImage, CV_8U);
+    }
+    else if (numChannels == 3) {
+        // Apply Laplacian filter to grayscale image
+        cv::Mat grayLaplacian;
+        bool success = applyFilterToChannel(grayImage, grayLaplacian);
+        if (!success) {
+            return cv::Mat();
+        }
+        grayLaplacian.convertTo(grayLaplacian, CV_8U);
+
+        // Convert the Laplacian result to color
+        cv::Mat coloredEdgeImage(grayImage.size(), CV_8UC3);
+        cv::cvtColor(grayLaplacian, coloredEdgeImage, cv::COLOR_GRAY2BGR);
+
+        // Overlay the Laplacian result on the original color image
+        cv::Mat colorLaplacian;
+        cv::addWeighted(inputImage, 0.5, coloredEdgeImage, 0.5, 0, colorLaplacian);
+        outputImage = colorLaplacian;
+    }
+
+    return outputImage;
+
+}
+
+3. imageProcessorNPP.cpp'
+cv::Mat ImageProcessorNPP::sobelFilter(cv::Mat& inputImage) {
+    if (inputImage.empty()) {
+        std::cerr << "Input image is empty." << std::endl;
+        return cv::Mat(); // 빈 이미지 반환
+    }
+
+    int numChannels = inputImage.channels();
+    cv::Mat grayImage, outputImage;
+
+    // 그레이스케일 이미지로 변환 (컬러 이미지일 경우)
+    if (numChannels == 3) {
+        cv::cvtColor(inputImage, grayImage, cv::COLOR_BGR2GRAY);
+    }
+    else if (numChannels == 1) {
+        grayImage = inputImage.clone();
+    }
+    else {
+        std::cerr << "Unsupported number of channels: " << numChannels << std::endl;
+        return cv::Mat(); // 빈 이미지 반환
+    }
+
+    // NPP 함수에 맞는 타입과 사이즈 설정
+    outputImage = cv::Mat::zeros(grayImage.size(), CV_8UC1);
+
+    Npp8u* d_src;
+    Npp8u* d_dst;
+    NppStatus status;
+
+    // CUDA 메모리 할당
+    cudaMalloc(&d_src, grayImage.rows * grayImage.step);
+    cudaMalloc(&d_dst, grayImage.rows * grayImage.step);
+
+    // 입력 이미지를 GPU 메모리로 복사
+    cudaMemcpy(d_src, grayImage.data, grayImage.rows * grayImage.step, cudaMemcpyHostToDevice);
+
+    // IPP 소벨 필터 적용
+    try {
+        // 수평 소벨 필터
+        status = nppiFilterSobelHoriz_8u_C1R(d_src, grayImage.step, d_dst, grayImage.step,
+            { grayImage.cols, grayImage.rows });
+        if (status != NPP_SUCCESS) {
+            std::cerr << "nppiFilterSobelHoriz_8u_C1R failed with status: " << status << std::endl;
+            throw std::runtime_error("nppiFilterSobelHoriz_8u_C1R failed.");
+        }
+
+        // 수직 소벨 필터
+        status = nppiFilterSobelVert_8u_C1R(d_dst, grayImage.step, d_dst, grayImage.step,
+            { grayImage.cols, grayImage.rows });
+        if (status != NPP_SUCCESS) {
+            std::cerr << "nppiFilterSobelVert_8u_C1R failed with status: " << status << std::endl;
+            throw std::runtime_error("nppiFilterSobelVert_8u_C1R failed.");
+        }
+
+        // 결과를 호스트로 복사
+        cudaMemcpy(outputImage.data, d_dst, grayImage.rows * grayImage.step, cudaMemcpyDeviceToHost);
+        cudaError_t cudaErr = cudaGetLastError();
+        if (cudaErr != cudaSuccess) {
+            std::cerr << "CUDA error: " << cudaGetErrorString(cudaErr) << std::endl;
+            throw std::runtime_error("CUDA error occurred.");
+        }
+    }
+    catch (const std::exception& ex) {
+        std::cerr << "Exception: " << ex.what() << std::endl;
+        cudaFree(d_src);
+        cudaFree(d_dst);
+        return cv::Mat(); // 빈 이미지 반환
+    }
+
+    // GPU 메모리 해제
+    cudaFree(d_src);
+    cudaFree(d_dst);
+
+    // 절대값으로 변환하고 8비트로 스케일링하여 시각화
+    cv::convertScaleAbs(outputImage, outputImage);
+
+    // 컬러 이미지인 경우, 결과를 원본 컬러 이미지 위에 오버레이
+    if (numChannels == 3) {
+        std::vector<cv::Mat> channels(3);
+        cv::split(inputImage, channels);
+
+        // 각 채널에 소벨 결과 오버레이 (원본 컬러 이미지와 합성)
+        for (auto& channel : channels) {
+            cv::Mat resizedOutput;
+            if (outputImage.size() != channel.size()) {
+                cv::resize(outputImage, resizedOutput, channel.size());
+            }
+            else {
+                resizedOutput = outputImage;
+            }
+            cv::addWeighted(channel, 0.5, resizedOutput, 0.5, 0, channel);
+        }
+
+        cv::merge(channels, outputImage);
+    }
+
+    return outputImage;
+}
+
+cv::Mat ImageProcessorNPP::laplacianFilter(cv::Mat& inputImage)
+{
+    std::cout << __func__ << std::endl;
+
+    int numChannels = inputImage.channels();
+    cv::Mat grayImage;
+
+    if (numChannels == 1) {
+        grayImage = inputImage.clone();
+    }
+    else if (numChannels == 3) {
+        grayImage = grayScale(inputImage);
+    }
+    else {
+        std::cerr << __func__ << " : Unsupported number of channels: " << numChannels << std::endl;
+        return cv::Mat(); // 빈 이미지 반환
+    }
+
+    int srcWidth = inputImage.cols;
+    int srcHeight = inputImage.rows;
+
+    // GPU 메모리로 이미지 업로드
+    cv::cuda::GpuMat d_inputImage, d_outputImage;
+    d_inputImage.upload(inputImage);
+
+    // 라플라시안 필터 커널 정의
+    Npp32s laplacianKernel3x3[9] = {
+        -1, -1, -1,
+        -1,  8, -1,
+        -1, -1, -1
+    };
+
+    NppiPoint oSrcOffset = { 0, 0 };
+    NppiMaskSize eMaskSize = NPP_MASK_SIZE_5_X_5;
+    NppiBorderType eBorderType = NPP_BORDER_REPLICATE; // 지원되는 경계 처리 방법
+
+    NppiSize oSrcSize = { srcWidth, srcHeight };
+    NppiSize oSizeROI = { srcWidth, srcHeight };
+
+    int srcStep = d_inputImage.step;
+    int dstStep = srcStep; // Destination step과 source step은 같음
+
+    NppStatus nppStatus;
+
+    cv::Mat outputImage; // Output image declaration
+    outputImage.create(srcHeight, srcWidth, inputImage.type()); // Create the output image matrix
+
+    // 그레이스케일 이미지에 라플라시안 필터 적용
+    d_outputImage.create(srcHeight, srcWidth, CV_8UC1); // Grayscale image type
+
+    nppStatus = nppiFilterLaplaceBorder_8u_C1R(
+        d_inputImage.ptr<Npp8u>(), srcStep,
+        oSrcSize, oSrcOffset,
+        d_outputImage.ptr<Npp8u>(), dstStep,
+        oSizeROI, eMaskSize, eBorderType
+    );    
+
+    if (nppStatus != NPP_SUCCESS) {
+        std::cerr << "NPP Error: " << nppStatus << std::endl;
+        return cv::Mat();
+    }
+    
+    d_outputImage.download(outputImage);
+
+    if (numChannels == 3) {        
+        cv::Mat coloredEdgeImage;
+        cv::cvtColor(outputImage, coloredEdgeImage, cv::COLOR_GRAY2BGR);  
+        cv::addWeighted(inputImage, 0.5, coloredEdgeImage, 0.5, 0, outputImage);
+    }      
+
+    return outputImage;
+}
+
+4. imageProcessorCUDA.cpp
+cv::Mat ImageProcessorCUDA::sobelFilter(cv::Mat& inputImage)
+{
+    //CUDA
+    int numChannels = inputImage.channels();
+    cv::Mat grayImage;
+    cv::Mat outputImage;
+
+    if (numChannels == 3) {
+        cv::cuda::GpuMat d_inputImage(inputImage);
+        cv::cuda::GpuMat d_grayImage;
+
+        // 컬러 이미지를 그레이스케일로 변환
+        cv::cuda::cvtColor(d_inputImage, d_grayImage, cv::COLOR_BGR2GRAY);
+        grayImage = cv::Mat(d_grayImage.size(), d_grayImage.type());
+        d_grayImage.download(grayImage);
+    }
+    else if (numChannels == 1) {
+        grayImage = inputImage;  // Clone을 사용할 필요 없이 참조만 사용
+    }
+    else {
+        std::cerr << __func__ << " : Unsupported number of channels: " << numChannels << std::endl;
+        return cv::Mat(); // 빈 이미지 반환
+    }
+
+    cv::cuda::GpuMat d_grayImage(grayImage);
+    cv::cuda::GpuMat d_outputImage;
+
+    cv::Ptr<cv::cuda::Filter> sobelFilter = cv::cuda::createSobelFilter(
+        d_grayImage.type(), // srcType
+        CV_8UC1,            // dstType
+        1,                  // dx (x 방향의 미분 차수)
+        0,                  // dy (y 방향의 미분 차수)
+        3                   // 커널 크기, 3x3 소벨
+    );
+
+    // GPU에서 소벨 필터 적용
+    sobelFilter->apply(d_grayImage, d_outputImage);
+
+    // 결과를 호스트로 전송
+    d_outputImage.download(outputImage);
+
+    // 컬러 이미지인 경우, 결과를 원본 컬러 이미지 위에 오버레이
+    if (numChannels == 3) {
+        //채널분리병합
+        /*cv::cuda::GpuMat d_inputImage(inputImage);
+        std::vector<cv::cuda::GpuMat> d_channels(3);
+
+        // 입력 이미지를 채널별로 분리
+        cv::cuda::split(d_inputImage, d_channels);
+
+        // 각 채널에 소벨 결과 오버레이 (원본 컬러 이미지와 합성)
+        cv::cuda::GpuMat d_resizedOutput;
+        if (outputImage.size() != d_channels[0].size()) {
+            cv::cuda::resize(d_outputImage, d_resizedOutput, d_channels[0].size());
+        }
+        else {
+            d_resizedOutput = d_outputImage;
+        }
+
+        for (auto& channel : d_channels) {
+            cv::cuda::addWeighted(channel, 0.5, d_resizedOutput, 0.5, 0, channel);
+        }
+
+        // 채널을 다시 병합
+        cv::cuda::merge(d_channels, d_inputImage);
+        d_inputImage.download(outputImage);*/
+
+        //오버래이
+        cv::Mat coloredEdgeImage;
+        cv::cvtColor(outputImage, coloredEdgeImage, cv::COLOR_GRAY2BGR);
+        cv::addWeighted(inputImage, 0.5, coloredEdgeImage, 0.5, 0, outputImage);
+    }
+
+    return outputImage;
+
+    //CUDA+OpenCV
+    /*
+    int numChannels = inputImage.channels();
+    cv::Mat grayImage;
+    cv::Mat outputImage;
+
+    if (numChannels == 3) {
+        grayImage = grayScale(inputImage);
+    }
+    else if(numChannels == 1) {
+        grayImage = inputImage.clone();
+    }
+    else {
+        std::cerr << __func__ << " : Unsupported number of channels: " << numChannels << std::endl;
+        return cv::Mat(); // 빈 이미지 반환
+    }
+
+    outputImage = cv::Mat::zeros(grayImage.size(), CV_8UC1);
+
+    cv::cuda::GpuMat d_inputImage(grayImage);
+    cv::cuda::GpuMat d_outputImage;
+
+    cv::Ptr<cv::cuda::Filter> sobelFilter = cv::cuda::createSobelFilter(
+        d_inputImage.type(),   // srcType
+        CV_8UC1,              // dstType
+        1,                     // dx (order of derivative in x)
+        0,                     // dy (order of derivative in y)
+        3                      // ksize (kernel size, 3x3 Sobel)
+    );
+
+    // Apply Sobel filter on GPU
+    sobelFilter->apply(d_inputImage, d_outputImage);
+
+    // Transfer result back to CPU
+    d_outputImage.download(outputImage);
+
+    // 컬러 이미지인 경우, 결과를 원본 컬러 이미지 위에 오버레이
+    if (numChannels == 3) {
+        std::vector<cv::Mat> channels(3);
+        cv::split(inputImage, channels);
+
+        // 각 채널에 소벨 결과 오버레이 (원본 컬러 이미지와 합성)
+        for (auto& channel : channels) {
+            cv::Mat resizedOutput;
+            if (outputImage.size() != channel.size()) {
+                cv::resize(outputImage, resizedOutput, channel.size());
+            }
+            else {
+                resizedOutput = outputImage;
+            }
+            cv::addWeighted(channel, 0.5, resizedOutput, 0.5, 0, channel);
+        }
+
+        cv::merge(channels, outputImage);
+    }
+    
+    return outputImage;
+    
+    */    
+}
+
+5.imageProcessing.cu
+// CUDA 커널 함수: 소벨 필터를 사용하여 그레이스케일 이미지 처리
+__global__ void sobelKernel(const uchar* input, uchar* output, int width, int height, int step) {
+    int x = blockIdx.x * blockDim.x + threadIdx.x;
+    int y = blockIdx.y * blockDim.y + threadIdx.y;
+
+    if (x >= 1 && x < width - 1 && y >= 1 && y < height - 1) {
+        int Gx = -input[(y - 1) * step + (x - 1)] - 2 * input[y * step + (x - 1)] - input[(y + 1) * step + (x - 1)]
+            + input[(y - 1) * step + (x + 1)] + 2 * input[y * step + (x + 1)] + input[(y + 1) * step + (x + 1)];
+
+        int Gy = -input[(y - 1) * step + (x - 1)] - 2 * input[(y - 1) * step + x] - input[(y - 1) * step + (x + 1)]
+            + input[(y + 1) * step + (x - 1)] + 2 * input[(y + 1) * step + x] + input[(y + 1) * step + (x + 1)];
+
+        int magnitude = sqrtf(float(Gx * Gx + Gy * Gy));
+
+        output[y * step + x] = min(255, magnitude);
+    }
+}
+
+// CUDA 커널 함수: 컬러 이미지와 소벨 필터 결과를 오버레이
+__global__ void overlayKernel(const uchar* sobel, uchar* image, int width, int height, int step, int imageStep) {
+    int x = blockIdx.x * blockDim.x + threadIdx.x;
+    int y = blockIdx.y * blockDim.y + threadIdx.y;
+
+    if (x < width && y < height) {
+        uchar sobelValue = sobel[y * step + x];
+
+        for (int c = 0; c < 3; ++c) {
+            int idx = y * imageStep + 3 * x + c;
+            image[idx] = uchar((image[idx] * 0.5) + (sobelValue * 0.5));
+        }
+    }
+}
+
+void callSobelFilterCUDA(cv::Mat& inputImage, cv::Mat& outputImage) {
+    int numChannels = inputImage.channels();
+    cv::Mat grayImage;
+
+    if (numChannels == 3) {
+        cv::cvtColor(inputImage, grayImage, cv::COLOR_BGR2GRAY);
+    }
+    else if (numChannels == 1) {
+        grayImage = inputImage;
+    }
+    else {
+        std::cerr << "Unsupported number of channels: " << numChannels << std::endl;
+        outputImage = cv::Mat();
+        return;
+    }
+
+    int width = grayImage.cols;
+    int height = grayImage.rows;
+    int grayStep = grayImage.step;
+    int colorStep = inputImage.step;
+
+    // GPU 메모리 할당
+    uchar* d_input;
+    uchar* d_output;
+    uchar* d_image;
+
+    cudaMalloc(&d_input, height * grayStep);
+    cudaMalloc(&d_output, height * grayStep);
+    cudaMalloc(&d_image, height * colorStep);
+
+    // 호스트에서 GPU로 메모리 복사
+    cudaMemcpy(d_input, grayImage.data, height * grayStep, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_image, inputImage.data, height * colorStep, cudaMemcpyHostToDevice);
+
+    // 커널 실행 설정
+    dim3 blockSize(16, 16);
+    dim3 gridSize((width + blockSize.x - 1) / blockSize.x, (height + blockSize.y - 1) / blockSize.y);
+
+    // 소벨 커널 실행
+    sobelKernel << <gridSize, blockSize >> > (d_input, d_output, width, height, grayStep);
+    cudaDeviceSynchronize();
+
+    if (numChannels == 3) {
+        // 오버레이 커널 실행
+        overlayKernel << <gridSize, blockSize >> > (d_output, d_image, width, height, grayStep, colorStep);
+        cudaDeviceSynchronize();
+
+        // GPU에서 호스트로 결과 복사
+        outputImage = cv::Mat(inputImage.size(), inputImage.type());
+        cudaMemcpy(outputImage.data, d_image, height * colorStep, cudaMemcpyDeviceToHost);
+    }
+    else {
+        // GPU에서 호스트로 결과 복사
+        outputImage = cv::Mat(grayImage.size(), grayImage.type());
+        cudaMemcpy(outputImage.data, d_output, height * grayStep, cudaMemcpyDeviceToHost);
+    }
+
+    // GPU 메모리 해제
+    cudaFree(d_input);
+    cudaFree(d_output);
+    cudaFree(d_image);
+
+}
+
+6. imageProcessorGStreamer.cpp
+cv::Mat ImageProcessorGStreamer::sobelFilter(cv::Mat& inputImage)
+{
+    gst_init(nullptr, nullptr);
+
+    GstElement* pipeline = nullptr;
+    GstElement* source = nullptr;
+    GstElement* convert = nullptr;
+    GstElement* sink = nullptr;
+    GstElement* flip = nullptr;
+    GstSample* sample = nullptr;
+
+    if (!initGst(pipeline, source, convert, sink, flip))
+        return cv::Mat();
+
+    GstCaps* srcCaps;
+    GstCaps* sinkCaps;
+
+    if (!CapSet(source, srcCaps, sinkCaps, inputImage, sink
+        , pipeline, convert, flip, __func__))
+        return cv::Mat();    
+
+    // Apply Sobel filter using OpenCV
+    cv::Mat gradX, gradY, absGradX, absGradY, sobelOutput;
+
+    cv::Mat grayImage;
+    int numChannels = inputImage.channels();
+
+    if (numChannels == 3)
+        grayImage = grayScale(inputImage);
+    else if (numChannels == 1)
+        grayImage = inputImage.clone();
+    else {
+        std::cerr << __func__ << " : Unsupported number of channels: " << numChannels << std::endl;
+        return cv::Mat(); // Return an empty image
+    }
+
+    // Apply Sobel filter
+    cv::Sobel(grayImage, gradX, CV_16S, 1, 0, 3);
+    cv::convertScaleAbs(gradX, absGradX);
+    cv::Sobel(grayImage, gradY, CV_16S, 0, 1, 3);
+    cv::convertScaleAbs(gradY, absGradY);
+    cv::addWeighted(absGradX, 0.5, absGradY, 0.5, 0, sobelOutput);
+
+    if (numChannels == 3) {
+
+        //분할병합
+        /*
+        cv::Mat overlayImage = inputImage.clone();
+        std::vector<cv::Mat> channels(3);
+        cv::split(overlayImage, channels);
+
+        // Scale sobelOutput to fit the range of color channels
+        for (auto& channel : channels) {
+            cv::addWeighted(channel, 0.5, sobelOutput, 0.5, 0, channel);
+        }
+        cv::merge(channels, overlayImage);
+        */
+
+        cv::Mat overlayImage;
+        cv::cvtColor(sobelOutput, overlayImage, cv::COLOR_GRAY2BGR);
+        cv::addWeighted(inputImage, 0.5, overlayImage, 0.5, 0, sobelOutput);
+
+        // Prepare the buffer for GStreamer
+        GstBuffer* buffer;
+        GstMapInfo map;
+        if (!createBuffer(buffer, map, overlayImage, pipeline, source))
+            return cv::Mat();
+
+        gst_element_set_state(pipeline, GST_STATE_PLAYING);
+
+        if (!getSample(sink, pipeline, sample))
+            return cv::Mat();
+
+        GstBuffer* outputBuffer;
+        if (!getSampleBuffer(sample, pipeline, outputBuffer))
+            return cv::Mat();
+
+        // Prepare the final output
+        gst_buffer_map(outputBuffer, &map, GST_MAP_READ);
+        cv::Mat outputImage(inputImage.rows, inputImage.cols, CV_8UC3, map.data);
+        outputImage = outputImage.clone(); // Make a deep copy of the data
+        gst_buffer_unmap(outputBuffer, &map);
+
+        gstDestroyAll(outputBuffer, sample, pipeline);
+    }
+
+    return sobelOutput;
+
+}
