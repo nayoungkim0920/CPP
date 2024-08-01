@@ -1,0 +1,317 @@
+<수정사항>
+1. Laplacian 필터
+CUDA, CUDAKernel, GStreamer 그레이스케일/컬러 수정완료
+
+<코드>
+1.imageProcessorCUDA.cpp
+cv::Mat ImageProcessorCUDA::laplacianFilter(cv::Mat& inputImage)
+{
+    std::cout << __func__ << std::endl;
+    
+    // 입력 이미지를 GPU 메모리로 업로드
+    cv::cuda::GpuMat d_inputImage;
+    d_inputImage.upload(inputImage);
+
+    // 입력 이미지 타입 확인 및 채널 수 변환
+    int inputType = d_inputImage.type();
+    int depth = CV_MAT_DEPTH(inputType);
+    int channels = d_inputImage.channels();
+
+    // CUDA Laplacian 필터를 적용할 수 있는 데이터 타입으로 변환
+    cv::cuda::GpuMat d_grayImage;
+    if (depth != CV_8U && depth != CV_16U && depth != CV_32F) {
+        d_inputImage.convertTo(d_grayImage, CV_32F);  // 입력 이미지를 CV_32F로 변환
+    }
+    else if (channels == 3) {
+        cv::cuda::cvtColor(d_inputImage, d_grayImage, cv::COLOR_BGR2GRAY); // RGB 이미지를 grayscale로 변환
+    }
+    else {
+        d_grayImage = d_inputImage.clone();  // 이미 적절한 타입인 경우 그대로 사용
+    }
+
+    // Laplacian 필터를 생성할 때 입력 및 출력 이미지 타입을 동일하게 설정
+    int srcType = d_grayImage.type();
+    cv::Ptr<cv::cuda::Filter> laplacianFilter = cv::cuda::createLaplacianFilter(srcType, srcType, 3);
+
+    // 출력 이미지 메모리 할당
+    cv::cuda::GpuMat d_outputImage(d_grayImage.size(), srcType);
+
+    // Laplacian 필터 적용
+    laplacianFilter->apply(d_grayImage, d_outputImage);
+
+    // GPU에서 CPU로 결과 이미지 다운로드
+    cv::Mat outputImage;
+    d_outputImage.download(outputImage);
+
+    if (channels == 3) {
+        cv::Mat coloredEdgeImage;
+        cv::cvtColor(outputImage, coloredEdgeImage, cv::COLOR_GRAY2BGR);
+        cv::addWeighted(inputImage, 0.5, coloredEdgeImage, 0.5, 0, outputImage);
+    }
+
+    return outputImage;
+}
+2.imageProcessorCUDAKernel.cpp
+cv::Mat ImageProcessorCUDAKernel::laplacianFilter(cv::Mat& inputImage)
+{
+    cv::Mat outputImage;
+    callLaplacianFilterCUDA(inputImage, outputImage);
+
+    // outputImage를 출력하여 내용 확인
+    //std::cout << "Output Image:" << std::endl;
+    //std::cout << outputImage << std::endl;
+
+    return outputImage;
+    
+    //채널분리병합
+    /*cv::Mat outputImage;
+    // 그레이스케일 이미지인 경우
+    if (inputImage.channels() == 1) {
+        callLaplacianFilterCUDA(inputImage, outputImage);
+    }
+    // 컬러 이미지인 경우
+    else if (inputImage.channels() == 3) {
+
+        std::cout << "this is color!" << std::endl;
+
+        // 채널 분리
+        std::vector<cv::Mat> channels;
+        cv::split(inputImage, channels);
+
+        std::vector<cv::Mat> outputChannels(channels.size());
+        for (int i = 0; i < channels.size(); ++i) {
+            callLaplacianFilterCUDA(channels[i], outputChannels[i]);
+        }
+
+        // 채널 병합
+        cv::merge(outputChannels, outputImage);
+    }
+    else {
+        std::cerr << "Unsupported image format." << std::endl;
+    }
+
+    return outputImage;*/
+}
+
+3.imageProcessing.cu
+// CUDA 커널 함수: 컬러 이미지와 소벨 필터 결과를 오버레이
+__global__ void overlayKernel(const uchar* sobel, uchar* image, int width, int height, int step, int imageStep) {
+    int x = blockIdx.x * blockDim.x + threadIdx.x;
+    int y = blockIdx.y * blockDim.y + threadIdx.y;
+
+    if (x < width && y < height) {
+        uchar sobelValue = sobel[y * step + x];
+
+        for (int c = 0; c < 3; ++c) {
+            int idx = y * imageStep + 3 * x + c;
+            image[idx] = uchar((image[idx] * 0.5) + (sobelValue * 0.5));
+        }
+    }
+}
+
+__global__ void laplacianFilterKernel(const unsigned char* input, unsigned char* output,
+    int cols, int rows, size_t pitch, int channels) {
+    int x = blockIdx.x * blockDim.x + threadIdx.x;
+    int y = blockIdx.y * blockDim.y + threadIdx.y;
+
+    if (x >= 1 && x < cols - 1 && y >= 1 && y < rows - 1) {
+        // Laplacian 필터 계산
+        int kernel[3][3] = {
+            {0, -1, 0},
+            {-1, 4, -1},
+            {0, -1, 0}
+        };
+
+        for (int c = 0; c < channels; ++c) {
+            float sum = 0.0f;
+
+            // 커널 적용
+            for (int ky = -1; ky <= 1; ++ky) {
+                for (int kx = -1; kx <= 1; ++kx) {
+                    int pixelX = x + kx;
+                    int pixelY = y + ky;
+                    float pixelValue = input[pixelY * pitch + pixelX * channels + c];
+                    sum += pixelValue * kernel[ky + 1][kx + 1];
+                }
+            }
+
+            // 결과 저장
+            output[y * pitch + x * channels + c] = static_cast<unsigned char>(min(max(sum, 0.0f), 255.0f));
+        }
+    }
+}
+
+void callLaplacianFilterCUDA(cv::Mat& inputImage, cv::Mat& outputImage) {
+
+    int numChannels = inputImage.channels();
+    cv::Mat grayImage;
+    int width = inputImage.cols;
+    int height = inputImage.rows;
+
+    // 이미지의 채널 수에 따라 처리
+    if (numChannels == 3) {
+        callGrayScaleImageCUDA(inputImage, grayImage);
+    }
+    else if (numChannels == 1) {
+        grayImage = inputImage;
+    }
+    else {
+        std::cerr << "지원하지 않는 채널 수: " << numChannels << std::endl;
+        outputImage = cv::Mat();
+        return;
+    }
+
+    unsigned char* d_input;
+    unsigned char* d_output;
+    unsigned char* d_image;
+    size_t pitch_input, pitch_output, pitch_image;
+
+    // CUDA 메모리 할당 (채널별로 pitch를 별도로 계산)
+    cudaMallocPitch(&d_input, &pitch_input, width * sizeof(unsigned char), height);
+    cudaMallocPitch(&d_output, &pitch_output, width * sizeof(unsigned char), height);
+    cudaMallocPitch(&d_image, &pitch_image, width * numChannels * sizeof(unsigned char), height);
+
+    // 입력 이미지 복사
+    cudaMemcpy2D(d_input, pitch_input, grayImage.ptr(), grayImage.step, width * sizeof(unsigned char), height, cudaMemcpyHostToDevice);
+    cudaMemcpy2D(d_image, pitch_image, inputImage.ptr(), inputImage.step, width * numChannels * sizeof(unsigned char), height, cudaMemcpyHostToDevice);
+
+    // CUDA 커널 실행 구성
+    dim3 blockSize(16, 16);
+    dim3 gridSize((width + blockSize.x - 1) / blockSize.x, (height + blockSize.y - 1) / blockSize.y);
+
+    // Laplacian 필터 CUDA 커널 호출
+    laplacianFilterKernel << <gridSize, blockSize >> > (d_input, d_output, width, height, pitch_input, 1);
+
+    // CUDA 오류 체크
+    cudaError_t cudaStatus = cudaGetLastError();
+    if (cudaStatus != cudaSuccess) {
+        std::cerr << "Laplacian CUDA 커널 실행 실패: " << cudaGetErrorString(cudaStatus) << std::endl;
+        cudaFree(d_input);
+        cudaFree(d_output);
+        cudaFree(d_image);
+        return;
+    }
+
+    if (numChannels == 3) {
+        // 오버레이 커널 실행
+        overlayKernel << <gridSize, blockSize >> > (d_output, d_image, width, height, pitch_output, pitch_image);
+        cudaDeviceSynchronize();
+
+        cudaStatus = cudaGetLastError();
+        if (cudaStatus != cudaSuccess) {
+            std::cerr << "Overlay CUDA 커널 실행 실패: " << cudaGetErrorString(cudaStatus) << std::endl;
+            cudaFree(d_input);
+            cudaFree(d_output);
+            cudaFree(d_image);
+            return;
+        }
+
+        // 결과 이미지 복사 (컬러 이미지로 복사)
+        outputImage.create(height, width, inputImage.type());
+        cudaMemcpy2D(outputImage.ptr(), outputImage.step, d_image, pitch_image, width * numChannels * sizeof(unsigned char), height, cudaMemcpyDeviceToHost);
+    }
+    else {
+        // 결과 이미지 복사 (그레이스케일 이미지로 복사)
+        outputImage.create(height, width, CV_8UC1);
+        cudaMemcpy2D(outputImage.ptr(), outputImage.step, d_output, pitch_output, width * sizeof(unsigned char), height, cudaMemcpyDeviceToHost);
+    }
+
+    // 메모리 해제
+    cudaFree(d_input);
+    cudaFree(d_output);
+    cudaFree(d_image);
+}
+
+4.imageProcessorGStreamer.cpp
+cv::Mat ImageProcessorGStreamer::laplacianFilter(cv::Mat& inputImage)
+{    
+    gst_init(nullptr, nullptr);
+
+    GstElement* pipeline = nullptr;
+    GstElement* source = nullptr;
+    GstElement* convert = nullptr;
+    GstElement* sink = nullptr;
+    GstElement* flip = nullptr;
+    GstSample* sample = nullptr;
+
+    if (!initGst(pipeline, source, convert, sink, flip))
+        return cv::Mat();
+
+    GstCaps* srcCaps;
+    GstCaps* sinkCaps;
+
+    if (!CapSet(source, srcCaps, sinkCaps, inputImage, sink
+        , pipeline, convert, flip, __func__))
+        return cv::Mat();
+
+    std::cout << __func__ << std::endl;
+
+    int numChannels = inputImage.channels();
+    cv::Mat grayImage;
+    cv::Mat outputImage;
+
+    if (numChannels == 1) {
+        grayImage = inputImage.clone();
+    }
+    else if (numChannels == 3) {
+        grayImage = grayScale(inputImage);
+    }
+    else {
+        std::cerr << __func__ << " : Unsupported number of channels: " << numChannels << std::endl;
+        return cv::Mat(); // 빈 이미지 반환
+    }
+
+    // For grayscale image
+    cv::Laplacian(grayImage, outputImage, CV_16S, 3);
+    cv::convertScaleAbs(outputImage, outputImage);
+
+    if (numChannels == 3) {
+        cv::Mat coloredEdgeImage;
+        cv::cvtColor(outputImage, coloredEdgeImage, cv::COLOR_GRAY2BGR);
+        cv::addWeighted(inputImage, 0.5, coloredEdgeImage, 0.5, 0, outputImage);
+    }
+
+    //분리병합
+    /*
+    if (inputImage.channels() == 3) {
+        // Apply Laplacian filter to each channel of the color image
+        std::vector<cv::Mat> channels(3);
+        cv::split(inputImage, channels);
+
+        std::vector<cv::Mat> laplacianChannels(3);
+        for (int i = 0; i < 3; ++i) {
+            cv::Mat grayChannel;
+            cv::Laplacian(channels[i], grayChannel, CV_16S, 3);
+            cv::convertScaleAbs(grayChannel, laplacianChannels[i]);
+        }
+
+        cv::merge(laplacianChannels, outputImage);
+    }*/
+
+    // Convert cv::Mat to GstBuffer
+    GstBuffer* buffer;
+    GstMapInfo map;
+    if (!createBuffer(buffer, map, inputImage, pipeline, source))
+        return cv::Mat();
+
+    // Set the pipeline to PLAYING state
+    gst_element_set_state(pipeline, GST_STATE_PLAYING);
+
+    // Pull sample from appsink
+    if (!getSample(sink, pipeline, sample))
+        return cv::Mat();
+
+    GstBuffer* outputBuffer;
+    if (!getSampleBuffer(sample, pipeline, outputBuffer))
+        return cv::Mat();
+
+    //gst_buffer_map(outputBuffer, &map, GST_MAP_READ);
+    //cv::Mat finalImage(inputImage.rows, inputImage.cols, CV_8UC1, map.data);
+    //finalImage = finalImage.clone(); // Make a deep copy of the data
+    //gst_buffer_unmap(outputBuffer, &map);
+
+    // Cleanup
+    gstDestroyAll(outputBuffer, sample, pipeline);
+
+    return outputImage;
+}
