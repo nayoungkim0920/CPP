@@ -1,0 +1,99 @@
+<수정사항>
+1. ZOOM IN을 하고 GrayScale적용하면 결과출력이 안됌
+- 메모리할당 수정
+- 출력은 되나 출력이미지가 비스듬히출력됨
+
+<코드>
+1. imageProcessorGStreamer.cpp
+
+bool ImageProcessorGStreamer::createBuffer(GstBuffer*& buffer
+    , GstMapInfo& map, cv::Mat& inputImage, GstElement*& pipeline, GstElement*& source) {
+    // 입력 이미지를 위한 버퍼 생성(버퍼를 넉넉히잡아줌)
+    buffer = gst_buffer_new_allocate(nullptr, inputImage.total() * inputImage.elemSize() + 1000, nullptr);
+
+    gst_buffer_map(buffer, &map, GST_MAP_WRITE);
+    std::memcpy(map.data, inputImage.data, inputImage.total() * inputImage.elemSize());
+    gst_buffer_unmap(buffer, &map);
+
+    GstFlowReturn ret;
+    g_signal_emit_by_name(source, "push-buffer", buffer, &ret);
+    gst_buffer_unref(buffer);
+
+    if (ret != GST_FLOW_OK) {
+        std::cerr << "Failed to push buffer to appsrc." << std::endl;
+        gst_object_unref(GST_OBJECT(pipeline));
+        return false;
+    }
+
+    return true;
+}
+
+cv::Mat ImageProcessorGStreamer::grayScale(cv::Mat& inputImage) {
+
+    // 입력 이미지가 이미 그레이스케일인지 확인
+    if (inputImage.type() == CV_8UC1) {
+        // 그레이스케일 이미지인 경우, 이미지 복제본을 반환
+        std::cout << "Input image is already grayscale." << std::endl;
+        return inputImage.clone(); // 이미지를 클론하여 반환
+    }
+
+    std::cout << __func__ << std::endl;
+
+    gst_init(nullptr, nullptr);
+
+    GstElement* pipeline = nullptr;
+    GstElement* source = nullptr;
+    GstElement* convert = nullptr;
+    GstElement* sink = nullptr;
+    GstSample* sample = nullptr;
+    GstElement* flip = nullptr;
+
+    if (!initGst(pipeline, source, convert, sink, flip))
+        return cv::Mat();
+
+    GstCaps* srcCaps;
+    GstCaps* sinkCaps;
+
+    if (!CapSet(source, srcCaps, sinkCaps, inputImage, sink
+        , pipeline, convert, flip, __func__))
+        return cv::Mat();
+
+    GstBuffer* buffer;
+    GstMapInfo map;
+    if (!createBuffer(buffer, map, inputImage, pipeline, source))
+        return cv::Mat();
+
+    if (!setPipeline(pipeline))
+        return cv::Mat();
+
+    if (!getSample(sink, pipeline, sample))
+        return cv::Mat();
+
+    GstBuffer* outputBuffer;
+    if (!getSampleBuffer(sample, pipeline, outputBuffer))
+        return cv::Mat();
+
+    GstCaps* caps;
+    if (!sampleGetCaps(caps, sample, pipeline))
+        return cv::Mat();
+
+    GstMapInfo outputMap;
+    gst_buffer_map(outputBuffer, &outputMap, GST_MAP_READ);
+
+    gint width;
+    gint height;
+    if (!capsGetStructure(caps, width, height
+        , outputBuffer, outputMap
+        , sample
+        , pipeline))
+        return cv::Mat();
+
+    //OpenCV
+    cv::Mat outputImage(height, width, CV_8UC1, outputMap.data);
+    cv::Mat outputImageClone = outputImage.clone(); // 깊은 복사 생성
+
+    gst_buffer_unmap(outputBuffer, &outputMap);
+    gstDestroyAll(outputBuffer, sample, pipeline);
+
+    return outputImageClone;
+}
