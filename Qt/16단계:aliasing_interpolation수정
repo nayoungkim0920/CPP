@@ -1,8 +1,11 @@
 <수정사항>
 1. IPP/CUDAKernel에서 zoomin/out시 aliasing발생 수정
+-IPP
 ippiResizeGetSize_8u ippNearest -> ippLinear
 ippiResizeNearestInit_8u -> ippiResizeLinearInit_8u
 ippiResizeNearest_8u_C3R -> ippiResizeLinear_8u_C3R
+-CUDAKernel
+resizeImageKernel Nearest-Neighbor Interpolation-> 선형 보간법 (Bilinear)
 
 <코드>
 1. imageProcessorIPP.cpp
@@ -200,4 +203,60 @@ cv::Mat ImageProcessorIPP::zoom(cv::Mat& inputImage, int newWidth, int newHeight
     ippFree(pSpec);
 
     return outputImage;
+}
+
+2. imageProcessing.cu
+__global__ void resizeImageKernel(const unsigned char* input, unsigned char* output, int oldWidth, int oldHeight, int newWidth, int newHeight, int channels) {
+    
+    //선형 보간법 (Bilinear)
+    int x = blockIdx.x * blockDim.x + threadIdx.x;
+    int y = blockIdx.y * blockDim.y + threadIdx.y;
+
+    if (x < newWidth && y < newHeight) {
+        float x_ratio = oldWidth / (float)newWidth;
+        float y_ratio = oldHeight / (float)newHeight;
+        float x_l = floor(x * x_ratio);
+        float y_l = floor(y * y_ratio);
+        float x_h = ceil(x * x_ratio);
+        float y_h = ceil(y * y_ratio);
+
+        int x_l_int = (int)x_l;
+        int y_l_int = (int)y_l;
+        int x_h_int = min(oldWidth - 1, (int)x_h);
+        int y_h_int = min(oldHeight - 1, (int)y_h);
+
+        float x_weight = (x * x_ratio) - x_l;
+        float y_weight = (y * y_ratio) - y_l;
+
+        for (int c = 0; c < channels; ++c) {
+            unsigned char top_left = input[(y_l_int * oldWidth + x_l_int) * channels + c];
+            unsigned char top_right = input[(y_l_int * oldWidth + x_h_int) * channels + c];
+            unsigned char bottom_left = input[(y_h_int * oldWidth + x_l_int) * channels + c];
+            unsigned char bottom_right = input[(y_h_int * oldWidth + x_h_int) * channels + c];
+
+            float top = top_left * (1 - x_weight) + top_right * x_weight;
+            float bottom = bottom_left * (1 - x_weight) + bottom_right * x_weight;
+            float value = top * (1 - y_weight) + bottom * y_weight;
+
+            output[(y * newWidth + x) * channels + c] = (unsigned char)value;
+        }
+    }
+
+    //Nearest-Neighbor Interpolation : 계단 현상 (aliasing)이 발생
+    /*
+    
+    int x = blockIdx.x * blockDim.x + threadIdx.x;
+    int y = blockIdx.y * blockDim.y + threadIdx.y;
+
+    if (x < newWidth && y < newHeight) {
+        float x_ratio = oldWidth / (float)newWidth;
+        float y_ratio = oldHeight / (float)newHeight;
+        int px = floor(x * x_ratio);
+        int py = floor(y * y_ratio);
+
+        for (int c = 0; c < channels; ++c) {
+            output[(y * newWidth + x) * channels + c] = input[(py * oldWidth + px) * channels + c];
+        }
+    }
+    */
 }
