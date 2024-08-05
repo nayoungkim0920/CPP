@@ -1,0 +1,291 @@
+<수정사항>
+1.Gstreamer
+rotate, grayscale 오류수정
+
+<코드>
+1.imageprocessorGStreamer.cpp
+cv::Mat ImageProcessorGStreamer::grayScale(cv::Mat& inputImage) {
+
+    std::cout << "<<<" << getClassName() << "::" << __func__ << ">>>" << std::endl;
+
+    if (inputImage.type() == CV_8UC1) {
+        std::cout << "Input image is already grayscale." << std::endl;
+        return inputImage.clone();
+    }
+
+    if (!gst_is_initialized()) {
+        gst_init(nullptr, nullptr);
+    }
+
+    GstElement* pipeline = gst_pipeline_new("pipeline");
+    GstElement* source = gst_element_factory_make("appsrc", "source");
+    GstElement* convert = gst_element_factory_make("videoconvert", "convert");
+    GstElement* sink = gst_element_factory_make("appsink", "sink");
+
+    if (!pipeline || !source || !convert || !sink) {
+        std::cerr << "Failed to create GStreamer elements." << std::endl;
+        return cv::Mat();
+    }
+
+    // BGR 입력을 위한 소스 캡 설정
+    GstCaps* srcCaps = gst_caps_new_simple("video/x-raw",
+        "format", G_TYPE_STRING, "BGR",
+        "width", G_TYPE_INT, inputImage.cols,
+        "height", G_TYPE_INT, inputImage.rows,
+        "framerate", GST_TYPE_FRACTION, 30, 1,
+        nullptr);
+    g_object_set(G_OBJECT(source), "caps", srcCaps, nullptr);
+    g_object_set(G_OBJECT(source), "is-live", TRUE, nullptr);
+
+    // GRAY8 출력을 위한 싱크 캡 설정
+    GstCaps* sinkCaps = gst_caps_new_simple("video/x-raw",
+        "format", G_TYPE_STRING, "GRAY8",
+        nullptr);
+    g_object_set(G_OBJECT(sink), "caps", sinkCaps, nullptr);
+    g_object_set(G_OBJECT(sink), "sync", FALSE, "emit-signals", TRUE, nullptr);
+
+    gst_bin_add_many(GST_BIN(pipeline), source, convert, sink, nullptr);
+    if (!gst_element_link_many(source, convert, sink, nullptr)) {
+        std::cerr << "Failed to link GStreamer elements." << std::endl;
+        gst_object_unref(GST_OBJECT(pipeline));
+        return cv::Mat();
+    }
+
+    // GStreamer 버퍼 생성 및 사이즈 조정
+    size_t bufferSize = inputImage.total() * inputImage.elemSize() + 1000;
+    GstBuffer* buffer = gst_buffer_new_allocate(nullptr, bufferSize, nullptr);
+    GstMapInfo map;
+    gst_buffer_map(buffer, &map, GST_MAP_WRITE);
+    std::memcpy(map.data, inputImage.data, bufferSize);
+    gst_buffer_unmap(buffer, &map);
+
+    GstFlowReturn ret;
+    g_signal_emit_by_name(source, "push-buffer", buffer, &ret);
+    gst_buffer_unref(buffer);
+
+    if (ret != GST_FLOW_OK) {
+        std::cerr << "Failed to push buffer to appsrc." << std::endl;
+        gst_object_unref(GST_OBJECT(pipeline));
+        return cv::Mat();
+    }
+
+    gst_element_set_state(pipeline, GST_STATE_PLAYING);
+
+    // GStreamer 파이프라인의 상태 확인
+    GstStateChangeReturn stateChangeRet;
+    do {
+        stateChangeRet = gst_element_get_state(pipeline, nullptr, nullptr, GST_CLOCK_TIME_NONE);
+        if (stateChangeRet == GST_STATE_CHANGE_FAILURE) {
+            std::cerr << "GStreamer pipeline failed!" << std::endl;
+            gst_element_set_state(pipeline, GST_STATE_NULL);
+            gst_object_unref(GST_OBJECT(pipeline));
+            return cv::Mat();
+        }
+    } while (stateChangeRet != GST_STATE_CHANGE_SUCCESS);
+
+    // appsink에서 샘플 가져오기
+    GstSample* sample = gst_app_sink_pull_sample(GST_APP_SINK(sink));
+    if (!sample) {
+        std::cerr << "Failed to pull sample from appsink." << std::endl;
+        gst_element_set_state(pipeline, GST_STATE_NULL);
+        gst_object_unref(GST_OBJECT(pipeline));
+        return cv::Mat();
+    }
+
+    GstBuffer* outputBuffer = gst_sample_get_buffer(sample);
+    if (!outputBuffer) {
+        std::cerr << "Failed to get buffer from sample." << std::endl;
+        gst_sample_unref(sample);
+        gst_element_set_state(pipeline, GST_STATE_NULL);
+        gst_object_unref(GST_OBJECT(pipeline));
+        return cv::Mat();
+    }
+
+    GstCaps* caps = gst_sample_get_caps(sample);
+    if (!caps) {
+        std::cerr << "Failed to get caps from sample." << std::endl;
+        gst_sample_unref(sample);
+        gst_element_set_state(pipeline, GST_STATE_NULL);
+        gst_object_unref(GST_OBJECT(pipeline));
+        return cv::Mat();
+    }
+
+    GstMapInfo outputMap;
+    gst_buffer_map(outputBuffer, &outputMap, GST_MAP_READ);
+
+    GstStructure* s = gst_caps_get_structure(caps, 0);
+    gint width, height;
+    if (!gst_structure_get_int(s, "width", &width) || !gst_structure_get_int(s, "height", &height)) {
+        std::cerr << "Failed to extract width and height from caps." << std::endl;
+        gst_buffer_unmap(outputBuffer, &outputMap);
+        gst_sample_unref(sample);
+        gst_element_set_state(pipeline, GST_STATE_NULL);
+        gst_object_unref(GST_OBJECT(pipeline));
+        return cv::Mat();
+    }
+
+    // cv::Mat을 올바르게 생성
+    cv::Mat outputImage(height, width, CV_8UC1, outputMap.data);
+
+    // 복제본 생성
+    cv::Mat outputImageClone = outputImage.clone();
+
+    // 정리
+    gst_buffer_unmap(outputBuffer, &outputMap);
+    gst_sample_unref(sample);
+    gst_element_set_state(pipeline, GST_STATE_NULL);
+    gst_object_unref(GST_OBJECT(pipeline));
+
+    std::cout << "OutputImage Size: [" << outputImageClone.cols << " x " << outputImageClone.rows << "]" << std::endl;
+
+    return outputImageClone;
+}
+
+cv::Mat ImageProcessorGStreamer::rotate(cv::Mat& inputImage, bool isRight) {
+    
+    std::cout << "<<<" << getClassName() << "::" << __func__ << ">>>" << std::endl;
+
+    GstElement* pipeline = nullptr;
+    GstElement* source = nullptr;
+    GstElement* convert = nullptr;
+    GstElement* flip = nullptr;
+    GstElement* sink = nullptr;
+    GstSample* sample = nullptr;
+
+    gst_init(nullptr, nullptr);
+
+    // GStreamer 요소 생성
+    pipeline = gst_pipeline_new("pipeline");
+    source = gst_element_factory_make("appsrc", "source");
+    convert = gst_element_factory_make("videoconvert", "convert");
+    flip = gst_element_factory_make("videoflip", "flip");
+    sink = gst_element_factory_make("appsink", "sink");
+
+    if (!pipeline || !source || !convert || !flip || !sink) {
+        std::cerr << "Failed to create GStreamer elements." << std::endl;
+        if (pipeline) gst_object_unref(GST_OBJECT(pipeline));
+        if (source) gst_object_unref(GST_OBJECT(source));
+        if (convert) gst_object_unref(GST_OBJECT(convert));
+        if (flip) gst_object_unref(GST_OBJECT(flip));
+        if (sink) gst_object_unref(GST_OBJECT(sink));
+        return cv::Mat();
+    }
+
+    // 회전을 위한 플립 방법 설정
+    g_object_set(G_OBJECT(flip), "method", isRight ? 1 : 3, nullptr); // 1은 시계 방향 90도, 3은 반시계 방향 90도
+
+    // 이미지 채널 수에 따른 GstCaps 설정
+    GstCaps* srcCaps = nullptr;
+    GstCaps* sinkCaps = nullptr;
+    if (inputImage.channels() == 3) {
+        // 컬러 이미지인 경우
+        srcCaps = gst_caps_new_simple("video/x-raw",
+            "format", G_TYPE_STRING, "BGR",
+            "width", G_TYPE_INT, inputImage.cols,
+            "height", G_TYPE_INT, inputImage.rows,
+            "framerate", GST_TYPE_FRACTION, 30, 1,
+            nullptr);
+        sinkCaps = gst_caps_new_simple("video/x-raw",
+            "format", G_TYPE_STRING, "BGR",
+            nullptr);
+    }
+    else if (inputImage.channels() == 1) {
+        // 그레이스케일 이미지인 경우
+        srcCaps = gst_caps_new_simple("video/x-raw",
+            "format", G_TYPE_STRING, "GRAY8",
+            "width", G_TYPE_INT, inputImage.cols,
+            "height", G_TYPE_INT, inputImage.rows,
+            "framerate", GST_TYPE_FRACTION, 30, 1,
+            nullptr);
+        sinkCaps = gst_caps_new_simple("video/x-raw",
+            "format", G_TYPE_STRING, "GRAY8",
+            nullptr);
+    }
+    else {
+        std::cerr << "Unsupported image format." << std::endl;
+        gst_object_unref(GST_OBJECT(pipeline));
+        return cv::Mat();
+    }
+
+    g_object_set(G_OBJECT(source), "caps", srcCaps, nullptr);
+    g_object_set(G_OBJECT(source), "is-live", TRUE, nullptr);
+    g_object_set(G_OBJECT(sink), "caps", sinkCaps, nullptr);
+    g_object_set(G_OBJECT(sink), "sync", FALSE, "emit-signals", TRUE, nullptr);
+
+    gst_bin_add_many(GST_BIN(pipeline), source, convert, flip, sink, nullptr);
+    if (!gst_element_link_many(source, convert, flip, sink, nullptr)) {
+        std::cerr << "Failed to link GStreamer elements." << std::endl;
+        gst_object_unref(GST_OBJECT(pipeline));
+        return cv::Mat();
+    }
+
+    // cv::Mat을 GstBuffer로 변환하고 appsrc로 푸시
+    GstBuffer* buffer = matToGstBuffer(inputImage);
+    GstFlowReturn ret;
+    g_signal_emit_by_name(source, "push-buffer", buffer, &ret);
+    gst_buffer_unref(buffer);
+
+    if (ret != GST_FLOW_OK) {
+        std::cerr << "Failed to push buffer to appsrc." << std::endl;
+        gst_object_unref(GST_OBJECT(pipeline));
+        return cv::Mat();
+    }
+
+    // 파이프라인을 PLAYING 상태로 설정
+    gst_element_set_state(pipeline, GST_STATE_PLAYING);
+
+    // 파이프라인이 PAUSED 상태가 될 때까지 대기
+    GstStateChangeReturn stateChangeRet;
+    do {
+        stateChangeRet = gst_element_get_state(pipeline, nullptr, nullptr, GST_CLOCK_TIME_NONE);
+        if (stateChangeRet == GST_STATE_CHANGE_FAILURE) {
+            std::cerr << "GStreamer pipeline failed!" << std::endl;
+            gst_element_set_state(pipeline, GST_STATE_NULL);
+            gst_object_unref(GST_OBJECT(pipeline));
+            return cv::Mat();
+        }
+    } while (stateChangeRet != GST_STATE_CHANGE_SUCCESS);
+
+    // 처리 완료 대기
+    gst_element_set_state(pipeline, GST_STATE_PAUSED);
+    GstState state;
+    GstState pending;
+    do {
+        gst_element_get_state(pipeline, &state, &pending, GST_CLOCK_TIME_NONE);
+    } while (state != GST_STATE_PAUSED && pending != GST_STATE_VOID_PENDING);
+
+    // appsink에서 샘플 가져오기
+    sample = gst_app_sink_pull_sample(GST_APP_SINK(sink));
+    if (!sample) {
+        std::cerr << "Failed to pull sample from appsink." << std::endl;
+        gst_element_set_state(pipeline, GST_STATE_NULL);
+        gst_object_unref(GST_OBJECT(pipeline));
+        return cv::Mat();
+    }
+
+    GstBuffer* outputBuffer = gst_sample_get_buffer(sample);
+    if (!outputBuffer) {
+        std::cerr << "Failed to get buffer from sample." << std::endl;
+        gst_sample_unref(sample);
+        gst_element_set_state(pipeline, GST_STATE_NULL);
+        gst_object_unref(GST_OBJECT(pipeline));
+        return cv::Mat();
+    }
+
+    GstCaps* caps = gst_sample_get_caps(sample);
+    if (!caps) {
+        std::cerr << "Failed to get caps from sample." << std::endl;
+        gst_sample_unref(sample);
+        gst_element_set_state(pipeline, GST_STATE_NULL);
+        gst_object_unref(GST_OBJECT(pipeline));
+        return cv::Mat();
+    }
+
+    cv::Mat outputImage = gstBufferToMat(outputBuffer, caps);
+
+    gst_sample_unref(sample);
+    gst_element_set_state(pipeline, GST_STATE_NULL);
+    gst_object_unref(GST_OBJECT(pipeline));
+
+    return outputImage;
+}
