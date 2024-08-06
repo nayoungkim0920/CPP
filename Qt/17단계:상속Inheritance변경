@@ -1,0 +1,140 @@
+<수정사항>
+1. 상속 구조로 변경
+AbstractImageProcessor 클래스를 만들어 상속구조로 변경함
+imageProcessorOpenCV, //매개변수가 다른 overloading 구현
+imageProcessorIPP,
+imageProcessorNPP,
+imageProcessorCUDA,
+imageProcessorCUDAKernel,
+imageProcessorGStreamer
+
+<코드>
+1. AbstractimageProcessor.h
+#ifndef ABSTRACTIMAGEPROCESSOR_H
+#define ABSTRACTIMAGEPROCESSOR_H
+
+#include <opencv2/core.hpp>
+#include <opencv2/opencv.hpp>
+
+// 추상 클래스
+class AbstractImageProcessor {
+public:
+    virtual ~AbstractImageProcessor() {}
+
+    // 순수 가상 함수 (자식 클래스에서 반드시 구현해야 함)
+    virtual cv::Mat rotate(cv::Mat& inputImage, bool isRight) = 0;
+    virtual cv::Mat grayScale(cv::Mat& inputImage) = 0;
+    virtual cv::Mat zoom(cv::Mat& inputImage, int newWidth, int newHeight) = 0;
+    virtual cv::Mat gaussianBlur(cv::Mat& inputImage, int kernelSize) = 0;
+    virtual cv::Mat cannyEdges(cv::Mat& inputImage) = 0;
+    virtual cv::Mat medianFilter(cv::Mat& inputImage) = 0;
+    virtual cv::Mat laplacianFilter(cv::Mat& inputImage) = 0;
+    virtual cv::Mat bilateralFilter(cv::Mat& inputImage) = 0;
+    virtual cv::Mat sobelFilter(cv::Mat& inputImage) = 0;
+
+private:
+    virtual std::string getClassName() const = 0;
+};
+
+#endif // ABSTRACTIMAGEPROCESSOR_H
+
+2. imageProcessorOpenCV.h (매개변수가 다른 overloading 구현)
+#ifndef IMAGEPROCESSOROPENCV_H
+#define IMAGEPROCESSOROPENCV_H
+
+#include <opencv2/core.hpp>
+#include <opencv2/opencv.hpp>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/highgui.hpp>
+#include <opencv2/core/cuda.hpp>
+#include <opencv2/cudaimgproc.hpp>
+#include <opencv2/cudaarithm.hpp>
+#include <opencv2/cudafilters.hpp>
+#include <opencv2/cudawarping.hpp>
+
+#include "AbstractImageProcessor.h"
+
+class ImageProcessorOpenCV : public AbstractImageProcessor {
+public:
+    ImageProcessorOpenCV();
+    ~ImageProcessorOpenCV();
+
+    // 추상 클래스에서 정의한 함수들
+    cv::Mat rotate(cv::Mat& inputImage, bool isRight) override;
+    cv::Mat grayScale(cv::Mat& inputImage) override;
+    cv::Mat zoom(cv::Mat& inputImage, int newWidth, int newHeight) override;
+    cv::Mat gaussianBlur(cv::Mat& inputImage, int kernelSize) override;
+    cv::Mat cannyEdges(cv::Mat& inputImage) override;
+    cv::Mat medianFilter(cv::Mat& inputImage) override;
+    cv::Mat laplacianFilter(cv::Mat& inputImage) override;
+    cv::Mat bilateralFilter(cv::Mat& inputImage) override;
+    cv::Mat sobelFilter(cv::Mat& inputImage) override;
+
+    // 오버로딩된 메소드들
+    cv::Mat zoom(cv::Mat& inputImage, int newWidth, int newHeight
+        , double x, double y, int interpolation);
+    cv::Mat gaussianBlur(cv::Mat& inputImage, int kernelSize
+        , int sigmaX, int sigmaY, int borderType);
+
+private:
+    std::string getClassName() const override;
+};
+
+#endif // IMAGEPROCESSOROPENCV_H
+
+3. imageProcessorIPP.h
+#ifndef IMAGEPROCESSORIPP_H
+#define IMAGEPROCESSORIPP_H
+
+#include <opencv2/core.hpp>
+#include <opencv2/opencv.hpp>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/highgui.hpp>
+#include <opencv2/core/cuda.hpp>
+#include <opencv2/cudaimgproc.hpp>
+#include <opencv2/cudaarithm.hpp>
+#include <opencv2/cudafilters.hpp>
+#include <opencv2/cudawarping.hpp>
+
+#include <omp.h>
+
+#include <npp.h>
+#include <nppi.h>
+#include <nppi_filtering_functions.h>
+
+#include <ipp.h>
+#include <ipp/ippcore.h>
+#include <ipp/ippi.h>
+#include <ipp/ippcc.h>
+#include <ipp/ipps.h>
+#include <ipp/ippcv.h>
+
+#include "AbstractImageProcessor.h"
+#include "ImageProcessingLib.h"
+
+class ImageProcessorIPP : public AbstractImageProcessor {
+public:
+    ImageProcessorIPP();
+    ~ImageProcessorIPP();
+
+    cv::Mat rotate(cv::Mat& inputImage, bool isRight) override;
+    cv::Mat grayScale(cv::Mat& inputImage) override;
+    cv::Mat zoom(cv::Mat& inputImage, int newWidth, int newHeight) override;
+    cv::Mat gaussianBlur(cv::Mat& inputImage, int kernelSize) override;
+    cv::Mat cannyEdges(cv::Mat& inputImage) override;
+    cv::Mat medianFilter(cv::Mat& inputImage) override;
+    cv::Mat laplacianFilter(cv::Mat& inputImage) override;
+    cv::Mat bilateralFilter(cv::Mat& inputImage) override;
+    cv::Mat sobelFilter(cv::Mat& inputImage) override;
+
+private:
+    std::string getClassName() const override;
+};
+
+#endif // IMAGEPROCESSORIPP_H
+
+4. imageProcessorNPP.h
+, imageProcessorCUDA.h
+, imageProcessorCUDAKernel.h
+, imageProcessorGStreamer.h
+동일
