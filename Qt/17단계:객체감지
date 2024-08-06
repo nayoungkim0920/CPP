@@ -17,6 +17,11 @@ c:/cup_test/valid/labels
 
 c:/data.yaml
 
+3. 디자인수정
+ detect > yolov5 메뉴 추가
+ yolov5 메뉴 선택시 yolov5 객체감지다이알로그 출력
+ 6개의 이미지 가져와 출력
+
 <코드>
 1.CmakeLists.txt
 cmake_minimum_required(VERSION 3.14)
@@ -245,3 +250,757 @@ if (MSVC)
         $<$<CONFIG:Release>:_ITERATOR_DEBUG_LEVEL=0>
     )
 endif()
+
+2.없음
+
+3. yolov5dialog.h
+#ifndef YOLOV5DIALOG_H
+#define YOLOV5DIALOG_H
+
+#include <QDialog>
+#include <opencv2/opencv.hpp>
+#include "ui_yolov5_result.h"
+#include "MainWindow.h"
+
+class YOLOv5Dialog : public QDialog
+{
+    Q_OBJECT
+
+public:
+    explicit YOLOv5Dialog(QWidget* parent = nullptr);
+    ~YOLOv5Dialog();
+
+    void setImages(const cv::Mat& imageOpenCV
+                    , const cv::Mat& imageIPP
+                    , const cv::Mat& imageNPP
+                    , const cv::Mat& imageCUDA
+                    , const cv::Mat& imageCUDAKernel
+                    , const cv::Mat& imageGStreamer);
+
+private:
+    Ui::YOLOv5Dialog* ui;
+
+    cv::Mat currentImageOpenCV;
+    cv::Mat currentImageIPP;
+    cv::Mat currentImageCUDA;
+    cv::Mat currentImageCUDAKernel;
+    cv::Mat currentImageNPP;
+    cv::Mat currentImageGStreamer;
+
+    void displayImage(cv::Mat image, QLabel* label);
+};
+
+#endif // YOLOV5DIALOG_H
+
+4. yolo5dialog.cpp
+#include "yolov5dialog.h"
+
+YOLOv5Dialog::YOLOv5Dialog(QWidget* parent)
+    : QDialog(parent), ui(new Ui::YOLOv5Dialog)
+{
+    ui->setupUi(this);
+}
+
+YOLOv5Dialog::~YOLOv5Dialog()
+{
+    delete ui;
+}
+
+void YOLOv5Dialog::setImages(const cv::Mat& imageOpenCV, const cv::Mat& imageIPP
+    , const cv::Mat& imageNPP, const cv::Mat& imageCUDA, const cv::Mat& imageCUDAKernel
+    , const cv::Mat& imageGStreamer)
+{
+    currentImageOpenCV = imageOpenCV;
+    currentImageIPP = imageIPP;
+    currentImageNPP = imageNPP;
+    currentImageCUDA = imageCUDA;
+    currentImageCUDAKernel = imageCUDAKernel;
+    currentImageGStreamer = imageGStreamer;
+
+    displayImage(currentImageOpenCV, ui->label_opencv);
+    displayImage(currentImageIPP, ui->label_ipp);
+    displayImage(currentImageNPP, ui->label_npp);
+    displayImage(currentImageCUDA, ui->label_npp);
+    displayImage(currentImageCUDAKernel, ui->label_cudakernel);
+    displayImage(currentImageGStreamer, ui->label_gstreamer);
+}
+
+void YOLOv5Dialog::displayImage(cv::Mat image, QLabel* label)
+{
+    // 이미지 타입에 따라 QImage를 생성합니다.
+    QImage qImage;
+
+    qDebug() << "displayImage() called with image type:" << image.type();
+
+    // OpenCV의 Mat 이미지 타입에 따라 다른 QImage 형식을 사용합니다.
+    if (image.type() == CV_8UC1) {
+        qDebug() << "displayImage() type: grayscale CV_8UC1 Format_Grayscale8";
+        qImage = QImage(image.data,
+            image.cols,
+            image.rows,
+            static_cast<int>(image.step),
+            QImage::Format_Grayscale8);
+    }
+    else if (image.type() == CV_8UC3) {
+        qDebug() << ">>displayImage() type: BGR CV_8UC3 Format_RGB888";
+        qImage = QImage(image.data,
+            image.cols,
+            image.rows,
+            static_cast<int>(image.step),
+            QImage::Format_RGB888).rgbSwapped(); // BGR -> RGB 순서로 변환
+    }
+    else if (image.type() == CV_8UC4) {
+        qDebug() << "displayImage() type: BGRA CV_8UC4 Format_RGBA8888";
+        qImage = QImage(image.data,
+            image.cols,
+            image.rows,
+            static_cast<int>(image.step),
+            QImage::Format_RGBA8888);
+    }
+    else if (image.type() == CV_16UC3) {
+        qDebug() << "displayImage() type: BGR CV_16UC3 Format_RGB16";
+
+        // 16-bit 이미지를 8-bit로 변환
+        cv::Mat temp;
+        image.convertTo(temp, CV_8UC3, 1.0 / 256.0);
+        qImage = QImage(temp.data,
+            temp.cols,
+            temp.rows,
+            static_cast<int>(temp.step),
+            QImage::Format_RGB888).rgbSwapped(); // BGR -> RGB 순서로 변환
+    }
+    else if (image.type() == CV_16SC1) {
+        qDebug() << "displayImage() type: 16-bit signed integer CV_16SC1 Format_Grayscale16";
+        qImage = QImage(reinterpret_cast<const uchar*>(image.data),
+            image.cols,
+            image.rows,
+            static_cast<int>(image.step),
+            QImage::Format_Grayscale16);
+    }
+    else if (image.type() == CV_16SC3) {
+        qDebug() << "displayImage() type: 16-bit signed integer CV_16SC3 Format_RGB16";
+        qImage = QImage(reinterpret_cast<const uchar*>(image.data),
+            image.cols,
+            image.rows,
+            static_cast<int>(image.step),
+            QImage::Format_RGB16);
+    }
+    else {
+        qDebug() << "displayImage() type: " << image.type() << " not supported";
+        return; // 지원하지 않는 이미지 타입은 처리하지 않음
+    }
+
+    // QLabel 위젯에 QPixmap으로 이미지를 설정합니다.
+    QPixmap pixmap = QPixmap::fromImage(qImage);
+    label->setPixmap(pixmap);
+    label->setScaledContents(false); // 이미지를 Label 크기에 맞게 조정
+    label->adjustSize(); // Label 크기 조정
+    qDebug() << "displayImage() finished";
+}
+
+5. yolov5_result.ui
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>YOLOv5Dialog</class>
+ <widget class="QDialog" name="YOLOv5Dialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>YOLOv5 Detection Results</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_main">
+   <!-- 이미지 및 처리 시간 레이아웃 -->
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout_images_and_times">
+     <!-- 첫 번째 이미지 행 -->
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_row1">
+       <item>
+        <widget class="QLabel" name="label_opencv">
+         <property name="text">
+          <string>OpenCV</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+         <property name="scaledContents">
+          <bool>true</bool>
+         </property>
+         <property name="fixedSize">
+          <size>
+           <width>400</width>
+           <height>300</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_ipp">
+         <property name="text">
+          <string>IPP</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+         <property name="scaledContents">
+          <bool>true</bool>
+         </property>
+         <property name="fixedSize">
+          <size>
+           <width>400</width>
+           <height>300</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_npp">
+         <property name="text">
+          <string>NPP</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+         <property name="scaledContents">
+          <bool>true</bool>
+         </property>
+         <property name="fixedSize">
+          <size>
+           <width>400</width>
+           <height>300</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <!-- 첫 번째 처리 시간 행 -->
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_row2">
+       <item>
+        <widget class="QLabel" name="label_opencv_time">
+         <property name="text">
+          <string>Processing Time: N/A</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignLeft</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_ipp_time">
+         <property name="text">
+          <string>Processing Time: N/A</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignLeft</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_npp_time">
+         <property name="text">
+          <string>Processing Time: N/A</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignLeft</set>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <!-- 두 번째 이미지 행 -->
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_row3">
+       <item>
+        <widget class="QLabel" name="label_cuda">
+         <property name="text">
+          <string>CUDA</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+         <property name="scaledContents">
+          <bool>true</bool>
+         </property>
+         <property name="fixedSize">
+          <size>
+           <width>400</width>
+           <height>300</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_cudakernel">
+         <property name="text">
+          <string>CUDA Kernel</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+         <property name="scaledContents">
+          <bool>true</bool>
+         </property>
+         <property name="fixedSize">
+          <size>
+           <width>400</width>
+           <height>300</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_gstreamer">
+         <property name="text">
+          <string>GStreamer</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+         <property name="scaledContents">
+          <bool>true</bool>
+         </property>
+         <property name="fixedSize">
+          <size>
+           <width>400</width>
+           <height>300</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <!-- 두 번째 처리 시간 행 -->
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_row4">
+       <item>
+        <widget class="QLabel" name="label_cuda_time">
+         <property name="text">
+          <string>Processing Time: N/A</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignLeft</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_cudakernel_time">
+         <property name="text">
+          <string>Processing Time: N/A</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignLeft</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_gstreamer_time">
+         <property name="text">
+          <string>Processing Time: N/A</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignLeft</set>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+</ui>
+
+6. MainWindow.ui
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QScrollArea" name="scrollArea">
+      <property name="widgetResizable">
+       <bool>true</bool>
+      </property>
+      <widget class="QWidget" name="scrollAreaWidgetContents">
+       <layout class="QVBoxLayout" name="verticalLayout_scroll">
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_images_and_times">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_row1">
+            <item>
+             <widget class="QLabel" name="label_opencv">
+              <property name="text">
+               <string>label_opencv</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+              <property name="scaledContents">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_ipp">
+              <property name="text">
+               <string>label_ipp</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+              <property name="scaledContents">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_npp">
+              <property name="text">
+               <string>label_npp</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+              <property name="scaledContents">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_row2">
+            <item>
+             <widget class="QLabel" name="label_opencv_title">
+              <property name="text">
+               <string>Processing Time:</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignLeft</set>
+              </property>
+              <property name="textInteractionFlags">
+               <set>Qt::TextSelectableByMouse</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_ipp_title">
+              <property name="text">
+               <string>Processing Time:</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignLeft</set>
+              </property>
+              <property name="textInteractionFlags">
+               <set>Qt::TextSelectableByMouse</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_npp_title">
+              <property name="text">
+               <string>Processing Time:</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignLeft</set>
+              </property>
+              <property name="textInteractionFlags">
+               <set>Qt::TextSelectableByMouse</set>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_row3">
+            <item>
+             <widget class="QLabel" name="label_cuda">
+              <property name="text">
+               <string>label_cuda</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+              <property name="scaledContents">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_cudakernel">
+              <property name="text">
+               <string>label_cudakernel</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+              <property name="scaledContents">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_gstreamer">
+              <property name="text">
+               <string>label_gstreamer</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+              <property name="scaledContents">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_row4">
+            <item>
+             <widget class="QLabel" name="label_cuda_title">
+              <property name="text">
+               <string>Processing Time:</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignLeft</set>
+              </property>
+              <property name="textInteractionFlags">
+               <set>Qt::TextSelectableByMouse</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_cudakernel_title">
+              <property name="text">
+               <string>Processing Time:</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignLeft</set>
+              </property>
+              <property name="textInteractionFlags">
+               <set>Qt::TextSelectableByMouse</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_gstreamer_title">
+              <property name="text">
+               <string>Processing Time:</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignLeft</set>
+              </property>
+              <property name="textInteractionFlags">
+               <set>Qt::TextSelectableByMouse</set>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionOpen"/>
+    <addaction name="actionSave"/>
+    <addaction name="actionExit"/>
+   </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+    <addaction name="actionRotate"/>
+    <addaction name="actionZoomIn"/>
+    <addaction name="actionZoomOut"/>
+    <addaction name="actionUndo"/> <!-- Undo 앞에 추가 -->
+    <addaction name="actionRedo"/> <!-- Redo 앞에 추가 -->
+    <addaction name="actionFirst"/> <!-- 처음 추가 -->
+   </widget>
+   <widget class="QMenu" name="menuFilters">
+    <property name="title">
+     <string>Filters</string>
+    </property>
+    <addaction name="actionGrayscale"/>
+    <addaction name="actionGaussianBlur"/>
+    <addaction name="actionCannyEdges"/>
+    <addaction name="actionMedianFilter"/> <!-- Median Filter 추가 -->
+    <addaction name="actionSobelFilter"/> <!-- Sobel Filter 추가 -->
+    <addaction name="actionLaplacianFilter"/> <!-- Laplacian Filter 추가 -->
+    <addaction name="actionBilateralFilter"/> <!-- Bilateral Filter 추가 -->
+   </widget>
+   <widget class="QMenu" name="menuDetect"> <!-- Detect 메뉴 추가 -->
+    <property name="title">
+     <string>Detect</string>
+    </property>
+    <addaction name="actionYOLOv5"/> <!-- YOLOv5 메뉴 항목 추가 -->
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuEdit"/>
+   <addaction name="menuFilters"/>
+   <addaction name="menuDetect"/> <!-- Detect 메뉴 추가 -->
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QToolBar" name="fileToolBar">
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionOpen"/>
+   <addaction name="actionSave"/>
+   <addaction name="actionExit"/>
+  </widget>
+  <widget class="QToolBar" name="filtersToolBar">
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionGrayscale"/>
+   <addaction name="actionGaussianBlur"/>
+   <addaction name="actionCannyEdges"/>
+   <addaction name="actionMedianFilter"/> <!-- Median Filter 추가 -->
+   <addaction name="actionSobelFilter"/> <!-- Sobel Filter 추가 -->
+   <addaction name="actionLaplacianFilter"/> <!-- Laplacian Filter 추가 -->
+   <addaction name="actionBilateralFilter"/> <!-- Bilateral Filter 추가 -->
+  </widget>
+  <widget class="QToolBar" name="mainToolBar">
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionRotate"/>
+   <addaction name="actionZoomIn"/>
+   <addaction name="actionZoomOut"/>
+   <addaction name="actionUndo"/> <!-- Undo 액션 추가 -->
+   <addaction name="actionRedo"/> <!-- Redo 액션 추가 -->
+   <addaction name="actionFirst"/> <!-- 처음 추가 -->
+  </widget>
+  <action name="actionOpen">
+   <property name="text">
+    <string>&amp;Open</string>
+   </property>
+  </action>
+  <action name="actionSave">
+   <property name="text">
+    <string>&amp;Save</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>E&amp;xit</string>
+   </property>
+  </action>
+  <action name="actionRotate">
+   <property name="text">
+    <string>&amp;Rotate</string>
+   </property>
+  </action>
+  <action name="actionZoomIn">
+   <property name="text">
+    <string>Zoom &amp;In</string>
+   </property>
+  </action>
+  <action name="actionZoomOut">
+   <property name="text">
+    <string>Zoom &amp;Out</string>
+   </property>
+  </action>
+  <action name="actionUndo">
+   <property name="text">
+    <string>&amp;Undo</string>
+   </property>
+  </action>
+  <action name="actionRedo">
+   <property name="text">
+    <string>&amp;Redo</string>
+   </property>
+  </action>
+  <action name="actionFirst">
+   <property name="text">
+    <string>&amp;First</string>
+   </property>
+  </action>
+  <action name="actionGrayscale">
+   <property name="text">
+    <string>&amp;Grayscale</string>
+   </property>
+  </action>
+  <action name="actionGaussianBlur">
+   <property name="text">
+    <string>&amp;Gaussian Blur</string>
+   </property>
+  </action>
+  <action name="actionCannyEdges">
+   <property name="text">
+    <string>&amp;Canny Edges</string>
+   </property>
+  </action>
+  <action name="actionMedianFilter">
+   <property name="text">
+    <string>&amp;Median Filter</string>
+   </property>
+  </action>
+  <action name="actionSobelFilter">
+   <property name="text">
+    <string>&amp;Sobel Filter</string>
+   </property>
+  </action>
+  <action name="actionLaplacianFilter">
+   <property name="text">
+    <string>&amp;Laplacian Filter</string>
+   </property>
+  </action>
+  <action name="actionBilateralFilter">
+   <property name="text">
+    <string>&amp;Bilateral Filter</string>
+   </property>
+  </action>
+  <action name="actionYOLOv5"> <!-- YOLOv5 액션 추가 -->
+   <property name="text">
+    <string>&amp;YOLOv5</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>
