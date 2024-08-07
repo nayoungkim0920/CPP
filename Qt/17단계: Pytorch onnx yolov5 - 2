@@ -1,3 +1,23 @@
 11. #include <absl/container/inlined_vector.h> 오류가 발생한 이유는 
 absl (Abseil) 라이브러리의 헤더 파일을 찾을 수 없기 때문입니다. 
 Abseil은 Google이 제공하는 C++ 라이브러리로, 다양한 유틸리티와 컨테이너를 포함하고 있습니다.
+-abseil-cpp 설치
+C:\>git clone https://github.com/abseil/abseil-cpp.git
+"C:\abseil-cpp"
+PS C:\abseil-cpp\build> cmake ..
+PS C:\abseil-cpp\build> cmake --build . --config Debug
+PS C:\abseil-cpp\build> cmake --build . --config Release
+
+PS C:\abseil-cpp\absl\build> cmake  -G "Visual Studio 16 2019" ..
+
+-CMakeLists.txt수정
+# Abseil 라이브러리 설정
+set(ABSEIL_ROOT "C:/abseil-cpp")
+include_directories("${ABSEIL_ROOT}")
+link_directories("${ABSEIL_ROOT}/build/lib")  # Abseil 라이브러리가 위치한 경로
+
+# Abseil의 헤더 파일과 라이브러리 디렉토리를 포함합니다.
+target_include_directories(Project1 PRIVATE
+    ${ABSEIL_ROOT}/absl
+)
+
