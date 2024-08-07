@@ -133,3 +133,23 @@ for i, (torch_out, onnx_out) in enumerate(zip(torch_outputs_np, onnx_outputs)):
 (base) (myenv) C:\myLab\Project1\Project1\python>python myTorchScriptCheck.py
 ONNX model inference completed.
 ONNX model output shape: [(1, 25200, 85), (1, 3, 80, 80, 85), (1, 3, 40, 40, 85), (1, 3, 20, 20, 85)]
+
+8. ONNX Runtime C++ 라이브러리 설치
+(base) (myenv) C:\myLab\Project1\Project1\python>git clone --recursive https://github.com/microsoft/onnxruntime.git
+
+9. myenv, onnxruntime c:/로 위치 이동
+- onnxruntime설치
+git clone --recursive https://github.com/microsoft/onnxruntime.git
+or
+git clone --recursive https://github.com/microsoft/onnxruntime.git C:\onnxruntime
+or
+onnxruntime-main.zip(https://github.com/microsoft/onnxruntime)
+- Cmake
+cd C:\onnxruntime\build Release
+cmake ..\cmake -DCMAKE_BUILD_TYPE=Release -DONNX_RUNTIME_BUILD_SHARED_LIBS=ON
+cmake --build . --config Release
+-> C:\onnxruntime\build\Release 생성
+
+cmake ..\cmake -DCMAKE_BUILD_TYPE=Debug -DONNX_RUNTIME_BUILD_SHARED_LIBS=ON
+cmake --build . --config Debug
+-> C:\onnxruntime\build\Debug 생성
