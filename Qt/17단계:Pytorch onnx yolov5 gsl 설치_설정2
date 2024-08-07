@@ -1,0 +1,3 @@
+11. #include <absl/container/inlined_vector.h> 오류가 발생한 이유는 
+absl (Abseil) 라이브러리의 헤더 파일을 찾을 수 없기 때문입니다. 
+Abseil은 Google이 제공하는 C++ 라이브러리로, 다양한 유틸리티와 컨테이너를 포함하고 있습니다.
