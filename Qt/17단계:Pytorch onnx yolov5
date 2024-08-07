@@ -1,11 +1,36 @@
-1.torch설치
-pip install torch torchvision torchaudio
-
-2. onnx설치
--가상환경으로설치함
+1. 가상환경생성
 cd C:\myLab\Project1\Project1\python
 python -m venv myenv
 C:\myLab\Project1\Project1\python\myenv\Scripts\activate
+
+2.torch설치(Gpu)
+(cpu) pip install torch torchvision torchaudio
+print(torch.__version__)
+2.4.0+cpu
+
+(pc)
+nvcc --version
+nvcc: NVIDIA (R) Cuda compiler driver
+Copyright (c) 2005-2023 NVIDIA Corporation
+Built on Wed_Feb__8_05:53:42_Coordinated_Universal_Time_2023
+Cuda compilation tools, release 12.1, V12.1.66
+Build cuda_12.1.r12.1/compiler.32415258_0
+
+(gpu)
+pip install torch==2.0.0+cu121 torchvision==0.15.1+cu121 torchaudio==2.0.0+cu121 -f https://download.pytorch.org/whl/torch_stable.html
+->12.1과 호환되지않아 11.8로 설치
+pip install torch==2.0.0+cu118 torchvision==0.15.1+cu118 torchaudio==2.0.0+cu118 -f https://download.pytorch.org/whl/torch_stable.html
+
+3. opencv-python 설치
+pip install opencv-python
+
+4. pandas 설치
+pip install pandas
+
+5. requests 설치
+pip install requests
+
+6. onnx설치
 pip install onnx
 pip install --upgrade onnx protobuf numpy onnxruntime
 pip install onnxruntime
