@@ -1,4 +1,15 @@
-
-
+1. onnx설치
+-가상환경으로설치함
+cd C:\myLab\Project1\Project1\python
+python -m venv myenv
+C:\myLab\Project1\Project1\python\myenv\Scripts\activate
+pip install onnx
 pip install --upgrade onnx protobuf numpy onnxruntime
+pip install onnxruntime
+python.exe -m pip install --upgrade pip
+conda install -c conda-forge onnx
+python myTorchScript.py
+python
+import onnx
+print(onnx.__version__)
 1.16.2
