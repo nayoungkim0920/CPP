@@ -1,4 +1,7 @@
-1. onnx설치
+1.torch설치
+pip install torch torchvision torchaudio
+
+2. onnx설치
 -가상환경으로설치함
 cd C:\myLab\Project1\Project1\python
 python -m venv myenv
