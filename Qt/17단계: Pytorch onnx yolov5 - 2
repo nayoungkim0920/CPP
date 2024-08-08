@@ -42,6 +42,9 @@ PS C:\onnxruntime\cmake\build> cmake --build . --config Release
 cmake_minimum_required(VERSION 3.14)
 project(Project1 LANGUAGES CXX CUDA)
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 # Vcpkg toolchain 파일 경로 설정
 set(CMAKE_TOOLCHAIN_FILE "C:/Users/nayou/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE FILEPATH "Path to vcpkg toolchain file")
 
@@ -50,12 +53,8 @@ set(CMAKE_PREFIX_PATH "C:/Users/nayou/vcpkg/installed/x64-windows" ${CMAKE_PREFI
 
 # LibTorch 설정
 set(TORCH_ROOT "C:/libtorch")
-#if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-#    set(TORCH_ROOT "C:/myLab/libtorch_Debug")
-#else()
-#    set(TORCH_ROOT "C:/myLab/libtorch_Release")
-#endif()
-#"C:\libtorch\share\cmake\Torch\TorchConfig.cmake"
+#set(TORCH_ROOT "C:/myLab/libtorch_Debug")  # Uncomment as needed
+#set(TORCH_ROOT "C:/myLab/libtorch_Release")  # Uncomment as needed
 set(Torch_DIR "${TORCH_ROOT}/share/cmake/Torch")
 
 # Qt, OpenCV, CUDA, Torch 설정
@@ -66,7 +65,7 @@ find_package(CUDA REQUIRED)
 find_package(GSL REQUIRED)
 find_package(Torch REQUIRED)
 
-message(STATUS "ONNX_RUNTIME_ROOT: ${ONNX_RUNTIME_ROOT}")
+# ONNX Runtime 설정
 set(ONNX_RUNTIME_ROOT "C:/onnxruntime")
 include_directories( 
     "${ONNX_RUNTIME_ROOT}"
@@ -80,7 +79,6 @@ include_directories(
     "${ONNX_RUNTIME_ROOT}/include/onnxruntime"
     "${ONNX_RUNTIME_ROOT}/include/onnxruntime/core/session")
 set(ONNX_RUNTIME_LIB_DIR "${ONNX_RUNTIME_ROOT}/build/${CMAKE_BUILD_TYPE}")
-message(STATUS "ONNX Runtime include directories set.")
 
 # IPP 설정
 set(IPP_ROOT "C:/Program Files (x86)/Intel/oneAPI/ipp/2021.11")
@@ -103,7 +101,7 @@ link_directories(
     "${IPLIB_ROOT}/build/lib/Debug"
     "${IPLIB_ROOT}/build/bin/Debug"
     "${IPLIB_ROOT}/build/Debug"
-    )
+)
 
 # Abseil 라이브러리 설정
 set(ABSEIL_ROOT "C:/abseil-cpp")
@@ -122,6 +120,10 @@ include_directories(
     ${ONNX_RUNTIME_INCLUDE_DIR}  # ONNX Runtime 포함 디렉토리
 )
 
+# GSL 설정 추가
+include_directories(${GSL_INCLUDE_DIRS})
+link_directories(${GSL_LIBRARY_DIR})
+
 # CUDA 아키텍처 설정
 set(CUDA_ARCHITECTURES "86")
 message(STATUS "CUDA Architectures set to: ${CUDA_ARCHITECTURES}")
@@ -138,7 +140,7 @@ cuda_add_library(image_processing
 qt6_wrap_cpp(MOC_FILES
     MainWindow.h
     ImageProcessor.h
-    yolov5dialog.h
+    DetectDialog.h
 )
 
 # 라이브러리 디렉토리 설정
@@ -163,6 +165,8 @@ target_link_libraries(image_processing
     nppitc
     npps
     imageProcessingLib
+    GSL::gsl
+    GSL::gslcblas
 )
 
 # GStreamer 라이브러리 추가
@@ -198,6 +202,9 @@ target_link_libraries(Project1
     ${CUDNN_LIBRARIES}
     ${GSTREAMER_LIBRARIES}
     "${TORCH_LIBRARIES}"  # LibTorch 링크
+    ${ONNX_RUNTIME_LIBRARIES}  # ONNX Runtime 링크
+    GSL::gsl
+    GSL::gslcblas
 )
 
 # 빌드 후 TARGET_FILE_DIR 출력
@@ -215,14 +222,6 @@ set_target_properties(Project1 PROPERTIES
 file(COPY "C:/myLab/Project1/Project1/imageProcessingLib/build/Debug/imageProcessingLib.dll"
      DESTINATION "${CMAKE_BINARY_DIR}/Debug"
 )
-
-#file(COPY "C:/myLab/Project1/Project1/imageProcessingLib/build/bin/Debug/imageProcessingLib.lib"
-#     DESTINATION "${CMAKE_BINARY_DIR}/Debug"
-#)
-
-#file(COPY "C:/myLab/Project1/Project1/imageProcessingLib/build/bin/Debug/imageProcessingLib.lib"
-#     DESTINATION "${CMAKE_BINARY_DIR}/Debug"
-#)
 
 # 디버그 빌드에서의 OpenCV opencv_world DLL 복사
 add_custom_command(TARGET Project1 POST_BUILD
@@ -298,6 +297,7 @@ if (MSVC)
         $<$<CONFIG:Release>:_ITERATOR_DEBUG_LEVEL=0>
     )
 endif()
+
 
 (실행결과)
 PS C:\myLab\Project1\Project1\build> cmake  -G "Visual Studio 16 2019" -DCMAKE_TOOLCHAIN_FILE=C:/Users/nayou/vcpkg/scripts/buildsystems/vcpkg.cmake ..
