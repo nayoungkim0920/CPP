@@ -299,7 +299,91 @@ if (MSVC)
     )
 endif()
 
+(실행결과)
+PS C:\myLab\Project1\Project1\build> cmake  -G "Visual Studio 16 2019" -DCMAKE_TOOLCHAIN_FILE=C:/Users/nayou/vcpkg/scripts/buildsystems/vcpkg.cmake ..
+-- Selecting Windows SDK version 10.0.22621.0 to target Windows 10.0.22631.
+-- The CXX compiler identification is MSVC 19.29.30154.0
+-- The CUDA compiler identification is NVIDIA 12.1.66
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/cl.exe - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Detecting CUDA compiler ABI info
+-- Detecting CUDA compiler ABI info - done
+-- Check for working CUDA compiler: C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1/bin/nvcc.exe - skipped
+-- Detecting CUDA compile features
+-- Detecting CUDA compile features - done
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+-- Looking for pthread_create in pthreads
+-- Looking for pthread_create in pthreads - not found
+-- Looking for pthread_create in pthread
+-- Looking for pthread_create in pthread - not found
+-- Found Threads: TRUE
+-- Performing Test HAVE_STDATOMIC
+-- Performing Test HAVE_STDATOMIC - Success
+-- Found WrapAtomic: TRUE
+-- Could NOT find WrapVulkanHeaders (missing: Vulkan_INCLUDE_DIR)
+CMake Warning (dev) at C:/Users/nayou/vcpkg/scripts/buildsystems/vcpkg.cmake:859 (_find_package):
+  Policy CMP0146 is not set: The FindCUDA module is removed.  Run "cmake
+  --help-policy CMP0146" for policy details.  Use the cmake_policy command to
+  set the policy and suppress this warning.
 
+Call Stack (most recent call first):
+  C:/opencv/build/OpenCVConfig.cmake:86 (find_package)
+  C:/opencv/build/OpenCVConfig.cmake:108 (find_host_package)
+  C:/Users/nayou/vcpkg/scripts/buildsystems/vcpkg.cmake:859 (_find_package)
+  CMakeLists.txt:23 (find_package)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- Found CUDA: C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1 (found suitable exact version "12.1")
+-- Found OpenCV: C:/opencv/build (found version "4.10.0") found components: core imgproc highgui cudaarithm cudafilters cudawarping cudacodec cudafeatures2d cudaimgproc
+CMake Warning (dev) at C:/Users/nayou/vcpkg/scripts/buildsystems/vcpkg.cmake:859 (_find_package):
+  Policy CMP0146 is not set: The FindCUDA module is removed.  Run "cmake
+  --help-policy CMP0146" for policy details.  Use the cmake_policy command to
+  set the policy and suppress this warning.
+
+Call Stack (most recent call first):
+  CMakeLists.txt:24 (find_package)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- Found CUDA: C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1 (found version "12.1")
+-- Found GSL: C:/Users/nayou/vcpkg/installed/x64-windows/include (found version "2.7.1")
+CMake Warning (dev) at C:/Users/nayou/vcpkg/scripts/buildsystems/vcpkg.cmake:859 (_find_package):
+  Policy CMP0144 is not set: find_package uses upper-case <PACKAGENAME>_ROOT
+  variables.  Run "cmake --help-policy CMP0144" for policy details.  Use the
+  cmake_policy command to set the policy and suppress this warning.
+
+  CMake variable TORCH_ROOT is set to:
+
+    C:/libtorch
+
+  For compatibility, find_package is ignoring the variable, but code in a
+  .cmake module might still use it.
+Call Stack (most recent call first):
+  CMakeLists.txt:26 (find_package)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- Found CUDAToolkit: C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1/include (found version "12.1.66")
+-- Caffe2: CUDA detected: 12.1
+-- Caffe2: CUDA nvcc is: C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1/bin/nvcc.exe
+-- Caffe2: CUDA toolkit directory: C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1
+-- Caffe2: Header version is: 12.1
+-- C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1/lib/x64/nvrtc.lib shorthash is bac8224f
+-- USE_CUDNN is set to 0. Compiling without cuDNN support
+-- USE_CUSPARSELT is set to 0. Compiling without cuSPARSELt support
+-- Autodetected CUDA architecture(s):  8.9
+-- Added CUDA NVCC flags for: -gencode;arch=compute_89,code=sm_89
+-- Found Torch: C:/libtorch/lib/torch.lib
+-- ONNX_RUNTIME_ROOT:
+-- ONNX Runtime include directories set.
+-- CUDA Architectures set to: 86
+-- Found OpenMP_CXX: -openmp (found version "2.0")
+-- Found OpenMP: TRUE (found version "2.0")
+-- Configuring done (32.6s)
+-- Generating done (0.4s)
+-- Build files have been written to: C:/myLab/Project1/Project1/build
 
 
 
