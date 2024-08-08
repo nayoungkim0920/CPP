@@ -33,3 +33,9 @@ C:\>rmdir /s /q myenv
 C:\>myenv\Scripts\activate
 C:\>myenv\Scripts\activate
 지정된 경로를 찾을 수 없습니다.
+
+2. yolov5->onnx export 필요한 모듈설치
+C:\>python -m venv myenv
+C:\>myenv\Scripts\activate
+(myenv) C:\>pip install dill
+(myenv) C:\>pip install torch
