@@ -77,6 +77,9 @@ Successfully installed colorama-0.4.6 contourpy-1.2.1 cycler-0.12.1 fonttools-4.
 Successfully installed utils-1.0.2
 
 #C:\yolov5\models\common.py
+(utils 모듈에서 TryExcept를 찾을 수 없기 때문
+잘못된 패키지 또는 파일 위치: 설치된 utils 패키지와 프로젝트의 utils 모듈이 충돌할 수 있음
+C:\yolov5\models\common.py에서 utils가 프로젝트 디렉토리의 로컬 모듈을 참조하도록 해야함)
 Exception has occurred: ImportError
 cannot import name 'TryExcept' from 'utils' (c:\myenv\Lib\site-packages\utils\__init__.py)
   File "C:\yolov5\models\common.py", line 38, in <module>
