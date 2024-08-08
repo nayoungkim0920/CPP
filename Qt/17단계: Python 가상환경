@@ -1,0 +1,35 @@
+<수정사항>
+1. 가상환경만들기, 가상환경실행, 종료, 삭제
+명령 프롬프트(CMD) 관리자권한실행
+C:\>python --version
+Python 3.12.3
+C:\>python -m venv myenv
+C:\>myenv\Scripts\activate
+(myenv) C:\>
+(myenv) C:\>pip install dill
+Collecting dill
+  Using cached dill-0.3.8-py3-none-any.whl.metadata (10 kB)
+Using cached dill-0.3.8-py3-none-any.whl (116 kB)
+Installing collected packages: dill
+Successfully installed dill-0.3.8
+
+[notice] A new release of pip is available: 24.0 -> 24.2
+[notice] To update, run: python.exe -m pip install --upgrade pip
+
+(myenv) C:\>python.exe -m pip install --upgrade pip
+Requirement already satisfied: pip in c:\myenv\lib\site-packages (24.0)
+Collecting pip
+  Using cached pip-24.2-py3-none-any.whl.metadata (3.6 kB)
+Using cached pip-24.2-py3-none-any.whl (1.8 MB)
+Installing collected packages: pip
+  Attempting uninstall: pip
+    Found existing installation: pip 24.0
+    Uninstalling pip-24.0:
+      Successfully uninstalled pip-24.0
+Successfully installed pip-24.2
+
+(myenv) C:\>deactivate
+C:\>rmdir /s /q myenv
+C:\>myenv\Scripts\activate
+C:\>myenv\Scripts\activate
+지정된 경로를 찾을 수 없습니다.
