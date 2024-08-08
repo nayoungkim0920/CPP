@@ -1,6 +1,6 @@
 <수정사항>
-1. ONNX 검출
-
+1. ONNX 변환 프로그램 수정
+2. ONNX 감지프로그램 구현
 
 <코드>
 1. CMakeLists.txt
@@ -266,3 +266,463 @@ if (MSVC)
         $<$<CONFIG:Release>:_ITERATOR_DEBUG_LEVEL=0>
     )
 endif()
+
+2. Yolov5 -> ONNX 변환프로그램 수정
+C:\myLab\Project1\Project1\python
+=> yolov5m.onnx
+
+import sys
+import torch
+import onnx
+import onnxruntime as ort
+
+# YOLOv5 경로를 추가합니다
+sys.path.append('C:/yolov5')
+
+# 모델 로드 (CUDA로)
+model_path = 'C:/yolov5/yolov5m.pt'
+
+# CUDA가 사용 가능한 경우, CUDA로 로드하고, 그렇지 않으면 CPU로 로드합니다
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+model = torch.load(model_path, map_location=device)['model'].float()
+model.to(device)  # 모델을 CUDA로 이동
+model.eval()
+
+# 더미 입력 텐서 생성 (CUDA 또는 CPU에 맞게 설정)
+dummy_input = torch.randn(1, 3, 640, 640).to(device)  # YOLOv5의 기본 입력 크기
+
+# ONNX로 모델 내보내기
+onnx_path = 'C:/myLab/Project1/Project1/python/yolov5m.onnx'
+torch.onnx.export(
+    model,
+    dummy_input,
+    onnx_path,
+    verbose=True,
+    opset_version=12,  # ONNX Opset version 변경
+    input_names=['input'],
+    output_names=['output'],
+    dynamic_axes={
+        'input': {0: 'batch_size'},
+        'output': {0: 'batch_size'}
+    }
+)
+
+print("Model has been exported to ONNX format at", onnx_path)
+
+# ONNX 모델 검증
+onnx_model = onnx.load(onnx_path)
+onnx.checker.check_model(onnx_model)
+
+# ONNX Runtime 세션 생성
+ort_session = ort.InferenceSession(onnx_path)
+
+# 더미 입력 준비
+dummy_input_np = dummy_input.cpu().numpy()
+
+# 추론 실행
+outputs = ort_session.run(None, {'input': dummy_input_np})
+print(outputs)
+(python 3.11.8 myenv:venv)
+Model has been exported to ONNX format at C:/myLab/Project1/Project1/python/yolov5m.onnx
+[array([[[      4.083,      6.2137,      7.9475, ...,   0.0041471,  0.00077999,   0.0027686],
+        [     9.1719,      6.1697,      17.878, ...,   0.0034927,  0.00090635,   0.0038726],
+        [     18.813,      5.5284,       23.73, ...,   0.0026654,  0.00078189,   0.0026406],
+        ...,
+        [     565.04,      607.87,      141.58, ...,   0.0075171,   0.0012242,   0.0013922],
+        [     587.18,      607.93,      114.81, ...,   0.0093757,   0.0011874,   0.0012849],
+        [     619.14,      619.84,      168.84, ...,   0.0082774,   0.0013637,   0.0014718]]], dtype=float32), array([[[[[   0.020746,     0.56825,    -0.21788, ...,     -5.4812,     -7.1555,     -5.8867],
+          [    -0.7389,     0.55635,     0.70164, ...,     -5.6536,     -7.0052,     -5.5499],
+          [   -0.29885,     0.38686,      1.2096, ...,     -5.9247,      -7.153,     -5.9341],
+          ...,
+          [    0.43875,     0.36941,     0.97533, ...,     -5.6012,     -7.1626,      -5.614],
+          [     0.6471,     0.73078,     0.72972, ...,     -5.6264,     -7.1797,     -5.5998],
+          [   -0.45626,     0.60416,    0.094509, ...,     -5.6385,     -7.3982,     -6.2988]],
+
+         [[    0.14213,    -0.14461,   -0.041051, ...,     -5.7211,     -6.9731,     -5.8666],
+          [   -0.51949,    -0.10908,     0.85853, ...,     -5.5525,     -6.8185,      -5.891],
+          [   -0.82527,     0.14095,      1.9371, ...,     -5.6576,     -6.7229,     -6.1038],
+          ...,
+          [     1.4303,    -0.40926,      1.4634, ...,     -5.6407,     -6.9508,     -5.8468],
+          [    0.54292,    -0.29051,     0.80568, ...,     -5.4343,     -6.9189,     -5.5308],
+          [   -0.64595,    -0.36265,     0.23684, ...,     -5.4233,     -7.1327,     -6.0462]],
+
+         [[  -0.038474,    -0.99534,    -0.22696, ...,     -5.3911,     -7.2979,     -6.2608],
+          [   -0.15523,     -1.1129,      1.1348, ...,     -5.3247,     -6.8865,     -5.7952],
+          [   -0.65034,    -0.87821,      2.0729, ...,     -5.2847,     -6.7526,     -5.9168],
+          ...,
+          [      0.992,    -0.12397,      1.6248, ...,     -5.5475,     -6.9746,     -6.1858],
+          [    0.40949,    -0.64661,     0.92532, ...,     -5.5664,      -7.159,     -6.3269],
+          [   -0.41394,    -0.73077,     0.10384, ...,     -5.4678,     -7.4949,     -6.4885]],
+
+         ...,
+
+         [[    0.11875,     0.14335,    -0.15127, ...,     -5.5353,     -7.3146,     -6.2751],
+          [   -0.26429,    -0.21074,      1.0141, ...,     -5.2591,     -6.9822,     -6.2492],
+          [   -0.82196,   -0.029722,      2.1014, ...,     -5.1711,     -6.8391,     -6.2128],
+          ...,
+          [    0.60006,     0.14941,      1.9903, ...,     -5.2267,     -6.8143,     -6.2896],
+          [  -0.046652,     0.44567,      1.2582, ...,     -5.2278,     -6.9868,       -6.27],
+          [  -0.031187,     0.57842,    -0.17263, ...,     -5.1545,     -7.2786,     -6.2938]],
+
+         [[  -0.057363,     0.88969,    -0.27139, ...,     -5.3319,     -7.5514,     -6.5142],
+          [  -0.076952,     0.42153,      1.1566, ...,      -5.408,     -7.3208,     -6.4131],
+          [   -0.55968,     0.60421,      1.9277, ...,      -5.481,      -7.107,      -6.364],
+          ...,
+          [    0.44097,      1.1263,      1.6179, ...,     -5.1762,     -7.1484,     -6.1002],
+          [   -0.00688,     0.48533,      1.2372, ...,     -5.2199,     -7.3143,     -6.4897],
+          [   -0.18738,     0.46002,   -0.031661, ...,     -5.8307,     -7.4887,     -6.6055]],
+
+         [[    0.12208,    -0.27074,    -0.17977, ...,     -5.4094,      -7.738,     -6.5768],
+          [   -0.75434,    -0.16598,     0.73485, ...,     -5.9618,      -7.616,     -6.4978],
+          [     0.2112,   -0.068665,      1.1296, ...,     -5.7572,     -7.3521,     -6.3559],
+          ...,
+          [    -0.3677,    -0.26866,     0.96424, ...,     -5.7172,     -7.3587,     -6.3088],
+          [   0.040319,    -0.46467,      1.1896, ...,     -5.7712,     -7.4828,     -6.5458],
+          [   -0.20106,    -0.72182,   -0.085702, ...,     -6.0996,     -7.7737,     -6.7606]]],
+
+
+        [[[    0.14002,     0.89561,    -0.49674, ...,     -5.1146,     -6.7739,     -5.7364],
+          [   -0.61045,     0.82164,     0.13904, ...,     -5.3266,     -6.6396,     -5.4567],
+          [   -0.23193,       0.685,     0.90518, ...,     -5.6412,     -6.8964,     -5.9366],
+          ...,
+          [    0.38878,     0.75269,     0.75232, ...,     -5.2163,     -6.8272,     -5.5675],
+          [    0.55856,      1.0001,     0.15154, ...,     -5.3149,     -6.8491,     -5.4823],
+          [   -0.51832,     0.80196,     -0.3114, ...,     -5.3563,     -7.1291,     -6.1785]],
+
+         [[    0.21024,   -0.069888,    -0.39699, ...,     -5.4407,     -6.6312,     -5.6441],
+          [   -0.42209,   -0.040873,     0.22409, ...,     -5.3529,     -6.5305,     -5.7841],
+          [   -0.48645,     0.26847,       1.067, ...,      -5.466,     -6.5196,     -6.2044],
+          ...,
+          [     1.0425,    -0.33806,     0.83247, ...,     -5.3717,     -6.6843,     -5.8236],
+          [    0.52555,    -0.22517,     0.20149, ...,      -5.179,     -6.6355,      -5.366],
+          [   -0.69835,    -0.29512,    -0.19117, ...,     -5.1383,     -6.8516,     -5.8949]],
+
+         [[    0.14159,     -1.0049,    -0.48798, ...,     -4.9814,     -6.9938,     -6.1061],
+          [  -0.033046,    -0.98342,     0.39541, ...,     -5.0277,     -6.6256,     -5.7678],
+          [   -0.38829,    -0.76348,      1.0925, ...,      -5.012,     -6.5824,      -6.047],
+          ...,
+          [       0.85,   -0.003981,      0.9061, ...,     -5.2964,     -6.9083,     -6.2824],
+          [    0.29389,    -0.41451,     0.31156, ...,     -5.3544,     -7.0813,     -6.3129],
+          [   -0.56671,    -0.71406,     -0.2671, ...,     -5.1473,     -7.2988,     -6.3707]],
+
+         ...,
+
+         [[    0.18384,    -0.14203,    -0.47542, ...,     -5.3144,     -7.1747,     -6.1719],
+          [   -0.26358,    -0.31036,     0.30442, ...,     -5.1323,     -6.9152,     -6.3138],
+          [   -0.54777,    -0.13779,      1.0502, ...,     -5.0338,     -6.8118,     -6.4221],
+          ...,
+          [    0.56499,   -0.063866,       1.047, ...,     -5.0465,     -6.7454,     -6.4563],
+          [   -0.17345,    0.028723,     0.51782, ...,     -5.0563,     -6.8915,     -6.3465],
+          [   -0.15631,     0.35693,    -0.48535, ...,      -4.882,     -7.0731,     -6.2462]],
+
+         [[  0.0050484,     0.47623,     -0.5798, ...,     -5.0248,     -7.3172,     -6.3654],
+          [  -0.025979,     0.26753,     0.40851, ...,     -5.2022,     -7.1745,     -6.3844],
+          [   -0.30531,     0.33255,      1.0861, ...,     -5.2788,     -6.9855,     -6.4665],
+          ...,
+          [    0.63842,      0.8669,     0.86743, ...,      -4.888,     -6.8827,      -6.047],
+          [  -0.062048,     0.42656,     0.48141, ...,      -5.035,     -7.1464,     -6.4091],
+          [   -0.26017,     0.35863,    -0.39388, ...,      -5.599,     -7.2464,     -6.4423]],
+
+         [[    0.21588,    -0.50845,    -0.44687, ...,     -5.0365,     -7.4816,     -6.4027],
+          [   -0.59465,    -0.35722,     0.18986, ...,     -5.6652,     -7.3927,     -6.3251],
+          [    0.19675,    -0.29226,     0.79841, ...,     -5.4444,      -7.124,     -6.2893],
+          ...,
+          [   0.016845,     -0.4755,     0.56065, ...,      -5.364,      -7.026,     -6.1624],
+          [  -0.075948,    -0.76921,     0.45875, ...,      -5.485,     -7.2502,     -6.4088],
+          [   -0.36126,      -1.067,    -0.42393, ...,     -5.8269,     -7.5418,     -6.5542]]],
+
+
+        [[[    0.48997,     0.87279,    -0.86337, ...,      -4.938,     -6.6452,     -5.8525],
+          [   -0.55416,     0.79914,    -0.50126, ...,     -5.1825,      -6.539,     -5.4997],
+          [    -0.2893,     0.68357,    0.047897, ...,     -5.5266,     -6.8419,     -6.0011],
+          ...,
+          [    0.43874,     0.74983,     -0.0518, ...,     -5.0693,     -6.7164,     -5.6032],
+          [     0.5859,     0.99178,    -0.50106, ...,     
+
+3. DetectDialog.h
+#ifndef DETECTDIALOG_H
+#define DETECTDIALOG_H
+
+#include <iostream>
+#include <vector>
+#include <string>
+
+#include <QImage>
+#include <QPixmap>
+#include <QLabel>
+#include <QDebug>
+
+#include <opencv2/dnn.hpp>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/highgui.hpp>
+#include <opencv2/core.hpp>
+
+#include "ui_detect_result.h"
+
+class DetectDialog : public QDialog
+{
+    Q_OBJECT
+
+public:
+    DetectDialog(QWidget* parent = nullptr);
+    ~DetectDialog();
+
+    void setImages(const cv::Mat& imageOpenCV
+                    , const cv::Mat& imageIPP
+                    , const cv::Mat& imageNPP
+                    , const cv::Mat& imageCUDA
+                    , const cv::Mat& imageCUDAKernel
+                    , const cv::Mat& imageGStreamer);
+
+private slots:
+    void RunOnnx();
+
+private:
+    Ui::DetectDialog* ui;
+
+    cv::Mat currentImageOpenCV;
+    cv::Mat currentImageIPP;
+    cv::Mat currentImageCUDA;
+    cv::Mat currentImageCUDAKernel;
+    cv::Mat currentImageNPP;
+    cv::Mat currentImageGStreamer;
+
+    cv::dnn::Net net; //OpenCV DNN 네트워크 객체
+
+    void connectActions();
+    void displayImage(cv::Mat image, QLabel* label);
+    std::string getClassName() const;
+};
+
+#endif // DETECTDIALOG_H
+
+4. DetectDialog.cpp
+#include "DetectDialog.h"
+
+DetectDialog::DetectDialog(QWidget* parent)
+    : QDialog(parent), ui(new Ui::DetectDialog)
+{
+    ui->setupUi(this);
+
+    ui->label_opencv_time->setText(QString("OpenCV"));
+    ui->label_ipp_time->setText(QString("IPP"));
+    ui->label_npp_time->setText(QString("NPP"));
+    ui->label_cuda_time->setText(QString("CUDA"));
+    ui->label_cudakernel_time->setText(QString("CUDA Kernel"));
+    ui->label_npp_time->setText(QString("NPP"));
+    ui->label_gstreamer_time->setText(QString("GStreamer"));
+
+    connectActions();
+}
+
+DetectDialog::~DetectDialog()
+{
+    delete ui;
+}
+
+void DetectDialog::connectActions()
+{
+    connect(ui->actionONNX, &QAction::triggered, this, &DetectDialog::RunOnnx);
+}
+
+void DetectDialog::setImages(const cv::Mat& imageOpenCV, const cv::Mat& imageIPP
+    , const cv::Mat& imageNPP, const cv::Mat& imageCUDA, const cv::Mat& imageCUDAKernel
+    , const cv::Mat& imageGStreamer)
+{
+    currentImageOpenCV = imageOpenCV;
+    currentImageIPP = imageIPP;
+    currentImageNPP = imageNPP;
+    currentImageCUDA = imageCUDA;
+    currentImageCUDAKernel = imageCUDAKernel;
+    currentImageGStreamer = imageGStreamer;
+
+    displayImage(currentImageOpenCV, ui->label_opencv);
+    displayImage(currentImageIPP, ui->label_ipp);
+    displayImage(currentImageNPP, ui->label_npp);
+    displayImage(currentImageCUDA, ui->label_cuda);
+    displayImage(currentImageCUDAKernel, ui->label_cudakernel);
+    displayImage(currentImageGStreamer, ui->label_gstreamer);
+}
+
+void DetectDialog::displayImage(cv::Mat image, QLabel* label)
+{
+    // 이미지 타입에 따라 QImage를 생성합니다.
+    QImage qImage;
+
+    qDebug() << "displayImage() called with image type:" << image.type();
+
+    // OpenCV의 Mat 이미지 타입에 따라 다른 QImage 형식을 사용합니다.
+    if (image.type() == CV_8UC1) {
+        qDebug() << "displayImage() type: grayscale CV_8UC1 Format_Grayscale8";
+        qImage = QImage(image.data,
+            image.cols,
+            image.rows,
+            static_cast<int>(image.step),
+            QImage::Format_Grayscale8);
+    }
+    else if (image.type() == CV_8UC3) {
+        qDebug() << ">>displayImage() type: BGR CV_8UC3 Format_RGB888";
+        qImage = QImage(image.data,
+            image.cols,
+            image.rows,
+            static_cast<int>(image.step),
+            QImage::Format_RGB888).rgbSwapped(); // BGR -> RGB 순서로 변환
+    }
+    else if (image.type() == CV_8UC4) {
+        qDebug() << "displayImage() type: BGRA CV_8UC4 Format_RGBA8888";
+        qImage = QImage(image.data,
+            image.cols,
+            image.rows,
+            static_cast<int>(image.step),
+            QImage::Format_RGBA8888);
+    }
+    else if (image.type() == CV_16UC3) {
+        qDebug() << "displayImage() type: BGR CV_16UC3 Format_RGB16";
+
+        // 16-bit 이미지를 8-bit로 변환
+        cv::Mat temp;
+        image.convertTo(temp, CV_8UC3, 1.0 / 256.0);
+        qImage = QImage(temp.data,
+            temp.cols,
+            temp.rows,
+            static_cast<int>(temp.step),
+            QImage::Format_RGB888).rgbSwapped(); // BGR -> RGB 순서로 변환
+    }
+    else if (image.type() == CV_16SC1) {
+        qDebug() << "displayImage() type: 16-bit signed integer CV_16SC1 Format_Grayscale16";
+        qImage = QImage(reinterpret_cast<const uchar*>(image.data),
+            image.cols,
+            image.rows,
+            static_cast<int>(image.step),
+            QImage::Format_Grayscale16);
+    }
+    else if (image.type() == CV_16SC3) {
+        qDebug() << "displayImage() type: 16-bit signed integer CV_16SC3 Format_RGB16";
+        qImage = QImage(reinterpret_cast<const uchar*>(image.data),
+            image.cols,
+            image.rows,
+            static_cast<int>(image.step),
+            QImage::Format_RGB16);
+    }
+    else {
+        qDebug() << "displayImage() type: " << image.type() << " not supported";
+        return; // 지원하지 않는 이미지 타입은 처리하지 않음
+    }
+
+    // QLabel 위젯에 QPixmap으로 이미지를 설정합니다.
+    QPixmap pixmap = QPixmap::fromImage(qImage);
+    label->setPixmap(pixmap);
+    label->setScaledContents(false); // 이미지를 Label 크기에 맞게 조정
+    label->adjustSize(); // Label 크기 조정
+    qDebug() << "displayImage() finished";
+}
+
+std::string DetectDialog::getClassName() const
+{
+    return "DetectDialog";
+}
+
+void DetectDialog::RunOnnx() {
+    std::cout << "<<<" << getClassName() << "::" << __func__ << ">>>" << std::endl;
+
+    // ONNX 모델 파일 경로
+    std::string modelPath = "C:/myLab/Project1/Project1/python/yolov5m.onnx";
+
+    // 모델 로드
+    net = cv::dnn::readNetFromONNX(modelPath);
+    if (net.empty()) {
+        qDebug() << "Failed to load ONNX model";
+        return;
+    }
+
+    // 그레이스케일 이미지를 3채널로 변환
+    cv::Mat colorImage;
+    if (currentImageOpenCV.channels() == 1) {
+        cv::cvtColor(currentImageOpenCV, colorImage, cv::COLOR_GRAY2BGR);
+    }
+    else {
+        colorImage = currentImageOpenCV;
+    }
+
+    // 이미지 전처리
+    cv::Mat blob;
+    cv::dnn::blobFromImage(colorImage, blob, 1.0 / 255.0, cv::Size(640, 640), cv::Scalar(0, 0, 0), true, false);
+
+    // 네트워크에 입력 전달
+    net.setInput(blob);
+    cv::Mat output = net.forward();
+
+    // 출력 처리
+    std::vector<cv::Mat> outputs;
+    outputs.push_back(output);
+
+    // YOLOv5의 경우, output의 형태는 (batch_size, num_anchors * (num_classes + 5), grid_size, grid_size)입니다.
+    // 예를 들어: 1 x 3 x 20 x 20 x 85
+    const int numClasses = 80; // 클래스 수
+    const int numAnchors = 3; // 앵커 수
+    const int gridSize = 20; // 그리드 크기
+    const int numOutputChannels = numAnchors * (numClasses + 5); // 출력 채널 수
+    const float confThreshold = 0.5; // confidence threshold
+    const float nmsThreshold = 0.4; // non-maximum suppression threshold
+
+    // Output tensor parsing
+    cv::Mat detection = outputs[0];
+    std::vector<int> classIds;
+    std::vector<float> confidences;
+    std::vector<cv::Rect> boxes;
+
+    // YOLOv5의 출력 파싱
+    for (int batch = 0; batch < detection.size[0]; ++batch) {
+        for (int anchor = 0; anchor < numAnchors; ++anchor) {
+            for (int y = 0; y < detection.size[2]; ++y) {
+                for (int x = 0; x < detection.size[3]; ++x) {
+                    // 텐서에서 데이터 포인터 가져오기
+                    float* data = reinterpret_cast<float*>(detection.data + detection.step[1] * anchor * (numClasses + 5) + detection.step[2] * y + detection.step[3] * x);
+
+                    // 바운딩 박스 좌표 및 confidence 추출
+                    float x_center = (data[0] + x) * colorImage.cols / gridSize;
+                    float y_center = (data[1] + y) * colorImage.rows / gridSize;
+                    float w = exp(data[2]) * colorImage.cols / gridSize;
+                    float h = exp(data[3]) * colorImage.rows / gridSize;
+                    float conf = data[4];
+
+                    if (conf > confThreshold) {
+                        float* classScores = data + 5;
+                        int classId = std::max_element(classScores, classScores + numClasses) - classScores;
+                        float classScore = classScores[classId];
+
+                        if (classScore > confThreshold) {
+                            int x = static_cast<int>(x_center - w / 2);
+                            int y = static_cast<int>(y_center - h / 2);
+                            int width = static_cast<int>(w);
+                            int height = static_cast<int>(h);
+
+                            classIds.push_back(classId);
+                            confidences.push_back(conf * classScore);
+                            boxes.push_back(cv::Rect(x, y, width, height));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Non-maximum suppression
+    std::vector<int> indices;
+    cv::dnn::NMSBoxes(boxes, confidences, confThreshold, nmsThreshold, indices);
+
+    // 결과 시각화
+    for (size_t i = 0; i < indices.size(); ++i) {
+        int idx = indices[i];
+        cv::Rect box = boxes[idx];
+        cv::rectangle(colorImage, box, cv::Scalar(0, 255, 0), 2);
+        std::string label = cv::format("Class %d: %.2f", classIds[idx], confidences[idx]);
+        cv::putText(colorImage, label, cv::Point(box.x, box.y - 10), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 255, 0), 2);
+    }
+
+    // 처리된 이미지 표시
+    displayImage(colorImage, ui->label_opencv);
+}
+
+
+
