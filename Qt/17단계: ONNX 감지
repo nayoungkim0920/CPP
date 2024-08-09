@@ -1,9 +1,125 @@
 <수정사항>
-1. ONNX 변환 프로그램 수정
-2. ONNX 감지프로그램 구현
+1. yolov5 best.pt (학습시킨 컵인식 90%이상)
+-> https://github.com/nayoungkim0920/SMART_AI_FARM/blob/main/yolov5inPC_CUDA_cuDNN 참고
+C:\yolov5\runs\train\exp35\weights\best.pt 파일을
+C:\myLab\Project1\Project1\python폴더로 복사
+"C:\myLab\Project1\Project1\python\myTorchScript.py" => best.onnx 생성
+
+2. CMakeLists.txt 수정
+
+3. 감지프로그램 구현 및 테스트(OpenCV만)
 
 <코드>
-1. CMakeLists.txt
+1. C:\myLab\Project1\Project1\python\myTorchScript.py
+import sys
+import torch
+import onnx
+import onnxruntime as ort
+import os
+
+# YOLOv5 경로를 추가합니다
+sys.path.append('C:/yolov5')
+print("YOLOv5 path added to system path.")
+
+# 모델 경로 설정
+model_path = 'C:/myLab/Project1/Project1/python/best.pt'
+print(f"Model path set to: {model_path}")
+
+# CUDA가 사용 가능한 경우, CUDA로 로드하고, 그렇지 않으면 CPU로 로드합니다
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+print(f"Using device: {device}")
+
+# 모델 로드
+try:
+    print("Attempting to load the model...")
+    model = torch.load(model_path, map_location=device, weights_only=False)['model'].float()
+    model.to(device)
+    model.eval()
+    print("Model loaded and set to evaluation mode.")
+except Exception as e:
+    print("Error loading model:", str(e))
+    sys.exit()  # 모델 로드 실패 시 종료
+
+# 더미 입력 텐서 생성 (CUDA 또는 CPU에 맞게 설정)
+dummy_input = torch.randn(1, 3, 640, 640).to(device)
+print(f"Dummy input tensor created with shape: {dummy_input.shape}")
+
+# ONNX로 모델 내보내기
+onnx_path = 'C:/myLab/Project1/Project1/python/best.onnx'
+print(f"Export path set to: {onnx_path}")
+
+try:
+    print("Attempting to export model to ONNX format...")
+    torch.onnx.export(
+        model,
+        dummy_input,
+        onnx_path,
+        verbose=True,
+        opset_version=12,
+        input_names=['input'],
+        output_names=['output'],
+        dynamic_axes={
+            'input': {0: 'batch_size'},
+            'output': {0: 'batch_size'}
+        }
+    )
+    # 디바이스 정보 출력
+    print(f"ONNX export completed. Using device: {device}")
+
+    # 파일 생성 확인
+    if os.path.exists(onnx_path):
+        print(f"ONNX file successfully created at: {onnx_path}")
+    else:
+        print(f"Failed to create ONNX file at: {onnx_path}")
+except Exception as e:
+    print("Error exporting model to ONNX:", str(e))
+    sys.exit()  # ONNX 변환 실패 시 종료
+
+# ONNX Runtime 버전과 CUDA 버전 출력
+try:
+    print("ONNX Runtime version:", ort.__version__)
+except Exception as e:
+    print("Error getting ONNX Runtime version:", str(e))
+
+try:
+    print("CUDA version:", torch.version.cuda)
+except Exception as e:
+    print("Error getting CUDA version:", str(e))
+
+# ONNX 모델 검증
+try:
+    print("Attempting to validate the ONNX model...")
+    onnx_model = onnx.load(onnx_path)
+    onnx.checker.check_model(onnx_model)
+    print("ONNX model is valid.")
+except Exception as e:
+    print("Error validating ONNX model:", str(e))
+    sys.exit()  # 모델 검증 실패 시 종료
+
+# ONNX Runtime 세션 생성 (GPU 사용)
+try:
+    print("Creating ONNX Runtime session...")
+    providers = ['CUDAExecutionProvider'] if torch.cuda.is_available() else ['CPUExecutionProvider']
+    ort_session = ort.InferenceSession(onnx_path, providers=providers)
+    print(f"ONNX Runtime session created with {'GPU' if torch.cuda.is_available() else 'CPU'} support.")
+except Exception as e:
+    print("Error creating ONNX Runtime session:", str(e))
+    sys.exit()  # 세션 생성 실패 시 종료
+
+# 더미 입력 준비
+dummy_input_np = dummy_input.cpu().numpy()
+print(f"Dummy input numpy array created with shape: {dummy_input_np.shape}")
+
+# 추론 실행
+try:
+    print("Running inference...")
+    outputs = ort_session.run(None, {'input': dummy_input_np})
+    print("Inference completed. Outputs:")
+    print(outputs)
+except Exception as e:
+    print("Error running inference:", str(e))
+
+2. CMakeLists.txt
 cmake_minimum_required(VERSION 3.14)
 project(Project1 LANGUAGES CXX CUDA)
 
@@ -267,179 +383,8 @@ if (MSVC)
     )
 endif()
 
-2. Yolov5 -> ONNX 변환프로그램 수정
-C:\myLab\Project1\Project1\python
-=> yolov5m.onnx
-
-import sys
-import torch
-import onnx
-import onnxruntime as ort
-
-# YOLOv5 경로를 추가합니다
-sys.path.append('C:/yolov5')
-
-# 모델 로드 (CUDA로)
-model_path = 'C:/yolov5/yolov5m.pt'
-
-# CUDA가 사용 가능한 경우, CUDA로 로드하고, 그렇지 않으면 CPU로 로드합니다
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-model = torch.load(model_path, map_location=device)['model'].float()
-model.to(device)  # 모델을 CUDA로 이동
-model.eval()
-
-# 더미 입력 텐서 생성 (CUDA 또는 CPU에 맞게 설정)
-dummy_input = torch.randn(1, 3, 640, 640).to(device)  # YOLOv5의 기본 입력 크기
-
-# ONNX로 모델 내보내기
-onnx_path = 'C:/myLab/Project1/Project1/python/yolov5m.onnx'
-torch.onnx.export(
-    model,
-    dummy_input,
-    onnx_path,
-    verbose=True,
-    opset_version=12,  # ONNX Opset version 변경
-    input_names=['input'],
-    output_names=['output'],
-    dynamic_axes={
-        'input': {0: 'batch_size'},
-        'output': {0: 'batch_size'}
-    }
-)
-
-print("Model has been exported to ONNX format at", onnx_path)
-
-# ONNX 모델 검증
-onnx_model = onnx.load(onnx_path)
-onnx.checker.check_model(onnx_model)
-
-# ONNX Runtime 세션 생성
-ort_session = ort.InferenceSession(onnx_path)
-
-# 더미 입력 준비
-dummy_input_np = dummy_input.cpu().numpy()
-
-# 추론 실행
-outputs = ort_session.run(None, {'input': dummy_input_np})
-print(outputs)
-(python 3.11.8 myenv:venv)
-Model has been exported to ONNX format at C:/myLab/Project1/Project1/python/yolov5m.onnx
-[array([[[      4.083,      6.2137,      7.9475, ...,   0.0041471,  0.00077999,   0.0027686],
-        [     9.1719,      6.1697,      17.878, ...,   0.0034927,  0.00090635,   0.0038726],
-        [     18.813,      5.5284,       23.73, ...,   0.0026654,  0.00078189,   0.0026406],
-        ...,
-        [     565.04,      607.87,      141.58, ...,   0.0075171,   0.0012242,   0.0013922],
-        [     587.18,      607.93,      114.81, ...,   0.0093757,   0.0011874,   0.0012849],
-        [     619.14,      619.84,      168.84, ...,   0.0082774,   0.0013637,   0.0014718]]], dtype=float32), array([[[[[   0.020746,     0.56825,    -0.21788, ...,     -5.4812,     -7.1555,     -5.8867],
-          [    -0.7389,     0.55635,     0.70164, ...,     -5.6536,     -7.0052,     -5.5499],
-          [   -0.29885,     0.38686,      1.2096, ...,     -5.9247,      -7.153,     -5.9341],
-          ...,
-          [    0.43875,     0.36941,     0.97533, ...,     -5.6012,     -7.1626,      -5.614],
-          [     0.6471,     0.73078,     0.72972, ...,     -5.6264,     -7.1797,     -5.5998],
-          [   -0.45626,     0.60416,    0.094509, ...,     -5.6385,     -7.3982,     -6.2988]],
-
-         [[    0.14213,    -0.14461,   -0.041051, ...,     -5.7211,     -6.9731,     -5.8666],
-          [   -0.51949,    -0.10908,     0.85853, ...,     -5.5525,     -6.8185,      -5.891],
-          [   -0.82527,     0.14095,      1.9371, ...,     -5.6576,     -6.7229,     -6.1038],
-          ...,
-          [     1.4303,    -0.40926,      1.4634, ...,     -5.6407,     -6.9508,     -5.8468],
-          [    0.54292,    -0.29051,     0.80568, ...,     -5.4343,     -6.9189,     -5.5308],
-          [   -0.64595,    -0.36265,     0.23684, ...,     -5.4233,     -7.1327,     -6.0462]],
-
-         [[  -0.038474,    -0.99534,    -0.22696, ...,     -5.3911,     -7.2979,     -6.2608],
-          [   -0.15523,     -1.1129,      1.1348, ...,     -5.3247,     -6.8865,     -5.7952],
-          [   -0.65034,    -0.87821,      2.0729, ...,     -5.2847,     -6.7526,     -5.9168],
-          ...,
-          [      0.992,    -0.12397,      1.6248, ...,     -5.5475,     -6.9746,     -6.1858],
-          [    0.40949,    -0.64661,     0.92532, ...,     -5.5664,      -7.159,     -6.3269],
-          [   -0.41394,    -0.73077,     0.10384, ...,     -5.4678,     -7.4949,     -6.4885]],
-
-         ...,
-
-         [[    0.11875,     0.14335,    -0.15127, ...,     -5.5353,     -7.3146,     -6.2751],
-          [   -0.26429,    -0.21074,      1.0141, ...,     -5.2591,     -6.9822,     -6.2492],
-          [   -0.82196,   -0.029722,      2.1014, ...,     -5.1711,     -6.8391,     -6.2128],
-          ...,
-          [    0.60006,     0.14941,      1.9903, ...,     -5.2267,     -6.8143,     -6.2896],
-          [  -0.046652,     0.44567,      1.2582, ...,     -5.2278,     -6.9868,       -6.27],
-          [  -0.031187,     0.57842,    -0.17263, ...,     -5.1545,     -7.2786,     -6.2938]],
-
-         [[  -0.057363,     0.88969,    -0.27139, ...,     -5.3319,     -7.5514,     -6.5142],
-          [  -0.076952,     0.42153,      1.1566, ...,      -5.408,     -7.3208,     -6.4131],
-          [   -0.55968,     0.60421,      1.9277, ...,      -5.481,      -7.107,      -6.364],
-          ...,
-          [    0.44097,      1.1263,      1.6179, ...,     -5.1762,     -7.1484,     -6.1002],
-          [   -0.00688,     0.48533,      1.2372, ...,     -5.2199,     -7.3143,     -6.4897],
-          [   -0.18738,     0.46002,   -0.031661, ...,     -5.8307,     -7.4887,     -6.6055]],
-
-         [[    0.12208,    -0.27074,    -0.17977, ...,     -5.4094,      -7.738,     -6.5768],
-          [   -0.75434,    -0.16598,     0.73485, ...,     -5.9618,      -7.616,     -6.4978],
-          [     0.2112,   -0.068665,      1.1296, ...,     -5.7572,     -7.3521,     -6.3559],
-          ...,
-          [    -0.3677,    -0.26866,     0.96424, ...,     -5.7172,     -7.3587,     -6.3088],
-          [   0.040319,    -0.46467,      1.1896, ...,     -5.7712,     -7.4828,     -6.5458],
-          [   -0.20106,    -0.72182,   -0.085702, ...,     -6.0996,     -7.7737,     -6.7606]]],
-
-
-        [[[    0.14002,     0.89561,    -0.49674, ...,     -5.1146,     -6.7739,     -5.7364],
-          [   -0.61045,     0.82164,     0.13904, ...,     -5.3266,     -6.6396,     -5.4567],
-          [   -0.23193,       0.685,     0.90518, ...,     -5.6412,     -6.8964,     -5.9366],
-          ...,
-          [    0.38878,     0.75269,     0.75232, ...,     -5.2163,     -6.8272,     -5.5675],
-          [    0.55856,      1.0001,     0.15154, ...,     -5.3149,     -6.8491,     -5.4823],
-          [   -0.51832,     0.80196,     -0.3114, ...,     -5.3563,     -7.1291,     -6.1785]],
-
-         [[    0.21024,   -0.069888,    -0.39699, ...,     -5.4407,     -6.6312,     -5.6441],
-          [   -0.42209,   -0.040873,     0.22409, ...,     -5.3529,     -6.5305,     -5.7841],
-          [   -0.48645,     0.26847,       1.067, ...,      -5.466,     -6.5196,     -6.2044],
-          ...,
-          [     1.0425,    -0.33806,     0.83247, ...,     -5.3717,     -6.6843,     -5.8236],
-          [    0.52555,    -0.22517,     0.20149, ...,      -5.179,     -6.6355,      -5.366],
-          [   -0.69835,    -0.29512,    -0.19117, ...,     -5.1383,     -6.8516,     -5.8949]],
-
-         [[    0.14159,     -1.0049,    -0.48798, ...,     -4.9814,     -6.9938,     -6.1061],
-          [  -0.033046,    -0.98342,     0.39541, ...,     -5.0277,     -6.6256,     -5.7678],
-          [   -0.38829,    -0.76348,      1.0925, ...,      -5.012,     -6.5824,      -6.047],
-          ...,
-          [       0.85,   -0.003981,      0.9061, ...,     -5.2964,     -6.9083,     -6.2824],
-          [    0.29389,    -0.41451,     0.31156, ...,     -5.3544,     -7.0813,     -6.3129],
-          [   -0.56671,    -0.71406,     -0.2671, ...,     -5.1473,     -7.2988,     -6.3707]],
-
-         ...,
-
-         [[    0.18384,    -0.14203,    -0.47542, ...,     -5.3144,     -7.1747,     -6.1719],
-          [   -0.26358,    -0.31036,     0.30442, ...,     -5.1323,     -6.9152,     -6.3138],
-          [   -0.54777,    -0.13779,      1.0502, ...,     -5.0338,     -6.8118,     -6.4221],
-          ...,
-          [    0.56499,   -0.063866,       1.047, ...,     -5.0465,     -6.7454,     -6.4563],
-          [   -0.17345,    0.028723,     0.51782, ...,     -5.0563,     -6.8915,     -6.3465],
-          [   -0.15631,     0.35693,    -0.48535, ...,      -4.882,     -7.0731,     -6.2462]],
-
-         [[  0.0050484,     0.47623,     -0.5798, ...,     -5.0248,     -7.3172,     -6.3654],
-          [  -0.025979,     0.26753,     0.40851, ...,     -5.2022,     -7.1745,     -6.3844],
-          [   -0.30531,     0.33255,      1.0861, ...,     -5.2788,     -6.9855,     -6.4665],
-          ...,
-          [    0.63842,      0.8669,     0.86743, ...,      -4.888,     -6.8827,      -6.047],
-          [  -0.062048,     0.42656,     0.48141, ...,      -5.035,     -7.1464,     -6.4091],
-          [   -0.26017,     0.35863,    -0.39388, ...,      -5.599,     -7.2464,     -6.4423]],
-
-         [[    0.21588,    -0.50845,    -0.44687, ...,     -5.0365,     -7.4816,     -6.4027],
-          [   -0.59465,    -0.35722,     0.18986, ...,     -5.6652,     -7.3927,     -6.3251],
-          [    0.19675,    -0.29226,     0.79841, ...,     -5.4444,      -7.124,     -6.2893],
-          ...,
-          [   0.016845,     -0.4755,     0.56065, ...,      -5.364,      -7.026,     -6.1624],
-          [  -0.075948,    -0.76921,     0.45875, ...,      -5.485,     -7.2502,     -6.4088],
-          [   -0.36126,      -1.067,    -0.42393, ...,     -5.8269,     -7.5418,     -6.5542]]],
-
-
-        [[[    0.48997,     0.87279,    -0.86337, ...,      -4.938,     -6.6452,     -5.8525],
-          [   -0.55416,     0.79914,    -0.50126, ...,     -5.1825,      -6.539,     -5.4997],
-          [    -0.2893,     0.68357,    0.047897, ...,     -5.5266,     -6.8419,     -6.0011],
-          ...,
-          [    0.43874,     0.74983,     -0.0518, ...,     -5.0693,     -6.7164,     -5.6032],
-          [     0.5859,     0.99178,    -0.50106, ...,     
-
-3. DetectDialog.h
+3. 감지프로그램 구현 및 테스트(OpenCV만)
+//DetectDialog.h
 #ifndef DETECTDIALOG_H
 #define DETECTDIALOG_H
 
@@ -467,12 +412,12 @@ public:
     DetectDialog(QWidget* parent = nullptr);
     ~DetectDialog();
 
-    void setImages(const cv::Mat& imageOpenCV
-                    , const cv::Mat& imageIPP
-                    , const cv::Mat& imageNPP
-                    , const cv::Mat& imageCUDA
-                    , const cv::Mat& imageCUDAKernel
-                    , const cv::Mat& imageGStreamer);
+    void setImages(const cv::Mat imageOpenCV
+                    , const cv::Mat imageIPP
+                    , const cv::Mat imageNPP
+                    , const cv::Mat imageCUDA
+                    , const cv::Mat imageCUDAKernel
+                    , const cv::Mat imageGStreamer);
 
 private slots:
     void RunOnnx();
@@ -496,7 +441,7 @@ private:
 
 #endif // DETECTDIALOG_H
 
-4. DetectDialog.cpp
+//DetectDialog.cpp
 #include "DetectDialog.h"
 
 DetectDialog::DetectDialog(QWidget* parent)
@@ -525,9 +470,9 @@ void DetectDialog::connectActions()
     connect(ui->actionONNX, &QAction::triggered, this, &DetectDialog::RunOnnx);
 }
 
-void DetectDialog::setImages(const cv::Mat& imageOpenCV, const cv::Mat& imageIPP
-    , const cv::Mat& imageNPP, const cv::Mat& imageCUDA, const cv::Mat& imageCUDAKernel
-    , const cv::Mat& imageGStreamer)
+void DetectDialog::setImages(const cv::Mat imageOpenCV, const cv::Mat imageIPP
+    , const cv::Mat imageNPP, const cv::Mat imageCUDA, const cv::Mat imageCUDAKernel
+    , const cv::Mat imageGStreamer)
 {
     currentImageOpenCV = imageOpenCV;
     currentImageIPP = imageIPP;
@@ -626,64 +571,76 @@ void DetectDialog::RunOnnx() {
     std::cout << "<<<" << getClassName() << "::" << __func__ << ">>>" << std::endl;
 
     // ONNX 모델 파일 경로
-    std::string modelPath = "C:/myLab/Project1/Project1/python/yolov5m.onnx";
+    std::string modelPath = "C:/myLab/Project1/Project1/python/best.onnx";
+    std::cout << "Loading ONNX model from: " << modelPath << std::endl;
 
     // 모델 로드
     net = cv::dnn::readNetFromONNX(modelPath);
     if (net.empty()) {
+        std::cerr << "Failed to load ONNX model from " << modelPath << std::endl;
         qDebug() << "Failed to load ONNX model";
+        ui->label_opencv_time->setText("Failed to load ONNX model");
         return;
     }
+    std::cout << "ONNX model loaded successfully." << std::endl;
 
-    // 그레이스케일 이미지를 3채널로 변환
+    // 이미지가 그레이스케일인 경우 3채널로 변환
     cv::Mat colorImage;
     if (currentImageOpenCV.channels() == 1) {
+        std::cout << "Converting grayscale image to BGR..." << std::endl;
         cv::cvtColor(currentImageOpenCV, colorImage, cv::COLOR_GRAY2BGR);
     }
     else {
         colorImage = currentImageOpenCV;
     }
 
-    // 이미지 전처리
+    std::cout << "Image size: " << colorImage.cols << "x" << colorImage.rows << std::endl;
+
+    // 이미지 전처리: 모델의 입력 크기에 맞추어 크기 조정
+    cv::Mat resizedImage;
+    cv::resize(colorImage, resizedImage, cv::Size(640, 640));  // 모델의 입력 크기
+    std::cout << "Resized image to: " << resizedImage.cols << "x" << resizedImage.rows << std::endl;
+
     cv::Mat blob;
-    cv::dnn::blobFromImage(colorImage, blob, 1.0 / 255.0, cv::Size(640, 640), cv::Scalar(0, 0, 0), true, false);
+    cv::dnn::blobFromImage(resizedImage, blob, 1.0 / 255.0, cv::Size(640, 640), cv::Scalar(0, 0, 0), true, false);
+    std::cout << "Blob created with size: " << blob.size << std::endl;
 
     // 네트워크에 입력 전달
     net.setInput(blob);
+    std::cout << "Performing forward pass..." << std::endl;
     cv::Mat output = net.forward();
+    std::cout << "Forward pass completed." << std::endl;
 
     // 출력 처리
     std::vector<cv::Mat> outputs;
     outputs.push_back(output);
 
-    // YOLOv5의 경우, output의 형태는 (batch_size, num_anchors * (num_classes + 5), grid_size, grid_size)입니다.
-    // 예를 들어: 1 x 3 x 20 x 20 x 85
     const int numClasses = 80; // 클래스 수
     const int numAnchors = 3; // 앵커 수
     const int gridSize = 20; // 그리드 크기
-    const int numOutputChannels = numAnchors * (numClasses + 5); // 출력 채널 수
     const float confThreshold = 0.5; // confidence threshold
     const float nmsThreshold = 0.4; // non-maximum suppression threshold
 
-    // Output tensor parsing
+    std::cout << "Processing detection output..." << std::endl;
     cv::Mat detection = outputs[0];
     std::vector<int> classIds;
     std::vector<float> confidences;
     std::vector<cv::Rect> boxes;
 
-    // YOLOv5의 출력 파싱
+    // 원본 이미지 크기와 비율
+    float scaleX = static_cast<float>(currentImageOpenCV.cols) / 640.0f;
+    float scaleY = static_cast<float>(currentImageOpenCV.rows) / 640.0f;
+
     for (int batch = 0; batch < detection.size[0]; ++batch) {
         for (int anchor = 0; anchor < numAnchors; ++anchor) {
             for (int y = 0; y < detection.size[2]; ++y) {
                 for (int x = 0; x < detection.size[3]; ++x) {
-                    // 텐서에서 데이터 포인터 가져오기
                     float* data = reinterpret_cast<float*>(detection.data + detection.step[1] * anchor * (numClasses + 5) + detection.step[2] * y + detection.step[3] * x);
 
-                    // 바운딩 박스 좌표 및 confidence 추출
-                    float x_center = (data[0] + x) * colorImage.cols / gridSize;
-                    float y_center = (data[1] + y) * colorImage.rows / gridSize;
-                    float w = exp(data[2]) * colorImage.cols / gridSize;
-                    float h = exp(data[3]) * colorImage.rows / gridSize;
+                    float x_center = (data[0] + x) * resizedImage.cols / gridSize;
+                    float y_center = (data[1] + y) * resizedImage.rows / gridSize;
+                    float w = exp(data[2]) * resizedImage.cols / gridSize;
+                    float h = exp(data[3]) * resizedImage.rows / gridSize;
                     float conf = data[4];
 
                     if (conf > confThreshold) {
@@ -692,37 +649,50 @@ void DetectDialog::RunOnnx() {
                         float classScore = classScores[classId];
 
                         if (classScore > confThreshold) {
-                            int x = static_cast<int>(x_center - w / 2);
-                            int y = static_cast<int>(y_center - h / 2);
-                            int width = static_cast<int>(w);
-                            int height = static_cast<int>(h);
+                            int x1 = static_cast<int>(std::max(0.0f, (x_center - w / 2) * scaleX));
+                            int y1 = static_cast<int>(std::max(0.0f, (y_center - h / 2) * scaleY));
+                            int width = static_cast<int>(std::max(0.0f, w * scaleX));
+                            int height = static_cast<int>(std::max(0.0f, h * scaleY));
 
-                            classIds.push_back(classId);
-                            confidences.push_back(conf * classScore);
-                            boxes.push_back(cv::Rect(x, y, width, height));
+                            // 바운딩 박스가 원본 이미지 크기를 초과하지 않도록 조정
+                            if (x1 + width > currentImageOpenCV.cols) width = currentImageOpenCV.cols - x1;
+                            if (y1 + height > currentImageOpenCV.rows) height = currentImageOpenCV.rows - y1;
+
+                            if (width > 0 && height > 0) {
+                                classIds.push_back(classId);
+                                confidences.push_back(conf * classScore);
+                                boxes.push_back(cv::Rect(x1, y1, width, height));
+                            }
                         }
                     }
                 }
             }
         }
     }
+    std::cout << "Detection completed. Found " << boxes.size() << " boxes." << std::endl;
 
     // Non-maximum suppression
     std::vector<int> indices;
     cv::dnn::NMSBoxes(boxes, confidences, confThreshold, nmsThreshold, indices);
 
     // 결과 시각화
-    for (size_t i = 0; i < indices.size(); ++i) {
-        int idx = indices[i];
-        cv::Rect box = boxes[idx];
-        cv::rectangle(colorImage, box, cv::Scalar(0, 255, 0), 2);
-        std::string label = cv::format("Class %d: %.2f", classIds[idx], confidences[idx]);
-        cv::putText(colorImage, label, cv::Point(box.x, box.y - 10), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 255, 0), 2);
+    if (indices.empty()) {
+        std::cout << "No detections found." << std::endl;
+        ui->label_opencv_time->setText("Recognition failed!");
     }
+    else {
+        std::cout << "Drawing bounding boxes..." << std::endl;
+        for (size_t i = 0; i < indices.size(); ++i) {
+            int idx = indices[i];
+            cv::Rect box = boxes[idx];
+            cv::rectangle(colorImage, box, cv::Scalar(0, 255, 0), 2);
+            std::string label = cv::format("Class %d: %.2f", classIds[idx], confidences[idx]);
+            cv::putText(colorImage, label, cv::Point(box.x, box.y - 10), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 255, 0), 2);
+        }
 
-    // 처리된 이미지 표시
-    displayImage(colorImage, ui->label_opencv);
+        // 처리된 이미지 표시
+        displayImage(colorImage, ui->label_opencv);
+        ui->label_opencv_time->setText("Recognition complete!");
+        std::cout << "Recognition complete!" << std::endl;
+    }
 }
-
-
-
