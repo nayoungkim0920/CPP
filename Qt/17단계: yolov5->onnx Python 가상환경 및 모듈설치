@@ -1,5 +1,10 @@
 <수정사항>
 1. 가상환경만들기, 가상환경실행, 종료, 삭제
+2. yolov5->onnx export 필요한 모듈설치
+3. DetectDialog.cpp
+
+<코드>
+1. 가상환경만들기, 가상환경실행, 종료, 삭제
 명령 프롬프트(CMD) 관리자권한실행
 C:\>python --version
 Python 3.12.3
@@ -498,8 +503,304 @@ Inference completed. Outputs:
           [   -0.87786,    -0.47824,    -0.65365,     0.81026,      -9.266,      11.047],
           [    -1.2551,    -0.76733,  -0.0084515,     0.39566,     -11.478,      11.047],
           ...,
+3. DetectDialog.cpp
+=> python 프로그램에서 검출되는데 onnx변환한걸로 C++프로그램에선 검출이안돼 수정해야함
 
+#include "DetectDialog.h"
 
+DetectDialog::DetectDialog(QWidget* parent)
+    : QDialog(parent), ui(new Ui::DetectDialog)
+{
+    ui->setupUi(this);
 
+    ui->label_opencv_time->setText(QString("OpenCV"));
+    ui->label_ipp_time->setText(QString("IPP"));
+    ui->label_npp_time->setText(QString("NPP"));
+    ui->label_cuda_time->setText(QString("CUDA"));
+    ui->label_cudakernel_time->setText(QString("CUDA Kernel"));
+    ui->label_npp_time->setText(QString("NPP"));
+    ui->label_gstreamer_time->setText(QString("GStreamer"));
+
+    connectActions();
+}
+
+DetectDialog::~DetectDialog()
+{
+    delete ui;
+}
+
+void DetectDialog::connectActions()
+{
+    connect(ui->actionONNX, &QAction::triggered, this, &DetectDialog::RunOnnx);
+}
+
+void DetectDialog::setImages(const cv::Mat imageOpenCV, const cv::Mat imageIPP
+    , const cv::Mat imageNPP, const cv::Mat imageCUDA, const cv::Mat imageCUDAKernel
+    , const cv::Mat imageGStreamer)
+{
+    currentImageOpenCV = imageOpenCV;
+    currentImageIPP = imageIPP;
+    currentImageNPP = imageNPP;
+    currentImageCUDA = imageCUDA;
+    currentImageCUDAKernel = imageCUDAKernel;
+    currentImageGStreamer = imageGStreamer;
+
+    displayImage(currentImageOpenCV, ui->label_opencv);
+    displayImage(currentImageIPP, ui->label_ipp);
+    displayImage(currentImageNPP, ui->label_npp);
+    displayImage(currentImageCUDA, ui->label_cuda);
+    displayImage(currentImageCUDAKernel, ui->label_cudakernel);
+    displayImage(currentImageGStreamer, ui->label_gstreamer);
+}
+
+void DetectDialog::displayImage(cv::Mat image, QLabel* label)
+{
+    // 이미지 타입에 따라 QImage를 생성합니다.
+    QImage qImage;
+
+    qDebug() << "displayImage() called with image type:" << image.type();
+
+    // OpenCV의 Mat 이미지 타입에 따라 다른 QImage 형식을 사용합니다.
+    if (image.type() == CV_8UC1) {
+        qDebug() << "displayImage() type: grayscale CV_8UC1 Format_Grayscale8";
+        qImage = QImage(image.data,
+            image.cols,
+            image.rows,
+            static_cast<int>(image.step),
+            QImage::Format_Grayscale8);
+    }
+    else if (image.type() == CV_8UC3) {
+        qDebug() << ">>displayImage() type: BGR CV_8UC3 Format_RGB888";
+        qImage = QImage(image.data,
+            image.cols,
+            image.rows,
+            static_cast<int>(image.step),
+            QImage::Format_RGB888).rgbSwapped(); // BGR -> RGB 순서로 변환
+    }
+    else if (image.type() == CV_8UC4) {
+        qDebug() << "displayImage() type: BGRA CV_8UC4 Format_RGBA8888";
+        qImage = QImage(image.data,
+            image.cols,
+            image.rows,
+            static_cast<int>(image.step),
+            QImage::Format_RGBA8888);
+    }
+    else if (image.type() == CV_16UC3) {
+        qDebug() << "displayImage() type: BGR CV_16UC3 Format_RGB16";
+
+        // 16-bit 이미지를 8-bit로 변환
+        cv::Mat temp;
+        image.convertTo(temp, CV_8UC3, 1.0 / 256.0);
+        qImage = QImage(temp.data,
+            temp.cols,
+            temp.rows,
+            static_cast<int>(temp.step),
+            QImage::Format_RGB888).rgbSwapped(); // BGR -> RGB 순서로 변환
+    }
+    else if (image.type() == CV_16SC1) {
+        qDebug() << "displayImage() type: 16-bit signed integer CV_16SC1 Format_Grayscale16";
+        qImage = QImage(reinterpret_cast<const uchar*>(image.data),
+            image.cols,
+            image.rows,
+            static_cast<int>(image.step),
+            QImage::Format_Grayscale16);
+    }
+    else if (image.type() == CV_16SC3) {
+        qDebug() << "displayImage() type: 16-bit signed integer CV_16SC3 Format_RGB16";
+        qImage = QImage(reinterpret_cast<const uchar*>(image.data),
+            image.cols,
+            image.rows,
+            static_cast<int>(image.step),
+            QImage::Format_RGB16);
+    }
+    else {
+        qDebug() << "displayImage() type: " << image.type() << " not supported";
+        return; // 지원하지 않는 이미지 타입은 처리하지 않음
+    }
+
+    // QLabel 위젯에 QPixmap으로 이미지를 설정합니다.
+    QPixmap pixmap = QPixmap::fromImage(qImage);
+    label->setPixmap(pixmap);
+    label->setScaledContents(false); // 이미지를 Label 크기에 맞게 조정
+    label->adjustSize(); // Label 크기 조정
+    qDebug() << "displayImage() finished";
+}
+
+std::string DetectDialog::getClassName() const
+{
+    return "DetectDialog";
+}
+
+// Helper function to draw bounding boxes
+void drawBoundingBoxes(cv::Mat& image, const std::vector<cv::Rect>& boxes, const std::vector<int>& classIds, const std::vector<float>& confidences, const std::vector<std::string>& classNames) {
+    for (size_t i = 0; i < boxes.size(); ++i) {
+        cv::rectangle(image, boxes[i], cv::Scalar(0, 255, 0), 2);
+        std::string label = cv::format("%s: %.2f", classNames[classIds[i]].c_str(), confidences[i]);
+        cv::putText(image, label, cv::Point(boxes[i].x, boxes[i].y - 10), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 255, 0), 2);
+    }
+}
+
+void DetectDialog::RunOnnx() {
+    try {
+        std::cout << "<<<" << __func__ << ">>>" << std::endl;
+        ui->label_opencv_time->setText("Running ONNX detection...");
+
+        // ONNX 모델 파일 경로
+        std::string modelPath = "C:/myLab/Project1/Project1/python/best.onnx";
+        std::cout << "Loading ONNX model from: " << modelPath << std::endl;
+        ui->label_opencv_time->setText("Loading ONNX model...");
+
+        // 모델 로드
+        cv::dnn::Net net = cv::dnn::readNetFromONNX(modelPath);
+        if (net.empty()) {
+            std::cerr << "Failed to load ONNX model from " << modelPath << std::endl;
+            ui->label_opencv_time->setText("Failed to load ONNX model.");
+            return;
+        }
+        std::cout << "ONNX model loaded successfully." << std::endl;
+        ui->label_opencv_time->setText("ONNX model loaded successfully.");
+
+        // 이미지 로드
+        cv::Mat colorImage = currentImageOpenCV;
+        if (colorImage.empty()) {
+            std::cerr << "Current image is empty." << std::endl;
+            ui->label_opencv_time->setText("Current image is empty.");
+            return;
+        }
+
+        std::cout << "Image loaded successfully. Size: " << colorImage.size() << std::endl;
+        ui->label_opencv_time->setText("Image loaded successfully.");
+
+        if (colorImage.channels() == 1) {
+            cv::cvtColor(colorImage, colorImage, cv::COLOR_GRAY2BGR);
+            std::cout << "Converted grayscale image to BGR." << std::endl;
+        }
+
+        // 이미지 전처리
+        cv::Mat resizedImage;
+        cv::resize(colorImage, resizedImage, cv::Size(640, 640));
+        std::cout << "Image resized to: " << resizedImage.size() << std::endl;
+
+        cv::Mat blob;
+        cv::dnn::blobFromImage(resizedImage, blob, 1.0 / 255.0, cv::Size(640, 640), cv::Scalar(0, 0, 0), true, false);
+        std::cout << "Blob created with shape: " << blob.size << std::endl;
+
+        // 네트워크에 입력 전달
+        net.setInput(blob);
+        std::vector<cv::Mat> outputs;
+        net.forward(outputs, net.getUnconnectedOutLayersNames());
+
+        // 출력 처리
+        if (outputs.empty()) {
+            std::cerr << "No outputs found from the network." << std::endl;
+            ui->label_opencv_time->setText("No outputs found from the network.");
+            return;
+        }
+
+        std::cout << "Model inference completed." << std::endl;
+
+        const cv::Mat& output = outputs[0];
+        std::cout << "Output 0 size: " << output.size << std::endl;
+        std::cout << "Output 0 dims: " << output.dims << std::endl;
+
+        if (output.dims == 3) {
+            int numBoxes = output.size[1];
+            int attributes = output.size[2];
+
+            std::cout << "Number of boxes: " << numBoxes << std::endl;
+            std::cout << "Number of attributes: " << attributes << std::endl;
+
+            if (attributes < 6) {
+                std::cerr << "Unexpected number of attributes. Expected at least 6 but got " << attributes << std::endl;
+                ui->label_opencv_time->setText("Unexpected number of attributes.");
+                return;
+            }
+
+            const float* data = (float*)output.data;
+            std::vector<int> classIds;
+            std::vector<float> confidences;
+            std::vector<cv::Rect> boxes;
+
+            float scaleX = static_cast<float>(colorImage.cols) / 640.0f;
+            float scaleY = static_cast<float>(colorImage.rows) / 640.0f;
+
+            for (int i = 0; i < numBoxes; ++i) {
+                float objectness = data[i * attributes + 4]; // objectness score
+                std::cout << "Box " << i << " objectness score: " << objectness << std::endl;
+
+                if (objectness >= 0.25) { // 임계값을 낮추어 감지 확률 증가
+                    float x_center = (data[i * attributes] * 640.0f);
+                    float y_center = (data[i * attributes + 1] * 640.0f);
+                    float w = (data[i * attributes + 2] * 640.0f);
+                    float h = (data[i * attributes + 3] * 640.0f);
+
+                    int left = static_cast<int>(std::max(0.0f, x_center - w / 2) * scaleX);
+                    int top = static_cast<int>(std::max(0.0f, y_center - h / 2) * scaleY);
+                    int right = static_cast<int>(std::min(static_cast<float>(colorImage.cols), x_center + w / 2) * scaleX);
+                    int bottom = static_cast<int>(std::min(static_cast<float>(colorImage.rows), y_center + h / 2) * scaleY);
+
+                    if (left < 0) left = 0;
+                    if (top < 0) top = 0;
+                    if (right > colorImage.cols) right = colorImage.cols;
+                    if (bottom > colorImage.rows) bottom = colorImage.rows;
+
+                    if (right > left && bottom > top) {
+                        classIds.push_back(0); // 예시: 클래스 인덱스
+                        confidences.push_back(objectness);
+                        boxes.push_back(cv::Rect(left, top, right - left, bottom - top));
+
+                        std::cout << "Box " << i << " detected: (" << left << ", " << top << ") - (" << right << ", " << bottom << ")" << std::endl;
+                    }
+                }
+            }
+
+            std::cout << "Detection completed. Found " << boxes.size() << " boxes before NMS." << std::endl;
+            ui->label_opencv_time->setText(QString("Detection completed. Found %1 boxes before NMS.").arg(boxes.size()));
+
+            // Non-maximum suppression
+            std::vector<int> indices;
+            cv::dnn::NMSBoxes(boxes, confidences, 0.25, 0.4, indices);
+
+            std::cout << "NMS completed. Found " << indices.size() << " boxes after NMS." << std::endl;
+            ui->label_opencv_time->setText(QString("NMS completed. Found %1 boxes after NMS.").arg(indices.size()));
+
+            // 결과 시각화
+            if (indices.empty()) {
+                ui->label_opencv_time->setText("No detections found.");
+                std::cout << "No detections found." << std::endl;
+            }
+            else {
+                std::cout << "Drawing bounding boxes..." << std::endl;
+                std::vector<cv::Rect> finalBoxes;
+                std::vector<int> finalClassIds;
+                std::vector<float> finalConfidences;
+
+                std::vector<std::string> classNames = { "cup" };
+
+                for (size_t i = 0; i < indices.size(); ++i) {
+                    int idx = indices[i];
+                    finalBoxes.push_back(boxes[idx]);
+                    finalClassIds.push_back(classIds[idx]);
+                    finalConfidences.push_back(confidences[idx]);
+
+                    std::cout << "Final box " << i << ": (" << finalBoxes.back().x << ", " << finalBoxes.back().y << ") - ("
+                        << finalBoxes.back().x + finalBoxes.back().width << ", " << finalBoxes.back().y + finalBoxes.back().height << ")"
+                        << " with confidence: " << finalConfidences.back() << std::endl;
+                }
+
+                drawBoundingBoxes(colorImage, finalBoxes, finalClassIds, finalConfidences, classNames);
+                displayImage(colorImage, ui->label_opencv);
+            }
+        }
+        else {
+            std::cerr << "Unexpected number of dimensions. Expected 3 but got " << output.dims << std::endl;
+            ui->label_opencv_time->setText(QString("Unexpected number of dimensions. Expected 3 but got %1.").arg(output.dims));
+        }
+    }
+    catch (const std::exception& e) {
+        std::cerr << "An error occurred: " << e.what() << std::endl;
+        ui->label_opencv_time->setText(QString("An error occurred: %1").arg(e.what()));
+    }
+}
 
 
