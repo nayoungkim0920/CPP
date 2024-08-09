@@ -5,6 +5,31 @@ C:\yolov5\runs\train\exp35\weights\best.pt 파일을
 C:\myLab\Project1\Project1\python폴더로 복사
 "C:\myLab\Project1\Project1\python\myTorchScript.py" => best.onnx 생성
 
+=> 결과 갭이너무커서 yolov5의 export.py를 사용하여 onnx export 하기로 함
+(myenv) C:\myenv\Scripts>python c:/yolov5/export.py --weights c:/yolov5/runs/train/exp30/weights/best.pt --img 640 --batch 1 --device 0 --include onnx
+export: data=C:\yolov5\data\coco128.yaml, weights=['c:/yolov5/runs/train/exp30/weights/best.pt'], imgsz=[640], batch_size=1, device=0, half=False, inplace=False, keras=False, optimize=False, int8=False, per_tensor=False, dynamic=False, simplify=False, opset=17, verbose=False, workspace=4, nms=False, agnostic_nms=False, topk_per_class=100, topk_all=100, iou_thres=0.45, conf_thres=0.25, include=['onnx']
+YOLOv5  v7.0-303-gcf8b67b7 Python-3.12.3 torch-2.4.0+cu121 CUDA:0 (NVIDIA GeForce RTX 4060 Laptop GPU, 8188MiB)
+
+Fusing layers...
+Model summary: 212 layers, 20852934 parameters, 0 gradients, 47.9 GFLOPs
+
+PyTorch: starting from c:\yolov5\runs\train\exp30\weights\best.pt with output shape (1, 25200, 6) (40.3 MB)
+
+ONNX: starting export with onnx 1.16.2...
+ONNX: export success  1.5s, saved as c:\yolov5\runs\train\exp30\weights\best.onnx (80.0 MB)
+
+Export complete (4.3s)
+Results saved to C:\yolov5\runs\train\exp30\weights
+Detect:          python detect.py --weights c:\yolov5\runs\train\exp30\weights\best.onnx
+Validate:        python val.py --weights c:\yolov5\runs\train\exp30\weights\best.onnx
+PyTorch Hub:     model = torch.hub.load('ultralytics/yolov5', 'custom', 'c:\yolov5\runs\train\exp30\weights\best.onnx') 
+Visualize:       https://netron.app
+
+(결과)
+"C:\yolov5\runs\train\exp30\weights\best.onnx" 생성됨
+(감지결과)
+같아서 프로그램 수정
+
 2. CMakeLists.txt 수정
 
 3. 감지프로그램 구현 및 테스트(OpenCV만)
