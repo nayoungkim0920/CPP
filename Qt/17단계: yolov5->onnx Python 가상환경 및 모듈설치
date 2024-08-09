@@ -100,29 +100,41 @@ import sys
 import torch
 import onnx
 import onnxruntime as ort
+import os
 
 # YOLOv5 경로를 추가합니다
 sys.path.append('C:/yolov5')
+print("YOLOv5 path added to system path.")
 
-# 모델 로드 (CUDA로)
+# 모델 경로 설정
 model_path = 'C:/myLab/Project1/Project1/python/best.pt'
+print(f"Model path set to: {model_path}")
 
 # CUDA가 사용 가능한 경우, CUDA로 로드하고, 그렇지 않으면 CPU로 로드합니다
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+print(f"Using device: {device}")
+
+# 모델 로드
 try:
+    print("Attempting to load the model...")
     model = torch.load(model_path, map_location=device, weights_only=False)['model'].float()
     model.to(device)
     model.eval()
     print("Model loaded and set to evaluation mode.")
 except Exception as e:
     print("Error loading model:", str(e))
+    sys.exit()  # 모델 로드 실패 시 종료
 
 # 더미 입력 텐서 생성 (CUDA 또는 CPU에 맞게 설정)
 dummy_input = torch.randn(1, 3, 640, 640).to(device)
+print(f"Dummy input tensor created with shape: {dummy_input.shape}")
 
 # ONNX로 모델 내보내기
 onnx_path = 'C:/myLab/Project1/Project1/python/best.onnx'
+print(f"Export path set to: {onnx_path}")
+
 try:
+    print("Attempting to export model to ONNX format...")
     torch.onnx.export(
         model,
         dummy_input,
@@ -136,9 +148,72 @@ try:
             'output': {0: 'batch_size'}
         }
     )
-    print("Model has been exported to ONNX format at", onnx_path)
+    print("Model has been exported to ONNX format.")
+    
+    # 파일 생성 확인
+    if os.path.exists(onnx_path):
+        print(f"ONNX file successfully created at: {onnx_path}")
+    else:
+        print(f"Failed to create ONNX file at: {onnx_path}")
 except Exception as e:
     print("Error exporting model to ONNX:", str(e))
+    sys.exit()  # ONNX 변환 실패 시 종료
+
+# ONNX 모델 검증
+try:
+    print("Attempting to validate the ONNX model...")
+    onnx_model = onnx.load(onnx_path)
+    onnx.checker.check_model(onnx_model)
+    print("ONNX model is valid.")
+except Exception as e:
+    print("Error validating ONNX model:", str(e))
+    sys.exit()  # 모델 검증 실패 시 종료
+
+# ONNX Runtime 세션 생성
+try:
+    print("Creating ONNX Runtime session...")
+    ort_session = ort.InferenceSession(onnx_path)
+    print("ONNX Runtime session created successfully.")
+except Exception as e:
+    print("Error creating ONNX Runtime session:", str(e))
+    sys.exit()  # 세션 생성 실패 시 종료
+
+# 더미 입력 준비
+dummy_input_np = dummy_input.cpu().numpy()
+print(f"Dummy input numpy array created with shape: {dummy_input_np.shape}")
+
+# 추론 실행
+try:
+    print("Running inference...")
+    outputs = ort_session.run(None, {'input': dummy_input_np})
+    print("Inference completed. Outputs:")
+    print(outputs)
+except Exception as e:
+    print("Error running inference:", str(e))
 
 #결과
-"C:\myLab\Project1\Project1\python\best.onnx" 생성완료
+Using device: cpu
+Model has been exported to ONNX format.
+ONNX file successfully created at: C:/myLab/Project1/Project1/python/best.onnx
+Attempting to validate the ONNX model...
+ONNX model is valid.
+Creating ONNX Runtime session...
+ONNX Runtime session created successfully.
+
+#GPU로변경
+ONNX Runtime GPU 설치
+(myenv) C:\>pip install onnxruntime-gpu
+Successfully installed onnxruntime-gpu-1.18.1
+
+(myenv) C:\> python
+import torch
+print("CUDA available:", torch.cuda.is_available())
+print("CUDA device count:", torch.cuda.device_count())
+print("CUDA current device:", torch.cuda.current_device())
+print("CUDA device name:", torch.cuda.get_device_name(torch.cuda.current_device()))
+(myenv) C:\>pip install torch==2.0.1+cu118 torchvision==0.15.1+cu118 torchaudio==2.0.2+cu118 -f https://download.pytorch.org/whl/cu118/torch_stable.html
+Looking in links: https://download.pytorch.org/whl/cu118/torch_stable.html
+ERROR: Could not find a version that satisfies the requirement torch==2.0.1+cu118 (from versions: 2.2.0, 2.2.0+cu118, 2.2.1, 2.2.1+cu118, 2.2.2, 2.2.2+cu118, 2.3.0, 2.3.0+cu118, 2.3.1, 2.3.1+cu118, 2.4.0)
+ERROR: No matching distribution found for torch==2.0.1+cu118
+
+(myenv) C:\>pip install torch==2.2.2+cu118 torchvision==0.15.1+cu118 torchaudio==2.0.2+cu118 -f https://download.pytorch.org/whl/cu118/torch_stable.html
