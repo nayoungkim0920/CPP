@@ -3,3 +3,223 @@
 인식결과가 차이가나 차이를 줄임
 python_yolov5에서는 90%이상 컵인식이 잘되었는데
 c++_onnx 정확도가 떨어짐
+=>onnxDetectImage.py를 만들어 객체감지확인함(C:/ObjectDetect/cups.jpg의 76%와 바운딩박스 확인)
+=>c++프로그램에 적용하여 테스트
+
+1) yolov5로 학습된 best.pt를 best.onnx파일로 export (python 3.12.3 myenv c:/myenv가상환경)
+# C:/yolov5/runs/train/exp30/weights/best.pt (인식률이나오는걸로고름)
+# C:\myLab\Project1\Project1\python\myTorchScript.py
+import sys
+import torch
+import onnx
+import onnxruntime as ort
+import os
+
+# 디버깅 정보 저장 리스트
+debug_info = []
+
+def log_debug_info(message):
+    debug_info.append(message)
+
+# YOLOv5 경로를 추가합니다
+sys.path.append('C:/yolov5')
+log_debug_info("YOLOv5 path added to system path.")
+
+# 모델 경로 설정
+model_path = 'C:/yolov5/runs/train/exp30/weights/best.pt'
+log_debug_info(f"Model path set to: {model_path}")
+
+# CUDA가 사용 가능한 경우, CUDA로 로드하고, 그렇지 않으면 CPU로 로드합니다
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+log_debug_info(f"Using device: {device}")
+
+# 모델 로드
+try:
+    log_debug_info("Attempting to load the model...")
+    model = torch.load(model_path, map_location=device, weights_only=False)['model'].float()
+    model.to(device)
+    model.eval()
+    log_debug_info("Model loaded and set to evaluation mode.")
+except Exception as e:
+    log_debug_info(f"Error loading model: {str(e)}")
+    sys.exit()
+
+# 더미 입력 텐서 생성 (CUDA 또는 CPU에 맞게 설정)
+dummy_input = torch.randn(1, 3, 640, 640).to(device)
+log_debug_info(f"Dummy input tensor created with shape: {dummy_input.shape}")
+
+# ONNX로 모델 내보내기
+onnx_path = 'C:/myLab/Project1/Project1/python/best.onnx'
+log_debug_info(f"Export path set to: {onnx_path}")
+
+try:
+    log_debug_info("Attempting to export model to ONNX format...")
+    torch.onnx.export(
+        model,
+        dummy_input,
+        onnx_path,
+        verbose=True,
+        opset_version=12,
+        input_names=['input'],
+        output_names=['output'],
+        dynamic_axes={
+            'input': {0: 'batch_size'},
+            'output': {0: 'batch_size'}
+        }
+    )
+    if os.path.exists(onnx_path):
+        log_debug_info(f"ONNX file successfully created at: {onnx_path}")
+    else:
+        log_debug_info(f"Failed to create ONNX file at: {onnx_path}")
+except Exception as e:
+    log_debug_info(f"Error exporting model to ONNX: {str(e)}")
+    sys.exit()
+
+# ONNX Runtime 버전과 CUDA 버전 출력
+try:
+    log_debug_info(f"ONNX Runtime version: {ort.__version__}")
+except Exception as e:
+    log_debug_info(f"Error getting ONNX Runtime version: {str(e)}")
+
+try:
+    log_debug_info(f"CUDA version: {torch.version.cuda}")
+except Exception as e:
+    log_debug_info(f"Error getting CUDA version: {str(e)}")
+
+# ONNX 모델 검증
+try:
+    log_debug_info("Attempting to validate the ONNX model...")
+    onnx_model = onnx.load(onnx_path)
+    onnx.checker.check_model(onnx_model)
+    log_debug_info("ONNX model is valid.")
+except Exception as e:
+    log_debug_info(f"Error validating ONNX model: {str(e)}")
+    sys.exit()
+
+# ONNX Runtime 세션 생성 (GPU 사용)
+try:
+    log_debug_info("Creating ONNX Runtime session...")
+    providers = ['CUDAExecutionProvider'] if torch.cuda.is_available() else ['CPUExecutionProvider']
+    ort_session = ort.InferenceSession(onnx_path, providers=providers)
+    log_debug_info(f"ONNX Runtime session created with {'GPU' if torch.cuda.is_available() else 'CPU'} support.")
+except Exception as e:
+    log_debug_info(f"Error creating ONNX Runtime session: {str(e)}")
+    sys.exit()
+
+# 더미 입력 준비
+dummy_input_np = dummy_input.cpu().numpy()
+log_debug_info(f"Dummy input numpy array created with shape: {dummy_input_np.shape}")
+
+# 추론 실행
+try:
+    log_debug_info("Running inference...")
+    outputs = ort_session.run(None, {'input': dummy_input_np})
+    log_debug_info("Inference completed. Outputs:")
+    log_debug_info(str(outputs))
+except Exception as e:
+    log_debug_info(f"Error running inference: {str(e)}")
+
+# 모든 디버깅 정보를 출력
+print("\n--- Debug Information ---")
+for info in debug_info:
+    print(info)
+
+2) C:\ObjectDetect\onnxDetectImage.py 파일만들어서 객체감지 테스트 (Python 3.12.3 c:/pythonEnv 가상환경)
+#C:\ObjectDetect\onnxDetectImage.py
+#76% 인식률 나옴
+import cv2
+import numpy as np
+import onnxruntime as ort
+
+# ONNX 모델 경로와 이미지 경로
+model_path = "C:/myLab/Project1/Project1/python/best.onnx"
+image_path = "C:/ObjectDetect/cups.jpg"
+
+# 모델 불러오기
+session = ort.InferenceSession(model_path)
+
+# 클래스 이름 (모델 학습 시 사용된 클래스 목록을 여기에 정의)
+class_names = ["cup"]
+
+# 이미지 불러오기
+image = cv2.imread(image_path)
+orig_img = image.copy()
+h, w = image.shape[:2]
+
+# 이미지 전처리
+input_size = 640  # YOLOv5 기본 입력 사이즈
+image = cv2.resize(image, (input_size, input_size))
+image = image.transpose(2, 0, 1)  # HWC to CHW
+image = np.expand_dims(image, axis=0)
+image = image.astype(np.float32) / 255.0
+
+# ONNX 모델 추론
+input_name = session.get_inputs()[0].name
+outputs = session.run(None, {input_name: image})
+
+# YOLOv5는 여러 스케일에서 감지된 결과를 반환합니다.
+predictions = outputs[0]
+
+# 후처리: NMS (Non-Maximum Suppression)
+def nms(boxes, scores, iou_threshold):
+    indices = cv2.dnn.NMSBoxes(boxes, scores, score_threshold=0.5, nms_threshold=iou_threshold)
+    return indices
+
+def process_predictions(predictions, h, w):
+    boxes = []
+    confidences = []
+    class_ids = []
+
+    for pred in predictions:
+        # 박스 좌표 (x_center, y_center, width, height)
+        pred = pred.reshape(-1, 6)  # reshape to (num_boxes, 6) if necessary
+
+        for box in pred:
+            # 박스 좌표와 confidence 값 추출
+            x_center, y_center, width, height, score = box[:5]
+            class_scores = box[5:]
+
+            # confidence 및 class_id 추출
+            class_id = np.argmax(class_scores)
+            score = float(score)
+
+            if score >= 0.5:  # confidence threshold
+                # 좌표를 원본 이미지 크기로 변환
+                x = int((x_center - width / 2) * w / input_size)
+                y = int((y_center - height / 2) * h / input_size)
+                width = int(width * w / input_size)
+                height = int(height * h / input_size)
+
+                boxes.append([x, y, width, height])
+                confidences.append(score)
+                class_ids.append(class_id)
+
+    # NMS 적용
+    indices = nms(boxes, confidences, 0.4)
+
+    # indices가 비어 있지 않은지 확인
+    if len(indices) > 0:
+        indices = indices.flatten()  # 2D 배열을 1D 배열로 변환
+        results = [(class_ids[i], boxes[i], confidences[i]) for i in indices]
+    else:
+        results = []  # 감지된 객체가 없는 경우 빈 리스트 반환
+    
+    return results
+
+# 결과 처리
+results = process_predictions(predictions, h, w)
+
+# 결과 표시
+for class_id, box, confidence in results:
+    if class_id < len(class_names):  # class_id가 class_names의 범위 내에 있는지 확인
+        x, y, width, height = box
+        label = f"{class_names[class_id]}: {confidence:.2f}"
+        cv2.rectangle(orig_img, (x, y), (x + width, y + height), (0, 255, 0), 2)
+        cv2.putText(orig_img, label, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+    else:
+        print(f"Invalid class_id {class_id}. It exceeds the number of class names.")
+
+# 이미지 출력
+cv2.imshow("Detected Objects", orig_img)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
