@@ -15,6 +15,7 @@ C:\date\build>cmake -G "Visual Studio 16 2019" ..
 -- Configuring done (7.7s)
 -- Generating done (0.7s)
 -- Build files have been written to: C:/date/build
+C:\date\build>cmake --build .
 
 ONNX (Open Neural Network Exchange)는 머신러닝 모델을 교환하는 데 사용
 C:\>git clone https://github.com/onnx/onnx.git
@@ -36,6 +37,7 @@ C:\flatbuffers\build>cmake -G "Visual Studio 16 2019" ..
 -- Configuring done (6.9s)
 -- Generating done (0.1s)
 -- Build files have been written to: C:/flatbuffers/build
+C:\flatbuffers\build>cmake --build .
 
 GSL(Gnu Scientific Library)은 과학적 계산과 수학적 작업을 지원하는 오픈 소스 라이브러리
 C:\>vcpkg install gsl 
