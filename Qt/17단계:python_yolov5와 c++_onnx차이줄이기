@@ -27,6 +27,25 @@ C:\onnx\build>cmake -G "Visual Studio 16 2019" ..
 -- Generating done (1.0s)
 -- Build files have been written to: C:/onnx/build
 C:\onnx\build>cmake --build .
+C:\onnx>protoc --proto_path=onnx --cpp_out=build onnx/onnx-operators.proto
+=> "C:\onnx\build\onnx\onnx-operators.pb.h", "C:\onnx\build\onnx\onnx-operators.pb.cc" 생성
+
+vcpkg 설치 및 업그레이
+Git을 사용하여 vcpkg를 클론
+C:\>git clone https://github.com/microsoft/vcpkg.git
+vcpkg 부트스트랩
+C:\>cd vcpkg
+C:\vcpkg>.\bootstrap-vcpkg.bat
+C:\>cd vcpkg
+C:\vcpkg>.\vcpkg.exe install protobuf
+"C:\vcpkg\packages\protobuf_x64-windows"
+find_package(protobuf CONFIG REQUIRED)
+target_link_libraries(main PRIVATE protobuf::libprotoc protobuf::libprotobuf protobuf::libprotobuf-lite)
+C:\vcpkg>.\vcpkg.exe install gsl
+"C:\vcpkg\packages\gsl_x64-windows"
+find_package(GSL REQUIRED)
+target_link_libraries(main PRIVATE GSL::gsl GSL::gslcblas)
+
 
 Google에서 개발한 직렬화 라이브러리
 C:\>git clone https://github.com/google/flatbuffers.git
