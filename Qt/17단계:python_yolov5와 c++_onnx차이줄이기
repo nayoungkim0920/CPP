@@ -29,6 +29,11 @@ C:\onnx\build>cmake -G "Visual Studio 16 2019" ..
 C:\onnx\build>cmake --build .
 C:\onnx>protoc --proto_path=onnx --cpp_out=build onnx/onnx-operators.proto
 => "C:\onnx\build\onnx\onnx-operators.pb.h", "C:\onnx\build\onnx\onnx-operators.pb.cc" 생성
+onnx.pb.h 생성하기
+C:\>protoc --version
+libprotoc 26.1
+C:\>protoc --proto_path=C:\onnx\onnx --cpp_out=C:\onnx\onnx C:\onnx\onnx\onnx.proto
+=>"C:\onnx\onnx\onnx.pb.h" 생성
 
 vcpkg 설치 및 업그레이
 Git을 사용하여 vcpkg를 클론
