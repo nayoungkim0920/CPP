@@ -3,10 +3,11 @@
 인식결과가 차이가나 차이를 줄임
 python_yolov5에서는 90%이상 컵인식이 잘되었는데
 c++_onnx 정확도가 떨어짐
-=>onnxDetectImage.py를 만들어 객체감지확인함(C:/ObjectDetect/cups.jpg의 76%와 바운딩박스 확인)
+=>onnxDetectImage.py를 만들어 객체감지확인함(C:/images/cups.jpg의 76%와 바운딩박스 확인)
 =>c++프로그램에 적용하여 테스트
+
 <필요한 모듈 설치>
-C++에서 날짜와 시간 관련 기능을 제공
+[date] C++에서 날짜와 시간 관련 기능을 제공
 C:\>git clone https://github.com/HowardHinnant/date.git
 C:\>cd date
 C:\date>mkdir build
@@ -17,7 +18,7 @@ C:\date\build>cmake -G "Visual Studio 16 2019" ..
 -- Build files have been written to: C:/date/build
 C:\date\build>cmake --build .
 
-ONNX (Open Neural Network Exchange)는 머신러닝 모델을 교환하는 데 사용
+[ONNX (Open Neural Network Exchange)] 머신러닝 모델을 교환하는 데 사용
 C:\>git clone https://github.com/onnx/onnx.git
 C:\>cd onnx
 C:\onnx>mkdir build
@@ -29,30 +30,34 @@ C:\onnx\build>cmake -G "Visual Studio 16 2019" ..
 C:\onnx\build>cmake --build .
 C:\onnx>protoc --proto_path=onnx --cpp_out=build onnx/onnx-operators.proto
 => "C:\onnx\build\onnx\onnx-operators.pb.h", "C:\onnx\build\onnx\onnx-operators.pb.cc" 생성
-onnx.pb.h 생성하기
+
+[onnx.pb.h 생성하기]
 C:\>protoc --version
 libprotoc 26.1
 C:\>protoc --proto_path=C:\onnx\onnx --cpp_out=C:\onnx\onnx C:\onnx\onnx\onnx.proto
 =>"C:\onnx\onnx\onnx.pb.h" 생성
 
-vcpkg 설치 및 업그레이
+[vcpkg 설치 및 업그레이드]
 Git을 사용하여 vcpkg를 클론
 C:\>git clone https://github.com/microsoft/vcpkg.git
 vcpkg 부트스트랩
 C:\>cd vcpkg
 C:\vcpkg>.\bootstrap-vcpkg.bat
 C:\>cd vcpkg
+
+[Protocol Buffers (protobuf)] Google에서 개발한 데이터 직렬화(serialization) 포맷
 C:\vcpkg>.\vcpkg.exe install protobuf
 "C:\vcpkg\packages\protobuf_x64-windows"
 find_package(protobuf CONFIG REQUIRED)
 target_link_libraries(main PRIVATE protobuf::libprotoc protobuf::libprotobuf protobuf::libprotobuf-lite)
+
+[GSL(Gnu Scientific Library)] 과학적 계산과 수학적 작업을 지원하는 오픈 소스 라이브러리
 C:\vcpkg>.\vcpkg.exe install gsl
 "C:\vcpkg\packages\gsl_x64-windows"
 find_package(GSL REQUIRED)
 target_link_libraries(main PRIVATE GSL::gsl GSL::gslcblas)
 
-
-Google에서 개발한 직렬화 라이브러리
+[flatbuffers] Google에서 개발한 직렬화 라이브러리
 C:\>git clone https://github.com/google/flatbuffers.git
 C:\>cd flatbuffers
 C:\flatbuffers>mkdir build
@@ -63,20 +68,303 @@ C:\flatbuffers\build>cmake -G "Visual Studio 16 2019" ..
 -- Build files have been written to: C:/flatbuffers/build
 C:\flatbuffers\build>cmake --build .
 
-GSL(Gnu Scientific Library)은 과학적 계산과 수학적 작업을 지원하는 오픈 소스 라이브러리
-C:\>vcpkg install gsl 
-Computing installation plan...
-The following packages are already installed:
-    gsl:x64-windows@2.7.1#3
-gsl:x64-windows is already installed
-Total install time: 182 us
-The package gsl is compatible with built-in CMake targets:
+1) CMakeLists.txt
+cmake_minimum_required(VERSION 3.14)
+project(Project1 LANGUAGES CXX CUDA)
 
-    find_package(GSL REQUIRED)
-    target_link_libraries(main PRIVATE GSL::gsl GSL::gslcblas)
-=> C:/Users/nayou/vcpkg/installed/x64-windows
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-1) yolov5로 학습된 best.pt를 best.onnx파일로 export (python 3.12.3 myenv c:/myenv가상환경)
+set(CMAKE_TOOLCHAIN_FILE "C:/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE FILEPATH "Path to vcpkg toolchain file")
+set(CMAKE_PREFIX_PATH "C:/vcpkg/packages" "C:/Qt/6.7.1/msvc2019_64" "C:/opencv/build")
+
+find_package(Qt6 REQUIRED COMPONENTS Widgets Core Gui)
+find_package(OpenCV REQUIRED COMPONENTS core imgproc highgui cudaarithm cudafilters cudawarping cudacodec cudafeatures2d cudaimgproc dnn)
+find_package(CUDA REQUIRED)
+
+# ONNX 설정
+# C:\>protoc --proto_path=C:\onnx\onnx --cpp_out=C:\onnx\onnx C:\onnx\onnx\onnx.proto
+set(ONNX_ROOT "C:/onnx")
+set(ONNX_DIR "C:/onnx/build") # ONNXConfig.cmake
+include_directories("${ONNX_ROOT}")
+link_directories("${ONNX_ROOT}/build/lib/pkgconfig")
+# Protobuf 설정
+set(Protobuf_ROOT "${CMAKE_PREFIX_PATH}/protobuf_x64-windows")
+set(Protobuf_INCLUDE_DIR "${Protobuf_ROOT}/include/google/protobuf")
+set(Protobuf_LIB "${Protobuf_ROOT}/bin")
+include_directories(${Protobuf_INCLUDE_DIR})
+link_directories("${Protobuf_LIB}")
+#onnx.pb.h생성(실패)
+#find_package(Protobuf REQUIRED)
+# Protobuf 설치 경로 설정 (경로는 실제 Protobuf 설치 경로로 수정해야 합니다)
+# set(CMAKE_PREFIX_PATH "C:/vcpkg/packages/protobuf_x64-windows" ${CMAKE_PREFIX_PATH})
+# Set Protobuf include directories
+#include_directories(${PROTOBUF_INCLUDE_DIRS})
+# Protobuf files
+#set(PROTO_FILES
+#    ${CMAKE_CURRENT_SOURCE_DIR}/onnx/onnx.proto
+#)
+# Generate Protobuf C++ files
+#protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${PROTO_FILES})
+# Create library from generated files
+#add_library(onnx_proto ${PROTO_SRCS} ${PROTO_HDRS})
+# Link against Protobuf
+#target_link_libraries(onnx_proto ${PROTOBUF_LIBRARIES})
+
+# GSL 설정 추가
+set(GSL_ROOT "${CMAKE_PREFIX_PATH}/gsl_x64-windows")
+set(GSL_INCLUDE_DIR "${GSL_ROOT}/include")
+set(GSL_LIBRARY "${GSL_ROOT}/lib")
+set(GSL_CBLAS_LIBRARY "${GSL_LIBRARY}/gslcblas.lib")
+include_directories(${GSL_INCLUDE_DIR})
+link_directories("${GSL_LIBRARY}" "${GSL_CBLAS_LIBRARY}")
+
+# LibTorch 설정
+set(TORCH_ROOT "C:/libtorch")
+set(Torch_DIR "${TORCH_ROOT}/share/cmake/Torch")
+include_directories("${TORCH_ROOT}/include")
+link_directories("${TORCH_ROOT}/lib")
+find_package(Torch REQUIRED)
+
+# ONNX Runtime 설정
+set(ONNX_RUNTIME_ROOT "C:/onnxruntime")
+include_directories( 
+    "${ONNX_RUNTIME_ROOT}"
+    "${ONNX_RUNTIME_ROOT}/cmake/build/_deps/safeint-src"
+    "${ONNX_RUNTIME_ROOT}/cmake/build/_deps/mp11-src/include"
+    "${ONNX_RUNTIME_ROOT}/cmake/build/_deps/onnx-src/onnx"
+    "${ONNX_RUNTIME_ROOT}/cmake/build"
+    "${ONNX_RUNTIME_ROOT}/build"
+    "${ONNX_RUNTIME_ROOT}/onnxruntime"
+    "${ONNX_RUNTIME_ROOT}/build/_deps/mp11-src/include"
+    "${ONNX_RUNTIME_ROOT}/build/_deps/safeint-src"
+    "${ONNX_RUNTIME_ROOT}/include/onnxruntime"
+    "${ONNX_RUNTIME_ROOT}/include/onnxruntime/core/session"
+    )
+link_directories("${ONNX_RUNTIME_ROOT}/cmake/build/Debug")
+find_library(ONNXRUNTIME_LIB NAMES custom_op_local_function PATHS "${ONNX_RUNTIME_ROOT}/cmake/build/Debug")
+if (ONNXRUNTIME_LIB)
+    message(STATUS "Found ONNX Runtime library: ${ONNXRUNTIME_LIB}")
+else()
+    message(FATAL_ERROR "ONNX Runtime library not found")
+endif()
+set(ONNX_RUNTIME_LIB_DIR "${ONNX_RUNTIME_ROOT}/build/${CMAKE_BUILD_TYPE}")
+
+# IPP 설정
+set(IPP_ROOT "C:/Program Files (x86)/Intel/oneAPI/ipp/2021.11")
+include_directories("${IPP_ROOT}/include")
+link_directories("${IPP_ROOT}/lib")
+
+# GStreamer 설정
+set(GSTREAMER_ROOT "C:/gstreamer/1.0/msvc_x86_64")
+include_directories(
+    "${GSTREAMER_ROOT}/include/gstreamer-1.0"
+    "${GSTREAMER_ROOT}/include/glib-2.0"
+    "${GSTREAMER_ROOT}/lib/glib-2.0/include"
+)
+link_directories("${GSTREAMER_ROOT}/lib")
+
+# IPLIB 설정
+set(IPLIB_ROOT "C:/myLab/Project1/Project1/imageProcessingLib")
+include_directories("${IPLIB_ROOT}")
+link_directories(
+    "${IPLIB_ROOT}/build/lib/${CMAKE_BUILD_TYPE}"
+    "${IPLIB_ROOT}/build/bin/${CMAKE_BUILD_TYPE}"
+    "${IPLIB_ROOT}/build/${CMAKE_BUILD_TYPE}"
+)
+
+# Abseil 라이브러리 설정
+# Google이 개발하고 관리하는 오픈 소스 C++ 라이브러리
+set(ABSEIL_ROOT "C:/abseil-cpp")
+include_directories("${ABSEIL_ROOT}")
+link_directories("${ABSEIL_ROOT}/build/lib")
+
+# flatbuffers 설정
+set(FLATBUFFERS_ROOT "C:/flatbuffers")
+include_directories("${FLATBUFFERS_ROOT}/include")
+link_directories("${FLATBUFFERS_ROOT}/build/Debug")
+
+# date 설정
+set(DATE_ROOT "C:/date")
+include_directories("${DATE_ROOT}/include")
+link_directories("${DATE_ROOT}/build/Debug")
+
+# CUDA 아키텍처 설정
+set(CUDA_ARCHITECTURES "86")
+message(STATUS "CUDA Architectures set to: ${CUDA_ARCHITECTURES}")
+
+# CUDA 파일 설정
+set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} -std=c++14 --expt-relaxed-constexpr -gencode arch=compute_86,code=sm_86)
+
+# CUDA 파일 컴파일 및 라이브러리 생성
+cuda_add_library(image_processing
+    imageProcessing.cu
+)
+
+# Qt 래핑 파일 생성
+qt6_wrap_cpp(MOC_FILES
+    MainWindow.h
+    ImageProcessor.h
+    DetectDialog.h
+)
+
+# 라이브러리 링크
+target_link_libraries(image_processing
+    ippcc.lib
+    ippcore.lib
+    ippvm.lib
+    ipps.lib
+    ippi.lib
+    ippcv.lib
+    nppial
+    nppicc
+    nppidei
+    nppif
+    nppig
+    nppim
+    nppist
+    nppisu
+    nppitc
+    npps
+    imageProcessingLib
+    flatbuffers
+    date
+    gstreamer-1.0.lib
+    gobject-2.0.lib
+    glib-2.0.lib
+    gstapp-1.0.lib
+    gstbase-1.0.lib
+    gstvideo-1.0.lib
+)
+
+# 실행 파일 추가
+add_executable(Project1
+    main.cpp
+    MainWindow.cpp
+    MainWindow.h
+    MainWindow.ui
+    ImageProcessor.cpp
+    ImageProcessor.h
+    ${MOC_FILES}
+)
+
+# 라이브러리 링크
+target_link_libraries(Project1
+    Qt6::Widgets
+    Qt6::Core
+    Qt6::Gui
+    ${OpenCV_LIBS}
+    image_processing
+    imageProcessingLib
+    ${CUDA_LIBRARIES}
+    ${CUDNN_LIBRARIES}
+    ${GSTREAMER_LIBRARIES}
+    ${TORCH_LIBRARIES}  # LibTorch 링크
+    flatbuffers
+    date
+    ${ONNX_RUNTIME_LIB}
+    ${ONNX_LIB}
+    ${Protobuf_LIB}
+    ${ONNX_DIR}/onnx/onnx-operators.pb.cc
+)
+
+# 빌드 후 TARGET_FILE_DIR 출력
+add_custom_command(TARGET Project1 POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E echo "TARGET_FILE_DIR for Project1: $<TARGET_FILE_DIR:Project1>"
+    COMMAND ${CMAKE_COMMAND} -E echo "$<TARGET_FILE_DIR:Project1>" > "Project1_dir.txt"
+)
+
+# 실행 파일 출력 디렉토리 설정
+set_target_properties(Project1 PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/Debug"
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/Release"
+)
+
+file(COPY "C:/myLab/Project1/Project1/imageProcessingLib/build/Debug/imageProcessingLib.dll"
+     DESTINATION "${CMAKE_BINARY_DIR}/Debug"
+)
+
+# 디버그 빌드에서의 OpenCV opencv_world DLL 복사
+add_custom_command(TARGET Project1 POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/x64/vc16/bin/opencv_world4100d.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMENT "Copying OpenCV Debug opencv_world DLL to output directory"
+)
+
+# 릴리스 빌드에서의 OpenCV opencv_world DLL 복사
+add_custom_command(TARGET Project1 POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/x64/vc16/bin/opencv_world4100.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMENT "Copying OpenCV Release opencv_world DLL to output directory"
+)
+
+# 디버그 빌드에서의 OpenCV DLL 복사
+add_custom_command(TARGET Project1 POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/bin/Debug/opencv_dnn4100d.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/bin/Debug/opencv_cudaarithm4100d.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/bin/Debug/opencv_cudaimgproc4100d.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/bin/Debug/opencv_cudafilters4100d.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/bin/Debug/opencv_imgcodecs4100d.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/bin/Debug/opencv_core4100d.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/bin/Debug/opencv_imgproc4100d.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMENT "Copying OpenCV Debug DLLs to output directory"
+)
+
+# 릴리스 빌드에서의 OpenCV DLL 복사
+add_custom_command(TARGET Project1 POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/bin/Release/opencv_dnn4100.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/bin/Release/opencv_cudaarithm4100.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/bin/Release/opencv_cudaimgproc4100.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/bin/Release/opencv_cudafilters4100.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/bin/Release/opencv_imgcodecs4100.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/bin/Release/opencv_core4100.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "C:/opencv/build/bin/Release/opencv_imgproc4100.dll" "$<TARGET_FILE_DIR:Project1>"
+    COMMENT "Copying OpenCV Release DLLs to output directory"
+)
+
+# 파일 인코딩 설정 추가
+add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
+
+# OpenMP 설정
+find_package(OpenMP REQUIRED)
+if(OpenMP_CXX_FOUND)
+    target_link_libraries(Project1 OpenMP::OpenMP_CXX)
+endif()
+
+if (MSVC)
+    set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Project1)
+
+    # Debug 빌드
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MDd")
+    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /MDd")
+
+    # Release 빌드
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MD")
+    set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /MD")
+
+    # 반복자 디버그 레벨 설정
+    add_compile_definitions(
+        $<$<CONFIG:Debug>:_ITERATOR_DEBUG_LEVEL=2>
+        $<$<CONFIG:Release>:_ITERATOR_DEBUG_LEVEL=0>
+    )
+endif()
+
+
+2) yolov5로 학습된 best.pt를 best.onnx파일로 export (python 3.12.3 myenv c:/myenv가상환경)
 # C:/yolov5/runs/train/exp30/weights/best.pt (인식률이나오는걸로고름)
 # C:\myLab\Project1\Project1\python\myTorchScript.py
 import sys
