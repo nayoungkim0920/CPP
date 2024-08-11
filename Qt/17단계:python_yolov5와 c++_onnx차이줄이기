@@ -25,6 +25,7 @@ C:\onnx\build>cmake -G "Visual Studio 16 2019" ..
 -- Configuring done (22.4s)
 -- Generating done (1.0s)
 -- Build files have been written to: C:/onnx/build
+C:\onnx\build>cmake --build .
 
 Google에서 개발한 직렬화 라이브러리
 C:\>git clone https://github.com/google/flatbuffers.git
