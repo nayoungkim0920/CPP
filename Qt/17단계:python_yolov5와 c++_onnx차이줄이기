@@ -100,6 +100,35 @@ C:\protobuf\build>cmake --build .
 c:\protobuf\build>protoc --version
 libprotoc 26.1
 
+심각도	코드	설명	프로젝트	파일	줄	비표시 오류(Suppression) 상태
+오류	C1128	섹션 수가 개체 파일 형식 한도를 초과했습니다. /bigobj를 사용하여 컴파일하십시오.	tests	C:\protobuf\src\google\protobuf\descriptor_unittest.cc	1	
+CMakeLists.txt에 추가한 후 빌드
+add_compile_options(/bigobj)
+
+openCV빌드
+C:\opencv\build>cmake -G "Visual Studio 16 2019" ../sources
+C:\opencv\build>cmake --build .
+error python path
+C:\>python
+Python 3.12.3 (tags/v3.12.3:f6650f9, Apr  9 2024, 14:05:25) [MSC v.1938 64 bit (AMD64)] on win32
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import sys
+>>> print(sys.executable)
+C:\Users\nayou\AppData\Local\Programs\Python\Python312\python.exe
+환경변수 Path에추가
+C:\>opencv\build>cmake -G "Visual Studio 16 2019" -DPYTHON3_EXECUTABLE="C:\Users\nayou\AppData\Local\Programs\Python\Python312\python.exe" ../sources
+-- Configuring done (153.8s)
+-- Generating done (14.8s)
+-- Build files have been written to: C:/opencv/build
+C:\>opencv\build>cmake --build .
+LINK : fatal error LNK1104: 'python312_d.lib' 파일을 열 수 없습니다. [C:\opencv\build\modules\python3\opencv_python3.vcxproj]
+cmake -G "Visual Studio 16 2019" ^
+      -DCMAKE_BUILD_TYPE=Release ^
+      -DPYTHON3_EXECUTABLE="C:\Users\nayou\AppData\Local\Programs\Python\Python312\python.exe" ^
+      -DPYTHON3_LIBRARY="C:\Users\nayou\AppData\Local\Programs\Python\Python312\libs\python312.lib" ^
+      -DPYTHON3_INCLUDE_DIR="C:\Users\nayou\AppData\Local\Programs\Python\Python312\include" ^
+      -DOPENCV_EXTRA_MODULES_PATH="C:\opencv_contrib\modules" ../sources
+
 [vcpkg 설치 및 업그레이드]
 Git을 사용하여 vcpkg를 클론
 C:\>git clone https://github.com/microsoft/vcpkg.git
