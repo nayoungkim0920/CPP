@@ -36,6 +36,69 @@ C:\>protoc --version
 libprotoc 26.1
 C:\>protoc --proto_path=C:\onnx\onnx --cpp_out=C:\onnx\onnx C:\onnx\onnx\onnx.proto
 =>"C:\onnx\onnx\onnx.pb.h" 생성
+심각도	코드	설명	프로젝트	파일	줄	비표시 오류(Suppression) 상태
+오류	C1189	#error:  "Protobuf C++ gencode is built with an incompatible version of"	Project1	C:\onnx\onnx\onnx.pb.h	15	
+C:\>protoc --version
+libprotoc 26.1
+C:\>vcpkg list | findstr protobuf
+protobuf:x64-windows                              4.25.1#1            Google's language-neutral, platform-neutral, ext...
+C:\vcpkg>.\vcpkg remove protobuf:x64-windows
+The following packages will be removed:
+    protobuf:x64-windows
+Removing 1/1 protobuf:x64-windows
+
+protobuf 3점대로 다운그레이드 git으로설치변경
+C:\>git clone https://github.com/protocolbuffers/protobuf.git
+PS C:\Windows\system32> Remove-Item -Path "C:\protobuf\build" -Recurse -Force(build 폴더가 아카이브로 숨겨있어 삭제)
+C:\protobuf>cd cmake
+C:\protobuf\cmake>mkdir build
+C:\protobuf\cmake>cd build
+C:\protobuf\cmake\build>cmake -G "Visual Studio 16 2019" ..
+-- Could NOT find ZLIB (missing: ZLIB_LIBRARY ZLIB_INCLUDE_DIR)
+ZLIB 라이브러리 설치 version "1.3.1.1"
+C:\>git clone https://github.com/madler/zlib.git
+C:\>cd zlib
+C:\zlib>mkdir build
+C:\zlib>cd build
+C:\zlib\build>cmake -G "Visual Studio 16 2019" ..
+C:\zlib\build>cmake --build .
+C:\protobuf\cmake\build>cmake -G "Visual Studio 16 2019" ..
+-- Could NOT find ZLIB (missing: ZLIB_LIBRARY ZLIB_INCLUDE_DIR)
+CMake Error at tests.cmake:11 (message):
+  Cannot find third_party/googletest directory that's needed to build tests.
+  If you use git, make sure you have cloned submodules:
+    git submodule update --init --recursive
+  If instead you want to skip tests, run cmake with:
+    cmake -Dprotobuf_BUILD_TESTS=OFF
+C:\protobuf>git submodule update --init --recursive
+C:\protobuf\cmake\build>cmake -G "Visual Studio 16 2019" -DZLIB_INCLUDE_DIR="C:\zlib" -DZLIB_LIBRARY="C:\zlib\build\Release\zlib.lib" -Dprotobuf_BUILD_TESTS=OFF ..
+C:\protobuf\cmake\build>cmake ..
+-- Selecting Windows SDK version 10.0.22621.0 to target Windows 10.0.22631.
+-- 2
+-- 3.20.0.2
+-- Configuring done (0.1s)
+-- Generating done (0.1s)
+-- Build files have been written to: C:/protobuf/cmake/build
+protobuf재설치
+C:\>git clone https://github.com/protocolbuffers/protobuf.git
+C:\>cd protobuf
+C:\protobuf>git checkout v26.1
+C:\protobuf>mkdir build
+C:\protobuf>cd build
+C:\protobuf\build>cmake -G "Visual Studio 16 2019" -DZLIB_INCLUDE_DIR="C:\zlib" -DZLIB_LIBRARY="C:\zlib\build\Release\zlib.lib" -Dprotobuf_BUILD_TESTS=OFF ..
+CMake Error at third_party/utf8_range/CMakeLists.txt:29 (add_subdirectory):
+  The source directory
+    C:/protobuf/third_party/abseil-cpp
+  does not contain a CMakeLists.txt file.
+C:\protobuf>git submodule update --init --recursive
+"C:\protobuf\third_party\abseil-cpp"생성
+-- Configuring done (12.1s)
+-- Generating done (28.8s)
+-- Build files have been written to: C:/protobuf/build
+C:\protobuf\build>cmake -G "Visual Studio 16 2019" -DZLIB_INCLUDE_DIR="C:\zlib" -DZLIB_LIBRARY="C:\zlib\build\Release\zlib.lib" -Dprotobuf_BUILD_TESTS=OFF ..
+C:\protobuf\build>cmake --build .
+c:\protobuf\build>protoc --version
+libprotoc 26.1
 
 [vcpkg 설치 및 업그레이드]
 Git을 사용하여 vcpkg를 클론
