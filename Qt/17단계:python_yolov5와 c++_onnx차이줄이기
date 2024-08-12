@@ -160,6 +160,29 @@ C:\onnxruntime\build>del /S /Q CMakeCache.txt CMakeFiles
 C:\onnxruntime\build>cmake -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Release ../cmake
 C:\onnxruntime\build>cmake --build . --config Release
 환경변수 Path 추가 : C:\zlib\build\Release
+C:\onnxruntime\build>cmake --build . --target clean
+C:\onnx\build\CMakeFiles\41a20bbd415e2018a37ef4502f9cfc52\onnx-ml.proto.rule
+C:\onnx\build\CMakeFiles\41a20bbd415e2018a37ef4502f9cfc52\onnx-ml.pb.cc.rule
+C:\onnx\build\CMakeFiles\242e772f96f3d05e3d2fffb145dc6636\gen_onnx_proto.rule
+
+[onnxruntime 재설치]
+git clone https://github.com/microsoft/onnxruntime.git
+cd onnxruntime
+https://github.com/microsoft/onnxruntime/releases
+Source code(zip)
+onnxruntime-1.18.1.zip
+압축을 풀고 c:\onnxruntime 으로 이동
+c:\onnxruntime>mkdir build
+c:\onnxruntime>cd build
+c:\onnxruntime\build>cmake ../cmake -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Release -DONNX_RUNTIME_BUILD_SHARED_LIB=ON -
+cmake ../cmake -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Release -DONNX_RUNTIME_BUILD_SHARED_LIB=ON -DUSE_PROTOBUF_SHARED_LIBS=ON -DONNX_BUILD_SHARED_LIBS=ON -DBUILD_SHARED_LIBS=ON
+C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Microsoft\VC\v170\Microsoft.CppCommon.targets(254,5):
+error MSB8066: 'C:\onnxruntime\build\CMakeFiles\51a714ff5d5f4ddcd911b32bf85404f6\onnx-ml.proto.rule;C:\onnxruntime\buil
+d\CMakeFiles\51a714ff5d5f4ddcd911b32bf85404f6\onnx-ml.pb.cc.rule;C:\onnxruntime\build\CMakeFiles\58447f3a954f50939f49ca
+782059b608\gen_onnx_proto.rule'에 대한 사용자 지정 빌드가 종료되었습니다(코드 9009). [C:\onnxruntime\build\_deps\onnx-build\gen_onnx_proto.
+vcxproj]
+==>미해결..
+
 
 [vcpkg 설치 및 업그레이드]
 Git을 사용하여 vcpkg를 클론
