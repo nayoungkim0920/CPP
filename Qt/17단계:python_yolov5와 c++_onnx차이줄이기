@@ -55,6 +55,7 @@ C:\protobuf\cmake>mkdir build
 C:\protobuf\cmake>cd build
 C:\protobuf\cmake\build>cmake -G "Visual Studio 16 2019" ..
 -- Could NOT find ZLIB (missing: ZLIB_LIBRARY ZLIB_INCLUDE_DIR)
+
 ZLIB 라이브러리 설치 version "1.3.1.1"
 C:\>git clone https://github.com/madler/zlib.git
 C:\>cd zlib
@@ -122,12 +123,43 @@ C:\>opencv\build>cmake -G "Visual Studio 16 2019" -DPYTHON3_EXECUTABLE="C:\Users
 -- Build files have been written to: C:/opencv/build
 C:\>opencv\build>cmake --build .
 LINK : fatal error LNK1104: 'python312_d.lib' 파일을 열 수 없습니다. [C:\opencv\build\modules\python3\opencv_python3.vcxproj]
-cmake -G "Visual Studio 16 2019" ^
-      -DCMAKE_BUILD_TYPE=Release ^
-      -DPYTHON3_EXECUTABLE="C:\Users\nayou\AppData\Local\Programs\Python\Python312\python.exe" ^
-      -DPYTHON3_LIBRARY="C:\Users\nayou\AppData\Local\Programs\Python\Python312\libs\python312.lib" ^
-      -DPYTHON3_INCLUDE_DIR="C:\Users\nayou\AppData\Local\Programs\Python\Python312\include" ^
-      -DOPENCV_EXTRA_MODULES_PATH="C:\opencv_contrib\modules" ../sources
+C:\opencv\build>cmake -G "Visual Studio 16 2019" ^      -DCMAKE_BUILD_TYPE=Debug ^      -DPYTHON3_EXECUTABLE="C:/Users/nayou/AppData/Local/Programs/Python/Python312/python.exe" ^      -DPYTHON3_LIBRARY="C:/Users/nayou/AppData/Local/Programs/Python/Python312/libs/python312.lib" ^      -DPYTHON3_INCLUDE_DIR="C:/Users/nayou/AppData/Local/Programs/Python/Python312/include" ^      -DOPENCV_EXTRA_MODULES_PATH="C:/opencv_contrib/modules" ^      -DPYTHON3_DEBUG_LIBRARY="C:/Users/nayou/AppData/Local/Programs/Python/Python312/libs/python312.lib" ^      ../sources
+C:\opencv\build>cmake --build . --config Debug 
+
+[onnxruntime 설치]
+대형 저장소를 클론할 때 --depth 플래그를 사용하여 클론 깊이를 줄일 수 있다.
+C:\>git clone --depth 1 https://github.com/microsoft/onnxruntime.git
+실패할경우 버퍼를 늘려준다.
+git config --global http.postBuffer 1048576000
+C:\>cd c:/onnxruntime
+c:\onnxruntime>mkdir build
+c:\onnxruntime>cd build
+c:\onnxruntime\build>cmake -DCMAKE_PREFIX_PATH="C:/onnxruntime" -DCMAKE_BUILD_TYPE=Release ../cmake
+c:\onnxruntime\build>cmake -DCMAKE_PREFIX_PATH="C:/onnxruntime" -DCMAKE_BUILD_TYPE=Debug ../cmake
+c:\onnxruntime\build>cmake --build . --config Debug
+c:\onnxruntime\build>cmake --build . --config Release --DProtobuf_PROTOC_EXECUTABLE="C:/protobuf/build/Release/protoc.exe"
+환경변수 Path 에 추가
+"C:\protobuf\build\Release\protoc.exe"
+C:\protobuf\build\Release
+"C:\protobuf\build\Debug\protoc.exe"
+C:\protobuf\build\Debug
+cmake -DCMAKE_PREFIX_PATH="C:/onnxruntime" -DProtobuf_PROTOC_EXECUTABLE="C:/protobuf/build/Release/protoc.exe" -DCMAKE_BUILD_TYPE=Release ../cmake
+cmake -DCMAKE_PREFIX_PATH="C:/onnxruntime" -DProtobuf_PROTOC_EXECUTABLE="C:/protobuf/build/Release/protoc.exe" -DCMAKE_BUILD_TYPE=Debug ../cmake
+
+Visual Studio 2019 개발자 명령프롬프트
+C:\onnxruntime\build>del /S /Q CMakeCache.txt CMakeFiles
+C:\onnxruntime\build>cmake -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Release ../cmake
+C:\onnxruntime\build>cmake --build . --config Release
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppCommon.targets(241
+,5): error MSB8066: 'C:\onnxruntime\build\CMakeFiles\51a714ff5d5f4ddcd911b32bf85404f6\onnx-ml.proto.rule;C:\onnxruntime
+\build\CMakeFiles\51a714ff5d5f4ddcd911b32bf85404f6\onnx-ml.pb.cc.rule;C:\onnxruntime\build\CMakeFiles\58447f3a954f50939
+f49ca782059b608\gen_onnx_proto.rule'에 대한 사용자 지정 빌드가 종료되었습니다(코드 9009). [C:\onnxruntime\build\_deps\onnx-build\gen_onnx_p
+roto.vcxproj]
+-환경변수에 다른경로가 지정되있어서 삭제함
+C:\onnxruntime\build>del /S /Q CMakeCache.txt CMakeFiles
+C:\onnxruntime\build>cmake -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Release ../cmake
+C:\onnxruntime\build>cmake --build . --config Release
+환경변수 Path 추가 : C:\zlib\build\Release
 
 [vcpkg 설치 및 업그레이드]
 Git을 사용하여 vcpkg를 클론
@@ -135,7 +167,6 @@ C:\>git clone https://github.com/microsoft/vcpkg.git
 vcpkg 부트스트랩
 C:\>cd vcpkg
 C:\vcpkg>.\bootstrap-vcpkg.bat
-C:\>cd vcpkg
 
 [Protocol Buffers (protobuf)] Google에서 개발한 데이터 직렬화(serialization) 포맷
 C:\vcpkg>.\vcpkg.exe install protobuf
