@@ -209,6 +209,96 @@ find_package(flatbuffers REQUIRED)
 include_directories(${FLATBUFFERS_INCLUDE_DIRS})
 link_directories(${FLATBUFFERS_LIBRARY_DIRS})
 c:\onnxruntime\build>cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE=Release -DONNX_RUNTIME_BUILD_SHARED_LIB=ON -DCMAKE_INSTALL_PREFIX=./install -DZLIB_INCLUDE_DIR="C:/zlib" ../cmake
+set(CMAKE_PREFIX_PATH "C:/flatbuffers")
+set(flatbuffers_DIR "${CMAKE_PREFIX_PATH}/build/Release" "${CMAKE_PREFIX_PATH}/CMake")
+find_package(flatbuffers REQUIRED)
+include_directories(${flatbuffers_INCLUDE_DIRS})
+link_directories(${flatbuffers_LIBRARY_DIRS})
+c:\onnxruntime\build>cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=./install -DZLIB_INCLUDE_DIR="C:/zlib" ../cmake
+-- Configuring done (36.4s)
+-- Generating done (22.6s)
+-- Build files have been written to: C:/onnxruntime/build
+c:\onnxruntime\build>cd C:\abseil-cpp\build
+C:\abseil-cpp\build>cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=./install -DZLIB_INCLUDE_DIR="C:/zlib" ..
+C:\abseil-cpp\build>cmake --build . --config Release
+=> C:/Program Files (x86)/absl
+C:\protobuf\CMakeLists.txt
+##################################################################
+set(absl_DIR "C:/abseil-cpp")
+find_package(absl REQUIRED)
+include_directories(${absl_INCLUDE_DIRS})
+link_directories(${absl_LIBRARY_DIRS})
+##################################################################
+c:\protobuf\build>cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=./install -DZLIB_INCLUDE_DIR="C:/zlib" ..
+C:\abseil-cpp\absl\log\log.h
+#include "absl/log/scoped_mock_log.h" 추가 저장 
+(파일이존재해도 absl::scoped_mock_log not found error
+"C:\abseil-cpp\absl\log\scoped_mock_log.h")
+C:\abseil-cpp\build
+C:\abseil-cpp\build>cmake ..
+C:\abseil-cpp\build>cmake --build .
+C:\abseil-cpp\absl\log\scoped_mock_log.h(27,10): error C1083: 포함 파일을 열 수 없습니다. 'gmock/gmock.h': No such file or directo
+ry [C:\abseil-cpp\build\absl\log\die_if_null.vcxproj]
+Google Test를 설치하면 Google Mock도 함께 설치해야함
+C:\>git clone https://github.com/google/googletest.git
+C:\>cd googletest
+C:\googletest>mkdir build
+C:\googletest>cd build
+C:\googletest\build>C:\googletest\build>cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_INSTALL_PREFIX=./install ..
+-- Configuring done (9.0s)
+-- Generating done (0.9s)
+-- Build files have been written to: C:/googletest/build
+C:\googletest\build>cmake --build .
+.NET Framework용 Microsoft (R) Build Engine 버전 16.11.2+f32259642
+Copyright (C) Microsoft Corporation. All rights reserved.
+  gtest-all.cc
+  gmock-all.cc
+  코드를 생성하고 있습니다...
+  gmock.vcxproj -> C:\googletest\build\lib\Debug\gmock.lib
+  gtest-all.cc
+  gmock-all.cc
+  gmock_main.cc
+  코드를 생성하고 있습니다...
+  gmock_main.vcxproj -> C:\googletest\build\lib\Debug\gmock_main.lib
+  gtest-all.cc
+  gtest.vcxproj -> C:\googletest\build\lib\Debug\gtest.lib
+  gtest_main.cc
+  gtest_main.vcxproj -> C:\googletest\build\lib\Debug\gtest_main.lib
+C:\googletest\build>cmake --install .
+C:\abseil-cpp\build>cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_INSTALL_PREFIX=./install ..
+-- Configuring done (0.3s)
+-- Generating done (12.2s)
+-- Build files have been written to: C:/abseil-cpp/build
+C:\abseil-cpp\build>cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_INSTALL_PREFIX=./install ..
+-- Configuring done (7.4s)
+-- Generating done (9.9s)
+-- Build files have been written to: C:/abseil-cpp/build
+C:\abseil-cpp\build>cmake --build .
+C:\abseil-cpp\build>cmake --install . 
+c:\protobuf\build>cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=./install -DZLIB_INCLUDE_DIR="C:/zlib" ..
+[libgtest.lib 및 libgtest_main.lib가 생성되지 않음]
+==> gtest.lib, gtest_main.lib 로 이름이 바뀐것같아 대체해보니 잘되었음.
+c:\googletest\build>del /S /Q CMakeCache.txt CMakeFiles 
+c:\googletest\build>cmake -G "Visual Studio 16 2019" -A x64 ..
+c:\googletest\build>cmake --build . --config Release
+c:\googletest\build>cmake --install . 
+c:\protobuf\build>cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=./install -DZLIB_INCLUDE_DIR="C:/zlib" ..
+c:\protobuf\build>cmake --build . --config Release
+c:\protobuf\build>cmake --install . 
+[C:\protobuf\CMakeLists.txt] - 성공!
+##################################################################
+set(GTEST_INCLUDE_DIR "C:/googletest/include")
+set(GTEST_LIBRARY "C:/googletest/build/lib/Release/gtest.lib")
+set(GTEST_MAIN_LIBRARY "C:/googletest/build/lib/Release/gtest_main.lib")
+include_directories(${GTEST_INCLUDE_DIRS})
+link_directories(${GTEST_LIBRARY_DIRS})
+include_directories("C:/abseil-cpp/absl")
+link_directories("C:/abseil-cpp/build/absl")
+##################################################################
+C:\myLab\Project1\Project1\build>del /S /Q CMakeCache.txt CMakeFiles
+C:\myLab\Project1\Project1\build>cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=./install ..
+
+
 
 
 
