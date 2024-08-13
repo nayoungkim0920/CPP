@@ -182,6 +182,35 @@ d\CMakeFiles\51a714ff5d5f4ddcd911b32bf85404f6\onnx-ml.pb.cc.rule;C:\onnxruntime\
 782059b608\gen_onnx_proto.rule'에 대한 사용자 지정 빌드가 종료되었습니다(코드 9009). [C:\onnxruntime\build\_deps\onnx-build\gen_onnx_proto.
 vcxproj]
 ==>미해결..
+재설치( ONNXRUNTIMEConfig.cmake, onnxruntime-config.cmake, share폴더 생성이안됌)
+c:\> git clone --recursive https://github.com/microsoft/onnxruntime
+c:\>cd onnxruntime
+c:\onnxruntime>mkdir build && cd build
+C:\onnxruntime\cmake\CMakeLists.txt 추가(옵션에서 설정이 안됨)
+#add user##############################################################################
+set(protobuf_PROTOC_EXECUTABLE "C:/protobuf/build/Release/protoc.exe" CACHE FILEPATH "Path to protoc executable")
+set(Protobuf_INCLUDE_DIR "C:/protobuf/src")
+set(Protobuf_LIBRARIES "C:/protobuf/build/Release/libprotobuf.lib")
+find_package(Protobuf REQUIRED)
+include_directories(${Protobuf_INCLUDE_DIRS})
+link_directories(${Protobuf_LIBRARY_DIRS})
+#add user##############################################################################
+c:\onnxruntime\build>cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE=Release -DONNX_RUNTIME_BUILD_SHARED_LIB=ON -DCMAKE_INSTALL_PREFIX=./install -DZLIB_INCLUDE_DIR="C:/zlib" ../cmake
+c:\onnxruntime\build>cmake --build . --config Release
+c:\>git clone https://github.com/google/flatbuffers.git
+c:\>cd flatbuffers
+c:\flatbuffers>mkdir build
+c:\flatbuffers>cd build
+c:\flatbuffers/build>cmake ..
+c:\flatbuffers/build>cmake --build . --config Release
+C:\onnxruntime\cmake\CMakeLists.txt 추가
+set(FLATBUFFERS_DIR "C:/flatbuffers/build/Release")
+find_package(flatbuffers REQUIRED)
+include_directories(${FLATBUFFERS_INCLUDE_DIRS})
+link_directories(${FLATBUFFERS_LIBRARY_DIRS})
+c:\onnxruntime\build>cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE=Release -DONNX_RUNTIME_BUILD_SHARED_LIB=ON -DCMAKE_INSTALL_PREFIX=./install -DZLIB_INCLUDE_DIR="C:/zlib" ../cmake
+
+
 
 
 [vcpkg 설치 및 업그레이드]
