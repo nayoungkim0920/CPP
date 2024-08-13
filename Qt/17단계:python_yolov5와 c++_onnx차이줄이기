@@ -414,8 +414,11 @@ c:\onnxruntime\build>cmake --build . --config Release
 C:\yolov5\python => C:\Users\nayou\AppData\Local\Programs\Python\Python312\python (몇개의 vcxproj파일마다 바꿔줘야함 한파일당 여러번선언되있음)
 onnx.vcxproj -> C:\onnxruntime\build\_deps\onnx-build\Release\onnx.lib
 onnxruntime_providers_shared.vcxproj -> C:\onnxruntime\build\Release\onnxruntime_providers_shared.dll
-
-
+c:\onnxruntime\build>cmake --install .
+-- Install configuration: "Release"
+CMake Error at cmake_install.cmake:39 (file):
+  file INSTALL cannot find
+  "C:/onnxruntime/build/Release/onnxruntime_flatbuffers.lib": No error.
 
 
 
