@@ -442,6 +442,14 @@ CMake Error at CMakeLists.txt:52 (find_package):
 
 
 
+
+
+
+
+
+
+
+
 [vcpkg 설치 및 업그레이드]
 Git을 사용하여 vcpkg를 클론
 C:\>git clone https://github.com/microsoft/vcpkg.git
