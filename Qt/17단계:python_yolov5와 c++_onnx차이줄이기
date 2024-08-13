@@ -420,11 +420,25 @@ CMake Error at cmake_install.cmake:39 (file):
   file INSTALL cannot find
   "C:/onnxruntime/build/Release/onnxruntime_flatbuffers.lib": No error.
 
-
-
-
-
-
+c:\onnxruntime\build>cd C:\myLab\Project1\Project1\build
+C:\myLab\Project1\Project1\build>rd /s /q CMakeFiles
+C:\myLab\Project1\Project1\build>del CMakeCache.txt
+C:\myLab\Project1\Project1\build>del /q /s *.cmake
+C:\myLab\Project1\Project1\build>cmake -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=./install ..
+에러!!
+CMake Error at CMakeLists.txt:52 (find_package):
+  By not providing "FindONNXRUNTIME.cmake" in CMAKE_MODULE_PATH this project
+  has asked CMake to find a package configuration file provided by
+  "ONNXRUNTIME", but CMake did not find one.
+  Could not find a package configuration file provided by "ONNXRUNTIME" with
+  any of the following names:
+    ONNXRUNTIMEConfig.cmake
+    onnxruntime-config.cmake
+  Add the installation prefix of "ONNXRUNTIME" to CMAKE_PREFIX_PATH or set
+  "ONNXRUNTIME_DIR" to a directory containing one of the above files.  If
+  "ONNXRUNTIME" provides a separate development package or SDK, be sure it
+  has been installed.
+-- Configuring incomplete, errors occurred!
 
 
 
