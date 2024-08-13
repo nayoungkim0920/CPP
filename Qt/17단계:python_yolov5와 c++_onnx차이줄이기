@@ -367,7 +367,12 @@ find_package(flatbuffers REQUIRED)
 include_directories(${flatbuffers_INCLUDE_DIRS})
 link_directories(${flatbuffers_LIBRARY_DIRS})
 #add user##############################################################################
+c:\onnxruntime\build>del /S /Q CMakeCache.txt CMakeFiles
+c:\onnxruntime\build>cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=./install ../cmake
 c:\onnxruntime\build>cmake --build . --config Release
+c:\onnxruntime\build>cmake --install .
+
+
 
 
 
