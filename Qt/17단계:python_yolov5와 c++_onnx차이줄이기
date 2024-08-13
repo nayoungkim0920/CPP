@@ -341,7 +341,7 @@ ild\_deps\onnx-build\gen_onnx_operators_proto.vcxproj]
 C:\>echo %PYTHONPATH%
 C:\Users\nayou\AppData\Local\Programs\Python\Python312 맞게되어있음
 C:\>findstr /s /i "C:\yolov5\python" *.* 어디에설정되있지 몰라 검색함
-=>"C:\onnxruntime\build\_deps\onnx-build\gen_onnx_proto.vcxproj" 
+=>"C:\onnxruntime\build\_deps\onnx-build\gen_onnx_proto.vcxproj" => *.vcxproj 마다 수정정
 <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
 C:\yolov5\python C:/onnxruntime/build/_deps/onnx-src/onnx/gen_proto.py -p onnx -o C:/onnxruntime/build/_deps/onnx-build/onnx onnx -m -l
 if %errorlevel% neq 0 goto :cmEnd
@@ -369,8 +369,57 @@ link_directories(${flatbuffers_LIBRARY_DIRS})
 #add user##############################################################################
 c:\onnxruntime\build>del /S /Q CMakeCache.txt CMakeFiles
 c:\onnxruntime\build>cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=./install ../cmake
+--   Protobuf compiler                 : C:/protobuf/build/Release/protoc.exe
+--   Protobuf includes                 : C:/protobuf/build/install/include
+--   Protobuf libraries                : C:/protobuf/build/Release/libprotobuf.lib
 c:\onnxruntime\build>cmake --build . --config Release
-c:\onnxruntime\build>cmake --install .
+
+C:\onnxruntime\build\_deps\abseil_cpp-src\absl\synchronization\internal\graphcycles.cc(368,19): error C2039: 'TestO
+nlyAddNodes': 'absl::lts_20240116::synchronization_internal::GraphCycles'의 멤버가 아닙니다. [C:\onnxruntime\build\_deps\ab
+seil_cpp-build\absl\synchronization\absl_graphcycles_internal.vcxproj]
+C:\onnxruntime\build\_deps\abseil_cpp-src\absl\synchronization\internal\graphcycles.cc(369,23): error C2065: 'rep_'
+: 선언되지 않은 식별자입니다. [C:\onnxruntime\build\_deps\abseil_cpp-build\absl\synchronization\absl_graphcycles_internal.vcxpr
+oj]
+C:\onnxruntime\build\_deps\abseil_cpp-src\absl\synchronization\internal\graphcycles.cc(370,3): error C2065: 'rep_':
+ 선언되지 않은 식별자입니다. [C:\onnxruntime\build\_deps\abseil_cpp-build\absl\synchronization\absl_graphcycles_internal.vcxpro
+j]
+C:\onnxruntime\build\_deps\abseil_cpp-src\absl\synchronization\internal\graphcycles.cc(372,5): error C2065: 'rep_':
+ 선언되지 않은 식별자입니다. [C:\onnxruntime\build\_deps\abseil_cpp-build\absl\synchronization\absl_graphcycles_internal.vcxpro
+j]
+C:\onnxruntime\build\_deps\abseil_cpp-src\absl\hash\internal\hash.cc(64,10): error C3861: 'LowLevelHashLenGt16': 식 별
+자를 찾을 수 없습니다. [C:\onnxruntime\build\_deps\abseil_cpp-build\absl\hash\absl_hash.vcxproj]
+c:\onnxruntime\build>rd /s /q _deps\abseil_cpp-src
+c:\onnxruntime\build>cmake --build . --target download_dependencies --config Release
+c:\onnxruntime\build>rd /s /q CMakeFiles
+c:\onnxruntime\build>del CMakeCache.txt
+c:\onnxruntime\build>cmake ../cmake
+-빌드환경정
+c:\onnxruntime\build>rd /s /q CMakeFiles
+c:\onnxruntime\build>del CMakeCache.txt
+c:\onnxruntime\build>del /q /s *.cmake
+
+c:\onnxruntime\build>cmake -G "Visual Studio 16 2019" -DZLIB_INCLUDE_DIR="C:/zlib" -DCMAKE_INSTALL_PREFIX=./install ../cmake 
+-- Configuring done (54.1s)
+-- Generating done (24.1s)
+-- Build files have been written to: C:/onnxruntime/build 
+c:\onnxruntime\build>cmake --build . --config Release
+Abseil C++ 라이브러리 오류발생..
+C:\onnxruntime\build\_deps\abseil_cpp-src\absl\hash\internal\hash.cc(64,10): error C3861: 'LowLevelHashLenGt16': 식 별
+자를 찾을 수 없습니다. [C:\onnxruntime\build\_deps\abseil_cpp-build\absl\hash\absl_hash.vcxproj]
+....
+del /s /q C:\onnxruntime\build\CMakeCache.txt
+rd /s /q C:\onnxruntime\build\CMakeFiles
+c:\onnxruntime\build>cmake -G "Visual Studio 16 2019" -DZLIB_INCLUDE_DIR="C:/zlib" -DCMAKE_INSTALL_PREFIX=./install ../cmake
+c:\onnxruntime\build>cmake --build . --config Release
+C:\yolov5\python => C:\Users\nayou\AppData\Local\Programs\Python\Python312\python (몇개의 vcxproj파일마다 바꿔줘야함 한파일당 여러번선언되있음)
+onnx.vcxproj -> C:\onnxruntime\build\_deps\onnx-build\Release\onnx.lib
+onnxruntime_providers_shared.vcxproj -> C:\onnxruntime\build\Release\onnxruntime_providers_shared.dll
+
+
+
+
+
+
 
 
 
