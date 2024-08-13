@@ -311,15 +311,37 @@ CMake Error at CMakeLists.txt:52 (find_package):
   has been installed.
 -- Configuring incomplete, errors occurred!
 c:\onnxruntime\build>del /S /Q CMakeCache.txt CMakeFiles 
-c:\onnxruntime\build>cmake -G "Visual Studio 16 2019" -A x64 ../cmake
+c:\onnxruntime\build>cmake -G "Visual Studio 16 2019" -A x64 -DZLIB_INCLUDE_DIR="C:/zlib" ../cmake
 c:\onnxruntime\build>cmake --build . --config Release
 C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppCommon.targets(241
 ,5): error MSB8066: 'C:\onnxruntime\build\CMakeFiles\51a714ff5d5f4ddcd911b32bf85404f6\onnx-ml.proto.rule;C:\onnxruntime
 \build\CMakeFiles\51a714ff5d5f4ddcd911b32bf85404f6\onnx-ml.pb.cc.rule;C:\onnxruntime\build\CMakeFiles\58447f3a954f50939
-f49ca782059b608\gen_onnx_proto.rule'에 대한 사용자 지정 빌드가 종료되었습니다(코드 9009). [C:\onnxruntime\build\_deps\onnx-build\gen_onnx_p
-roto.vcxproj]
-
-
+f49ca782059b608\gen_onnx_proto.rule'에 대한 사용자 지정 빌드가 종료되었습니다(코드 9009). 
+[C:\onnxruntime\build\_deps\onnx-build\gen_onnx_proto.vcxproj]
+c:\onnxruntime\build>cmake --build . --config Release
+...
+  'C:\yolov5\python'은(는) 내부 또는 외부 명령, 실행할 수 있는 프로그램, 또는
+  배치 파일이 아닙니다.
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microso
+ft.CppCommon.targets(241,5): error MSB8066: 'C:\onnxruntime\build\CMakeFiles\51a714ff5d5f4ddcd9
+11b32bf85404f6\onnx-data.proto.rule;C:\onnxruntime\build\CMakeFiles\51a714ff5d5f4ddcd911b32bf85
+404f6\onnx-data.pb.cc.rule;C:\onnxruntime\build\CMakeFiles\58447f3a954f50939f49ca782059b608\gen
+_onnx_data_proto.rule'에 대한 사용자 지정 빌드가 종료되었습니다(코드 9009). [C:\onnxruntime\build\_deps\onnx-build\
+gen_onnx_data_proto.vcxproj]
+  Running gen_proto.py on onnx/onnx-operators.in.proto
+  'C:\yolov5\python'은(는) 내부 또는 외부 명령, 실행할 수 있는 프로그램, 또는
+  배치 파일이 아닙니다.
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microso
+ft.CppCommon.targets(241,5): error MSB8066: 'C:\onnxruntime\build\CMakeFiles\51a714ff5d5f4ddcd9
+11b32bf85404f6\onnx-operators-ml.proto.rule;C:\onnxruntime\build\CMakeFiles\51a714ff5d5f4ddcd91
+1b32bf85404f6\onnx-operators-ml.pb.cc.rule;C:\onnxruntime\build\CMakeFiles\58447f3a954f50939f49
+ca782059b608\gen_onnx_operators_proto.rule'에 대한 사용자 지정 빌드가 종료되었습니다(코드 9009). [C:\onnxruntime\bu
+ild\_deps\onnx-build\gen_onnx_operators_proto.vcxproj]
+환경변수검색
+C:\>echo %PYTHONPATH%
+C:\Users\nayou\AppData\Local\Programs\Python\Python312 맞게되어있음
+C:\>findstr /s /i "C:\yolov5\python" *.* 어디에설정되있지 몰라 검색함
+ 
 
 
 
