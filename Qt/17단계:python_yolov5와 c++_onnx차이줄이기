@@ -341,10 +341,33 @@ ild\_deps\onnx-build\gen_onnx_operators_proto.vcxproj]
 C:\>echo %PYTHONPATH%
 C:\Users\nayou\AppData\Local\Programs\Python\Python312 맞게되어있음
 C:\>findstr /s /i "C:\yolov5\python" *.* 어디에설정되있지 몰라 검색함
- 
-
-
-
+=>"C:\onnxruntime\build\_deps\onnx-build\gen_onnx_proto.vcxproj" 
+<Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+C:\yolov5\python C:/onnxruntime/build/_deps/onnx-src/onnx/gen_proto.py -p onnx -o C:/onnxruntime/build/_deps/onnx-build/onnx onnx -m -l
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+C:\yolov5\python => C:\Users\nayou\AppData\Local\Programs\Python\Python312 로 수정
+C:\onnxruntime\cmake\CMakeLists.txt
+#add user##############################################################################
+set(protobuf_PROTOC_EXECUTABLE "C:/protobuf/build/Release/protoc.exe" CACHE FILEPATH "Path to protoc executable")
+set(Protobuf_INCLUDE_DIR "C:/protobuf/build/install/include")
+set(Protobuf_LIBRARIES "C:/protobuf/build/Release/libprotobuf.lib")
+find_package(Protobuf REQUIRED)
+include_directories(${Protobuf_INCLUDE_DIRS})
+link_directories(${Protobuf_LIBRARY_DIRS})
+set(flatbuffers_DIR "C:/flatbuffers/CMake")
+set(flatbuffers_INCLUDE_DIRS "C:/flatbuffers/include")
+set(flatbuffers_LIBRARY_DIRS "C:/flatbuffers/build/Release")
+find_package(flatbuffers REQUIRED)
+include_directories(${flatbuffers_INCLUDE_DIRS})
+link_directories(${flatbuffers_LIBRARY_DIRS})
+#add user##############################################################################
+c:\onnxruntime\build>cmake --build . --config Release
 
 
 
