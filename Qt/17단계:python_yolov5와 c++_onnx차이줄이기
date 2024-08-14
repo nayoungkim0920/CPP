@@ -492,6 +492,91 @@ Cuda compilation tools, release 12.1, V12.1.66
 Build cuda_12.1.r12.1/compiler.32415258_0
 C:\myLab\Project1\Project1\build>cmake --build . --config Release
 C:\myLab\Project1\Project1\build>cmake -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=./install ..
+find_package(CUDAToolkit REQUIRED cudaarithm cudafilters cudawarping cudacodec cudafeatures2d cudaimgproc)
+# Cuda 아키텍처 설정
+set(CUDA_TOOLKIT_ROOT_DIR "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1")
+set(CUDA_NVCC_EXECUTABLE "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1/bin/nvcc.exe")
+set(CUDA_ARCHITECTURES "89")
+include_directories("${CUDAToolkit_INCLUDE_DIRS}")
+message(STATUS "CUDA Architectures set to: ${CUDA_ARCHITECTURES}")
+# CUDA 파일 설정
+set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} -std=c++20 --expt-relaxed-constexpr -gencode arch=compute_89,code=sm_89)
+# CUDA 파일 컴파일 및 라이브러리 생성
+cuda_add_library(project1
+    imageProcessing.cu
+)
+# CUDA 컴파일러 경로 확인
+if (CUDAToolkit_FOUND)
+    message(STATUS "CUDAToolkit_INCLUDE_DIRS: ${CUDAToolkit_INCLUDE_DIRS}")
+    message(STATUS "CUDAToolkit_BIN_DIR: ${CUDAToolkit_BIN_DIR}")
+    message(STATUS "CUDAToolkit_BIN_DIR: ${CUDAToolkit_VERSION}")
+else()
+    message(FATAL_ERROR "CUDA Toolkit not found.")
+endif()
+C:\onnxruntime\onnxruntime/core/providers/cuda/cuda_provider_factory.h(5,10): fatal error C1083: 포함 파일을 열 수 없습 니다. 'core
+/framework/provider_options.h': No such file or directory [C:\myLab\Project1\Project1\build\Project1.vcxproj]
+[GPU & machinelearnging 설정부터 적용]
+C:\myLab\Project1\Project1\build>cmake -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=./install ..
+-- Selecting Windows SDK version 10.0.22621.0 to target Windows 10.0.22631.
+-- The CXX compiler identification is MSVC 19.29.30154.0
+-- The CUDA compiler identification is NVIDIA 12.1.66
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/cl.exe - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Detecting CUDA compiler ABI info
+-- Detecting CUDA compiler ABI info - done
+-- Check for working CUDA compiler: C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1/bin/nvcc.exe - skipped
+-- Detecting CUDA compile features
+-- Detecting CUDA compile features - done
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+-- Looking for pthread_create in pthreads
+-- Looking for pthread_create in pthreads - not found
+-- Looking for pthread_create in pthread
+-- Looking for pthread_create in pthread - not found
+-- Found Threads: TRUE
+-- Performing Test HAVE_STDATOMIC
+-- Performing Test HAVE_STDATOMIC - Success
+-- Found WrapAtomic: TRUE
+-- Found WrapVulkanHeaders: C:/VulkanSDK/1.3.290.0/Include
+-- Found OpenCV: C:/opencv/build (found version "4.10.0") found components: core imgproc highgui dnn
+-- Found CUDAToolkit: C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1/include (found version "12.1.66")
+-- Found Protobuf: C:/protobuf/build/Release/libprotobuf.lib (found version "5.26.1")
+-- Found GSL: C:/vcpkg/packages;C:/Qt/6.7.1/msvc2019_64;C:/opencv/build;C:/onnxruntime/gsl_x64-windows/include (found version "")
+-- Found CUDA: C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1 (found version "12.1")
+-- Found CUDAToolkit: C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1/include (found version "12.1.66")
+-- Caffe2: CUDA detected: 12.1
+-- Caffe2: CUDA nvcc is: C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1/bin/nvcc.exe
+-- Caffe2: CUDA toolkit directory: C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1
+-- Caffe2: Header version is: 12.1
+-- C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1/lib/x64/nvrtc.lib shorthash is bac8224f
+-- USE_CUDNN is set to 0. Compiling without cuDNN support
+-- USE_CUSPARSELT is set to 0. Compiling without cuSPARSELt support
+-- Autodetected CUDA architecture(s):  8.9
+-- Added CUDA NVCC flags for: -gencode;arch=compute_89,code=sm_89
+-- Found Torch: C:/libtorch/lib/torch.lib
+-- Found Vulkan: C:/VulkanSDK/1.3.290.0/Lib (found version "1.3.292") found components: glslc glslangValidator
+-- Vulkan INCLUDE found: C:/VulkanSDK/1.3.290.0/Include
+-- Vulkan LIBRARY found: C:/VulkanSDK/1.3.290.0/Lib
+-- glslc found: C:/VulkanSDK/1.3.290.0/Bin/glslc.exe
+-- glslangValidator found: C:/VulkanSDK/1.3.290.0/Bin/glslangValidator.exe
+-- CUDA Architectures set to: 89
+-- USE_CUSPARSELT: ON
+-- USE_CUDNN: ON
+-- CAFFE2_USE_CUDNN: ON
+-- cuDNN is enabled for Caffe2.
+-- Found OpenMP_CXX: -openmp (found version "2.0")
+-- Found OpenMP: TRUE (found version "2.0")
+-- Configuring done (33.2s)
+-- Generating done (0.2s)
+-- Build files have been written to: C:/myLab/Project1/Project1/build
+
+
+
+
+
 
 
 
