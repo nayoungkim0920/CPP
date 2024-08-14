@@ -439,11 +439,59 @@ CMake Error at CMakeLists.txt:52 (find_package):
   "ONNXRUNTIME" provides a separate development package or SDK, be sure it
   has been installed.
 -- Configuring incomplete, errors occurred!
-
-
-
-
-
+C:\myLab\Project1\Project1\build>rd /s /q CMakeFiles && del CMakeCache.txt && del /q /s *.cmake
+C:\myLab\Project1\Project1\build>cmake -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=./install ..
+# ONNX Runtime 설정 - 성공!
+set(ONNXRUNTIME_DIR "C:/onnxruntime/build/Release")
+include_directories("C:/onnxruntime/include")
+link_directories("C:/onnxruntime/build/Release")
+-- Could NOT find WrapVulkanHeaders (missing: Vulkan_INCLUDE_DIR)
+Vulkan-Headers 설치
+C:\>git clone https://github.com/KhronosGroup/Vulkan-Headers.git
+C:\Vulkan-Headers>xcopy /E /I include\vulkan "C:\VulkanSDK\Include\vulkan"
+Vulkan SDK 설치 (Khronos Group에서 개발한 고성능, 크로스 플랫폼의 그래픽 및 컴퓨팅 API)
+https://www.lunarg.com/vulkan-sdk/
+VulkanSDK-1.3.290.0-Installer.exe
+변수 이름: VULKAN_SDK
+변수 값: C:\VulkanSDK\1.3.290.0
+PATH 변수에 다음을 추가합니다:
+%VULKAN_SDK%\Bin
+INCLUDE 변수에 다음을 추가합니다:
+%VULKAN_SDK%\Include
+LIB 변수에 다음을 추가합니다:
+%VULKAN_SDK%\Lib
+C:\>xcopy /E /I "C:\Vulkan-Headers\include\vulkan" "C:\VulkanSDK\1.3.290.0\Include\vulkan" 
+=> 35개파일카피
+C:\myLab\Project1\Project1\CMakeLists.txt
+# Vulkan 설정
+set(VULKAN_SDK "C:/VulkanSDK/1.3.290.0")
+set(VULKAN_BIN "${VULKAN_SDK}/Bin")
+set(Vulkan_INCLUDE_DIR "${VULKAN_SDK}/Include")
+set(Vulkan_LIBRARY "${VULKAN_SDK}/Lib")
+find_package(Vulkan REQUIRED)
+message(STATUS "Vulkan INCLUDE found: ${Vulkan_INCLUDE_DIRS}")
+message(STATUS "Vulkan LIBRARY found: ${Vulkan_LIBRARIES}")
+find_program(GLSLC_EXECUTABLE glslc PATHS ${VULKAN_BIN} NO_DEFAULT_PATH)
+if(NOT GLSLC_EXECUTABLE)
+    message(FATAL_ERROR "glslc executable not found.")
+endif()
+성공!
+C:\myLab\Project1\Project1\build>cmake --build . --config Release
+C:\onnxruntime\include\../include/onnxruntime/core/providers/cpu/cpu_provider_factory.h(4,10): fatal error C1083: 포함  파일
+을 열 수 없습니다. 'onnxruntime_c_api.h': No such file or directory [C:\myLab\Project1\Project1\build\Project1.vcxproj]
+"C:\onnxruntime\include\onnxruntime\core\session\onnxruntime_c_api.h"
+에러체크
+-- Check for working CUDA compiler: C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1/bin/nvcc.exe - skipped
+C:\myLab\Project1\Project1\build>cmake --version
+cmake version 3.29.3
+C:\myLab\Project1\Project1\build>"C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1/bin/nvcc.exe" --version
+nvcc: NVIDIA (R) Cuda compiler driver
+Copyright (c) 2005-2023 NVIDIA Corporation
+Built on Wed_Feb__8_05:53:42_Coordinated_Universal_Time_2023
+Cuda compilation tools, release 12.1, V12.1.66
+Build cuda_12.1.r12.1/compiler.32415258_0
+C:\myLab\Project1\Project1\build>cmake --build . --config Release
+C:\myLab\Project1\Project1\build>cmake -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=./install ..
 
 
 
