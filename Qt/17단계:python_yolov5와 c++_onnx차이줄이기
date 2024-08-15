@@ -696,16 +696,29 @@ nayou@kimnayooung MINGW64 /c/bazel
 GRPC_JAVA_PLUGIN을 설정
 protoc-gen-grpc-java는 gRPC 관련 코드를 생성하는 데 필요한 플러그인
 c:\>git clone https://github.com/grpc/grpc-java.git
-
-
-
-
-
-
-
-
-
-
+cd C:\grpc-java
+gradlew.bat build
+--에러..
+Android SDK 설치
+Android SDK 없이도 gRPC Java 프로젝트를 빌드
+c:\grpc-java> gradlew build -PskipAndroid=true
+C:\grpc-java> local.properties 생성
+# Protobuf 경로 설정 (실제 경로로 대체)
+# Protobuf 경로 설정
+protobuf.path=C:/protobuf
+protobuf.dir=C:/protobuf/build/install
+c:\grpc-java>gradlew build -PskipAndroid=true --debug
+c:\grpc-java>gradlew clean -PskipAndroid=true
+c:\grpc-java>gradlew build -PskipAndroid=true
+C++ 컴파일러가 제대로 작동하는지 확인
+c:\grpc-java>cl
+x86용 Microsoft (R) C/C++ 최적화 컴파일러 버전 19.29.30154
+Copyright (c) Microsoft Corporation. All rights reserved.
+사용법: cl [ option... ] filename... [ /link linkoption... ]
+gradlew clean -PskipAndroid=true
+gradlew build -PskipAndroid=true
+"C:\protobuf\build\install\lib\libprotobuf.lib" 이걸찾지못함..
+Path C:\protobuf\build\install\lib\ 경로를 추가
 
 
 
