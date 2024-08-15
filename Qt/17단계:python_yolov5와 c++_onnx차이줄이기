@@ -572,6 +572,135 @@ C:\myLab\Project1\Project1\build>cmake -G "Visual Studio 16 2019" -DCMAKE_BUILD_
 -- Configuring done (33.2s)
 -- Generating done (0.2s)
 -- Build files have been written to: C:/myLab/Project1/Project1/build
+C:\myLab\Project1\Project1\build>cmake -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=./install ..
+C:\myLab\Project1\Project1\build>cmake --build . --config Debug
+C:\onnx\onnx/defs/shape_inference.h(174,6): fatal error C1003: 오류 수가 100개를 초과했습니다. 컴
+파일을 중지합니다. [C:\myLab\Project1\Project1\build\Project1.vcxproj]
+proto_utils.h와 shape_inference.h => tensorflow설치
+C:\>git clone https://github.com/tensorflow/tensorflow.git
+C:\>cd tensorflow
+C:\tensorflow>git checkout r2.17
+Updating files: 100% (5832/5832), done.
+branch 'r2.17' set up to track 'origin/r2.17'.
+Switched to a new branch 'r2.17'
+
+  proto_utils.cc
+C:\tensorflow\tensorflow/core/util/proto/proto_utils.h(20,10): fatal error C1083: 포함
+ 파일을 열 수 없습니다. 'xla/tsl/util/proto/proto_utils.h': No such file or directory [C:\myL
+ab\Project1\Project1\build\tensorflow_util_proto.vcxproj]
+  shape_inference.cc
+C:\tensorflow\tensorflow/core/framework/shape_inference.h(21,10): fatal error C1083:
+ 포함 파일을 열 수 없습니다. 'tensorflow/core/framework/full_type.pb.h': No such file or direct
+ory [C:\myLab\Project1\Project1\build\tensorflow_util_proto.vcxproj]
+
+Bazel을 설치(tensorflow build)
+C:\>git clone https://github.com/bazelbuild/bazel.git
+Visual Studio: Visual C++ 컴파일러가 포함된 Visual Studio Build Tools를 설치
+Visual Studio Installer > Visual Studio 2019 "C++ 데스크톱 개발" 워크로드가 체크 확인
+Bazel을 빌드하기 위해 MSYS2와 필요한 패키지(zip, unzip, patch)를 설치
+https://www.msys2.org/
+Download the installer: msys2-x86_64-20240727.exe
+"C:\msys64"
+MSYS2 MinGW 64-bit 셸을 열고 다음 명령어를 입력하여 패키지를 설치
+pacman -Syu    # 패키지 데이터베이스와 기본 패키지 업데이트
+pacman -S zip unzip patch
+
+JDK 설치
+https://adoptium.net/
+OpenJDK21U-jdk_x64_windows_hotspot_21.0.4_7.msi
+JAVA_HOME 
+C:\Program Files\Eclipse Adoptium\jdk-21.0.4.7-hotspot\
+Path
+C:\Program Files\Eclipse Adoptium\jdk-21.0.4.7-hotspot\bin
+
+C:\>echo %JAVA_HOME%
+C:\Program Files\Eclipse Adoptium\jdk-21.0.4.7-hotspot\
+C:\>java -version
+openjdk version "21.0.4" 2024-07-16 LTS
+OpenJDK Runtime Environment Temurin-21.0.4+7 (build 21.0.4+7-LTS)
+OpenJDK 64-Bit Server VM Temurin-21.0.4+7 (build 21.0.4+7-LTS, mixed mode, sharing)
+
+MSYS2 MinGW 64-bit 셸을 열고 다음 명령어를 입력(붙여넣기는 마우스 오른쪽 Paste)
+export BAZEL_VC="C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC"
+export BAZEL_SH="$(cygpath -m $(realpath $(which bash)))"
+export PATH="/c/Users/nayou/AppData/Local/Programs/Python/Python312:$PATH"
+export JAVA_HOME="C:\Program Files\Eclipse Adoptium\jdk-21.0.4.7-hotspot"
+
+명령 프롬프트
+setx BAZEL_VC "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC"
+setx BAZEL_SH "C:\msys64\usr\bin\bash.exe"
+setx PATH "%PATH%;C:\Users\nayou\AppData\Local\Programs\Python\Python312"
+setx JAVA_HOME "C:\Program Files\Eclipse Adoptium\jdk-21.0.4.7-hotspot"
+->사용자변수로생성되서 사용자변수에서 삭제하고 시스템변수로 수동으로 등록함
+
+Visual Studio Build Tools의 환경을 설정
+C:\>"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat" x64
+**********************************************************************
+** Visual Studio 2019 Developer Command Prompt v16.11.37
+** Copyright (c) 2021 Microsoft Corporation
+**********************************************************************
+[vcvarsall.bat] Environment initialized for: 'x64'
+
+BAZEL_SH C:\msys64\usr\bin\bash.exe
+BAZEL_VS C:\Program Files (x86)\Microsoft Visual Studio\2019\Community
+JAVA_HOME C:\Program Files\Eclipse Adoptium\jdk-21.0.4.7-hotspot
+Path "%PATH%;C:\Users\nayou\AppData\Local\Programs\Python\Python312"
+
+echo %BAZEL_SH%echo %BAZEL_VS%echo %JAVA_HOME%echo %PATH%
+
+MSYS2 MINGW64 을 열고 패키지설치
+pacman -S git zip unzip patch
+
+export BAZEL_SH="/c/msys64/usr/bin/bash.exe"
+export BAZEL_VS="/c/Program Files (x86)/Microsoft Visual Studio/2019/Community"
+export JAVA_HOME="/c/Program Files/Eclipse Adoptium/jdk-21.0.4.7-hotspot"
+export PATH="$PATH:/c/Users/nayou/AppData/Local/Programs/Python/Python312"
+
+Bazel을 빌드
+cd /c/bazel
+export EXTRA_BAZEL_ARGS="--tool_java_runtime_version=local_jdk"
+./compile.sh
+("C:\bazel\compile.sh")
+$ ls -l compile.sh
+-rwxr-xr-x 1 nayou nayou 2821 Aug 15 08:42 compile.sh
+실행 권한을 부여
+chmod +x compile.sh
+./compile.sh
+빌드가 완료되면 bazel 바이너리 파일이 생성되어야 함
+오류나서 오류처리해야함.
+nayou@kimnayooung MINGW64 /c/bazel
+$ cd /c/bazel/output
+nayou@kimnayooung MINGW64 /c/bazel/output
+$ ls -l bazel.exe
+ls: cannot access 'bazel.exe': No such file or directory
+
+명령프롬프트
+protoc --version
+libprotoc 26.1
+환경변수에등록
+set PROTOC=C:\protobuf\build\install\bin\protoc.exe
+
+MSYS2 MINGW64열고
+nayou@kimnayooung MINGW64 ~
+# cd /c/bazel
+nayou@kimnayooung MINGW64 /c/bazel
+# ./compile.sh
+scripts/bootstrap/buildenv.sh: line 38: hash: python.exe: not found
+ERROR: cannot locate python.exe; check your PATH.
+       You may need to run the following command, or something
+       similar, depending on where you installed Python:
+         export PATH="/c/Python27:$PATH"
+nayou@kimnayooung MINGW64 /c/bazel
+# export PATH="/c/Users/nayou/AppData/Local/Programs/Python/Python312:$PATH"
+
+GRPC_JAVA_PLUGIN을 설정
+protoc-gen-grpc-java는 gRPC 관련 코드를 생성하는 데 필요한 플러그인
+c:\>git clone https://github.com/grpc/grpc-java.git
+
+
+
+
+
 
 
 
