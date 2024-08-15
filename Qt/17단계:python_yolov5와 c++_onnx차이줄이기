@@ -784,9 +784,10 @@ gradlew dependencyInsight --dependency grpc --configuration runtimeClasspath
 gradlew dependencyInsight --dependency protobuf --configuration implementation
 -PskipAndroid=tru(Android SDK 설치 무시 옵션)
 
-
-
-
+"C:\grpc-java\CMakeLists.txt" 생성
+c:\grpc-java\build>cmake -G "Visual Studio 16 2019" ..
+c:\grpc-java\build>cmake --build .
+링크오류남...
 
 
 
