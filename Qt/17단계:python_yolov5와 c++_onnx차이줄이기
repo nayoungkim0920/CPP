@@ -718,7 +718,76 @@ Copyright (c) Microsoft Corporation. All rights reserved.
 gradlew clean -PskipAndroid=true
 gradlew build -PskipAndroid=true
 "C:\protobuf\build\install\lib\libprotobuf.lib" 이걸찾지못함..
-Path C:\protobuf\build\install\lib\ 경로를 추가
+Path C:\protobuf\build\install\lib\ 경로를 추가 => 찾았으나 링크에러남
+build.gradle 수정 => 빌드 => 에러
+absl (Abseil)과 protobuf (Protocol Buffers) 라이브러리 간의 버전
+absl::lts_20240116
+c:\protobuf>findstr /i "version" CMakeLists.txt
+protobuf_VERSION_STRING "5.26.1"
+set INCLUDE=C:\protobuf\build\install\include;C:\abseil-cpp\build\install\include
+set LIBRARY_PATH=C:\protobuf\build\install\lib;C:\abseil-cpp\build\install\lib
+c:\grpc-java>gradlew clean -PskipAndroid=true
+c:\grpc-java>gradlew build -PskipAndroid=true
+
+C:\>git clone https://github.com/abseil/abseil-cpp.git
+C:\>cd abseil-cpp
+C:\abseil-cpp>git fetch --tags
+C:\abseil-cpp>git tag
+20240722.rc2
+C:\abseil-cpp>git checkout 20240722.rc2
+C:\abseil-cpp\build>cmake -G "Visual Studio 16 2019" -DCMAKE_INSTALL_PREFIX=./install ..
+C:\abseil-cpp\build>cmake --build . --config Release
+C:\abseil-cpp\build>cmake --install .
+absl.lib 확인 -> 없음
+https://protobuf.dev/news/2022-08-03/
+News Announcements for Version 22.x
+Protobuf GitHub 리포지토리에서 최신 릴리즈 태그를 확인
+C:\>git clone https://github.com/protocolbuffers/protobuf.git
+C:\>cd protobuf
+C:\protobuf>git tag -l
+C:\protobuf>git checkout v22.0
+C:\protobuf\build>cmake -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=./install ..
+C:\protobuf\build>cmake -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Release -DZLIB_INCLUDE_DIR="C:\zlib" -DZLIB_LIBRARY="C:\zlib\build\Release\zlib.lib" -Dprotobuf_BUILD_TESTS=OFF -DCMAKE_INSTALL_PREFIX=./install ..
+C:\protobuf\third_party\abseil-cpp 비어있음
+C:\protobuf>git submodule update --init --recursive
+C:\protobuf\build>cmake -G "Visual Studio 16 2019" -DABSL_ROOT_DIR=C:/abseil-cpp -DZLIB_INCLUDE_DIR="C:\zlib" -DZLIB_LIBRARY="C:\zlib\build\Release\zlib.lib" -Dprotobuf_BUILD_TESTS=OFF -DCMAKE_INSTALL_PREFIX=./install -DABSL_PROPAGATE_CXX_STD=ON -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_STANDARD_REQUIRED=ON ..
+C:\protobuf\build>cmake --build . --config Release
+C:\protobuf\build>cmake --install .
+버전이안맞아 다시설치
+C:\>git clone https://github.com/abseil/abseil-cpp.git
+C:\abseil-cpp>git fetch --all --tags
+C:\abseil-cpp>git tag
+C:\abseil-cpp>git checkout 20240116.0
+C:\abseil-cpp>mkdir build
+C:\abseil-cpp>cd build
+C:\abseil-cpp\build>cmake -G "Visual Studio 16 2019" -DCMAKE_INSTALL_PREFIX=./install ..
+C:\abseil-cpp\build>cmake --build . --config Release
+C:\abseil-cpp\build>cmake --install .
+
+C:\protobuf>git submodule update --init --recursive
+C:\protobuf\build>cmake -G "Visual Studio 16 2019" -DABSL_ROOT_DIR=C:/abseil-cpp -DZLIB_INCLUDE_DIR="C:\zlib" -DZLIB_LIBRARY="C:\zlib\build\Release\zlib.lib" -Dprotobuf_BUILD_TESTS=OFF -DCMAKE_INSTALL_PREFIX=./install -DABSL_PROPAGATE_CXX_STD=ON -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_STANDARD_REQUIRED=ON ..
+C:\protobuf\build>cmake --build . --config Release
+C:\protobuf\build>cmake --install .
+
+abseil-cpp 버전이 안맞는다는 에러로 인해 20230802.0버전으로 다시 설치
+protobuf v22.0과 abseil-cpp 20230802.0 버전이 호환
+성공!
+
+c:\grpc-java>gradlew clean -PskipAndroid=true
+c:\grpc-java>gradlew build -PskipAndroid=true
+에러발생!
+c:\grpc-java>gradlew build -PskipAndroid=true -Pprofile=release
+
+의존성확인
+c:\grpc-java>gradlew dependencies --configuration compileClasspath -PskipAndroid=true
+gradlew dependencyInsight --dependency grpc --configuration runtimeClasspath
+gradlew dependencyInsight --dependency protobuf --configuration implementation
+-PskipAndroid=tru(Android SDK 설치 무시 옵션)
+
+
+
+
+
 
 
 
