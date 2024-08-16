@@ -871,10 +871,27 @@ java version "1.8.0_401"
 Java(TM) SE Runtime Environment (build 1.8.0_401-b25)
 Java HotSpot(TM) 64-Bit Server VM (build 25.401-b25, mixed mode)
 javac 1.8.0_401
-
 c:\grpc-java>gradlew build --warning-mode all -PskipAndroid=true
-c:\grpc-java\build>cmake -G "Visual Studio 16 2019" ..
-c:\grpc-java\build>cmake --build .
+Plugin [id: 'net.ltgt.errorprone', version: '2.10.0'] was not found in any of the following sources:
+gradle-wrapper.properties파일수정
+distributionUrl=https\://services.gradle.org/distributions/gradle-7.6-all.zip
+C:\grpc-java>gradlew wrapper --gradle-version 7.6
+* Where:
+Build file 'C:\grpc-java\build.gradle' line: 10
+
+* What went wrong:
+Plugin [id: 'net.ltgt.errorprone', version: '2.10.0'] was not found in any of the following sources:
+
+- Gradle Core Plugins (plugin is not in 'org.gradle' namespace)
+- Plugin Repositories (could not resolve plugin artifact 'net.ltgt.errorprone:net.ltgt.errorprone.gradle.plugin:2.10.0')
+  Searched in the following repositories:
+    Gradle Central Plugin Repository
+    MavenRepo
+    Google
+C:\grpc-java>gradlew clean build --no-daemon --refresh-dependencies
+캐시버전삭제도 에러
+
+Error Prone 플러그인 4.0.1깔면 그럼 jdk17버전
 
 
 
