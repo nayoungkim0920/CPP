@@ -780,14 +780,95 @@ c:\grpc-java>gradlew build -PskipAndroid=true -Pprofile=release
 
 의존성확인
 c:\grpc-java>gradlew dependencies --configuration compileClasspath -PskipAndroid=true
-gradlew dependencyInsight --dependency grpc --configuration runtimeClasspath
-gradlew dependencyInsight --dependency protobuf --configuration implementation
--PskipAndroid=tru(Android SDK 설치 무시 옵션)
+gradlew dependencyInsight --dependency grpc --configuration runtimeClasspath -PskipAndroid=true
+gradlew dependencyInsight --dependency protobuf --configuration implementation -PskipAndroid=true
+-PskipAndroid=true(Android SDK 설치 무시 옵션)
 
 "C:\grpc-java\CMakeLists.txt" 생성
 c:\grpc-java\build>cmake -G "Visual Studio 16 2019" ..
 c:\grpc-java\build>cmake --build .
 링크오류남...
+
+의존성확인
+
+"C:\grpc-java\build.gradle"
+c:\grpc-java>gradlew dependencyInsight --dependency grpc --configuration runtimeClasspath -PskipAndroid=true
+c:\grpc-java>gradlew dependencyInsight --dependency grpc --configuration runtimeClasspath -PskipAndroid=true
+c:\grpc-java>gradlew dependencyInsight --dependency protobuf --configuration compileClasspath -PskipAndroid=true
+c:\grpc-java>gradlew dependencyInsight --dependency protobuf --configuration runtimeClasspath -PskipAndroid=true
+c:\grpc-java>gradlew dependencies --configuration compileClasspath -PskipAndroid=true
+c:\grpc-java>gradlew dependencies -PskipAndroid=true
+gradle 설치
+https://gradle.org/releases/
+v8.10 Download: binary-only or complete (checksums)
+gradle-8.10-bin.zip => C:/gradle
+C:\>gradle -v
+------------------------------------------------------------
+Gradle 8.10
+------------------------------------------------------------
+Build time:    2024-08-14 11:07:45 UTC
+Revision:      fef2edbed8af1022cefaf44d4c0514c5f89d7b78
+
+Kotlin:        1.9.24
+Groovy:        3.0.22
+Ant:           Apache Ant(TM) version 1.10.14 compiled on August 16 2023
+Launcher JVM:  21.0.4 (Eclipse Adoptium 21.0.4+7-LTS)
+Daemon JVM:    C:\Program Files\Eclipse Adoptium\jdk-21.0.4.7-hotspot (no JDK specified, using current Java home)
+OS:            Windows 11 10.0 amd64
+
+c:\grpc-java\build.gradle파일 수정
+c:\grpc-java>gradlew build --warning-mode all -PskipAndroid=true
+
+jdk 17로 호환성 맞추라고 나옴
+(기존버전)
+c:\>java -version && javac -version
+openjdk version "21.0.4" 2024-07-16 LTS
+OpenJDK Runtime Environment Temurin-21.0.4+7 (build 21.0.4+7-LTS)
+OpenJDK 64-Bit Server VM Temurin-21.0.4+7 (build 21.0.4+7-LTS, mixed mode, sharing)
+javac 21.0.4
+jdk-21 폴더를 찾아 삭제, 환경변수 삭제
+C:\Program Files\Eclipse Adoptium
+(새로설치할버전)
+https://www.oracle.com/java/technologies/downloads/#jdk17-windows
+x64 Installer	153.92 MB	
+https://download.oracle.com/java/17/latest/jdk-17_windows-x64_bin.exe ( sha256)
+jdk-17_windows-x64_bin.exe
+C:\Program Files\Java\jdk-17
+환경변수
+echo %JAVA_HOME%
+C:\Program Files\Java\jdk-17
+Path C:\Program Files\Java\jdk-17\bin
+C:\>java -version && javac -version
+java version "17.0.12" 2024-07-16 LTS
+Java(TM) SE Runtime Environment (build 17.0.12+8-LTS-286)
+Java HotSpot(TM) 64-Bit Server VM (build 17.0.12+8-LTS-286, mixed mode, sharing)
+javac 17.0.12
+에러...
+java jdk 8과 Error Prone 2.10.0 설치..
+Error Prone 2.10.0 is the latest version to support running on JDK 8.
+https://www.oracle.com/java/technologies/javase-jdk8-downloads.html
+windows > x64 Installer	150.83 MB  jdk-8u421-windows-x64.exe
+내PC 장치정보확인
+window+R > control system
+프로세서 : 13th Gen Intel(R) Core(TM) i7-13620H   2.40 GHz
+설치된RAM : 16.0GB
+시스템종류 : 64비트 운영 체제, x64 기반 프로세서
+Window사양
+에디션 : Windows 11 Pro
+버전 : 23H2
+경험 : Windows Feature Experience Pack 1000.22700.1027.0
+https://cfdownload.adobe.com/pub/adobe/coldfusion/java/java8/java8u401/jdk/jdk-8u401-windows-x64.exe
+설치된 jdk 17 제거
+jdk-8u401-windows-x64.exe 설치
+환경변수설정
+
+
+
+
+
+
+
+
 
 
 
