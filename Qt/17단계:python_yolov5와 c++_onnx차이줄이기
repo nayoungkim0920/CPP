@@ -848,8 +848,8 @@ java jdk 8과 Error Prone 2.10.0 설치..
 Error Prone 2.10.0 is the latest version to support running on JDK 8.
 https://www.oracle.com/java/technologies/javase-jdk8-downloads.html
 windows > x64 Installer	150.83 MB  jdk-8u421-windows-x64.exe
-내PC 장치정보확인
-window+R > control system
+[내PC 장치정보확인]
+window + R > control system
 프로세서 : 13th Gen Intel(R) Core(TM) i7-13620H   2.40 GHz
 설치된RAM : 16.0GB
 시스템종류 : 64비트 운영 체제, x64 기반 프로세서
@@ -857,6 +857,7 @@ Window사양
 에디션 : Windows 11 Pro
 버전 : 23H2
 경험 : Windows Feature Experience Pack 1000.22700.1027.0
+
 https://cfdownload.adobe.com/pub/adobe/coldfusion/java/java8/java8u401/jdk/jdk-8u401-windows-x64.exe
 설치된 jdk 17 제거
 jdk-8u401-windows-x64.exe 설치
@@ -891,7 +892,162 @@ Plugin [id: 'net.ltgt.errorprone', version: '2.10.0'] was not found in any of th
 C:\grpc-java>gradlew clean build --no-daemon --refresh-dependencies
 캐시버전삭제도 에러
 
-Error Prone 플러그인 4.0.1깔면 그럼 jdk17버전
+수정해야할파일들
+C:\grpc-java\build.gradle
+아래 소스코드 추가 참고
+C:\grpc-java\settings.gradle
+id "net.ltgt.errorprone" version "4.0.1"
+C:\grpc-java\gradle-wrapper.properties
+distributionUrl=https\://services.gradle.org/distributions/gradle-7.6-all.zip
+
+[Error Prone 플러그인 4.0.1, jdk17버전] -https://plugins.gradle.org/ (net.ltgt.errorprone검색)
+https://www.oracle.com/kr/java/technologies/downloads/#jdk17-windows
+x64 Installer	153.92 MB	
+https://download.oracle.com/java/17/latest/jdk-17_windows-x64_bin.exe ( sha256)
+C:\Program Files\Java\jdk-17 설치
+환경변수수정(JAVA_HOME, Path)
+C:\Program Files\Common Files\Oracle\Java\javapath 삭제 (java.exe, javac.exe, javaw.exe, jsheel.exe)
+C:\>java -version && javac -version
+java version "17.0.12" 2024-07-16 LTS
+Java(TM) SE Runtime Environment (build 17.0.12+8-LTS-286)
+Java HotSpot(TM) 64-Bit Server VM (build 17.0.12+8-LTS-286, mixed mode, sharing)
+javac 17.0.12
+c:\grpc-java>gradlew build --warning-mode all -PskipAndroid=true
+* Where:
+Build file 'C:\grpc-java\build.gradle' line: 7
+* What went wrong:
+An exception occurred applying plugin request [id: 'com.github.johnrengelman.shadow', version: '8.1.1']
+> Failed to apply plugin class 'com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin'.
+   > This version of Shadow supports Gradle 8.0+ only. Please upgrade.
+c:\grpc-java>gradlew --version
+
+------------------------------------------------------------
+Gradle 7.6
+------------------------------------------------------------
+
+Build time:   2022-11-25 13:35:10 UTC
+Revision:     daece9dbc5b79370cc8e4fd6fe4b2cd400e150a8
+
+Kotlin:       1.7.10
+Groovy:       3.0.13
+Ant:          Apache Ant(TM) version 1.10.11 compiled on July 10 2021
+JVM:          17.0.12 (Oracle Corporation 17.0.12+8-LTS-286)
+OS:           Windows 11 10.0 amd64
+com.github.johnrengelman.shadow 플러그인 8.1.1에서 요구하는 Gradle 8.0 이상의 버전설치해야함
+C:\grpc-java\gradle\wrapper\gradle-wrapper.properties 수정
+distributionUrl=https\://services.gradle.org/distributions/gradle-8.1.1-bin.zip
+변경사항적용
+gradlew wrapper --gradle-version 8.1.1
+c:\grpc-java>gradlew wrapper --gradle-version 8.1.1 -PskipAndroid=true
+* What went wrong:
+An exception occurred applying plugin request [id: 'com.github.johnrengelman.shadow', version: '8.1.1']
+> Failed to apply plugin class 'com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin'.
+   > This version of Shadow supports Gradle 8.0+ only. Please upgrade.
+c:\grpc-java>curl -L https://services.gradle.org/distributions/gradle-8.1.1-bin.zip -o gradle-8.1.1-bin.zip
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100   167  100   167    0     0    875      0 --:--:-- --:--:-- --:--:--   902
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+100  118M  100  118M    0     0  9425k      0  0:00:12  0:00:12 --:--:-- 10.8M
+c:\grpc-java>unzip gradle-8.1.1-bin.zip -d gradle
+C:\grpc-java\gradle 압축푼 디렉터리와 파일을 gradle 폴더로 이동
+환경변수 Path "C:\grpc-java\gradle"
+c:\grpc-java>gradle --version
+
+------------------------------------------------------------
+Gradle 8.10
+------------------------------------------------------------
+
+Build time:    2024-08-14 11:07:45 UTC
+Revision:      fef2edbed8af1022cefaf44d4c0514c5f89d7b78
+
+Kotlin:        1.9.24
+Groovy:        3.0.22
+Ant:           Apache Ant(TM) version 1.10.14 compiled on August 16 2023
+Launcher JVM:  17.0.12 (Oracle Corporation 17.0.12+8-LTS-286)
+Daemon JVM:    C:\Program Files\Java\jdk-17 (no JDK specified, using current Java home)
+OS:            Windows 11 10.0 amd64
+
+c:\grpc-java>gradlew.bat wrapper --gradle-version 8.10
+* What went wrong:
+An exception occurred applying plugin request [id: 'com.github.johnrengelman.shadow', version: '8.1.1']
+> Failed to apply plugin class 'com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin'.
+   > This version of Shadow supports Gradle 8.0+ only. Please upgrade.
+c:\grpc-java>gradlew.bat --version
+Downloading https://services.gradle.org/distributions/gradle-8.10-bin.zip
+.............10%.............20%.............30%.............40%.............50%.............60%.............70%.............80%.............90%.............100%
+
+------------------------------------------------------------
+Gradle 8.10
+------------------------------------------------------------
+
+Build time:    2024-08-14 11:07:45 UTC
+Revision:      fef2edbed8af1022cefaf44d4c0514c5f89d7b78
+
+Kotlin:        1.9.24
+Groovy:        3.0.22
+Ant:           Apache Ant(TM) version 1.10.14 compiled on August 16 2023
+Launcher JVM:  17.0.12 (Oracle Corporation 17.0.12+8-LTS-286)
+Daemon JVM:    C:\Program Files\Java\jdk-17 (no JDK specified, using current Java home)
+OS:            Windows 11 10.0 amd64
+
+https://plugins.gradle.org/plugin/com.github.johnrengelman.shadow
+Using the plugins DSL:
+plugins {
+  id("com.github.johnrengelman.shadow") version "8.1.1"
+}
+https://github.com/GradleUp/shadow
+Latest Test Compatibility
+Gradle Version	Shadow Version
+5.x	5.2.0 - 6.0.0
+6.x	5.2.0 - 6.1.0
+7.x	7.0.0+
+8.0 - 8.2.x	8.0.0 - 8.1.1 <- 여기에해당
+8.3+	8.3.0+
+
+계속 에러발생
+A problem occurred evaluating project ':grpc-api'.
+> Could not get unknown property 'libraries' for object of type org.gradle.api.internal.artifacts.dsl.dependencies.DefaultDependencyHandler.
+C:\grpc-java>settings.gradle 파일열어서
+project(':grpc-api').projectDir = "$rootDir/api" as File
+=> project(':grpc-api').projectDir = "$rootDir/api/build/libs" as File
+경로 다 변경해 주니까 성공함.
+c:\grpc-java>gradlew clean -PskipAndroid=true
+  * Skipping the build of Android projects because skipAndroid=true
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+For more on this, please refer to https://docs.gradle.org/8.10/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+BUILD SUCCESSFUL in 955ms
+3 actionable tasks: 1 executed, 2 up-to-date
+c:\grpc-java>gradlew clean
+c:\grpc-java>gradlew --stop
+c:\grpc-java>gradlew build --refresh-dependencies -PskipAndroid=true
+성공!
+Bazel을 빌드하기 위해 MSYS2와 필요한 패키지(zip, unzip, patch)를 설치
+C:\bazel\output에 결과가 생성되지 않아 아래과정을 다시진행함
+[MSYS2 CLANGARM64] C:\msys64\mingw64.exe
+ERROR: JDK version (1.17) is lower than 21, please set $JAVA_HOME.
+https://www.oracle.com/java/technologies/downloads/#jdk21-windows
+JDK Development Kit 21.0.4 downloads
+jdk-21_windows-x64_bin.exe
+https://download.oracle.com/java/21/latest/jdk-21_windows-x64_bin.exe (sha256)
+설치위치: C:\Program Files\Java\jdk-21
+설치완료!
+환경변수추가
+JAVA_HOME C:\Program Files\Java\jdk-21
+Path C:\Program Files\Java\jdk-21\bin
+$ /c/bazel
+$ ./compile.sh
+$ export PATH="/c/Users/nayou/AppData/Local/Programs/Python/Python312:$PATH"
+ERROR: JAVA_HOME (C:/Program Files/Java/jdk-21;C:/Program Files/Java/jdk-17;) is not a path to a working JDK.
+JAVA_HOME C:\Program Files\Java\jdk-17
+JAVA_HOME_21 C:\Program Files\Java\jdk-21
+Path C:\Program Files\Java\jdk-21\bin; C:\Program Files\Java\jdk-17\bin
+(일단설정만해놓음)
+export JAVA_HOME="/c/Program Files/Java/jdk-21"
+
+
+
 
 
 
