@@ -1036,7 +1036,7 @@ https://download.oracle.com/java/21/latest/jdk-21_windows-x64_bin.exe (sha256)
 환경변수추가
 JAVA_HOME C:\Program Files\Java\jdk-21
 Path C:\Program Files\Java\jdk-21\bin
-$ /c/bazel
+$ cd /c/bazel
 $ ./compile.sh
 $ export PATH="/c/Users/nayou/AppData/Local/Programs/Python/Python312:$PATH"
 ERROR: JAVA_HOME (C:/Program Files/Java/jdk-21;C:/Program Files/Java/jdk-17;) is not a path to a working JDK.
@@ -1045,6 +1045,102 @@ JAVA_HOME_21 C:\Program Files\Java\jdk-21
 Path C:\Program Files\Java\jdk-21\bin; C:\Program Files\Java\jdk-17\bin
 (일단설정만해놓음)
 export JAVA_HOME="/c/Program Files/Java/jdk-21"
+$ cd /c/bazel
+$ ./compile.sh
+scripts/bootstrap/buildenv.sh: 행 38번: hash: python.exe: 찾을 수 없음
+ERROR: cannot locate python.exe; check your PATH.
+       You may need to run the following command, or something
+       similar, depending on where you installed Python:
+         export PATH="/c/Python27:$PATH"
+$ export PATH="/c/Users/nayou/AppData/Local/Programs/Python/Python312:$PATH"
+$ ./compile.sh
+find: ‘derived/maven’: No such file or directory
+...
+ERROR: JAVA_HOME (C:/Program Files/Java/jdk-17;) is not a path to a working JDK.
+$ export JAVA_HOME="/c/Program Files/Java/jdk-21"
+...
+find: ‘/usr/share/java/caffeine.jar’: No such file or directory
+find: ‘derived/maven’: No such file or directory
+
+ERROR: Must specify GRPC_JAVA_PLUGIN if not bootstrapping from the distribution artifact
+
+[프로젝트에서 GRPC_JAVA_PLUGIN 다운로드 및 설정]
+"C:\grpc-java\build.gradle" 수정
+// GRPC_JAVA_PLUGIN 바이너리 다운로드 작업 추가
+task downloadGrpcJavaPlugin(type: de.undercouch.gradle.tasks.download.Download) {
+    src 'https://repo1.maven.org/maven2/io/grpc/protoc-gen-grpc-java/1.66.0/protoc-gen-grpc-java-1.66.0-windows-x86_64.exe'
+    dest new File("$buildDir/gradle/wrapper/protoc-gen-grpc-java.exe")
+    overwrite true
+}
+...
+C:\Windows\System32>cd c:\grpc-java
+c:\grpc-java>set JAVA_HOME=C:\Program Files\Java\jdk-17
+c:\grpc-java>gradlew build -PskipAndroid=true
+"C:\grpc-java\build\gradle\wrapper\protoc-gen-grpc-java.exe" 생성됨!!
+[MSYS2 CLANGARM64]
+$ export JAVA_HOME="/c/Program Files/Java/jdk-21"
+$ export GRPC_JAVA_PLUGIN="/c/grpc-java/build/gradle/wrapper/protoc-gen-grpc-java.exe"
+에러
+[전체 시스템 업데이트]
+pacman -Syu
+[필수 패키지 설치]
+pacman -S base-devel git zip unzip
+
+오류: 파일 'binutils-2.43-1-x86_64.pkg.tar.zst'를 mirror.msys2.org에서 가져오는 데 실패 :irrors.bfsu.edu.cn
+경고: mirror.msys2.org에 치명 오류: 이 트랜잭션의 나머지는 건너뜁니다
+오류: 파일 'diffstat-1.66-1-x86_64.pkg.tar.zst'를 mirror.msys2.org에서 가져오는 데 실패 :irrors.bfsu.edu.cn
+$ ls /etc/pacman.d/
+gnupg               mirrorlist.clang64  mirrorlist.mingw32  mirrorlist.msys
+mirrorlist.clang32  mirrorlist.mingw    mirrorlist.mingw64  mirrorlist.ucrt64
+notepad /etc/pacman.d/mirrorlist.msys
+추가
+## Official mirrors
+Server = https://mirror.rackspace.com/msys2/base
+Server = https://mirror.umd.edu/msys2/base
+패키지 데이터베이스 새로 고치기
+pacman -Syy
+필수 패키지 설치
+pacman -Q jdk-openjdk
+pacman -S jdk-openjdk
+pacman -Syu
+pacman -Ss jdk
+pacman -Ss java
+
+./compile.sh clean
+./compile.sh -PskipAndroid=true
+find: No such file or directory => JAR 파일이 누락
+export JAVA_HOME=/c/Program\ Files/Java/jdk-21
+export PATH=$JAVA_HOME/bin:$PATH
+echo $JAVA_HOME
+echo $PATH
+
+MSYS2 재설치 ㅜㅜ
+https://www.msys2.org/
+Installation
+Download the installer: msys2-x86_64-20240727.exe
+C:\msys64
+"C:\msys64\mingw64.exe"
+$ pacman -Syu
+환경 변수를 직접 현재 세션에 적용
+export PATH="/c/Users/nayou/AppData/Local/Programs/Python/Python312:$PATH"
+export JAVA_HOME="/c/Program Files/Java/jdk-21"
+export GRPC_JAVA_PLUGIN="/c/grpc-java/build/gradle/wrapper/protoc-gen-grpc-java.exe"
+export PATH=$JAVA_HOME/bin:$PATH
+환경변수즉시사용
+source ~/.bashrc
+MSYS2 터미널을 열 때마다 설정한 환경 변수가 자동으로 적용
+"C:\msys64\home\nayou\.bashrc"
+"C:\msys64\home\nayou\.bash_profile"
+설정이 자동으로 되지않음
+pacman -S unzip
+unzip -v
+"C:\msys64\home\nayou\.bashrc" 에 환경변수추가하고 source 명령어 실행하면 자동 세팅됨.
+source ~/.bashrc
+
+
+
+
+
 
 
 
