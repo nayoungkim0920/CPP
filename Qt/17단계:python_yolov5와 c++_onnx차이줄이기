@@ -1264,6 +1264,23 @@ ln -s /c/msys64/tmp/bazel_nzp2u3X6/src/com/google /c/msys64/tmp/bazel_nzp2u3X6/s
 ...
 링크만들고 컴파일돌리면 또 다른 링크에러가나서 "C:\bazel\autolink.sh" 만들어서 자동으로 생성루틴 실행
 =>에러발생안할때까지
+"C:\bazel\compile.sh" => 이파일에서 오류발생할때 차라리 생성하는걸로 대치하는게나을거같아 수정
+nayou@kimnayooung MINGW64 /c/bazel
+# ./compile.sh
+🍃  Building Bazel from scratchStarting build process...
+Error detected. Creating missing directories...
+Extracted missing directories:
+Added to array: dirs[0]: C:/msys64/tmp/bazel_1TRn6wud/src/build/bazel
+dirs[1] 도 나와야하는데 안나옴. 
+
+
+
+
+
+
+
+
+
 
 
 
