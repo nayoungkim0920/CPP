@@ -1126,7 +1126,7 @@ export PATH="/c/Users/nayou/AppData/Local/Programs/Python/Python312:$PATH"
 export JAVA_HOME="/c/Program Files/Java/jdk-21"
 export GRPC_JAVA_PLUGIN="/c/grpc-java/build/gradle/wrapper/protoc-gen-grpc-java.exe"
 export PATH=$JAVA_HOME/bin:$PATH
-환경변수즉시사용
+환경변수즉시사용(터미널을 재실행안해도 바로적용됨)
 source ~/.bashrc
 MSYS2 터미널을 열 때마다 설정한 환경 변수가 자동으로 적용
 "C:\msys64\home\nayou\.bashrc"
@@ -1136,11 +1136,114 @@ pacman -S unzip
 unzip -v
 "C:\msys64\home\nayou\.bashrc" 에 환경변수추가하고 source 명령어 실행하면 자동 세팅됨.
 source ~/.bashrc
+[원하는 문장찾기]
+findstr /s /m /c:"/c/Users/nayou/AppData/Local/Programs/Python/Python312" *.*
 
-
-
-
-
+nayou@kimnayooung MINGW64 /c/bazel
+# ./compile.sh 
+find: ‘/usr/share/java/netty-codec-dns.jar’: No such file or directory
+.... 수십개에러발생
+[명령프롬프트]
+set JAVA_HOME=C:\Program Files\Java\jdk-17
+Gradle을 사용하는 경우 build.gradle 파일에 의존성을 추가
+"C:\grpc-java\build.gradle"
+implementation 'io.netty:netty-buffer:4.1.68.Final
+환경변수
+BAZEL_SH C:\msys64\usr\bin\bash.exe
+BAZEL_VS  C:\Program Files (x86)\Microsoft Visual Studio\2019\Community
+Path C:\bazel
+cp 명령어가 심볼릭 링크를 생성하지 못하는 문제
+mkdir C:\msys64\tmp\bazel_MlCyCiY1\src\build
+C:\msys64\tmp\bazel_MlCyCiY1\src\build 생성
+c:/bazel
+bazel fetch //...
+모든 의존성을 다운로드
+bazel version
+Bazel 프로젝트의 루트 디렉토리에는 WORKSPACE 파일이 있어야 함
+gradlew build -PskipAndroid=true (큰프로적트인경우 제공되는 gradle보다 gradlew사용하는게 적합)
+> Task :downloadGrpcJavaPlugin
+Download https://repo1.maven.org/maven2/io/grpc/protoc-gen-grpc-java/1.66.0/protoc-gen-grpc-java-1.66.0-windows-x86_64.exe
+성공!
+...
+find: ‘/usr/share/java/caffeine.jar’: No such file or directory
+find: ‘derived/maven’: No such file or directory
+nayou@kimnayooung MINGW64 /c/bazel
+# ls /usr/share/java
+ls: cannot access '/usr/share/java': No such file or directory
+nayou@kimnayooung MINGW64 /c/bazel
+# mkdir -p /usr/share/java
+에러잡기
+mkdir -p C:/bazel/third_party/java/netty
+wget -P C:/bazel/third_party/java/netty/ https://repo1.maven.org/maven2/io/netty/netty-buffer/4.1.68.Final/netty-buffer-4.1.68.Final.jar
+2024-08-19 11:28:04 (677 KB/s) - `C:/bazel/third_party/java/netty/netty-buffer-4.1.68.Final.jar' 저장함 [301820/301820]
+"C:\bazel\download_jars.sh"을 만들어서 다운로드받는 명령어를 한꺼번에 실행함
+nayou@kimnayooung MINGW64 /c/bazel
+# ./download_jars.sh
+Downloading /usr/share/java/netty-codec-dns.jar...
+--2024-08-19 11:53:20--  https://repo1.maven.org/maven2/io/netty/netty-codec-dns/4.1.68.Final/netty-codec-dns-4.1.68.Final.jar
+'/usr/ssl/certs/ca-bundle.crt' CA 인증서를 불러왔습니다
+repo1.maven.org (repo1.maven.org) 해석 중... 146.75.92.209, 2a04:4e42:87::209
+다음으로 연결 중: repo1.maven.org (repo1.maven.org)|146.75.92.209|:443... 연결했습니다.
+HTTP 요청을 보냈습니다. 응답 기다리는 중... 200 OK
+길이: 65450 (64K) [application/java-archive]
+저장 위치: `/usr/share/java/netty-codec-dns.jar'
+/usr/share/java/netty-co 100%[==================================>]  63.92K   390KB/s    /  0.2s
+2024-08-19 11:53:21 (390 KB/s) - `/usr/share/java/netty-codec-dns.jar' 저장함 [65450/65450]
+Download completed.
+배치파일만들어서 찾지못하는 jar파일 전부설치함
+"C:\bazel\download_jars1.sh"
+"C:\bazel\download_jars1.sh"
+nayou@kimnayooung MINGW64 /c/bazel
+# ./download_jars2.sh
+...
+100  256k  100  256k    0     0   251k      0  0:00:01  0:00:01 --:--:--  251k
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100 15979  100 15979    0     0  25168      0 --:--:-- --:--:-- --:--:-- 25323
+All JAR files have been downloaded to /usr/share/java.
+nayou@kimnayooung MINGW64 /c/bazel
+# ./compile.sh
+🍃  Building Bazel from scratchfind: ‘/usr/share/java/netty-buffer.jar’: No such file or directory
+find: ‘derived/maven’: No such file or directory
+.cp: cannot create symbolic link 'C:/msys64/tmp/bazel_6lZWERiv/src/build/bazel': No such file or directory
+cp: cannot create symbolic link 'C:/msys64/tmp/bazel_6lZWERiv/src/com/google': No such file or directory
+C:\bazel\derived\maven 생성
+bazel.exe가없어서 재설치
+C:/>git clone https://github.com/bazelbuild/bazel.git
+여기도 exe파일이없어서 공식다운로드 싸이트에서 받아설치
+https://github.com/bazelbuild/bazel/releases
+bazel-7.3.1rc2-windows-x86_64.exe => bazel.exe 만 c:/bazel 폴더에 넣어줌
+명령프롬프트
+c:\bazel>bazel --version
+bazel 7.3.1rc2
+빌드
+c:\bazel>bazel build //src:bazel
+=> bazel.exe가생성됨
+export PATH="/c/bazel:/c/Users/nayou/AppData/Local/Programs/Python/Python312:$PATH"
+=> bazel --version
+export PATH="/c/bazel:/c/Users/nayou/AppData/Local/Programs/Python/Python312:$PATH"
+bazel 7.3.1rc2
+nayou@kimnayooung MINGW64 /c/bazel/src
+# bazel build bazel
+ERROR: C:/msys64/home/nayou/_bazel_nayou/4yp365mj/external/grpc~/BUILD:2089:16: Compiling src/core/lib/gprpp/time.cc failed: (Exit 2): cl.exe failed: error executing CppCompile command (from target @@grpc~//:time) C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\bin\HostX64\x64\cl.exe @bazel-out/x64_windows-fastbuild/bin/external/grpc~/_objs/time/time.obj.params
+nayou@kimnayooung MINGW64 /c/bazel/src
+# "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
+**********************************************************************
+** Visual Studio 2019 Developer Command Prompt v16.11.37
+** Copyright (c) 2021 Microsoft Corporation
+**********************************************************************
+[vcvarsall.bat] Environment initialized for: 'x64'
+nayou@kimnayooung MINGW64 /c/bazel
+# bazel build src:bazel --verbose_failures
+ERROR: C:/msys64/home/nayou/_bazel_nayou/4yp365mj/external/grpc~/BUILD:2089:16: Compiling src/core/lib/gprpp/time.cc failed: (Exit 2): cl.exe failed: error executing CppCompile command (from target @@grpc~//:time)
+bazel clean --expunge
+"C:\bazel\bazel-bazel\external\grpc~\src\core\lib\gprpp\time.cc"수정
+UTF-8로 설정되어 있는지 확인
+프로그램 수정
+nayou@kimnayooung MINGW64 /c/bazel
+# bazel build src:bazel
+ERROR: C:/msys64/home/nayou/_bazel_nayou/4yp365mj/external/grpc~/BUILD:2089:16: Compiling src/core/lib/gprpp/time.cc failed: (Exit 2): cl.exe failed: error executing CppCompile command (from target @@grpc~//:time) C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\bin\HostX64\x64\cl.exe @bazel-out/x64_windows-fastbuild/bin/external/grpc~/_objs/time/time.obj.params
+time.cc
 
 
 
