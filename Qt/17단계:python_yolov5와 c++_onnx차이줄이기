@@ -1244,14 +1244,26 @@ nayou@kimnayooung MINGW64 /c/bazel
 # bazel build src:bazel
 ERROR: C:/msys64/home/nayou/_bazel_nayou/4yp365mj/external/grpc~/BUILD:2089:16: Compiling src/core/lib/gprpp/time.cc failed: (Exit 2): cl.exe failed: error executing CppCompile command (from target @@grpc~//:time) C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\bin\HostX64\x64\cl.exe @bazel-out/x64_windows-fastbuild/bin/external/grpc~/_objs/time/time.obj.params
 time.cc
-
-
-
-
-
-
-
-
+패키지업데이트
+nayou@kimnayooung MINGW64 /c/bazel
+# pacman -Syu
+nayou@kimnayooung MINGW64 /c/bazel
+# ./compile.sh
+Building Bazel from scratch.cp: cannot create symbolic link 'C:/msys64/tmp/bazel_L6X4dv73/src/build/bazel': No such file or directory
+cp: cannot create symbolic link 'C:/msys64/tmp/bazel_L6X4dv73/src/com/google': No such file or directory
+심볼릭 링크 관련 문제를 해결하기 위해 필요한 패키지를 설치
+pacman -S msys2-runtime
+nayou@kimnayooung MINGW64 /c/bazel
+# ./compile.sh
+🍃  Building Bazel from scratch.cp: cannot create symbolic link 'C:/msys64/tmp/bazel_nzp2u3X6/srild/bazel': No such file or directory
+cp: cannot create symbolic link 'C:/msys64/tmp/bazel_nzp2u3X6/src/com/google': No such file or dtory
+# 필요한 상위 디렉토리 생성
+mkdir -p /c/msys64/tmp/bazel_nzp2u3X6/src/com/google
+mkdir -p /c/msys64/tmp/bazel_nzp2u3X6/srild
+ln -s /c/msys64/tmp/bazel_nzp2u3X6/src/com/google /c/msys64/tmp/bazel_nzp2u3X6/srild/bazel
+...
+링크만들고 컴파일돌리면 또 다른 링크에러가나서 "C:\bazel\autolink.sh" 만들어서 자동으로 생성루틴 실행
+=>에러발생안할때까지
 
 
 
@@ -1287,6 +1299,90 @@ C:\flatbuffers\build>cmake -G "Visual Studio 16 2019" ..
 -- Generating done (0.1s)
 -- Build files have been written to: C:/flatbuffers/build
 C:\flatbuffers\build>cmake --build .
+
+1) MSYS2 에러안날떄까지 디렉토리만들고 심볼링크만드는 sh파일
+#"C:\bazel\autolink.sh"
+#!/bin/bash
+
+while true; do
+  # compile.sh 실행 및 에러를 compile.log에 저장
+  echo "Running compile.sh..."
+  ./compile.sh > compile.log 2>&1
+
+  # 에러 메시지 출력
+  echo "Errors detected:"
+  ERROR_COUNT=$(grep -c "No such file or directory" compile.log)
+  grep "No such file or directory" compile.log
+  
+  if [ "$ERROR_COUNT" -eq 0 ]; then
+    echo "No errors detected. Exiting loop."
+    break
+  fi
+
+  # C:/로 시작하는 경로 추출
+  echo "Extracting C:/ paths from error messages..."
+  path1=$(grep -oP "C:/[^']+" compile.log | grep 'build/bazel' | head -n 1)
+  path2=$(grep -oP "C:/[^']+" compile.log | grep 'com/google' | head -n 1)
+
+  # 디렉토리 변수 출력
+  echo "DIR1: $path1"
+  echo "DIR2: $path2"
+
+  # 디렉토리 생성
+  if [ ! -d "$path1" ]; then
+    echo "Creating directory: $path1"
+    mkdir -p "$path1"
+  fi
+
+  if [ ! -d "$path2" ]; then
+    echo "Creating directory: $path2"
+    mkdir -p "$path2"
+  fi
+
+  # 디렉토리 생성 여부 출력
+  echo "Created directories:"
+  echo "path1: $path1"
+  echo "path2: $path2"
+
+  # 심볼릭 링크 생성
+  if [ -n "$path1" ] && [ -n "$path2" ]; then
+    echo "Creating symbolic link from $path2 to $path1"
+    ln -s "$path2" "$path1"
+  else
+    echo "Paths for symbolic link are not properly set."
+  fi
+
+  # 잠시 대기 후 다시 시도 (옵션)
+  sleep 1
+done
+
+2) MSYS2 빌드시 jar파일 Not Found Directory and File 너무많아서 sh파일로만듬
+"C:\bazel\download_jars1.sh"
+"C:\bazel\download_jars2.sh"
+"C:\bazel\download_jars3.sh"
+#!/bin/bash
+
+# Define the target directory
+TARGET_DIR="/usr/share/java"
+mkdir -p "$TARGET_DIR"
+
+# List of JAR files and their Maven Central URLs
+declare -A JAR_FILES=(
+  ["netty-buffer.jar"]="https://repo1.maven.org/maven2/io/netty/netty-buffer/4.1.75.Final/netty-buffer-4.1.75.Final.jar"
+  ["netty-common.jar"]="https://repo1.maven.org/maven2/io/netty/netty-common/4.1.75.Final/netty-common-4.1.75.Final.jar"
+  ["netty-handler.jar"]="https://repo1.maven.org/maven2/io/netty/netty-handler/4.1.75.Final/netty-handler-4.1.75.Final.jar"
+  ["netty-transport.jar"]="https://repo1.maven.org/maven2/io/netty/netty-transport/4.1.75.Final/netty-transport-4.1.75.Final.jar"
+  ["netty-codec.jar"]="https://repo1.maven.org/maven2/io/netty/netty-codec/4.1.75.Final/netty-codec-4.1.75.Final.jar"
+  # Add other necessary JAR files here...
+)
+
+# Download each JAR file
+for jar_name in "${!JAR_FILES[@]}"; do
+  jar_url="${JAR_FILES[$jar_name]}"
+  curl -o "$TARGET_DIR/$jar_name" "$jar_url"
+done
+
+echo "All JAR files have been downloaded to $TARGET_DIR."
 
 1) CMakeLists.txt
 cmake_minimum_required(VERSION 3.14)
