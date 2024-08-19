@@ -1272,6 +1272,10 @@ Error detected. Creating missing directories...
 Extracted missing directories:
 Added to array: dirs[0]: C:/msys64/tmp/bazel_1TRn6wud/src/build/bazel
 dirs[1] 도 나와야하는데 안나옴. 
+"C:\bazel\compile.sh" => 수정
+추출된 누락 디렉토리:
+배열에 추가됨: dirs[0]: C:/msys64/tmp/bazel_1TRn6wud/src/build/bazel
+배열에 추가됨: dirs[1]: C:/msys64/tmp/bazel_1TRn6wud/src/com/google
 
 
 
