@@ -1355,7 +1355,62 @@ wget https://repo1.maven.org/maven2/com/applitools/applitools-android-common/3.0
 wget https://repo1.maven.org/maven2/com/applitools/applitools-android-common/3.0.18/applitools-android-common-3.0.18.pom -O /usr/share/java/applitools-android-common.pom
 https://central.sonatype.com/search?q=com.android.tools.repository.jar
 여기서 검색해서 다운로드 받아야하는데 지원되지않아 다운못하고 
-WORKSPACE, BUILD 파일을 수정하기로 함
+WORKSPACE, BUILD 파일을 수정하기로 함=> 취소 수정했는데 안돼서 원복
+scripts/bootstrap/compile.sh: 줄 164: BAZEL_JAVAC_OPTS: 바인딩 해제한 변수
+"C:\bazel\scripts\bootstrap\compile.sh" 수정
+export BAZEL_JAVAC_OPTS="--source 21 --target 21"
+"C:\bazel\.bazelrc"
+bazel shutdown
+bazel build  @@//src/main/java/com/google/devtools/build/lib/bazel:BazelServer
+INFO: Found 1 target...
+Target //src/main/java/com/google/devtools/build/lib/bazel:BazelServer up-to-date:
+  bazel-bin/src/main/java/com/google/devtools/build/lib/bazel/BazelServer.exe
+  bazel-bin/src/main/java/com/google/devtools/build/lib/bazel/BazelServer.jar
+INFO: Elapsed time: 206.127s, Critical Path: 50.01s
+INFO: 2635 processes: 69 internal, 1630 local, 936 worker.
+INFO: Build completed successfully, 2635 total actions
+에러(다운받아야할목록)
+com.android.tools.common.jar
+com.android.tools.layoutlib.layoutlib-api.jar
+com.android.tools.repository.jar
+escapevelocity.jar
+google-extensions.jar
+java-diff-utils.jar
+javapoet.jar
+jcip-annotations.jar
+==> GitHub에서 검색해서 다운로드 받아 설치할 수 밖에 없음
+[javapoet.jar]
+wget https://repo.maven.apache.org/maven2/com/squareup/javapoet/1.13.0/javapoet-1.13.0.jar -O /usr/share/java/javapoet.jar
+성공!
+[rxjava.jar] //v3.1.9
+CMD에서
+git clone https://github.com/ReactiveX/RxJava.git
+git checkout v3.1.9
+set JAVA_HOME="C:\Program Files\Java\jdk-21"
+gradlew build
+"C:\bazel\rxjava\gradle.properties" 수정
+org.gradle.daemon=true
+org.gradle.jvmargs=-Xmx4g -Xms1g -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=heapdump.hprof
+"C:\bazel\RxJava\gradle\wrapper\gradle-wrapper.properties"
+distributionUrl=https\://services.gradle.org/distributions/gradle-8.3-bin.zip 로 수정
+gradlew wrapper --gradle-version 8.3
+"C:\bazel\rxjava\build.gradle" 수정
+C:\bazel\rxjava>gradlew build
+BUILD SUCCESSFUL in 4m 23s
+17 actionable tasks: 3 executed, 14 up-to-date
+=> "C:\bazel\rxjava\build\libs\rxjava-3.1.9.jar" 생성됨
+참고 (오류를 볼 수 있음)
+file:///C:/bazel/rxjava/build/reports/tests/test/classes/Gradle%2320Test%2320Executor%232010.html#failed%20to%20execute%20tests
+MINGW64 환경에서 복사
+nayou@kimnayooung MINGW64 /c/bazel/rxjava/build/libs 
+# cp rxjava-3.1.9.jar /usr/share/java/rxjava.jar
+[jcip-annotations.jar]
+https://github.com/stephenc/jcip-annotations
+C:\bazel>git clone https://github.com/stephenc/jcip-annotations.git
+2024-08-20  오후 04:39             5,701 pom.xml
+Maven으로 JAR 파일 빌드하기 가능(pom.xml이 제공됨)
+https://maven.apache.org/download.cgi
+Binary zip archive	apache-maven-3.9.9-bin.zip
 
 
 
