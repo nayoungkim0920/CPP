@@ -1,0 +1,60 @@
+"C:\myLab\Project1\Project1\imageProcessingLib\CMakeLists.txt"
+===========================================================================================
+(CMakeLists.txt)
+...
+# GStreamer 설정
+set(GSTREAMER_DIR "C:/gstreamer/1.0/msvc_x64")
+# CMake가 라이브러리나 패키지를 찾는 경로를 지정하는 변수
+set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH};${GSTREAMER_DIR}")
+find_package(GSTREAMER REQUIRED gstreamer-1.0 gstreamer-base-1.0 gstreamer-video-1.0)
+set(GSTREAMER_INCLUDE_DIRS "${GSTREAMER_PREFIX}/include/gstreamer-1.0;${GSTREAMER_PREFIX}/include/glib-2.0;${GSTREAMER_PREFIX}/lib/glib-2.0/include;${GSTREAMER_INCLUDE_DIRS}")
+set(GSTREAMER_LIB_DIR "${GSTREAMER_PREFIX}/lib;${GSTREAMER_LIBRARY_DIRS}")
+include_directories(${GSTREAMER_INCLUDE_DIRS})
+link_directories(${GSTREAMER_LIB_DIR})
+message(STATUS "CMAKE_PREFIX_PATH: ${CMAKE_PREFIX_PATH}")
+message(STATUS "GSTREAMER_INCLUDE_DIRS: ${GSTREAMER_INCLUDE_DIRS}")
+message(STATUS "GSTREAMER_LIB_DIR: ${GSTREAMER_LIB_DIR}")
+message(STATUS "GSTREAMER_LIBS: ${GSTREAMER_LIBS}")
+...
+===========================================================================================
+PS C:\myLab\Project1\Project1\imageProcessingLib\build> cmake -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Debug ..
+===========================================================================================
+(OUTPUT)
+CMake Error at CMakeLists.txt:39 (find_package):
+  By not providing "FindGSTREAMER.cmake" in CMAKE_MODULE_PATH this project
+  has asked CMake to find a package configuration file provided by
+  "GSTREAMER", but CMake did not find one.
+
+  Could not find a package configuration file provided by "GSTREAMER" with
+  any of the following names:
+
+    GSTREAMERConfig.cmake
+    gstreamer-config.cmake
+
+  Add the installation prefix of "GSTREAMER" to CMAKE_PREFIX_PATH or set
+  "GSTREAMER_DIR" to a directory containing one of the above files.  If
+  "GSTREAMER" provides a separate development package or SDK, be sure it has
+  been installed.
+===========================================================================================
+[설치하기]
+C:\>git clone https://gitlab.freedesktop.org/gstreamer/gstreamer.git
+C:\>cd gstreamer
+C:\gstreamer>git submodule update --init --recursive
+설치하다가 오류가나면 아래를 실행하고 재실행
+C:\gstreamer>rd /s /q "C:\gstreamer\subprojects\gst-integration-testsuites\medias"
+설치안돼서 수동으로 설치
+C:\gstreamer>cd C:\gstreamer\subprojects
+C:\gstreamer\subprojects>mkdir gst-integration-testsuites
+하위 디렉터리 또는 파일 gst-integration-testsuites이(가) 이미 있습니다.
+C:\gstreamer\subprojects>cd gst-integration-testsuites
+C:\gstreamer\subprojects\gst-integration-testsuites>git clone https://gitlab.freedesktop.org/gstreamer/gst-integration-testsuites.git medias
+C:\gstreamer\subprojects\gst-integration-testsuites>cd C:\gstreamer
+C:\gstreamer>git submodule update --init --recursive
+run the command again with `GIT_CLONE_PROTECTION_ACTIVE=false`
+warning: Clone succeeded, but checkout failed.
+You can inspect what was checked out with 'git status'
+and retry with 'git restore --source=HEAD :/'
+클론 작업을 다시 시도할 때 GIT_CLONE_PROTECTION_ACTIVE=false 환경 변수를 설정하여 클론 보호 기능을 비활성화
+C:\gstreamer\subprojects\gst-integration-testsuites>rd /s /q "C:\gstreamer\subprojects\gst-integration-testsuites\medias"
+C:\gstreamer\subprojects\gst-integration-testsuites>set GIT_CLONE_PROTECTION_ACTIVE=false
+C:\gstreamer\subprojects\gst-integration-testsuites>git clone https://gitlab.freedesktop.org/gstreamer/gst-integration-testsuites.git medias
