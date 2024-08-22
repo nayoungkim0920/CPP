@@ -58,3 +58,28 @@ and retry with 'git restore --source=HEAD :/'
 C:\gstreamer\subprojects\gst-integration-testsuites>rd /s /q "C:\gstreamer\subprojects\gst-integration-testsuites\medias"
 C:\gstreamer\subprojects\gst-integration-testsuites>set GIT_CLONE_PROTECTION_ACTIVE=false
 C:\gstreamer\subprojects\gst-integration-testsuites>git clone https://gitlab.freedesktop.org/gstreamer/gst-integration-testsuites.git medias
+Cloning into 'medias'...
+remote: Enumerating objects: 11778, done.
+remote: Counting objects: 100% (122/122), done.
+remote: Compressing objects: 100% (68/68), done.
+remote: Total 11778 (delta 50), reused 122 (delta 50), pack-reused 11656 (from 1)
+Receiving objects: 100% (11778/11778), 4.95 MiB | 602.00 KiB/s, done.
+Resolving deltas: 100% (5403/5403), done.
+Updating files: 100% (1703/1703), done.
+Filtering content: 100% (1603/1603), 586.08 MiB | 1.84 MiB/s, done.
+C:\gstreamer\subprojects\gst-integration-testsuites>cd C:\gstreamer\subprojects\gst-integration-testsuites\medias
+C:\gstreamer\subprojects\gst-integration-testsuites\medias>
+C:\gstreamer\subprojects\gst-integration-testsuites\medias>git status
+On branch main
+Your branch is up to date with 'origin/main'.
+nothing to commit, working tree clean
+훅 파일 비활성화
+C:\gstreamer\subprojects\gst-integration-testsuites\medias>cd C:\gstreamer
+C:\gstreamer>git submodule update --init --recursive
+GStreamer 빌드
+
+
+
+
+
+
