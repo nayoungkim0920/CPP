@@ -13,3 +13,49 @@ GLib의 객체 시스템으로, GStreamer의 다양한 요소들이 객체 지�
 
 gstreamer-1.0-devel-msvc-x86_64-1.24.6.msi
 C:\gstreamer\1.0\msvc_x86_64
+
+CMakeLists.txt 
+...
+# GStreamer 설정
+set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH};${GSTREAMER_DIR}") 
+find_package(GSTREAMER REQUIRED)
+message(STATUS "GSTREAMER_DIR : ${GSTREAMER_DIR}")
+message(STATUS "GSTREAMER_INCLUDE_DIR : ${GSTREAMER_INCLUDE_DIR}")
+message(STATUS "GSTREAMER_INCLUDE_DIRS : ${GSTREAMER_INCLUDE_DIRS}")
+message(STATUS "GSTREAMER_LIB_DIR : ${GSTREAMER_LIB_DIR}")
+message(STATUS "GSTREAMER_LIB_DIRS : ${GSTREAMER_LIB_DIRS}")
+message(STATUS "GSTREAMER_LIBRARY : ${GSTREAMER_LIBRARY}")
+message(STATUS "GSTREAMER_LIBRARIES : ${GSTREAMER_LIBRARIES}")
+
+
+set(GSTREAMER_ROOT "C:/gstreamer/1.0/msvc_x86_64")
+include_directories(
+    "${GSTREAMER_ROOT}/include/gstreamer-1.0"
+    "${GSTREAMER_ROOT}/include/glib-2.0"
+    "${GSTREAMER_ROOT}/lib/glib-2.0/include"
+)
+set(GSTREAMER_LIB "${GSTREAMER_ROOT}/lib")
+link_directories("${GSTREAMER_LIB}")
+...
+PS C:\myLab\Project1\Project1\build> cmake -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Debug ..
+CMake Error at C:/Program Files/CMake/share/cmake-3.29/Modules/FindPackageHandleStandardArgs.cmake:230 (message):
+  Could NOT find GLIB2 (missing: GLIB2_LIBRARIES GTHREAD2_LIBRARIES
+  GLIB2_INCLUDE_DIRS)
+Call Stack (most recent call first):
+  C:/Program Files/CMake/share/cmake-3.29/Modules/FindPackageHandleStandardArgs.cmake:600 (_FPHSA_FAILURE_MESSAGE)
+  C:/Qt/6.7.1/msvc2019_64/lib/cmake/Qt6/3rdparty/extra-cmake-modules/find-modules/FindGLIB2.cmake:130 (find_package_handle_standard_args)
+  C:/Program Files/CMake/share/cmake-3.29/Modules/CMakeFindDependencyMacro.cmake:76 (find_package)
+  C:/Qt/6.7.1/msvc2019_64/lib/cmake/Qt6/FindGObject.cmake:20 (find_dependency)
+  C:/Program Files/CMake/share/cmake-3.29/Modules/CMakeFindDependencyMacro.cmake:76 (find_package)
+  C:/Qt/6.7.1/msvc2019_64/lib/cmake/Qt6/FindGStreamer.cmake:26 (find_dependency)
+  CMakeLists.txt:133 (find_package)
+
+=> Could NOT find GLIB2 (missing: GLIB2_LIBRARIES GTHREAD2_LIBRARIES  GLIB2_INCLUDE_DIRS)
+=> GLIB설치해야함
+[폴더확인]
+C:\gstreamer\1.0\msvc_x86_64\include\glib-2.0
+C:\gstreamer\1.0\msvc_x86_64\lib
+[CMakeLists.txt 추가]
+set(GLIB2_INCLUDE_DIRS "C:/gstreamer/1.0/msvc_x86_64/include/glib-2.0")
+set(GLIB2_LIBRARIES "C:/gstreamer/1.0/msvc_x86_64/lib/glib-2.0.lib")
+set(GTHREAD2_LIBRARIES "C:/gstreamer/1.0/msvc_x86_64/lib/gthread-2.0.lib")
