@@ -1,0 +1,450 @@
+#cmake -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Debug ..
+
+cmake_minimum_required(VERSION 3.14)
+project(Project1 LANGUAGES CXX CUDA)
+
+# BUILD TYPE 설정
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Debug)
+endif()
+message(STATUS "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_TOOLCHAIN_FILE "C:/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE FILEPATH "Path to vcpkg toolchain file")
+set(CMAKE_PREFIX_PATH 
+    "C:/vcpkg/packages" 
+    "C:/onnxruntime")
+
+# QT 설정
+set(Qt6_DIR "C:/Qt/6.7.1/")
+set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${Qt6_DIR}/msvc2019_64/lib/cmake/Qt6") #Find<Module>.cmake
+set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH};${Qt6_DIR}") #CMakeLists.txt
+find_package(Qt6 REQUIRED COMPONENTS Widgets Core Gui)
+set(CMAKE_PREFIX_PATH "${Qt6_DIR};${CMAKE_PREFIX_PATH}")
+set(Qt6_INCLUDE_DIRS ${Qt6_DIR}/msvc2019_64/include)
+set(Qt6_LIB_DIR ${Qt6_DIR}/msvc2019_64/lib)
+set(Qt6_LIBRARIES Qt6::Widgets;Qt6::Core;Qt6::Gui)
+include_directories(${Qt6_INCLUDE_DIRS})
+link_directories(${Qt6_LIB_DIR})
+link_libraries(${Qt6_LIBRARIES})
+message(STATUS "Qt6_INCLUDE_DIRS: ${Qt6_INCLUDE_DIRS}")
+message(STATUS "Qt6_LIB_DIR: ${Qt6_LIB_DIR}")
+message(STATUS "Qt6_LIBRARIES: ${Qt6_LIBRARIES}")
+
+# OpenCV 설정
+set(OpenCV_DIR "C:/opencv")
+set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${OpenCV_DIR}/sources/cmake") #Find<Module>.cmake
+set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH};${OpenCV_DIR}") #CMakeLists.txt
+#find_package(OpenCV REQUIRED COMPONENTS core imgproc highgui dnn features2d calib3d imgcodecs ml video videoio objdetect opencv_photo)
+find_package(OpenCV REQUIRED) 
+set(OpenCV_LIBRARIES 
+    cudaarithm cudaimgproc cudafilters imgcodecs core imgproc dnn 
+    cudawarping cudacodec cudabgsegm cudafeatures2d cudalegacy features2d calib3d ml 
+    video videoio objdetect photo ${OpenCV_LIBRARIES}
+)
+set(CMAKE_PREFIX_PATH "${OpenCV_DIR};${CMAKE_PREFIX_PATH}")
+set(OpenCV_INCLUDE_DIRS "${OpenCV_DIR}/install/include" "${OpenCV_DIR}/include" "${OpenCV_INCLUDE_DIRS}")
+set(OpenCV_LIB_DIR "${OpenCV_DIR}/lib/${CMAKE_BUILD_TYPE}")
+set(OpenCV_BIN_DIR "${OpenCV_DIR}/x64/vc16/bin")
+set(OpenCV_BIN_DIR_TYPE "${OpenCV_DIR}/bin/${CMAKE_BUILD_TYPE}")
+set(OpenCV_LIB_ALL ${OpenCV_LIBRARIES};${OpenCV_LIBS})
+
+set(OpenCV_LINK_LIBS "")
+set(OpenCV_DLLS "")
+foreach(lib ${OpenCV_LIB_ALL})    
+    if(CMAKE_BUILD_TYPE MATCHES Debug)
+        if("${OpenCV_DLLS}" STREQUAL "")
+            list(APPEND OpenCV_LINK_LIBS ${OpenCV_BIN_DIR}/opencv_world4100d.lib)
+            list(APPEND OpenCV_DLLS ${OpenCV_BIN_DIR}/opencv_world4100d.dll)
+        endif()
+        if(${lib} MATCHES "^opencv_")
+            list(APPEND OpenCV_LINK_LIBS "${lib}4100d.lib")
+            list(APPEND OpenCV_DLLS "${OpenCV_BIN_DIR_TYPE}/${lib}4100d.dll")
+        else()
+            list(APPEND OpenCV_LINK_LIBS "opencv_${lib}4100d.lib")
+            list(APPEND OpenCV_DLLS "${OpenCV_BIN_DIR_TYPE}/opencv_${lib}4100d.dll")
+        endif()
+    else()
+        if("${OpenCV_DLLS}" STREQUAL "")
+            list(APPEND OpenCV_LINK_LIBS ${OpenCV_BIN_DIR}/opencv_world4100.lib)
+            list(APPEND OpenCV_DLLS ${OpenCV_BIN_DIR}/opencv_world4100.dll)
+        endif()
+        if(${lib} MATCHES "^opencv_")
+            list(APPEND OpenCV_LINK_LIBS "${lib}4100.lib")
+            list(APPEND OpenCV_DLLS "${OpenCV_BIN_DIR_TYPE}/${lib}4100.dll")
+        else()
+            list(APPEND OpenCV_LINK_LIBS "opencv_${lib}4100.lib")
+            list(APPEND OpenCV_DLLS "${OpenCV_BIN_DIR_TYPE}/opencv_${lib}4100.dll")
+        endif()
+    endif()      
+endforeach()
+#foreach(lib1 ${OpenCV_LINK_LIBS})
+#    message(STATUS "${lib1}")
+#endforeach()
+#foreach(lib2 ${OpenCV_DLLS})
+#    message(STATUS "${lib2}")
+#endforeach()
+include_directories(${OpenCV_INCLUDE_DIRS})
+link_directories(${OpenCV_LIB_DIR} ${OpenCV_LIB_DIR_DEBUG} ${OpenCV_LIB_DIR_RELEASE})
+link_libraries(${OpenCV_LINK_LIBS} ${OpenCV_DLLS})
+message(STATUS "OpenCV_INCLUDE_DIRS: ${OpenCV_INCLUDE_DIRS}")
+message(STATUS "OpenCV_LIB_DIR: ${OpenCV_LIB_DIR}")
+message(STATUS "OpenCV_LINK_LIBS: ${OpenCV_LINK_LIBS}")
+
+# CUDA 설정"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.1\lib\cmake\thrust\FindTBB.cmake"
+set(CUDAToolkit_DIR "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1")
+set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${CUDAToolkit_DIR}/lib/cmake") #Find<Module>.cmake
+set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH};${CUDAToolkit_DIR}") #CMakeLists.txt
+find_package(CUDAToolkit REQUIRED)
+set(CUDAToolkit_LIBRARIES 
+    cudaarithm cudafilters cudawarping cudacodec cudafeatures2d cudaimgproc cudart_static cuda
+    CUDA::cudart CUDA::cuda_driver CUDA::nvrtc CUDA::cublas CUDA::curand CUDA::cufft
+)
+# ${CUDAToolkit_INCLUDE_DIRS} C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1/include
+set(CUDAToolkit_LIB_DIR "${CUDAToolkit_DIR}/lib/x64")
+set(CUDA_NVCC_EXECUTABLE "${CUDAToolkit_DIR}/bin/nvcc.exe")
+set(CUDA_ARCHITECTURES "89")
+set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} -std=c++20 --expt-relaxed-constexpr -gencode arch=compute_89,code=sm_89)
+#set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} -std=c++20 --expt-relaxed-constexpr) # -gencode : torch의 TORCH_CUDA_ARCH_LIST과 함깨 사용하지 말것
+include_directories("${CUDAToolkit_INCLUDE_DIRS}")
+link_directories("${CUDAToolkit_LIB_DIR}")
+link_libraries("${CUDAToolkit_LIBRARIES}")
+message(STATUS "CUDAToolkit_INCLUDE_DIRS: ${CUDAToolkit_INCLUDE_DIRS}")
+message(STATUS "CUDAToolkit_LIB_DIR: ${CUDAToolkit_LIB_DIR}")
+message(STATUS "CUDAToolkit_LIBRARIES: ${CUDAToolkit_LIBRARIES}")
+
+
+
+
+# CUDNN 설정
+set(CUDNN_DIR "C:/Program Files/NVIDIA/CUDNN/v9.1")
+set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${CUDNN_DIR}/cmake") #Find<Module>.cmake
+set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH};${CUDNN_DIR}") #CMakeLists.txt
+#find_package(CUDNN REQUIRED) -- error occured
+set(USE_CUDNN ON CACHE BOOL "Use CUDNN for deep learning") 
+set(cuDNN_INCLUDE_DIR "${CUDNN_DIR}/include/12.4")
+set(CUDNN_BIN "${CUDNN_DIR}/bin/12.4" ${CUDNN_BIN})
+set(cuDNN_LIB_DIR "${CUDNN_DIR}/lib/12.4/x64" ${cuDNN_LIB_DIR})
+set(cuDNN_LIBRARY "${CUDNN_DIR}/lib/12.4/x64/cudnn.lib" ${cuDNN_LIBRARY})
+set(CUDNN_LIBRARIES "${CUDNN_DIR}/lib/12.4/x64/cudnn.lib" ${CUDNN_LIBRARIES})
+include_directories("${cuDNN_INCLUDE_DIR}")
+link_directories("${cuDNN_LIB_DIR}")
+link_libraries("${CUDNN_LIBRARIES}")
+message(STATUS "USE_CUDNN : ${USE_CUDNN}")
+message(STATUS "CUDNN_INCLUDE_DIR : ${cuDNN_INCLUDE_DIR}") #C:/Program Files/NVIDIA/CUDNN/v9.1/include/12.4;C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1/include
+message(STATUS "CUDNN_BIN : ${CUDNN_BIN}") # C:/Program Files/NVIDIA/CUDNN/v9.1/bin/12.4
+message(STATUS "cuDNN_LIBRARY : ${cuDNN_LIBRARY}") #C:/Program Files/NVIDIA/CUDNN/v9.1/lib/12.4/x64
+message(STATUS "CUDNN_LIBRARIES : ${CUDNN_LIBRARIES}") #C:/Program Files/NVIDIA/CUDNN/v9.1/lib/12.4/x64/cudnn.lib
+
+
+# GStreamer 설정
+set(GSTREAMER_DIR "C:/gstreamer/1.0/msvc_x86_64")
+#set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${GSTREAMER_DIR}/cmake") #Find<Module>.cmake --cmake 폴더 없음
+set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH};${GSTREAMER_DIR}") #CMakeLists.txt
+find_package(GStreamer REQUIRED) # 호출패이키명의 대소문자를 확실히 입력
+# C:/gstreamer/1.0/msvc_x86_64/include/gstreamer-1.0;C:/gstreamer/1.0/msvc_x86_64/include/glib-2.0;C:/gstreamer/1.0/msvc_x86_64/lib/glib-2.0/include
+set(GLIB2_INCLUDE_DIRS "${GSTREAMER_DIR}/include/glib-2.0") #C:/gstreamer/1.0/msvc_x86_64/include/glib-2.0
+set(GLIB2_LIBRARIES "${GSTREAMER_DIR}/lib/glib-2.0.lib") #C:/gstreamer/1.0/msvc_x86_64/lib/glib-2.0.lib
+set(GTHREAD2_LIBRARIES "${GSTREAMER_DIR}/lib/gthread-2.0.lib") #C:/gstreamer/1.0/msvc_x86_64/lib/gthread-2.0.lib
+set(GSTREAMER_INCLUDE_DIRS "${GSTREAMER_DIR}/include/gstreamer-1.0" "${GSTREAMER_DIR}/include/glib-2.0" "${GSTREAMER_DIR}/lib/glib-2.0/include" ${GSTREAMER_INCLUDE_DIRS} ${GLIB2_INCLUDE_DIRS})
+set(GSTREAMER_LIB_DIRS "${GSTREAMER_DIR}/lib") #C:/gstreamer/1.0/msvc_x86_64/lib
+set(GSTREAMER_LIBRARIES gstreamer-1.0 gobject-2.0.lib glib-2.0.lib gstapp-1.0.lib gstbase-1.0.lib gstvideo-1.0.lib ${GLIB2_LIBRARIES} ${GTHREAD2_LIBRARIES})
+include_directories(${GSTREAMER_INCLUDE_DIRS})
+link_directories(${GSTREAMER_LIB_DIRS})
+link_libraries(${GSTREAMER_LIBRARIES})
+# GLib 및 GThread 라이브러리를 찾고 연결
+#find_library(TMP_VALUE NAMES glib-2.0 PATHS ${GSTREAMER_LIB_DIRS}) # C:/gstreamer/1.0/msvc_x86_64/lib/glib-2.0.lib
+message(STATUS "GLIB2_INCLUDE_DIRS : ${GLIB2_INCLUDE_DIRS}")
+message(STATUS "GLIB2_LIBRARIES : ${GLIB2_LIBRARIES}")
+message(STATUS "GTHREAD2_LIBRARIES : ${GTHREAD2_LIBRARIES}")
+message(STATUS "GSTREAMER_INCLUDE_DIRS : ${GSTREAMER_INCLUDE_DIRS}")
+message(STATUS "GSTREAMER_LIB_DIRS : ${GSTREAMER_LIB_DIRS}")
+message(STATUS "GSTREAMER_LIBRARIES : ${GSTREAMER_LIBRARIES}")
+if(NOT GLIB2_LIBRARIES)
+    message(FATAL_ERROR "Could not find GLIB2_LIBRARIES")
+endif()
+if(NOT GTHREAD2_LIBRARIES)
+    message(FATAL_ERROR "Could not find GTHREAD2_LIBRARIES")
+endif()
+
+
+
+# LibTorch 설정
+set(Torch_DIR "C:/libtorch")
+set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${Torch_DIR}/cmake" "${Torch_DIR}/libtorch/share/cmake") #Find<Module>.cmake --cmake 폴더 없음
+set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH}" "${Torch_DIR}") #CMakeLists.txt
+find_package(Torch REQUIRED)
+#CUDA 아키텍처 플래그를 설정
+set(TORCH_CUDA_ARCH_LIST "8.9") # NVIDIA GeForce RTX 4060 8.9 Ada Lovelace 아키텍처를 기반 compute capability 8.9를 지원
+#cuda_select_nvcc_arch_flags(ARCH_FLAGS ${TORCH_CUDA_ARCH_LIST}) 지원하지않아
+#C:\libtorch\share\cmake\Caffe2\public\utils.cmake 수정
+#cuda_select_nvcc_arch_flags(${store_var} ${TORCH_CUDA_ARCH_LIST})
+# => set(TORCH_CUDA_ARCH_LIST ${TORCH_CUDA_ARCH_LIST})
+set(Torch_INCLUDE_DIRS "${Torch_DIR}/include" "${Torch_DIR}/libtorch/include" "${Torch_INCLUDE_DIRS}")
+set(Torch_BIN "${Torch_DIR}/bin" "${Torch_DIR}/lib")
+set(Torch_LIB_DIR "${Torch_DIR}/lib" "${Torch_LIB_DIR}")
+set(Torch_LIBRARY "${Torch_DIR}/lib/torch.lib" ${Torch_LIBRARY})
+set(Torch_LIBRARIES "${Torch_DIR}/lib/torch.lib" ${Torch_LIBRARIES})
+include_directories("${Torch_INCLUDE_DIRS}")
+link_directories("${Torch_LIB_DIR}")
+link_libraries("${Torch_LIBRARIES}")
+message(STATUS "Torch_DIR : ${Torch_DIR}")
+message(STATUS "Torch_INCLUDE_DIRS : ${Torch_INCLUDE_DIRS}")
+message(STATUS "Torch_BIN : ${Torch_BIN}")
+message(STATUS "Torch_LIB_DIR : ${Torch_LIB_DIR}")
+message(STATUS "Torch_LIBRARY : ${Torch_LIBRARY}")
+message(STATUS "Torch_LIBRARIES : ${Torch_LIBRARIES}")
+
+
+# flatbuffers 설정
+set(FLATBUFFERS_DIR "C:/flatbuffers")
+set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${FLATBUFFERS_DIR}/Cmake") #Find<Module>.cmake --cmake 폴더 없음
+set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH}" "${FLATBUFFERS_DIR}") #CMakeLists.txt
+set(FLATBUFFERS_BIN "${FLATBUFFERS_DIR}/build/${CMAKE_BUILD_TYPE}")
+set(FLATBUFFERS_FLATC_EXECUTABLE "${FLATBUFFERS_BIN}/flatc.exe") #find_package 이전에 설정할것
+find_package(FlatBuffers REQUIRED)
+set(FLATBUFFERS_INCLUDE_DIRS "${FLATBUFFERS_DIR}/include" "${FLATBUFFERS_INCLUDE_DIRS}")
+set(FLATBUFFERS_LIB_DIR "${FLATBUFFERS_DIR}/build/${CMAKE_BUILD_TYPE}" "${FLATBUFFERS_LIB_DIR}")
+set(FLATBUFFERS_LIBRARY "${FLATBUFFERS_DIR}/build/${CMAKE_BUILD_TYPE}/flatbuffers.lib" ${FLATBUFFERS_LIBRARY})
+set(FLATBUFFERS_LIBRARIES "${FLATBUFFERS_DIR}/build/${CMAKE_BUILD_TYPE}/flatbuffers.lib" ${FLATBUFFERS_LIBRARIES})
+include_directories("${FLATBUFFERS_INCLUDE_DIR}")
+link_directories("${FLATBUFFERS_LIB_DIR}")
+link_libraries("${FLATBUFFERS_LIBRARIES}")
+message(STATUS "FLATBUFFERS_DIR : ${FLATBUFFERS_DIR}")
+message(STATUS "FLATBUFFERS_INCLUDE_DIRS : ${FLATBUFFERS_INCLUDE_DIRS}")
+message(STATUS "FLATBUFFERS_BIN : ${FLATBUFFERS_BIN}")
+message(STATUS "FLATBUFFERS_LIB_DIR : ${FLATBUFFERS_LIB_DIR}")
+message(STATUS "FLATBUFFERS_LIBRARY : ${FLATBUFFERS_LIBRARY}")
+message(STATUS "FLATBUFFERS_LIBRARIES : ${FLATBUFFERS_LIBRARIES}")
+
+
+
+# tensorflow 설정
+# 헤더 파일 경로 포함
+#set(tensorflow_ROOT_DIR "C:/tensorflow")
+#include_directories(
+#    ${tensorflow_ROOT_DIR}
+#    "${tensorflow_ROOT_DIR}/third_party/xla"
+#    "${tensorflow_ROOT_DIR}/third_party/eigen3")
+# 라이브러리 생성
+#set(tensorflow_SOURCES
+#    ${tensorflow_ROOT_DIR}/tensorflow/core/util/proto/proto_utils.cc
+#    ${tensorflow_ROOT_DIR}/tensorflow/core/framework/shape_inference.cc
+#)
+#add_library(tensorflow_util_proto ${tensorflow_SOURCES})
+
+# ONNX 설정
+
+set(ONNX_ROOT "C:/onnx")
+set(CMAKE_PREFIX_PATH "${ONNX_DIR};${CMAKE_PREFIX_PATH}")
+set(onnx_DIR "${ONNX_ROOT}/build") # ONNXConfig.cmake
+set(onnx_proto "${ONNX_ROOT}/onnx")
+include_directories("${ONNX_ROOT}")
+link_directories("${ONNX_ROOT}/build/lib/pkgconfig")
+
+# Protobuf 설정 버전 4.25.1
+set(Protobuf_INCLUDE_DIR "C:/protobuf/src")
+find_package(Protobuf REQUIRED)
+include_directories(${PROTOBUF_INCLUDE_DIRS})
+link_directories(${PROTOBUF_LIBRARY_DIRS})
+
+# GSL 설정 추가
+set(GSL_ROOT "${CMAKE_PREFIX_PATH}/gsl_x64-windows")
+set(GSL_INCLUDE_DIR "${GSL_ROOT}/include")
+set(GSL_LIBRARY "${GSL_ROOT}/lib")
+set(GSL_CBLAS_LIBRARY "${GSL_LIBRARY}/gslcblas.lib")
+find_package(GSL REQUIRED)
+include_directories(${GSL_INCLUDE_DIRS})
+link_directories(${GSL_LIBRARY_DIRS})
+
+
+# ONNX Runtime 설정
+set(ONNX_RUNTIME_ROOT "C:/onnxruntime")
+set(onnxruntime_dir "${ONNX_RUNTIME_ROOT}/build/Debug")
+set(onnxruntime_include_dir 
+    "${ONNX_RUNTIME_ROOT}"
+    "${ONNX_RUNTIME_ROOT}/cmake/build/_deps/safeint-src"
+    "${ONNX_RUNTIME_ROOT}/cmake/build/_deps/mp11-src/include"
+    "${ONNX_RUNTIME_ROOT}/cmake/build/_deps/onnx-src/onnx"
+    "${ONNX_RUNTIME_ROOT}/cmake/build"
+    "${ONNX_RUNTIME_ROOT}/build"
+    "${ONNX_RUNTIME_ROOT}/onnxruntime"
+    "${ONNX_RUNTIME_ROOT}/build/_deps/mp11-src/include"
+    "${ONNX_RUNTIME_ROOT}/build/_deps/safeint-src"
+    "${ONNX_RUNTIME_ROOT}/include/onnxruntime"
+    "${ONNX_RUNTIME_ROOT}/include/onnxruntime/core/session")
+include_directories("${onnxruntime_include_dir}")
+link_directories("${onnxruntime_dir}")
+
+# Vulkan 설정
+set(Vulkan_SDK "C:/VulkanSDK/1.3.290.0")
+set(Vulkan_BIN "${Vulkan_SDK}/Bin")
+set(Vulkan_INCLUDE_DIR "${Vulkan_SDK}/Include")
+set(Vulkan_LIBRARY "${Vulkan_SDK}/Lib")
+find_package(Vulkan REQUIRED)
+message(STATUS "Vulkan INCLUDE found: ${Vulkan_INCLUDE_DIRS}")
+message(STATUS "Vulkan LIBRARY found: ${Vulkan_LIBRARIES}")
+find_program(GLSLC_EXECUTABLE glslc PATHS ${Vulkan_BIN} NO_DEFAULT_PATH)
+find_program(GLSLANGVALIDATOR_EXECUTABLE glslangValidator PATHS ${Vulkan_BIN} NO_DEFAULT_PATH)
+if(NOT GLSLC_EXECUTABLE)
+    message(FATAL_ERROR "glslc executable not found. Please ensure Vulkan SDK is installed correctly.")
+endif()
+if(NOT GLSLANGVALIDATOR_EXECUTABLE)
+    message(FATAL_ERROR "glslangValidator executable not found. Please ensure Vulkan SDK is installed correctly.")
+endif()
+message(STATUS "glslc found: ${GLSLC_EXECUTABLE}")
+message(STATUS "glslangValidator found: ${GLSLANGVALIDATOR_EXECUTABLE}")
+
+# IPP 설정
+set(IPP_ROOT "C:/Program Files (x86)/Intel/oneAPI/ipp/2021.11")
+include_directories("${IPP_ROOT}/include")
+link_directories("${IPP_ROOT}/lib")
+
+
+
+# IPLIB 설정
+set(IPLIB_ROOT "C:/myLab/Project1/Project1/imageProcessingLib")
+set(IPLIB_LIBRARY "${IPLIB_ROOT}/build/${CMAKE_BUILD_TYPE}/imageProcessingLib.lib")
+set(IPLIB_DLL "${IPLIB_ROOT}/build/${CMAKE_BUILD_TYPE}/imageProcessingLib.dll")
+include_directories("${IPLIB_ROOT}")
+link_directories(
+    "${IPLIB_ROOT}/build/bin/${CMAKE_BUILD_TYPE}" #imageProcessingLib.lib
+    "${IPLIB_ROOT}/build/lib/${CMAKE_BUILD_TYPE}" #imageProcessingLib.lib
+)
+link_libraries("${IPLIB_LIBRARY}")
+
+# Abseil 라이브러리 설정
+# Google이 개발하고 관리하는 오픈 소스 C++ 라이브러리
+set(ABSEIL_ROOT "C:/abseil-cpp")
+include_directories("${ABSEIL_ROOT}")
+link_directories("${ABSEIL_ROOT}/build/lib")
+
+
+# date 설정
+set(DATE_ROOT "C:/date")
+set(DATE_INCLUDE_DIR "${DATE_ROOT}/build/${CMAKE_BUILD_TYPE}")
+include_directories("${DATE_ROOT}/include")
+link_directories("${DATE_INCLUDE_DIR}")
+
+
+
+# cuSPARSELt 설정
+set(USE_CUSPARSELT ON CACHE BOOL "Use USE_CUSPARSELT")
+message(STATUS "USE_CUSPARSELT: ${USE_CUSPARSELT}")
+set(CUSPARSELT_INCLUDE_DIR "${CUDA_TOOLKIT_INCLUDE_DIR}")
+set(CUSPARSELT_LIB_DIR "${CUDA_TOOLKIT_LIB_DIR}")
+set(CUSPARSELT_LIBRARY "${CUDA_TOOLKIT_LIB_DIR}/cusparse.lib")
+
+
+
+# Thread 설정
+find_package(Threads REQUIRED)
+
+# CAFFE2 설정
+set(CAFFE2_USE_CUDNN ON CACHE BOOL "Use cuDNN in Caffe2")
+message(STATUS "CAFFE2_USE_CUDNN: ${CAFFE2_USE_CUDNN}")
+if(CAFFE2_USE_CUDNN)
+  message(STATUS "cuDNN is enabled for Caffe2.")
+else()
+  message(STATUS "cuDNN is not enabled for Caffe2.")
+endif()
+
+# Qt 래핑 파일 생성
+qt6_wrap_cpp(MOC_FILES
+    MainWindow.h
+    ImageProcessor.h
+)
+
+# 실행 파일 추가
+add_executable(Project1
+    main.cpp
+    MainWindow.cpp
+    MainWindow.h
+    MainWindow.ui
+    ImageProcessor.cpp
+    ImageProcessor.h
+    ImageProcessing.cu
+    ImageProcessing.cuh
+    ${MOC_FILES}
+)
+
+
+
+target_link_libraries(Project1
+
+    ${Qt6_LIBRARIES}
+
+    ${OpenCV_LINK_LIBS}
+
+    ${GSTREAMER_LIBRARIES}
+
+    ${TORCH_LIBRARIES}
+
+    flatbuffers
+
+    ${ONNX_RUNTIME_LIB}  # ONNX Runtime 라이브러리
+
+    ${ONNX_LIB}  # ONNX 라이브러리
+
+    ${Protobuf_LIB}  # Protobuf 라이브러리
+
+    ${CUDAToolkit_LIBRARIES}  # CUDA Toolkit 라이브러리
+
+    ${CUDNN_LIBRARIES}  # cuDNN 라이브러리
+
+    ippcc.lib
+    ippcore.lib
+    ippvm.lib
+    ipps.lib
+    ippi.lib
+    ippcv.lib  # Intel IPP 라이브러리
+
+    nppc
+    nppial
+    nppicc
+    nppidei
+    nppif
+    nppig
+    nppim
+    nppist
+    nppisu
+    nppitc
+    npps  # NVIDIA Performance Primitives (NPP) 라이브러리
+
+    Threads::Threads  # POSIX 스레드 라이브러리
+
+    ${IPLIB_LIBRARY}  # 사용자 정의 라이브러리 (경로가 명시된 라이브러리)
+)
+
+# CUDA 아키텍처 플래그 적용
+target_compile_options(Project1 PRIVATE ${ARCH_FLAGS})
+
+# 파일 인코딩 설정 추가
+add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
+
+# OpenMP 설정
+find_package(OpenMP REQUIRED)
+if(OpenMP_CXX_FOUND)
+    target_link_libraries(Project1 OpenMP::OpenMP_CXX)
+endif()
+
+file(COPY ${IPLIB_DLL}
+     DESTINATION "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}"
+)
+# C:/myLab/Project1/Project1/build/Debug
+message(STATUS "IPLIB_DLL : ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}")
+
+file(COPY ${IPLIB_LIBRARY}
+     DESTINATION "${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}"
+)
+# C:/myLab/Project1/Project1/build/Debug
+message(STATUS "IPLIB_LIBRARY : ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE}")
+
+#OpenCV DLL COPY
+foreach(dll ${OpenCV_DLLS})
+    add_custom_command(TARGET Project1 POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${dll}" "$<TARGET_FILE_DIR:Project1>"
+    )
+endforeach()
