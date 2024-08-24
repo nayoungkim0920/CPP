@@ -448,3 +448,316 @@ foreach(dll ${OpenCV_DLLS})
         "${dll}" "$<TARGET_FILE_DIR:Project1>"
     )
 endforeach()
+
+PS C:\onnxruntime\build> cmake -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Debug ../cmake
+CMake Deprecation Warning at CMakeLists.txt:14 (cmake_policy):
+  The OLD behavior for policy CMP0104 will be removed from a future version
+  of CMake.
+
+  The cmake-policies(7) manual explains that the OLD behaviors of all
+  policies are deprecated and that a policy should be set to OLD only under
+  specific short-term circumstances.  Projects should be ported to the NEW
+  behavior and not rely on setting a policy to OLD.
+
+
+-- Selecting Windows SDK version 10.0.22621.0 to target Windows 10.0.22631.
+-- The C compiler identification is MSVC 19.29.30154.0
+-- The CXX compiler identification is MSVC 19.29.30154.0
+-- The ASM compiler identification is MSVC
+-- Found assembler: C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/cl.exe
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/cl.exe - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/cl.exe - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found Protobuf: C:/protobuf/build/Release/libprotobuf.lib (found version "4.22.0")
+CMake Warning (dev) at CMakeLists.txt:75 (include):
+  Policy CMP0145 is not set: The Dart and FindDart modules are removed.  Run
+  "cmake --help-policy CMP0145" for policy details.  Use the cmake_policy
+  command to set the policy and suppress this warning.
+
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+CMake Warning (dev) at C:/Program Files/CMake/share/cmake-3.29/Modules/Dart.cmake:47 (message):
+  Policy CMP0145 is not set: The Dart and FindDart modules are removed.  Run
+  "cmake --help-policy CMP0145" for policy details.  Use the cmake_policy
+  command to set the policy and suppress this warning.
+Call Stack (most recent call first):
+  CMakeLists.txt:75 (include)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- The ASM_MASM compiler identification is MSVC
+-- Found assembler: C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/ml64.exe
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+-- Looking for pthread_create in pthreads
+-- Looking for pthread_create in pthreads - not found
+-- Looking for pthread_create in pthread
+-- Looking for pthread_create in pthread - not found
+-- Found Threads: TRUE
+-- Found Patch: C:/Program Files/Git/usr/bin/patch.exe
+Patch found: C:/Program Files/Git/usr/bin/patch.exe
+Loading Dependencies URLs ...
+Loading Dependencies ...
+-- Performing Test ABSL_INTERNAL_AT_LEAST_CXX17
+-- Performing Test ABSL_INTERNAL_AT_LEAST_CXX17 - Success
+-- Performing Test ABSL_INTERNAL_AT_LEAST_CXX20
+-- Performing Test ABSL_INTERNAL_AT_LEAST_CXX20 - Failed
+-- Abseil source dir:C:/onnxruntime/build/_deps/abseil_cpp-src
+# date: USE_SYSTEM_TZ_DB ON
+# date: MANUAL_TZ_DB OFF
+# date: USE_TZ_DB_IN_DOT OFF
+# date: BUILD_SHARED_LIBS OFF
+# date: ENABLE_DATE_TESTING OFF
+# date: DISABLE_STRING_VIEW OFF
+--
+-- 3.21.12.0
+-- Performing Test protobuf_HAVE_LD_VERSION_SCRIPT
+-- Performing Test protobuf_HAVE_LD_VERSION_SCRIPT - Success
+-- Found ZLIB: C:/zlib/build/Release/zlib.lib (found version "1.2.12")
+CMake Deprecation Warning at C:/onnxruntime/build/_deps/nlohmann_json-src/CMakeLists.txt:1 (cmake_minimum_required):
+  Compatibility with CMake < 3.5 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value or use a ...<max> suffix to tell
+  CMake that the project does not need compatibility with older versions.
+
+
+-- Using the single-header code from C:/onnxruntime/build/_deps/nlohmann_json-src/single_include/
+-- Proceeding with version: 23.5.26.0
+-- Looking for _strtof_l
+-- Looking for _strtof_l - found
+-- Looking for _strtoui64_l
+-- Looking for _strtoui64_l - found
+-- CMAKE_CXX_FLAGS: /DWIN32 /D_WINDOWS /EHsc /Zc:__cplusplus /EHsc /wd26812 -DEIGEN_HAS_C99_MATH -DCPUINFO_SUPPORTED
+CMake Deprecation Warning at C:/onnxruntime/build/_deps/pytorch_clog-src/deps/clog/CMakeLists.txt:1 (CMAKE_MINIMUM_REQUIRED):
+  Compatibility with CMake < 3.5 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value or use a ...<max> suffix to tell
+  CMake that the project does not need compatibility with older versions.
+
+
+CMake Warning (dev) at C:/onnxruntime/build/_deps/onnx-src/CMakeLists.txt:107 (find_package):
+  Policy CMP0148 is not set: The FindPythonInterp and FindPythonLibs modules
+  are removed.  Run "cmake --help-policy CMP0148" for policy details.  Use
+  the cmake_policy command to set the policy and suppress this warning.
+
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- Found PythonInterp: C:/Users/nayou/AppData/Local/Programs/Python/Python312/python.exe (found version "3.12.3")
+Generated: C:/onnxruntime/build/_deps/onnx-build/onnx/onnx-ml.proto
+Generated: C:/onnxruntime/build/_deps/onnx-build/onnx/onnx-operators-ml.proto
+Generated: C:/onnxruntime/build/_deps/onnx-build/onnx/onnx-data.proto
+--
+-- ******** Summary ********
+--   CMake version                     : 3.29.3
+--   CMake command                     : C:/Program Files/CMake/bin/cmake.exe
+--   System                            : Windows
+--   C++ compiler                      : C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/cl.exe
+--   C++ compiler version              : 19.29.30154.0
+--   CXX flags                         : /DWIN32 /D_WINDOWS /EHsc /Zc:__cplusplus /EHsc /wd26812 -DEIGEN_HAS_C99_MATH -DCPUINFO_SUPPORTED /EHsc /wd26812
+--   Build type                        : Debug
+--   Compile definitions               : ORT_ENABLE_STREAM;ORT_NO_RTTI;EIGEN_MPL2_ONLY;EIGEN_HAS_CONSTEXPR;EIGEN_HAS_VARIADIC_TEMPLATES;EIGEN_HAS_CXX11_MATH;EIGEN_HAS_CXX11_ATOMIC;EIGEN_STRONG_INLINE=inline;__STDC_FORMAT_MACROS
+--   CMAKE_PREFIX_PATH                 :
+--   CMAKE_INSTALL_PREFIX              : C:/Program Files (x86)/onnxruntime
+--   CMAKE_MODULE_PATH                 : C:/onnxruntime/cmake/external
+--
+--   ONNX version                      : 1.16.1
+--   ONNX NAMESPACE                    : onnx
+--   ONNX_USE_LITE_PROTO               : ON
+--   USE_PROTOBUF_SHARED_LIBS          : OFF
+--   Protobuf_USE_STATIC_LIBS          : ON
+--   ONNX_DISABLE_EXCEPTIONS           : OFF
+--   ONNX_DISABLE_STATIC_REGISTRATION  : OFF
+--   ONNX_WERROR                       : OFF
+--   ONNX_BUILD_TESTS                  : OFF
+--   ONNX_BUILD_BENCHMARKS             : OFF
+--   ONNX_BUILD_SHARED_LIBS            :
+--   BUILD_SHARED_LIBS                 : OFF
+--
+--   Protobuf compiler                 : C:/protobuf/build/Release/protoc.exe
+--   Protobuf includes                 : C:/protobuf/build/install/include
+--   Protobuf libraries                : C:/protobuf/build/Release/libprotobuf.lib
+--   BUILD_ONNX_PYTHON                 : OFF
+Finished fetching external dependencies
+-- Found Git: C:/Program Files/Git/cmd/git.exe (found version "2.45.1.windows.1")
+fatal: detected dubious ownership in repository at 'C:/onnxruntime'
+'C:/onnxruntime' is owned by:
+        BUILTIN/Administrators (S-1-5-32-544)
+but the current user is:
+        KIMNAYOOUNG/nayou (S-1-5-21-3734693049-4166439889-937236257-1001)
+To add an exception for this directory, call:
+
+        git config --global --add safe.directory C:/onnxruntime
+fatal: detected dubious ownership in repository at 'C:/onnxruntime'
+'C:/onnxruntime' is owned by:
+        BUILTIN/Administrators (S-1-5-32-544)
+but the current user is:
+        KIMNAYOOUNG/nayou (S-1-5-21-3734693049-4166439889-937236257-1001)
+To add an exception for this directory, call:
+
+        git config --global --add safe.directory C:/onnxruntime
+CMake Warning at CMakeLists.txt:1649 (message):
+  MPI and NCCL are disabled because build is on Windows or USE_NCCL is set to
+  OFF.
+
+
+-- Configuring done (31.3s)
+-- Generating done (12.9s)
+-- Build files have been written to: C:/onnxruntime/build
+
+Deprecated CMake 정책 경고:
+
+cmake_policy 관련 경고가 몇 가지 나타납니다. 이는 특정 CMake 정책이 향후 버전에서 지원되지 않거나 변경될 예정이라는 경고입니다.
+예를 들어, CMP0104, CMP0145, CMP0148 등의 정책이 포함되어 있습니다. 이는 프로젝트 유지 관리자가 새로운 정책을 사용하도록 코드를 업데이트해야 한다는 의미입니다.
+경고: FindDart 모듈 제거:
+
+Dart 및 FindDart 모듈이 제거되었으며, 관련된 정책이 설정되지 않았다는 경고입니다. 이는 현재 사용 중인 CMakeLists.txt 파일이 오래된 모듈을 참조하고 있다는 것을 의미합니다.
+Git 소유권 문제:
+
+Git 리포지토리에서 dubious ownership(의심스러운 소유권) 문제가 발생했습니다. 현재 사용자와 리포지토리의 소유자가 다르기 때문에 발생하는 문제입니다.
+이 문제를 해결하려면 아래 명령어를 사용하여 해당 디렉터리를 안전한 디렉터리로 설정할 수 있습니다:
+bash
+코드 복사
+git config --global --add safe.directory C:/onnxruntime
+
+Windows에서 MPI와 NCCL 비활성화:
+
+MPI와 NCCL이 Windows에서는 비활성화되었음을 알리는 메시지가 있습니다. 이는 Windows 환경에서의 제한 사항을 나타냅니다.
+
+PS C:\onnxruntime\build> cmake -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Debug ../cmake
+-- Selecting Windows SDK version 10.0.22621.0 to target Windows 10.0.22631.
+CMake Error at CMakeLists.txt:80 (include):
+  include could not find requested file:
+
+    Dart
+PS C:\> git clone https://github.com/dart-lang/sdk.git
+"C:\onnxruntime\cmake\CMakeLists.txt" 수정
+# cmake_policy(SET CMP0104 OLD) # 권장되지 않음
+# 추가
+cmake_policy(SET CMP0104 NEW)
+cmake_policy(SET CMP0145 NEW)
+cmake_policy(SET CMP0148 NEW)
+# Set Dart SDK root 추가
+set(DART_ROOT "C:/Dart")
+
+Debug 폴더 생성 안되는 현상
+PS C:\onnxruntime\build> Remove-Item -Recurse -Force C:/onnxruntime/build/CMakeCache.txt
+PS C:\onnxruntime\build> Remove-Item -Recurse -Force C:/onnxruntime/build/CMakeFiles
+PS C:\onnxruntime> Remove-Item -Recurse -Force C:/onnxruntime/build
+PS C:\onnxruntime> New-Item -ItemType Directory -Path C:/onnxruntime/build
+    디렉터리: C:\onnxruntime
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d-----      2024-08-24   오전 7:05                build
+
+PS C:\onnxruntime> cd build
+PS C:\onnxruntime\build> cmake -G "Visual Studio 16 2019" ../cmake
+"C:\onnxruntime\build\onnxruntime.sln" -> Visual Studio 2019 로 열기 한 후 디버그 모드/릴리즈 모드로 빌드하면 
+C:\onnxruntime\build\Debug, C:\onnxruntime\build\Relase 폴더 생성됨
+
+CMake Error at C:/opencv/sources/cmake/FindONNX.cmake:1 (ocv_clear_vars):
+  Unknown CMake command "ocv_clear_vars".
+Call Stack (most recent call first):
+  CMakeLists.txt:267 (find_package)
+"C:\opencv\sources\cmake\FindONNX.cmake" 수정
+#ocv_clear_vars(HAVE_ONNX) #주석처리
+# if(NOT HAVE_ONNX) 주석처리
+#  ocv_clear_vars(HAVE_ONNX ORT_LIB ORT_INCLUDE_DIR)
+# endif()
+# 추가
+if(NOT HAVE_ONNX)
+  # 수동으로 변수 초기화
+  set(HAVE_ONNX)
+  set(ORT_LIB)
+  set(ORT_INCLUDE_DIR)
+endif()
+PS C:\onnx\build> cmake -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Debug ..
+PS C:\onnx\build> cmake -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=Release ..
+C:\onnx\build에 Debug or Relase 폴더가 생성되지않으면 Visual Studio 2019로 sln파일 열어서
+Debug, Relase 모드로 빌드를 해주면 생성이 된다.
+
+gsl 재설치(깃 주소 오류)
+GNU Scientific Library (GSL)은 다양한 수학 및 과학 계산을 위한 라이브러리
+MSYS2 MinGW 64-bit 쉘을 열고 다음 명령어를 실행하여 패키지를 업데이트
+cd /c/
+패키지를 업데이트
+pacman -Syu
+MinGW-w64 및 필요한 도구를 설치
+pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-make
+깃 설치
+pacman -S git
+깃 로그인
+아이디 입력, 패스워드에 Personal Access Token 생성해서 붙여넣기
+GitHub에서 Personal Access Token 생성
+[순서]
+GitHub 계정에 로그인합니다.
+우측 상단 프로필 아이콘을 클릭하고 Settings로 이동합니다.
+Developer settings를 클릭하고, 왼쪽 메뉴에서 Personal access tokens > **Tokens (classic)**를 선택합니다.
+Generate new token 버튼을 클릭합니다.
+토큰에 이름을 지정하고, repo (모든 리포지토리에 대한 액세스 권한)와 read
+(조직 정보 읽기 권한)와 같은 필요한 권한을 선택합니다.
+토큰의 유효 기간을 선택한 후 Generate token 버튼을 클릭합니다.
+생성된 토큰을 복사합니다. 이 토큰은 다시 표시되지 않으므로 안전한 곳에 저장하세요.
+Git 명령어로 Personal Access Token 사용
+GSL 리포지토리를 클론할 때 사용자 이름 대신 GitHub 사용자 이름을 입력하고, 
+비밀번호 대신 Personal Access Token을 입력합니다.
+다시 클론 명령어를 실행한 후:
+git clone https://github.com/gnu/gsl.git
+Username for 'https://github.com': 프롬프트가 나오면 GitHub 사용자 이름을 입력합니다.
+Password for 'https://<your-email>@github.com': 프롬프트가 나오면, 
+복사한 Personal Access Token을 붙여넣습니다.
+nayou@kimnayooung MINGW64 /c
+# git clone https://github.com/ampl/gsl.git
+nayou@kimnayooung MINGW64 /c
+# git clone https://github.com/ampl/gsl.git
+'gsl'에 복제합니다...
+remote: Enumerating objects: 5373, done.
+remote: Counting objects: 100% (1071/1071), done.
+remote: Compressing objects: 100% (529/529), done.
+remote: Total 5373 (delta 576), reused 921 (delta 506), pack-reused 4302 (from 1)
+오브젝트를 받는 중: 100% (5373/5373), 13.89 MiB | 10.35 MiB/s, 완료.
+델타를 알아내는 중: 100% (2921/2921), 완료.
+warning: Clone succeeded, but checkout failed.
+You can inspect what was checked out with 'git status'
+and retry with 'git restore --source=HEAD :/'
+nayou@kimnayooung MINGW64 /c/gsl
+# git restore --source=HEAD :/
+
+nayou@kimnayooung MINGW64 /c/gsl
+# git config --system core.longpaths true
+
+nayou@kimnayooung MINGW64 /c/gsl
+# git reset --hard HEAD
+Updating files: 100% (2290/2290), 완료.
+HEAD의 현재 위치는 60539d2입니다 Docs: replace direct link by reference
+cd /c/
+rm -rf gsl
+git clone https://github.com/ampl/gsl.git
+설치완료
+CMake Error at ampl/CMakeLists.txt:6 (add_subdirectory):
+  The source directory
+
+    C:/gsl/ampl/thirdparty/asl
+
+  does not contain a CMakeLists.txt file.
+
+
+CMake Error at ampl/CMakeLists.txt:7 (add_to_folder):
+  Unknown CMake command "add_to_folder".
+
+nayou@kimnayooung MINGW64 /c/gsl
+# git submodule update --init --recursive
+'ampl/thirdparty/asl' 경로에 대해 'ampl/thirdparty/asl' (https://github.com/ampl/asl.git) 하위 모듈 등록
+'/c/gsl/ampl/thirdparty/asl'에 복제합니다...
+Submodule path 'ampl/thirdparty/asl': checked out 'dd1c4c4e5647ead51169caad280c36a88d0f0237'
+"C:\gsl\CMakeLists.txt"
+"C:\gsl\ampl\thirdparty\asl\CMakeLists.txt"
+두파일의 CMake 버전 에러 -> 3.5로 변경
+Debug, Release로 
