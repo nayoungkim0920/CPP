@@ -760,4 +760,75 @@ Submodule path 'ampl/thirdparty/asl': checked out 'dd1c4c4e5647ead51169caad280c3
 "C:\gsl\CMakeLists.txt"
 "C:\gsl\ampl\thirdparty\asl\CMakeLists.txt"
 두파일의 CMake 버전 에러 -> 3.5로 변경
-Debug, Release로 
+Debug, Release로 visual studio  2019로 빌드
+
+CMake Error at C:/Program Files/CMake/share/cmake-3.29/Modules/FindPackageHandleStandardArgs.cmake:230 (message):
+  Could NOT find GSL (missing: GSL_INCLUDE_DIR GSL_LIBRARY GSL_CBLAS_LIBRARY)
+  (found version "")
+Call Stack (most recent call first):
+  C:/Program Files/CMake/share/cmake-3.29/Modules/FindPackageHandleStandardArgs.cmake:600 (_FPHSA_FAILURE_MESSAGE)
+  C:/Program Files/CMake/share/cmake-3.29/Modules/FindGSL.cmake:151 (find_package_handle_standard_args)
+  CMakeLists.txt:337 (find_package)
+#find_package(GSL REQUIRED) 주석처리 후 성공
+
+date date.lib 생성안돼서 재설치
+c:/date 삭제
+C:\>git clone https://github.com/HowardHinnant/date.git
+Cloning into 'date'...
+remote: Enumerating objects: 3989, done.
+remote: Counting objects: 100% (334/334), done.
+remote: Compressing objects: 100% (139/139), done.
+remote: Total 3989 (delta 178), reused 254 (delta 155), pack-reused 3655 (from 1)
+Receiving objects: 100% (3989/3989), 3.31 MiB | 10.51 MiB/s, done.
+Resolving deltas: 100% (2556/2556), done.
+C:\date\build>cmake -G "Visual Studio 16 2019" -DCMAKEBUILD_TYPE=Debug ..
+C:\date\build>cmake -G "Visual Studio 16 2019" -DCMAKEBUILD_TYPE=Debug ..
+-- Selecting Windows SDK version 10.0.22621.0 to target Windows 10.0.22631.
+-- The C compiler identification is MSVC 19.29.30154.0
+-- The CXX compiler identification is MSVC 19.29.30154.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/cl.exe - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/cl.exe - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+# date: USE_SYSTEM_TZ_DB OFF
+# date: MANUAL_TZ_DB OFF
+# date: USE_TZ_DB_IN_DOT OFF
+# date: BUILD_SHARED_LIBS OFF
+# date: ENABLE_DATE_TESTING OFF
+# date: DISABLE_STRING_VIEW OFF
+-- Configuring done (6.8s)
+-- Generating done (0.0s)
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    CMAKEBUILD_TYPE
+
+
+-- Build files have been written to: C:/date/build
+C:\date\build>cmake --build . --config=Debug
+.NET Framework용 Microsoft (R) Build Engine 버전 16.11.2+f32259642
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+  1>Checking Build System
+  Building Custom Rule C:/date/CMakeLists.txt
+
+date.lib 생성안됨
+"C:\date\CMakeLists.txt" 분석
+BUILD_TZ_LIB 옵션이 켜져야 date-tz 라이브러리가 컴파일되며, 
+date-tz 라이브러리는 date.lib와 같은 실제 라이브러리 파일을 생성
+C:\date\build>cmake -G "Visual Studio 16 2019" -DBUILD_TZ_LIB=ON ..
+Could NOT find CURL (missing: CURL_LIBRARY CURL_INCLUDE_DIR)
+CURL 라이브러리를 설치
+C:\>git clone https://github.com/curl/curl.git
+C:\>cd curl
+C:\curl>mkdir build
+C:\curl>cd build
+C:\curl\build>cmake -G "Visual Studio 16 2019" -DCMAKEBUILD_TYPE=Debug ..
+visual studio 2019에서 curl.sln 열어서 빌드
+
