@@ -832,52 +832,72 @@ C:\curl>cd build
 C:\curl\build>cmake -G "Visual Studio 16 2019" -DCMAKEBUILD_TYPE=Debug ..
 visual studio 2019에서 curl.sln 열어서 빌드
 
-libidn2.pc.in 파일 생성
-prefix=@prefix@
-exec_prefix=@exec_prefix@
-libdir=@libdir@
-includedir=@includedir@
+- Could NOT find Libssh2 (missing: LIBSSH2_INCLUDE_DIR LIBSSH2_LIBRARY)
+Protocols: dict file ftp gopher http imap ipfs ipns ldap ldaps mqtt pop3 rtsp smb smtp telnet tftp
+Features: alt-svc AsynchDNS HSTS IPv6 Largefile libz NTLM threadsafe UnixSockets
+-- Enabled SSL backends:
 
-Name: libidn2
-Description: Internationalized Domain Names library
-Version: @VERSION@
-Cflags: -I${includedir}/libidn2
-Libs: -L${libdir} -lidn2
-configure.ac 파일에서 libidn2.pc 설정 확인
-# Set up pkg-config file
-AC_CONFIG_FILES([libidn2.pc])
-Makefile.am 파일에서 libidn2.pc 설정 확인
-# Install the pkg-config file
-pkgconfig_DATA = libidn2.pc
-configure.ac 파일 수정
-AC_CONFIG_FILES([
-  libidn2.pc
-  # 다른 파일들
-])
-
-autoreconf -v -i
+https://packages.msys2.org/package/gettext-devel
+pacman -S gettext-devel
+/usr/share/gettext/archive.dir.tar.xz
 
 nayou@kimnayooung MINGW64 /c/libidn2
 # autoreconf -v -i
 autoreconf-2.72: export WARNINGS=
 autoreconf-2.72: Entering directory '.'
 autoreconf-2.72: running: autopoint
-autoreconf-2.72: running: aclocal -I m4
-autoreconf-2.72: configure.ac: tracing
-autoreconf-2.72: running: libtoolize --copy
-autoreconf-2.72: configure.ac: not using Intltool
-autoreconf-2.72: configure.ac: not using Gtkdoc
-autoreconf-2.72: running: aclocal -I m4
-autoreconf-2.72: running: /usr/bin/autoconf-2.72
-autoreconf-2.72: running: /usr/bin/autoheader-2.72
-autoreconf-2.72: running: automake --add-missing --copy --no-force
-Makefile.am:1: warning: AM_GNU_GETTEXT used but 'po' not in SUBDIRS
-Makefile.am:4: error: 'pkgconfig_DATA' is used but 'pkgconfigdir' is undefined
-fuzz/Makefile.am:5: error: 'fuzz_PROGRAMS' is used but 'fuzzdir' is undefined
-fuzz/Makefile.am:6: warning: variable 'fuzz_test_SOURCES' is defined but no program or
-fuzz/Makefile.am:6: library has 'fuzz_test' as canonical name (possible typo)
-fuzz/Makefile.am:8: warning: variable 'fuzz_test_LDADD' is defined but no program or
-fuzz/Makefile.am:8: library has 'fuzz_test' as canonical name (possible typo)
-configure.ac:150: error: required file 'lib/idn2.h.in' not found
-autoreconf-2.72: error: automake failed with exit status: 1
+autoreconf-2.72: running: aclocal
+configure.ac:175: error: '#' is already registered with AC_CONFIG_FILES.
+../autoconf-2.72/lib/autoconf/status.m4:289: AC_CONFIG_FILES is expanded from...
+configure.ac:175: the top level
+autom4te-2.72: error: /usr/bin/m4 failed with exit status: 1
+aclocal-1.17: error: /usr/bin/autom4te-2.72 failed with exit status: 1
+autoreconf-2.72: error: aclocal failed with exit status: 1
+AC_CONFIG_FILES에 동일한 파일이 여러 번 등록되었거나 중복된 파일명이 들어있기 때문
+"C:\libidn2\configure.ac" 수정
 
+nayou@kimnayooung MINGW64 /c/libidn2
+autoreconf -v -i
+nayou@kimnayooung MINGW64 /c/libidn2
+# autoreconf -v -i
+autoreconf-2.72: export WARNINGS=
+autoreconf-2.72: Entering directory '.'
+autoreconf-2.72: running: autopoint
+autoreconf-2.72: running: aclocal
+configure.ac:175: error: '#' is already registered with AC_CONFIG_FILES.
+../autoconf-2.72/lib/autoconf/status.m4:289: AC_CONFIG_FILES is expanded from...
+configure.ac:175: the top level
+autom4te-2.72: error: /usr/bin/m4 failed with exit status: 1
+aclocal-1.17: error: /usr/bin/autom4te-2.72 failed with exit status: 1
+autoreconf-2.72: error: aclocal failed with exit status: 1
+
+nayou@kimnayooung MINGW64 /c/libidn2
+# touch Makefile.am
+"C:\libidn2\Makefile.am" 생성됨
+파일 생성: 만약 해당 디렉터리에 Makefile.am 파일이 없다면, 
+touch Makefile.am 명령어를 실행하면 빈 Makefile.am 파일이 생성
+이미 존재하는 파일의 수정 시간이 갱신
+
+각 Makefile.am생성 후 내용을 입력하고 저장한다.
+src/Makefile.am:
+bin_PROGRAMS = myprogram
+myprogram_SOURCES = main.c utils.c
+doc/Makefile.am:
+dist_doc_DATA = README.md INSTALL.md
+tests/Makefile.am:
+check_PROGRAMS = test_program
+test_program_SOURCES = test_main.c
+examples/Makefile.am:
+bin_PROGRAMS = example
+example_SOURCES = example.c
+lib/Makefile.am:
+lib_LIBRARIES = libmylib.a
+libmylib_a_SOURCES = mylib.c mylib.h
+gl/Makefile.am:
+include gnulib.mk
+fuzz/Makefile.am:
+# Include fuzzing related build files here.
+po/Makefile.am:
+# Include localization related build files here.
+nayou@kimnayooung MINGW64 /c/libidn2
+# autoreconf -v -i
