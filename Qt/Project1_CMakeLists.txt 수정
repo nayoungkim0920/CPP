@@ -832,3 +832,52 @@ C:\curl>cd build
 C:\curl\build>cmake -G "Visual Studio 16 2019" -DCMAKEBUILD_TYPE=Debug ..
 visual studio 2019에서 curl.sln 열어서 빌드
 
+libidn2.pc.in 파일 생성
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: libidn2
+Description: Internationalized Domain Names library
+Version: @VERSION@
+Cflags: -I${includedir}/libidn2
+Libs: -L${libdir} -lidn2
+configure.ac 파일에서 libidn2.pc 설정 확인
+# Set up pkg-config file
+AC_CONFIG_FILES([libidn2.pc])
+Makefile.am 파일에서 libidn2.pc 설정 확인
+# Install the pkg-config file
+pkgconfig_DATA = libidn2.pc
+configure.ac 파일 수정
+AC_CONFIG_FILES([
+  libidn2.pc
+  # 다른 파일들
+])
+
+autoreconf -v -i
+
+nayou@kimnayooung MINGW64 /c/libidn2
+# autoreconf -v -i
+autoreconf-2.72: export WARNINGS=
+autoreconf-2.72: Entering directory '.'
+autoreconf-2.72: running: autopoint
+autoreconf-2.72: running: aclocal -I m4
+autoreconf-2.72: configure.ac: tracing
+autoreconf-2.72: running: libtoolize --copy
+autoreconf-2.72: configure.ac: not using Intltool
+autoreconf-2.72: configure.ac: not using Gtkdoc
+autoreconf-2.72: running: aclocal -I m4
+autoreconf-2.72: running: /usr/bin/autoconf-2.72
+autoreconf-2.72: running: /usr/bin/autoheader-2.72
+autoreconf-2.72: running: automake --add-missing --copy --no-force
+Makefile.am:1: warning: AM_GNU_GETTEXT used but 'po' not in SUBDIRS
+Makefile.am:4: error: 'pkgconfig_DATA' is used but 'pkgconfigdir' is undefined
+fuzz/Makefile.am:5: error: 'fuzz_PROGRAMS' is used but 'fuzzdir' is undefined
+fuzz/Makefile.am:6: warning: variable 'fuzz_test_SOURCES' is defined but no program or
+fuzz/Makefile.am:6: library has 'fuzz_test' as canonical name (possible typo)
+fuzz/Makefile.am:8: warning: variable 'fuzz_test_LDADD' is defined but no program or
+fuzz/Makefile.am:8: library has 'fuzz_test' as canonical name (possible typo)
+configure.ac:150: error: required file 'lib/idn2.h.in' not found
+autoreconf-2.72: error: automake failed with exit status: 1
+
