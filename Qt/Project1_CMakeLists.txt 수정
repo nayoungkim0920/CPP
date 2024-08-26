@@ -1138,3 +1138,58 @@ checking whether to build with code coverage support... no
 "C:\libidn2\configure.ac"
 # Add warnings 추가
 AM_CFLAGS = -Werror
+
+"C:\libidn2\configure"
+if test "$enable_gcc_warnings" = error; then
+     gl_WARN_ADD(-Werror, WERROR_CFLAGS)
+     gl_WARN_ADD(-Wno-error=analyzer-use-of-uninitialized-value, WERROR_CFLAGS)
+     gl_WARN_ADD(-Wno-error=missing-field-initializers, WERROR_TESTS_CFLAGS)
+     gl_WARN_ADD(-Wno-error=analyzer-double-free, WERROR_TESTS_CFLAGS)
+   fi
+여기서
+gl_WARN_ADD(-Werror, WERROR_CFLAGS) 이부분이 에러야
+./configure: line 16464: syntax error near unexpected token -Werror,'
+./configure: line 16464:      gl_WARN_ADD(-Werror, WERROR_CFLAGS)'
+(수정)
+if test "$enable_gcc_warnings" = error; then
+     #gl_WARN_ADD(-Werror, WERROR_CFLAGS) 주석처리
+     # Define gl_WARN_ADD if not defined 추가
+     gl_WARN_ADD() {
+         echo "Adding warning flags $1 to $2"
+         CFLAGS="$CFLAGS $1"
+     }
+     gl_WARN_ADD(-Wno-error=analyzer-use-of-uninitialized-value, WERROR_CFLAGS)
+     gl_WARN_ADD(-Wno-error=missing-field-initializers, WERROR_TESTS_CFLAGS)
+     gl_WARN_ADD(-Wno-error=analyzer-double-free, WERROR_TESTS_CFLAGS)
+   fi
+"C:\libidn2\configure.ac"
+# 주석처리
+ #   if test "$enable_gcc_warnings" = error; then
+ #    gl_WARN_ADD([-Werror], [WERROR_CFLAGS])
+ #    gl_WARN_ADD([-Wno-error=analyzer-use-of-uninitialized-value], [WERROR_CFLAGS])
+ #    gl_WARN_ADD([-Wno-error=missing-field-initializers], [WERROR_TESTS_CFLAGS])
+ #    gl_WARN_ADD([-Wno-error=analyzer-double-free], [WERROR_TESTS_CFLAGS])
+ #  fi
+
+#gl_MANYWARN_ALL_GCC([possible_warning_options]) 주석처리
+
+   # 추가
+   # Define gl_MANYWARN_ALL_GCC if not defined 
+   gl_MANYWARN_ALL_GCC() {
+       echo "Adding warning options $1"
+       CFLAGS="$CFLAGS $1"
+   }
+
+   # 추가
+   if test "$enable_gcc_warnings" = error; then
+       gl_MANYWARN_ALL_GCC "-Werror"
+   fi
+
+   # 추가
+   AC_REQUIRE([gl_MANYWARN_ALL_GCC]) 
+   AC_PROG_CC 
+   AC_PROG_MAKE_SET 
+
+자동화 도구 호출: 매크로 정의와 호출을 추가한 후, autoreconf를 사용하여 변경 사항을 적용
+autoreconf -v -i
+configure 파일은 configure.ac에서 자동으로 생성
