@@ -1276,6 +1276,50 @@ configuer.ac수정
 자동화 도구 호출: 매크로 정의와 호출을 추가한 후, autoreconf를 사용하여 변경 사항을 적용
 autoreconf -v -i
 
+m4/custom-macros.m4 수정
+# custom-macros.m4
+
+# Define gl_MANYWARN_ALL_GCC
+gl_MANYWARN_ALL_GCC() {
+    echo "Adding warning options $1"
+    CFLAGS="$CFLAGS $1"
+}
+
+# Define gl_MANYWARN_COMPLEMENT
+gl_MANYWARN_COMPLEMENT() {
+    echo "Complementing warning options $1 with $2 and excluding $3"
+    CFLAGS="$CFLAGS $1"
+}
+
+# Define gl_WARN_ADD
+gl_WARN_ADD() {
+    echo "Adding warning option $1"
+    CFLAGS="$CFLAGS $1"
+}
+configuer.ac수정
+AC_CONFIG_MACRO_DIR([m4])
+m4_include([m4/custom-macros.m4])
+# Define or use gl_MANYWARN_ALL_GCC
+    gl_MANYWARN_ALL_GCC $nw 
+
+    # Complement and modify warning options 주석처리
+    #desired_warning_options="-Werror"
+    #possible_warning_options="$nw"
+    # Define warning options 추가
+    nw="-Wall -Wextra"
+    desired_warning_options="-Werror"
+    possible_warning_options="$nw"
+    
+    # Define or use gl_MANYWARN_COMPLEMENT
+    gl_MANYWARN_COMPLEMENT "$desired_warning_options" "$possible_warning_options"
+    gl_MANYWARN_COMPLEMENT "$remaining_undesired_warning_options" "$nw"
+ 
+
+    #주석처리
+    #gl_MANYWARN_COMPLEMENT("$desired_warning_options", "$possible_warning_options")
+    #gl_MANYWARN_COMPLEMENT("$remaining_undesired_warning_options", "$nw")
+
+
 autoconf 및 automake 재생성
 autoreconf -v -i
 nayou@kimnayooung MINGW64 /c/libidn2
@@ -1458,5 +1502,21 @@ WERROR_TESTS_CFLAGS:
 
   Valgrind:
 경고와 오류 메시지가 있지만, configure 과정 자체는 성공적으로 완료
-나머지오류만해결하면됨
-
+나머지오류만해결하면됨(no로 끝나는 항목은 비활성화상태를 나타냄)
+./configure: line 4970: gl_EARLY: command not found
+./configure: line 4971: unistring_EARLY: command not found
+./configure: line 13570: gl_INIT: command not found
+./configure: line 13571: unistring_INIT: command not found
+./configure: line 13574: AM_CFLAGS: command not found
+./configure: line 16474: syntax error near unexpected token "$desired_warning_options",'
+./configure: line 16474: gl_MANYWARN_COMPLEMENT("$desired_warning_options", "$possible_warning_options")
+./configure: line 16502: syntax error near unexpected token $w'
+./configure: line 16502: gl_WARN_ADD($w)
+checking whether to build with code coverage support... no
+checking for CFPreferencesCopyAppValue... no
+checking for CFLocaleCopyCurrent... no
+checking for GNU gettext in libc... no
+checking whether stripping libraries is possible... no
+checking for mt... no
+checking if : is a manifest tool... no
+checking for dlfcn.h... no
