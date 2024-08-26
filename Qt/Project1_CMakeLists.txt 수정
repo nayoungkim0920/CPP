@@ -1520,3 +1520,125 @@ checking whether stripping libraries is possible... no
 checking for mt... no
 checking if : is a manifest tool... no
 checking for dlfcn.h... no
+
+configure.ac
+주로 autoconf 매크로들을 사용하는 곳
+# Add warnings 추가 Makefile.am파일에서 설정하는게 일반적
+#AM_CFLAGS = -Werror #제거
+Makefile.am
+# Add warnings 추가 Makefile.am파일에서 설정하는게 일반적
+#AM_CFLAGS = -Werror #추가
+configure.ac
+AC_PROG_LIBTOOL-> LT_INIT
+autoreconf-2.72: ... not using Intltool
+autoreconf-2.72: ... not using Gtkdoc
+# 추가
+IT_PROG_INTLTOOL([0.40.0]) # 다국어 지원을 위한 도구
+GTK_DOC_CHECK([1.0]) # API 문서를 생성하는 도구
+#추가
+CFLAGS="$CFLAGS -Werror"
+#추가
+AC_SUBST(CFLAGS)
+(에러)
+nayou@kimnayooung MINGW64 /c/libidn2
+# autoreconf -v -i
+autoreconf-2.72: export WARNINGS=
+autoreconf-2.72: Entering directory '.'
+autoreconf-2.72: running: autopoint
+autoreconf-2.72: running: aclocal -I m4
+m4/custom-macros.m4:44: warning: macro 'AM_CFLAGS' not found in library
+autoreconf-2.72: configure.ac: tracing
+autoreconf-2.72: running: libtoolize --copy
+autoreconf-2.72: configure.ac: not using Intltool
+autoreconf-2.72: configure.ac: not using Gtkdoc
+autoreconf-2.72: running: aclocal -I m4
+m4/custom-macros.m4:44: warning: macro 'AM_CFLAGS' not found in library
+autoreconf-2.72: running: /usr/bin/autoconf-2.72
+configure.ac:216: error: possibly undefined macro: AC_PROG_GETTEXT
+      If this token and others are legitimate, please use m4_pattern_allow.
+      See the Autoconf documentation.
+autoreconf-2.72: error: /usr/bin/autoconf-2.72 failed with exit status: 1
+
+gettext 설치 확인
+pacman -S mingw-w64-x86_64-gettext
+AC_PROG_GETTEXT 설정
+configure.ac에 추가
+AM_GNU_GETTEXT([external])
+AM_GNU_GETTEXT_VERSION([0.19.8])
+autopoint 확인
+autopoint는 gettext 패키지의 일부로, 자동으로 프로젝트에 필요한 국제화 파일을 설정
+ ACLOCAL_PATH 설정
+export ACLOCAL_PATH="/usr/share/aclocal:$ACLOCAL_PATH"
+Makefile.am 추
+ACLOCAL_AMFLAGS = -I /usr/share/aclocal -I m4
+# Add warnings 추가 Makefile.am파일에서 설정하는게 일반적
+#AM_CFLAGS = -Werror #m4/custom-macros.m4:44: warning: macro 'AM_CFLAGS' not found in library
+
+autoreconf-2.72: configure.ac: not using Intltool
+autoreconf-2.72: configure.ac: not using Gtkdoc
+Intltool 사용하기
+pacman -S intltool
+configure.ac 파일 수정
+IT_PROG_INTLTOOL([0.40.0]) #추가
+Gtkdoc 사용하기(https://gitlab.gnome.org/GNOME/gtk-doc)
+nayou@kimnayooung MINGW64 /c/libidn2
+# git clone https://gitlab.gnome.org/GNOME/gtk-doc.git
+cp /c/libidn2/gtk-doc/buildsystems/autotools/gtk-doc.m4 /c/libidn2/m4
+
+# Root 디렉토리의 Makefile.am
+# 이 파일은 프로젝트의 최상위 디렉토리에서 Makefile을 설정합니다.
+
+# Include subdirectories Makefile.am
+SUBDIRS = gl gnulib lib m4 po src tests tmpwrk2270 unistring build-aux contrib doc examples fuzz gettext-0.19.8 gettext-0.19.8/os2
+
+# Specify the directory for pkg-config files
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = libidn2.pc
+
+ACLOCAL_AMFLAGS = -I /usr/share/aclocal -I /c/libidn2/m4 #export ACLOCAL_PATH="/c/libidn2/m4:$ACLOCAL_PATH"
+
+# Automake options
+AM_GNU_GETTEXT([external])
+
+# Add warnings 추가 Makefile.am파일에서 설정하는게 일반적
+#AM_CFLAGS = -Werror #m4/custom-macros.m4:44: warning: macro 'AM_CFLAGS' not found in library
+
+# 추가
+gtkdocdir = $(datadir)/gtk-doc/html #/c/libidn2/gtk-doc/html
+gtkdoc_DATA = $(DOCS)
+nayou@kimnayooung MINGW64 /c/libidn2
+# autoreconf -v -i
+Makefile.am
+ACLOCAL_AMFLAGS = -I /usr/share/aclocal -I m4
+configure.ac
+AC_CONFIG_MACRO_DIRS([/usr/share/aclocal])
+
+intltoolize: 'po/Makefile.in.in' exists: use '--force' to overwrite
+intltoolize: 'po/Makefile.in.in' is out of date: use '--force' to overwrite
+po/Makefile.in.in 파일이 존재하거나 구버전이라는 것을 알림
+intltoolize는 이 파일이 이미 존재하거나 오래되었기 때문에 덮어쓰기를 제안
+덮어쓰기를 하려면 --force 옵션을 사용하라는 메시지
+nayou@kimnayooung MINGW64 /c/libidn2
+# intltoolize --force
+nayou@kimnayooung MINGW64 /c/libidn2
+# autoreconf -v -i
+autoreconf-2.72: export WARNINGS=
+autoreconf-2.72: Entering directory '.'
+autoreconf-2.72: running: autopoint
+autopoint: File po/Makefile.in.in has been locally modified.
+autopoint: *** Some files have been locally modified. Not overwriting them because --force has not been specified. For your convenience, you find the local modifications in the file '/tmp/ar8PLRf3/gtJ1QdHy/autopoint.diff'.
+autopoint: *** Stop.
+autoreconf-2.72: error: autopoint failed with exit status: 1
+/tmp/ar8PLRf3/gtJ1QdHy/autopoint.diff 파일을 열어 로컬 수정 내용을 확인
+nayou@kimnayooung MINGW64 /c/libidn2
+# autopoint --force
+Copying file po/Makefile.in.in
+파일을 삭제한 후, autopoint를 다시 실행
+rm po/Makefile.in.in
+autopoint
+nayou@kimnayooung MINGW64 /c/libidn2
+# autopoint
+Copying file po/Makefile.in.in
+autopoint와 autoreconf를 포함하여 전체 빌드 시스템을 재구성
+nayou@kimnayooung MINGW64 /c/libidn2
+# autoreconf -v -i
