@@ -1147,7 +1147,7 @@ if test "$enable_gcc_warnings" = error; then
      gl_WARN_ADD(-Wno-error=analyzer-double-free, WERROR_TESTS_CFLAGS)
    fi
 여기서
-gl_WARN_ADD(-Werror, WERROR_CFLAGS) 이부분이 에러야
+gl_WARN_ADD(-Werror, WERROR_CFLAGS) 이부분이 에러
 ./configure: line 16464: syntax error near unexpected token -Werror,'
 ./configure: line 16464:      gl_WARN_ADD(-Werror, WERROR_CFLAGS)'
 (수정)
@@ -1193,3 +1193,45 @@ if test "$enable_gcc_warnings" = error; then
 자동화 도구 호출: 매크로 정의와 호출을 추가한 후, autoreconf를 사용하여 변경 사항을 적용
 autoreconf -v -i
 configure 파일은 configure.ac에서 자동으로 생성
+
+"C:\libidn2\m4\custom-macros.m4" 생성
+# custom-macros.m4
+
+# Define gl_MANYWARN_ALL_GCC
+gl_MANYWARN_ALL_GCC() {
+    echo "Adding warning options $1"
+    CFLAGS="$CFLAGS $1"
+}
+
+# Define gl_MANYWARN_COMPLEMENT
+gl_MANYWARN_COMPLEMENT() {
+    echo "Complementing warning options $1 with $2 and excluding $3"
+    CFLAGS="$CFLAGS $1"
+}
+
+"C:\libidn2\configure.ac"
+# 추가
+AC_CONFIG_MACRO_DIR([m4])
+m4_include([m4/custom-macros.m4])
+자동화 도구 호출: 매크로 정의와 호출을 추가한 후, autoreconf를 사용하여 변경 사항을 적용
+autoreconf -v -i
+#빌드
+./configure
+nayou@kimnayooung MINGW64 /c/libidn2
+# ./configure
+
+checking whether to build with code coverage support... no
+checking for CFPreferencesCopyAppValue... no
+checking for CFLocaleCopyCurrent... no
+checking for GNU gettext in libc... no
+checking whether stripping libraries is possible... no
+checking for mt... no
+checking if : is a manifest tool... no
+checking for dlfcn.h... no
+./configure: line 4950: gl_EARLY: command not found
+./configure: line 4951: unistring_EARLY: command not found
+./configure: line 13550: gl_INIT: command not found
+./configure: line 13551: unistring_INIT: command not found
+./configure: line 13554: AM_CFLAGS: command not found
+./configure: line 16474: syntax error near unexpected token \"$desired_warning_options",`
+./configure: line 16474: gl_MANYWARN_COMPLEMENT("$desired_warning_options", "$possible_warning_options")
