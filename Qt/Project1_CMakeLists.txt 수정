@@ -1642,3 +1642,26 @@ Copying file po/Makefile.in.in
 autopoint와 autoreconf를 포함하여 전체 빌드 시스템을 재구성
 nayou@kimnayooung MINGW64 /c/libidn2
 # autoreconf -v -i
+intltoolize: 'po/Makefile.in.in' exists: use '--force' to overwrite
+intltoolize: 'po/Makefile.in.in' is out of date: use '--force' to overwrite
+autoreconf-2.72: error: intltoolize failed with exit status: 1
+최신상태로 업데이트
+intltoolize --force
+수동삭
+nayou@kimnayooung MINGW64 /c/libidn2
+# rm po/Makefile.in.in
+intltoolize
+pacman -Syu gettext intltool
+intltoolize: 'po/Makefile.in.in' exists: use '--force' to overwrite
+intltoolize: 'po/Makefile.in.in' is out of date: use '--force' to overwrite
+
+[google keyword autopoint: File po/Makefile.in.in has been locally modified.]
+https://www.linuxquestions.org/questions/linux-software-2/building-cinelerra-cv-from-git-repository-syntax-error-820826-print/
+nayou@kimnayooung MINGW64 /c/libidn2
+# autoreconf -if
+
+Copying file po/Makefile.in.in
+libtoolize: putting auxiliary files in AC_CONFIG_AUX_DIR, 'build-aux'.
+libtoolize: copying file 'build-aux/ltmain.sh'
+libtoolize:   error: '/usr/share/aclocal/libtool.m4' does not exist.
+autoreconf-2.72: error: libtoolize failed with exit status: 1
