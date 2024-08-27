@@ -2298,4 +2298,430 @@ autoreconf-2.72: error: libtoolize failed with exit status: 1
 
 nayou@kimnayooung MINGW64 /c/libidn2
 
+nayou@kimnayooung MINGW64 /c/libidn2
+# cp /usr/share/aclocal/libtool.m4 /mingw64/share/aclocal/
+
+nayou@kimnayooung MINGW64 /c/libidn2
+# ls -l /mingw64/share/aclocal/libtool.m4
+-rw-r--r-- 1 nayou nayou 307384  8월 27 20:10 /mingw64/share/aclocal/libtool.m4
+
+nayou@kimnayooung MINGW64 /c/libidn2
+# chmod 644 /mingw64/share/aclocal/libtool.m4
+
+nayou@kimnayooung MINGW64 /c/libidn2
+# libtool --version
+libtool (GNU libtool) 2.4.7
+Written by Gordon Matzigkeit, 1996
+
+Copyright (C) 2014 Free Software Foundation, Inc.
+
+
+nayou@kimnayooung MINGW64 /c/libidn2
+# pacman -R libtool
+의존성 검사 중...
+
+꾸러미 (1) libtool-2.4.7-4
+
+총 제거 크기:  2.15 MiB
+
+:: 이 꾸러미를 제거하시겠습니까? [Y/n] y
+:: 전처리 훅들을 실행 중...
+(1/1) Removing old entries from the info directory file...
+:: 꾸러미 변경사항을 처리 중...
+(1/1) 삭제 중 libtool                              [#] 100%
+
+nayou@kimnayooung MINGW64 /c/libidn2
+# pacman -S libtool
+의존성 해결 중...
+꾸러미 충돌을 찾는 중...
+
+꾸러미 (1) libtool-2.4.7-4
+
+총 설치 크기:  2.15 MiB
+
+:: 설치를 진행하시겠습니까? [Y/n] y
+(1/1) 키링의 키를 검사 중                          [#] 100%
+(1/1) 꾸러미 무결성 검사 중                        [#] 100%
+(1/1) 꾸러미 파일 불러오는 중                      [#] 100%
+(1/1) 파일 충돌 검사 중                            [#] 100%
+(1/1) 사용 가능한 디스크 공간 검사 중              [#] 100%
+:: 꾸러미 변경사항을 처리 중...
+(1/1) 설치 중 libtool                              [#] 100%
+:: 후처리 훅들을 실행 중...
+(1/1) Updating the info directory file...
+
+nayou@kimnayooung MINGW64 /c/libidn2
+# echo $ACLOCAL_PATH
+/usr/share/aclocal:/mingw64/share/aclocal:/c/libidn2/m4
+
+nayou@kimnayooung MINGW64 /c/libidn2
+# find . -name "config.cache" -delete
+find . -name "config.log" -delete
+
+libtoolize를 소스에서 직접 빌드
+# wget https://ftp.gnu.org/gnu/libtool/libtool-2.4.6.tar.gz
+# tar -xzvf libtool-2.4.6.tar.gz
+# cd libtool-2.4.6
+# ./configure
+configure: creating ./config.status
+config.status: creating Makefile
+config.status: creating config.h
+config.status: executing tests/atconfig commands
+config.status: executing depfiles commands
+config.status: executing libtool commands
+# make
+# make install
+
+# which libtoolize
+/mingw64/bin/libtoolize
+
+nayou@kimnayooung MINGW64 /c/libidn2/libtool-2.4.6
+# notepad ~/.bashrc
+PATH에 /c/libidn2/libtool-2.4.6 추가
+
+nayou@kimnayooung MINGW64 /c/libidn2/libtool-2.4.6
+# source ~/.bashrc
+
+nayou@kimnayooung MINGW64 /c/libidn2/libtool-2.4.6
+# which libtoolize
+/c/libidn2/libtool-2.4.6/libtoolize
+
+경로확인 
+# ls /c/libidn2/libtool-2.4.6/libtoolize
+/c/libidn2/libtool-2.4.6/libtoolize
+
+# libtoolize --version
+libtoolize (GNU libtool) 2.4.6
+Written by Gary V. Vaughan <gary@gnu.org>, 2003
+
+Copyright (C) 2015 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+# find / -name libtool.m4
+/home/nayou/_bazel_nayou/4yp365mj/external/protobuf~/m4/libtool.m4
+/home/nayou/_bazel_nayou/4yp365mj/external/protobuf~/third_party/googletest/googletest/m4/libtool.m4
+/mingw64/share/aclocal/libtool.m4 (있음)
+/usr/share/aclocal/libtool.m4
+
+nayou@kimnayooung MINGW64 /c/libidn2/libtool-2.4.6
+# ls -l /mingw64/share/aclocal/libtool.m4
+ls -l /usr/share/aclocal/libtool.m4
+-rw-r--r-- 1 nayou nayou 305723  8월 27 20:17 /mingw64/share/aclocal/libtool.m4
+-rw-r--r-- 1 nayou nayou 307384  7월  5 17:31 /usr/share/aclocal/libtool.m4
+
+nayou@kimnayooung MINGW64 /c/libidn2/libtool-2.4.6
+# chmod 644 /mingw64/share/aclocal/libtool.m4
+chmod 644 /usr/share/aclocal/libtool.m4
+
+nayou@kimnayooung MINGW64 /c/libidn2/libtool-2.4.6
+# chmod 755 /mingw64/share/aclocal
+chmod 755 /usr/share/aclocal
+
+libtool의 설정 파일들을 프로젝트 디렉토리에 복사하거나 업데이트하여, 
+라이브러리 관리와 관련된 설정을 자동으로 처리할 수 있게 됨.
+configure.ac나 Makefile.am 파일에 필요한 설정을 추가하는 데 도움이 됨.
+# libtoolize --force --copy
+libtoolize: putting auxiliary files in AC_CONFIG_AUX_DIR, 'build-aux'.
+libtoolize: copying file 'build-aux/compile'
+libtoolize: copying file 'build-aux/config.guess'
+libtoolize: copying file 'build-aux/config.sub'
+libtoolize: copying file 'build-aux/depcomp'
+libtoolize: copying file 'build-aux/install-sh'
+libtoolize: copying file 'build-aux/missing'
+libtoolize: copying file 'build-aux/ltmain.sh'
+libtoolize: putting macros in AC_CONFIG_MACRO_DIRS, 'm4'.
+libtoolize: copying file 'm4/libtool.m4'
+libtoolize: copying file 'm4/ltoptions.m4'
+libtoolize: copying file 'm4/ltsugar.m4'
+libtoolize: copying file 'm4/ltversion.m4'
+libtoolize: copying file 'm4/lt~obsolete.m4'
+
+autoreconf는 autoconf, automake, libtool, 등과 같은 Autotools 구성 도구들을 자동으로 업데이트하는 데 사용
+프로젝트의 빌드 시스템을 최신 상태로 유지하는 데 도움
+# autoreconf -if
+libtoolize: putting auxiliary files in AC_CONFIG_AUX_DIR, 'build-aux'.
+libtoolize: copying file 'build-aux/compile'
+libtoolize: copying file 'build-aux/config.guess'
+libtoolize: copying file 'build-aux/config.sub'
+libtoolize: copying file 'build-aux/depcomp'
+libtoolize: copying file 'build-aux/install-sh'
+libtoolize: copying file 'build-aux/missing'
+libtoolize: copying file 'build-aux/ltmain.sh'
+libtoolize: putting macros in AC_CONFIG_MACRO_DIRS, 'm4'.
+libtoolize: copying file 'm4/libtool.m4'
+libtoolize: copying file 'm4/ltargz.m4'
+libtoolize: You should add the contents of 'm4/ltargz.m4' to 'aclocal.m4'.
+libtoolize: copying file 'm4/ltdl.m4'
+libtoolize: You should add the contents of 'm4/ltdl.m4' to 'aclocal.m4'.
+libtoolize: copying file 'm4/ltoptions.m4'
+libtoolize: copying file 'm4/ltsugar.m4'
+libtoolize: copying file 'm4/ltversion.m4'
+libtoolize: copying file 'm4/lt~obsolete.m4'
+libtoolize: putting libltdl files in LT_CONFIG_LTDL_DIR, 'libltdl'.
+libtoolize: copying file 'libltdl/COPYING.LIB'
+libtoolize: copying file 'libltdl/Makefile.am'
+libtoolize: copying file 'libltdl/README'
+libtoolize: copying file 'libltdl/configure.ac'
+libtoolize: copying file 'libltdl/aclocal.m4'
+libtoolize: copying file 'libltdl/Makefile.in'
+libtoolize: copying file 'libltdl/config-h.in'
+libtoolize: copying file 'libltdl/configure'
+libtoolize: copying file 'libltdl/libltdl/lt__alloc.h'
+libtoolize: copying file 'libltdl/libltdl/lt__argz_.h'
+libtoolize: copying file 'libltdl/libltdl/lt__dirent.h'
+libtoolize: copying file 'libltdl/libltdl/lt__glibc.h'
+libtoolize: copying file 'libltdl/libltdl/lt__private.h'
+libtoolize: copying file 'libltdl/libltdl/lt__strl.h'
+libtoolize: copying file 'libltdl/libltdl/lt_dlloader.h'
+libtoolize: copying file 'libltdl/libltdl/lt_error.h'
+libtoolize: copying file 'libltdl/libltdl/lt_system.h'
+libtoolize: copying file 'libltdl/libltdl/slist.h'
+libtoolize: copying file 'libltdl/loaders/dld_link.c'
+libtoolize: copying file 'libltdl/loaders/dlopen.c'
+libtoolize: copying file 'libltdl/loaders/dyld.c'
+libtoolize: copying file 'libltdl/loaders/load_add_on.c'
+libtoolize: copying file 'libltdl/loaders/loadlibrary.c'
+libtoolize: copying file 'libltdl/loaders/preopen.c'
+libtoolize: copying file 'libltdl/loaders/shl_load.c'
+libtoolize: copying file 'libltdl/lt__alloc.c'
+libtoolize: copying file 'libltdl/lt__argz.c'
+libtoolize: copying file 'libltdl/lt__dirent.c'
+libtoolize: copying file 'libltdl/lt__strl.c'
+libtoolize: copying file 'libltdl/lt_dlloader.c'
+libtoolize: copying file 'libltdl/lt_error.c'
+libtoolize: copying file 'libltdl/ltdl.c'
+libtoolize: copying file 'libltdl/ltdl.h'
+libtoolize: copying file 'libltdl/slist.c'
+libtoolize: Remember to add 'LTDL_INIT' to configure.ac.
+automake-1.15: error: cannot open < libltdl/ltdl.mk: No such file or directory
+autoreconf-2.69: automake failed with exit status: 1
+
+libltdl 디렉토리 확인
+# ls -l /c/libidn2/libtool-2.4.6/libltdl
+합계 909
+-rw-r--r-- 1 nayou nayou  42362  8월 27 20:31 aclocal.m4
+-rw-r--r-- 1 nayou nayou   4863  8월 27 20:31 config-h.in
+-rwxr-xr-x 1 nayou nayou 461349  8월 27 20:31 configure
+-rw-r--r-- 1 nayou nayou   2628  8월 27 20:31 configure.ac
+-rw-r--r-- 1 nayou nayou  26530  8월 27 20:31 COPYING.LIB
+drwxr-xr-x 1 nayou nayou      0  8월 27 20:31 libltdl
+-rw-r--r-- 1 nayou nayou    941  8월 27 20:16 libltdl.la
+-rw-r--r-- 1 nayou nayou    344  8월 27 20:16 libltdl_libltdl_la-lt__alloc.lo
+-rw-r--r-- 1 nayou nayou   8636  8월 27 20:16 libltdl_libltdl_la-lt__alloc.o
+-rw-r--r-- 1 nayou nayou    350  8월 27 20:16 libltdl_libltdl_la-lt_dlloader.lo
+-rw-r--r-- 1 nayou nayou  12489  8월 27 20:16 libltdl_libltdl_la-lt_dlloader.o
+-rw-r--r-- 1 nayou nayou    341  8월 27 20:16 libltdl_libltdl_la-lt_error.lo
+-rw-r--r-- 1 nayou nayou   8080  8월 27 20:16 libltdl_libltdl_la-lt_error.o
+-rw-r--r-- 1 nayou nayou    329  8월 27 20:16 libltdl_libltdl_la-ltdl.lo
+-rw-r--r-- 1 nayou nayou 100456  8월 27 20:16 libltdl_libltdl_la-ltdl.o
+-rw-r--r-- 1 nayou nayou    332  8월 27 20:16 libltdl_libltdl_la-slist.lo
+-rw-r--r-- 1 nayou nayou  13258  8월 27 20:16 libltdl_libltdl_la-slist.o
+drwxr-xr-x 1 nayou nayou      0  8월 27 20:31 loaders
+-rw-r--r-- 1 nayou nayou    859  8월 27 20:16 loadlibrary.la
+-rw-r--r-- 1 nayou nayou   2298  8월 27 20:31 lt__alloc.c
+-rw-r--r-- 1 nayou nayou   5896  8월 27 20:31 lt__argz.c
+-rw-r--r-- 1 nayou nayou    284  8월 27 20:16 lt__argz.lo
+-rw-r--r-- 1 nayou nayou  11779  8월 27 20:16 lt__argz.o
+-rw-r--r-- 1 nayou nayou   3014  8월 27 20:31 lt__dirent.c
+-rw-r--r-- 1 nayou nayou   3610  8월 27 20:31 lt__strl.c
+-rw-r--r-- 1 nayou nayou    284  8월 27 20:16 lt__strl.lo
+-rw-r--r-- 1 nayou nayou   5959  8월 27 20:16 lt__strl.o
+-rw-r--r-- 1 nayou nayou   6088  8월 27 20:31 lt_dlloader.c
+-rw-r--r-- 1 nayou nayou   2967  8월 27 20:31 lt_error.c
+-rw-r--r-- 1 nayou nayou  55324  8월 27 20:31 ltdl.c
+-rw-r--r-- 1 nayou nayou   5709  8월 27 20:31 ltdl.h
+-rw-r--r-- 1 nayou nayou   5146  8월 27 20:31 Makefile.am
+-rw-r--r-- 1 nayou nayou  53358  8월 27 20:31 Makefile.in
+-rw-r--r-- 1 nayou nayou    693  8월 27 20:31 README
+-rw-r--r-- 1 nayou nayou   9830  8월 27 20:31 slist.c
+-rw-r--r-- 1 nayou nayou      6  2월 16  2015 stamp-mk
+=>libltdl/ltdl.mk 파일이 누락
+
+libtool 소스에서 libltdl 디렉토리 설치
+# make
+make: *** 'm4/ltversion.m4'에서 필요한 'm4/ltversion.in' 타겟을 만들 규칙이 없습니다.  멈춤.
+
+/c/libidn2
+# wget https://ftp.gnu.org/gnu/libtool/libtool-2.4.6.tar.gz
+tar -xzf libtool-2.4.6.tar.gz
+cd libtool-2.4.6
+--2024-08-27 20:45:41--  https://ftp.gnu.org/gnu/libtool/libtool-2.4.6.tar.gz
+'/usr/ssl/certs/ca-bundle.crt' CA 인증서를 불러왔습니다
+ftp.gnu.org (ftp.gnu.org) 해석 중... 209.51.188.20, 2001:470:142:3::b
+다음으로 연결 중: ftp.gnu.org (ftp.gnu.org)|209.51.188.20|:443... 연결했습니다.
+HTTP 요청을 보냈습니다. 응답 기다리는 중... 200 OK
+길이: 1806697 (1.7M) [application/x-gzip]
+저장 위치: `libtool-2.4.6.tar.gz.1'
+
+libtool-2.4.6. 100%[====>]   1.72M   864KB/s    /  2.0s
+
+2024-08-27 20:45:45 (864 KB/s) - `libtool-2.4.6.tar.gz.1' 저장함 [1806697/1806697]
+
+cd libtool-2.4.6
+# make
+  GEN      libtoolize
+  GEN      libltdl/libltdl/lt__argz.h
+make  all-recursive
+make[1]: Entering directory '/c/libidn2/libtool-2.4.6'
+Making all in .
+make[2]: Entering directory '/c/libidn2/libtool-2.4.6'
+  CC       libltdl/loaders/libltdl_libltdl_la-preopen.lo
+  CC       libltdl/libltdl_libltdl_la-lt__alloc.lo
+  CC       libltdl/libltdl_libltdl_la-lt_dlloader.lo
+  CC       libltdl/libltdl_libltdl_la-lt_error.lo
+  CC       libltdl/libltdl_libltdl_la-ltdl.lo
+  CC       libltdl/libltdl_libltdl_la-slist.lo
+  CC       libltdl/loaders/loadlibrary.lo
+  CCLD     libltdl/loadlibrary.la
+C:\msys64\mingw64\bin\ar.exe: `u' modifier ignored since `D' is the default (see `U')
+  CC       libltdl/lt__argz.lo
+  CCLD     libltdl/libltdl.la
+C:\msys64\mingw64\bin\ar.exe: `u' modifier ignored since `D' is the default (see `U')
+make[2]: Leaving directory '/c/libidn2/libtool-2.4.6'
+make[1]: Leaving directory '/c/libidn2/libtool-2.4.6'
+
+# make install
+make  install-recursive
+make[1]: Entering directory '/c/libidn2/libtool-2.4.6'
+Making install in .
+make[2]: Entering directory '/c/libidn2/libtool-2.4.6'
+make[3]: Entering directory '/c/libidn2/libtool-2.4.6'
+ /usr/bin/mkdir -p '/mingw64/bin'
+ /usr/bin/install -c libtool '/mingw64/bin'
+ /usr/bin/mkdir -p '/mingw64/lib'
+ /bin/sh ./libtool   --mode=install /usr/bin/install -c   libltdl/libltdl.la '/mingw64/lib'
+libtool: install: /usr/bin/install -c libltdl/.libs/libltdl.dll.a /mingw64/lib/libltdl.dll.a
+libtool: install: base_file=`basename libltdl/libltdl.la`
+libtool: install:  dlpath=`/bin/sh 2>&1 -c '. libltdl/.libs/'libltdl.la'i; echo libltdl-7.dll'`
+libtool: install:  dldir=/mingw64/lib/`dirname ../bin/libltdl-7.dll`
+libtool: install:  test -d /mingw64/lib/../bin || mkdir -p /mingw64/lib/../bin
+libtool: install:  /usr/bin/install -c libltdl/.libs/libltdl-7.dll /mingw64/lib/../bin/libltdl-7.dll
+libtool: install:  chmod a+x /mingw64/lib/../bin/libltdl-7.dll
+libtool: install:  if test -n '' && test -n 'strip --strip-unneeded'; then eval 'strip --strip-unneeded /mingw64/lib/../bin/libltdl-7.dll' || exit 0; fi
+libtool: install: /usr/bin/install -c libltdl/.libs/libltdl.lai /mingw64/lib/libltdl.la
+libtool: install: /usr/bin/install -c libltdl/.libs/libltdl.a /mingw64/lib/libltdl.a
+libtool: install: chmod 644 /mingw64/lib/libltdl.a
+libtool: install: ranlib /mingw64/lib/libltdl.a
+ GREP='/usr/bin/grep' SED='/usr/bin/sed' './build-aux/inline-source' libtoolize > '/mingw64/bin/libtoolize'
+rm -rf '/mingw64/share/libtool'/*
+ /usr/bin/install -c -m 644 './m4/libtool.m4' '/mingw64/share/aclocal/libtool.m4'
+ /usr/bin/install -c -m 644 './m4/ltargz.m4' '/mingw64/share/aclocal/ltargz.m4'
+ /usr/bin/install -c -m 644 './m4/ltdl.m4' '/mingw64/share/aclocal/ltdl.m4'
+ /usr/bin/install -c -m 644 './m4/ltoptions.m4' '/mingw64/share/aclocal/ltoptions.m4'
+ /usr/bin/install -c -m 644 './m4/ltsugar.m4' '/mingw64/share/aclocal/ltsugar.m4'
+ /usr/bin/install -c -m 644 './m4/ltversion.m4' '/mingw64/share/aclocal/ltversion.m4'
+ /usr/bin/install -c -m 644 './m4/lt~obsolete.m4' '/mingw64/share/aclocal/lt~obsolete.m4'
+ /usr/bin/install -c './build-aux/compile' '/mingw64/share/libtool/build-aux/compile'
+ /usr/bin/install -c './build-aux/config.guess' '/mingw64/share/libtool/build-aux/config.guess'
+ /usr/bin/install -c './build-aux/config.sub' '/mingw64/share/libtool/build-aux/config.sub'
+ /usr/bin/install -c './build-aux/depcomp' '/mingw64/share/libtool/build-aux/depcomp'
+ /usr/bin/install -c './build-aux/install-sh' '/mingw64/share/libtool/build-aux/install-sh'
+ /usr/bin/install -c './build-aux/missing' '/mingw64/share/libtool/build-aux/missing'
+ /usr/bin/install -c -m 644 './build-aux/ltmain.sh' '/mingw64/share/libtool/build-aux/ltmain.sh'
+ /usr/bin/install -c -m 644 './libltdl/COPYING.LIB' '/mingw64/share/libtool/COPYING.LIB'
+ /usr/bin/install -c -m 644 './libltdl/Makefile.am' '/mingw64/share/libtool/Makefile.am'
+ /usr/bin/install -c -m 644 './libltdl/README' '/mingw64/share/libtool/README'
+ /usr/bin/install -c -m 644 './libltdl/configure.ac' '/mingw64/share/libtool/configure.ac'
+ /usr/bin/install -c -m 644 './libltdl/aclocal.m4' '/mingw64/share/libtool/aclocal.m4'
+ /usr/bin/install -c -m 644 './libltdl/Makefile.in' '/mingw64/share/libtool/Makefile.in'
+ /usr/bin/install -c -m 644 './libltdl/config-h.in' '/mingw64/share/libtool/config-h.in'
+ /usr/bin/install -c -m 644 './libltdl/configure' '/mingw64/share/libtool/configure'
+ /usr/bin/install -c -m 644 './libltdl/libltdl/lt__alloc.h' '/mingw64/share/libtool/libltdl/lt__alloc.h'
+ /usr/bin/install -c -m 644 './libltdl/libltdl/lt__argz_.h' '/mingw64/share/libtool/libltdl/lt__argz_.h'
+ /usr/bin/install -c -m 644 './libltdl/libltdl/lt__dirent.h' '/mingw64/share/libtool/libltdl/lt__dirent.h'
+ /usr/bin/install -c -m 644 './libltdl/libltdl/lt__glibc.h' '/mingw64/share/libtool/libltdl/lt__glibc.h'
+ /usr/bin/install -c -m 644 './libltdl/libltdl/lt__private.h' '/mingw64/share/libtool/libltdl/lt__private.h'
+ /usr/bin/install -c -m 644 './libltdl/libltdl/lt__strl.h' '/mingw64/share/libtool/libltdl/lt__strl.h'
+ /usr/bin/install -c -m 644 './libltdl/libltdl/lt_dlloader.h' '/mingw64/share/libtool/libltdl/lt_dlloader.h'
+ /usr/bin/install -c -m 644 './libltdl/libltdl/lt_error.h' '/mingw64/share/libtool/libltdl/lt_error.h'
+ /usr/bin/install -c -m 644 './libltdl/libltdl/lt_system.h' '/mingw64/share/libtool/libltdl/lt_system.h'
+ /usr/bin/install -c -m 644 './libltdl/libltdl/slist.h' '/mingw64/share/libtool/libltdl/slist.h'
+ /usr/bin/install -c -m 644 './libltdl/loaders/dld_link.c' '/mingw64/share/libtool/loaders/dld_link.c'
+ /usr/bin/install -c -m 644 './libltdl/loaders/dlopen.c' '/mingw64/share/libtool/loaders/dlopen.c'
+ /usr/bin/install -c -m 644 './libltdl/loaders/dyld.c' '/mingw64/share/libtool/loaders/dyld.c'
+ /usr/bin/install -c -m 644 './libltdl/loaders/load_add_on.c' '/mingw64/share/libtool/loaders/load_add_on.c'
+ /usr/bin/install -c -m 644 './libltdl/loaders/loadlibrary.c' '/mingw64/share/libtool/loaders/loadlibrary.c'
+ /usr/bin/install -c -m 644 './libltdl/loaders/preopen.c' '/mingw64/share/libtool/loaders/preopen.c'
+ /usr/bin/install -c -m 644 './libltdl/loaders/shl_load.c' '/mingw64/share/libtool/loaders/shl_load.c'
+ /usr/bin/install -c -m 644 './libltdl/lt__alloc.c' '/mingw64/share/libtool/lt__alloc.c'
+ /usr/bin/install -c -m 644 './libltdl/lt__argz.c' '/mingw64/share/libtool/lt__argz.c'
+ /usr/bin/install -c -m 644 './libltdl/lt__dirent.c' '/mingw64/share/libtool/lt__dirent.c'
+ /usr/bin/install -c -m 644 './libltdl/lt__strl.c' '/mingw64/share/libtool/lt__strl.c'
+ /usr/bin/install -c -m 644 './libltdl/lt_dlloader.c' '/mingw64/share/libtool/lt_dlloader.c'
+ /usr/bin/install -c -m 644 './libltdl/lt_error.c' '/mingw64/share/libtool/lt_error.c'
+ /usr/bin/install -c -m 644 './libltdl/ltdl.c' '/mingw64/share/libtool/ltdl.c'
+ /usr/bin/install -c -m 644 './libltdl/ltdl.h' '/mingw64/share/libtool/ltdl.h'
+ /usr/bin/install -c -m 644 './libltdl/ltdl.mk' '/mingw64/share/libtool/ltdl.mk'
+ /usr/bin/install -c -m 644 './libltdl/slist.c' '/mingw64/share/libtool/slist.c'
+chmod a+x '/mingw64/share/libtool/configure'
+ /usr/bin/mkdir -p '/mingw64/include'
+ /usr/bin/install -c -m 644 libltdl/ltdl.h '/mingw64/include'
+ /usr/bin/mkdir -p '/mingw64/share/info'
+ /usr/bin/install -c -m 644 ./doc/libtool.info ./doc/libtool.info-1 ./doc/libtool.info-2 '/mingw64/share/info'
+ install-info --info-dir='/mingw64/share/info' '/mingw64/share/info/libtool.info'
+ /usr/bin/mkdir -p '/mingw64/include/libltdl'
+ /usr/bin/install -c -m 644 libltdl/libltdl/lt_system.h libltdl/libltdl/lt_error.h libltdl/libltdl/lt_dlloader.h '/mingw64/include/libltdl'
+ /usr/bin/mkdir -p '/mingw64/share/man/man1'
+ /usr/bin/install -c -m 644 ./doc/libtool.1 ./doc/libtoolize.1 '/mingw64/share/man/man1'
+make[3]: Leaving directory '/c/libidn2/libtool-2.4.6'
+make[2]: Leaving directory '/c/libidn2/libtool-2.4.6'
+make[1]: Leaving directory '/c/libidn2/libtool-2.4.6'
+
+=> libtool 실행 파일: /mingw64/bin/libtoolize
+라이브러리 파일들: /mingw64/lib/
+헤더 파일들: /mingw64/include/
+문서와 매뉴얼: /mingw64/share/info/ 및 /mingw64/share/man/man1/
+
+/c/libidn2/libtool-2.4.6
+# /mingw64/bin/libtool --version
+libtool (GNU libtool) 2.4.6
+Written by Gordon Matzigkeit, 1996
+
+Copyright (C) 2014 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+# which libtoolize
+/c/libidn2/libtool-2.4.6/libtoolize
+
+다시 돌아와서
+cd /c/libidn2
+# autoreconf -if
+libtoolize: putting auxiliary files in AC_CONFIG_AUX_DIR, 'build-aux'.
+libtoolize: copying file 'build-aux/ltmain.sh'
+libtoolize:   error: '/mingw64/share/aclocal/libtool.m4' does not exist.
+autoreconf-2.72: error: libtoolize failed with exit status: 1
+
+# libtoolize --install --force
+libtoolize: putting auxiliary files in AC_CONFIG_AUX_DIR, 'build-aux'.
+libtoolize: linking file 'build-aux/config.guess'
+libtoolize: linking file 'build-aux/config.sub'
+libtoolize: linking file 'build-aux/install-sh'
+libtoolize: linking file 'build-aux/ltmain.sh'
+libtoolize:   error: '/mingw64/share/aclocal/libtool.m4' does not exist.
+
+nayou@kimnayooung MINGW64 /c/libidn2
+# which libtoolize
+/c/libidn2/libtool-2.4.6/libtoolize
+
+nayou@kimnayooung MINGW64 /c/libidn2
+# cd /c/libidn2/libtool-2.4.6
+
+nayou@kimnayooung MINGW64 /c/libidn2/libtool-2.4.6
+# notepad libtoolize
+
+  # Locations for important files:
+  prefix="/mingw64"
+  datadir="/mingw64/share"
+  pkgauxdir="/mingw64/share/libtool/build-aux"
+  pkgltdldir="/mingw64/share/libtool"
+  aclocaldir="/mingw64/share/aclocal"
+
+
+
+
+
+
+
 
