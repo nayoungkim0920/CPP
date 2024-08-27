@@ -1665,3 +1665,289 @@ libtoolize: putting auxiliary files in AC_CONFIG_AUX_DIR, 'build-aux'.
 libtoolize: copying file 'build-aux/ltmain.sh'
 libtoolize:   error: '/usr/share/aclocal/libtool.m4' does not exist.
 autoreconf-2.72: error: libtoolize failed with exit status: 1
+
+libtoolize:   error: '/usr/share/aclocal/libtool.m4' does not exist.
+nayou@kimnayooung MINGW64 /c/libidn2
+# pacman -S libtool automake
+intltoolize: 'po/Makefile.in.in' exists: use '--force' to overwrite
+intltoolize: 'po/Makefile.in.in' is out of date: use '--force' to overwrite
+intltoolize 명령어를 실행할 때, po/Makefile.in.in 파일이 이미 존재하고 있지만, 
+해당 파일이 현재 사용 중인 버전과 일치하지 않아서 업데이트가 필요
+intltoolize는 이미 존재하는 파일을 덮어쓰지 않도록 설계되어 있다.
+--force 옵션을 사용하여 강제로 덮어쓸 수 있다.
+nayou@kimnayooung MINGW64 /c/libidn2
+# intltoolize --force
+autopoint: File po/Makefile.in.in has been locally modified.
+autopoint: *** Some files have been locally modified. Not overwriting them because --force has not been specified. For your convenience, you find the local modifications in the file '/tmp/arjezVBk/gtWcVd0M/autopoint.diff'.
+autopoint: *** Stop.
+autopoint 도구가 po/Makefile.in.in 파일이 로컬에서 수정되었음을 감지하고, 
+이를 덮어쓰지 않기 위해 작업을 중단한 것임
+파일 덮어쓰기를 위해서는 추가적으로 --force 옵션이 필요하다고 경고
+만약 백업할경우 cp po/Makefile.in.in po/Makefile.in.in.bak
+nayou@kimnayooung MINGW64 /c/libidn2
+# autopoint --force
+Copying file po/Makefile.in.in
+
+nayou@kimnayooung MINGW64 /c/libidn2
+# intltoolize --force
+
+https://www.linuxquestions.org/questions/linux-software-2/building-cinelerra-cv-from-git-repository-syntax-error-820826-print/
+nayou@kimnayooung MINGW64 /c/libidn2
+Autotools 기반의 프로젝트에서 일반적으로 사용되는 명령어로, 
+configure 스크립트를 자동으로 생성하고 갱신하는 데 사용
+-i 또는 --install: 필요한 경우, 프로젝트 디렉토리에 누락된 파일을 추가합니다. 예를 들어, config.guess, config.sub, install-sh 등의 파일을 추가합니다.
+-f 또는 --force: 기존 파일을 강제로 덮어씁니다.
+# autoreconf -if
+aclocal, autoconf, autoheader, automake, libtoolize 등의 도구를 실행하여 configure 스크립트와 관련 파일들을 생성하고 갱신
+nayou@kimnayooung MINGW64 /c/libidn2
+# autoreconf -if
+Copying file po/Makefile.in.in
+libtoolize: putting auxiliary files in AC_CONFIG_AUX_DIR, 'build-aux'.
+libtoolize: copying file 'build-aux/ltmain.sh'
+libtoolize:   error: '/usr/share/aclocal/libtool.m4' does not exist.
+autoreconf-2.72: error: libtoolize failed with exit status: 1
+/usr/share/aclocal/libtool.m4 파일을 찾지 못함
+pacman -S libtool
+nayou@kimnayooung MINGW64 /c/libidn2
+# autoreconf -if
+libtoolize: putting auxiliary files in AC_CONFIG_AUX_DIR, 'build-aux'.
+libtoolize: copying file 'build-aux/ltmain.sh'
+libtoolize:   error: '/usr/share/aclocal/libtool.m4' does not exist.
+autoreconf-2.72: error: libtoolize failed with exit status: 1
+pacman -Syu           # 시스템 및 패키지 업데이트
+pacman -S libtool     # libtool 설치
+pacman -S autoconf automake  # autoconf 및 automake도 설치
+nayou@kimnayooung MINGW64 /c/libidn2
+# find /usr/share -name "libtool.m4"
+/usr/share/aclocal/libtool.m4
+export ACLOCAL_PATH="/usr/share/aclocal"
+autoreconf -if
+libtoolize:   error: '/usr/share/aclocal/libtool.m4' does not exist.
+libtoolize --copy --install --automake
+환경변수설정할때
+Makefile.am (현재 세션만 적용)
+#m4 디렉토리는 AC_CONFIG_MACRO_DIRS에서 이미 포함되므로, 중복된 경로를 제거
+#ACLOCAL_AMFLAGS = -I /usr/share/aclocal -I /c/libidn2/m4 
+#export ACLOCAL_PATH="export ACLOCAL_PATH="/usr/share/aclocal:/c/libidn2/m4":$ACLOCAL_PATH"
+ACLOCAL_AMFLAGS = -I /usr/share/aclocal -I m4
+# -I m4를 제거 configure.ac파일의  AC_CONFIG_MACRO_DIRS([m4]) #여기에서 찾음
+.bashrc 또는 .bash_profile 추가(지속적설정)
+echo 'export ACLOCAL_PATH="/usr/share/aclocal"' >> ~/.bashrc
+source ~/.bashrc
+nayou@kimnayooung MINGW64 /usr/share/aclocal
+# find / -name "libtool.m4" 2>/dev/null
+/home/nayou/_bazel_nayou/4yp365mj/external/protobuf~/m4/libtool.m4
+/home/nayou/_bazel_nayou/4yp365mj/external/protobuf~/third_party/googletest/googletest/m4/libtool.m4
+/mingw64/share/aclocal/libtool.m4
+nayou@kimnayooung MINGW64 /usr/share/aclocal
+# echo 'export ACLOCAL_PATH="/mingw64/share/aclocal:/usr/share/aclocal"' >> ~/.bashrc
+
+nayou@kimnayooung MINGW64 /usr/share/aclocal
+# source ~/.bashrc
+
+AC_CONFIG_MACRO_DIRS([/usr/share/aclocal]) 
+AC_CONFIG_MACRO_DIRS([/usr/share/aclocal, /mingw64/share/aclocal]) 
+ACLOCAL_AMFLAGS = -I /usr/share/aclocal -I /mingw64/share/aclocal -I m4
+echo 'export ACLOCAL_PATH="/mingw64/share/aclocal:/usr/share/aclocal"' >> ~/.bashrc
+source ~/.bashrc
+export ACLOCAL_PATH="/mingw64/share/aclocal:/usr/share/aclocal"
+=> libtoolize:   error: '/usr/share/aclocal/libtool.m4' does not exist.
+
+nayou@kimnayooung MINGW64 /c/libidn2
+/dev/null로 오류 메시지를 버려서 결과를 깨끗하게 확인하는 것
+파일 디스크립터 표준 입력 (stdin) 0, 표준 출력 (stdout) 1, 표준 오류 (stderr) 2
+# find / -name "libtool.m4" 2>/dev/null
+/home/nayou/_bazel_nayou/4yp365mj/external/protobuf~/m4/libtool.m4
+/home/nayou/_bazel_nayou/4yp365mj/external/protobuf~/third_party/googletest/googletest/m4/libtool.m4
+/mingw64/share/aclocal/libtool.m4
+nayou@kimnayooung MINGW64 /c/libidn2
+# echo $ACLOCAL_PATH
+/mingw64/share/aclocal:/usr/share/aclocal
+삭제하고 다시설치
+pacman -R libtool
+pacman -S libtool
+libtoolize --verbose
+pacman -R autoconf automake
+pacman -S autoconf automake
+libtoolize:   error: '/usr/share/aclocal/libtool.m4' does not exist.
+Makefile.am
+AC_CONFIG_MACRO_DIRS([/mingw64/share/aclocal, /usr/share/aclocal, m4])
+configure.ac
+ACLOCAL_AMFLAGS = -I /mingw64/share/aclocal -I /usr/share/aclocal -I m4
+nayou@kimnayooung MINGW64 /c/libidn2
+# chmod 644 /mingw64/share/aclocal/libtool.m4
+
+nayou@kimnayooung MINGW64 /c/libidn2
+# ls -l /mingw64/share/aclocal/libtool.m4
+-rw-r--r-- 1 nayou nayou 307384  8월 14  2023 /mingw64/share/aclocal/libtool.m4
+
+nayou@kimnayooung MINGW64 /mingw64/share/aclocal
+# find / -name "libtool.m4" 2>/dev/null
+/home/nayou/_bazel_nayou/4yp365mj/external/protobuf~/m4/libtool.m4
+/home/nayou/_bazel_nayou/4yp365mj/external/protobuf~/third_party/googletest/googletest/m4/libtool.m4
+
+cp /home/nayou/_bazel_nayou/4yp365mj/external/protobuf~/m4/libtool.m4 /mingw64/share/aclocal/
+
+nayou@kimnayooung MINGW64 /mingw64/share/aclocal
+# find / -name "libtool.m4" 2>/dev/null                                        /home/nayou/_bazel_nayou/4yp365mj/external/protobuf~/m4/libtool.m4
+/home/nayou/_bazel_nayou/4yp365mj/external/protobuf~/third_party/googletest/googletest/m4/libtool.m4
+/mingw64/share/aclocal/libtool.m4
+
+nayou@kimnayooung MINGW64 /c/libidn2
+# libtoolize --version
+libtoolize (GNU libtool) 2.4.7
+Written by Gary V. Vaughan <gary@gnu.org>, 2003
+
+Copyright (C) 2022 Free Software Foundation, Inc.
+
+Can't exec "gtkdocize": No such file or directory at /usr/share/autoconf-2.72/Autom4te/FileUtils.pm line 318.
+nayou@kimnayooung MINGW64 /c/libidn2
+# pacman -S gtk-doc
+의존성 해결 중...
+꾸러미 충돌을 찾는 중...
+
+꾸러미 (16) docbook-xml-4.5-4  docbook-xsl-1.79.2-3  glib2-2.80.4-1
+            itstool-2.0.7-1  libxml2-2.13.3-1  libxml2-python-2.13.3-1
+            libxslt-1.1.42-1  mpdecimal-4.0.0-1  python-3.12.5-1
+            python-lxml-5.2.2-4  python-mallard-ducktype-1.0.2-6
+            python-pygments-2.18.0-2  vim-9.1.0648-1  yelp-tools-42.1-1
+            yelp-xsl-42.1-1  gtk-doc-1.34.0-1
+
+총 다운로드 크기:   39.19 MiB
+총 설치 크기:      292.29 MiB
+
+:: 설치를 진행하시겠습니까? [Y/n] y
+:: 꾸러미 가져오는 중...
+ vim-9.1.0648-1-x...     9.0 MiB  3.02 MiB/s 00:03 [####################] 100%
+ python-pygments-...  1895.1 KiB   622 KiB/s 00:03 [####################] 100%
+ docbook-xsl-1.79...   677.8 KiB  1281 KiB/s 00:01 [####################] 100%
+ python-lxml-5.2....  1222.3 KiB   305 KiB/s 00:04 [####################] 100%
+ glib2-2.80.4-1-x...     2.5 MiB   607 KiB/s 00:04 [####################] 100%
+ gtk-doc-1.34.0-1...   304.3 KiB   664 KiB/s 00:00 [####################] 100%
+ yelp-xsl-42.1-1-any   191.1 KiB   357 KiB/s 00:01 [####################] 100%
+ libxslt-1.1.42-1...   138.0 KiB   271 KiB/s 00:01 [####################] 100%
+ python-mallard-d...   100.1 KiB   211 KiB/s 00:00 [####################] 100%
+ docbook-xml-4.5-...    85.0 KiB   152 KiB/s 00:01 [####################] 100%
+ mpdecimal-4.0.0-...    73.7 KiB  88.8 KiB/s 00:01 [####################] 100%
+ yelp-tools-42.1-...    32.9 KiB  47.9 KiB/s 00:01 [####################] 100%
+ python-3.12.5-1-...    22.4 MiB  3.16 MiB/s 00:07 [####################] 100%
+ itstool-2.0.7-1-...    19.7 KiB  33.0 KiB/s 00:01 [####################] 100%
+ libxml2-2.13.3-1...   485.3 KiB   180 KiB/s 00:03 [####################] 100%
+ libxml2-python-2...   260.0 KiB   401 KiB/s 00:01 [####################] 100%
+ 총합 (16/16)           39.2 MiB  2.06 MiB/s 00:19 [####################] 100%
+오류: 파일 'libxml2-2.13.3-1-x86_64.pkg.tar.zst'를 mirror.msys2.org에서 가져오는 데 실패 : Operation too slow. Less than 1 bytes/sec transferred the last 10 seconds
+오류: 파일 'libxml2-python-2.13.3-1-x86_64.pkg.tar.zst'를 mirror.msys2.org에서 가져오는 데 실패 : Operation too slow. Less than 1 bytes/sec transferred the last 10 seconds
+(16/16) 키링의 키를 검사 중                        [####################] 100%
+(16/16) 꾸러미 무결성 검사 중                      [####################] 100%
+(16/16) 꾸러미 파일 불러오는 중                    [####################] 100%
+(16/16) 파일 충돌 검사 중                          [####################] 100%
+(16/16) 사용 가능한 디스크 공간 검사 중            [####################] 100%
+:: 꾸러미 변경사항을 처리 중...
+( 1/16) 설치 중 libxml2                            [####################] 100%
+etc/xml/catalog:1: parser error : Document is empty
+
+^
+( 2/16) 설치 중 libxslt                            [####################] 100%
+( 3/16) 설치 중 docbook-xml                        [####################] 100%
+( 4/16) 설치 중 docbook-xsl                        [####################] 100%
+( 5/16) 설치 중 glib2                              [####################] 100%
+( 6/16) 설치 중 libxml2-python                     [####################] 100%
+( 7/16) 설치 중 mpdecimal                          [####################] 100%
+( 8/16) 설치 중 python                             [####################] 100%
+( 9/16) 설치 중 python-pygments                    [####################] 100%
+(10/16) 설치 중 vim                                [####################] 100%
+(11/16) 설치 중 yelp-xsl                           [####################] 100%
+(12/16) 설치 중 python-lxml                        [####################] 100%
+(13/16) 설치 중 itstool                            [####################] 100%
+(14/16) 설치 중 python-mallard-ducktype            [####################] 100%
+(15/16) 설치 중 yelp-tools                         [####################] 100%
+(16/16) 설치 중 gtk-doc                            [####################] 100%
+
+# echo $PATH
+/usr/bin:/mingw64/bin:/c/Program Files/Java/jdk-21/bin:/c/bazel:/c/Users/nayou/AppData/Local/Programs/Python/Python312:/usr/bin:/mingw64/bin:/c/Program Files/Java/jdk-21/bin:/c/bazel:/c/Users/nayou/AppData/Local/Programs/Python/Python312:/mingw64/bin:/usr/local/bin:/usr/bin:/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0/:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl
+export PATH="/mingw64/bin:$PATH"
+# which gtkdocize
+/usr/bin/gtkdocize
+nayou@kimnayooung MINGW64 /c/libidn2
+# pacman -Qi gtk-doc
+이름               : gtk-doc
+버전               : 1.34.0-1
+설명               : Documentation tool for public library API
+아키텍처           : x86_64
+URL                : https://gitlab.gnome.org/GNOME/gtk-doc
+라이선스           : GPL  FDL
+모음들             : 없음
+다음을 제공        : 없음
+다음에 의존        : docbook-xsl  glib2  libxml2-python  python
+                     python-pygments  vim  yelp-tools
+선택 의존성        : 없음
+다음이 요구        : 없음
+다음의 선택 의존성 : 없음
+다음과 충돌        : 없음
+다음을 대체        : 없음
+설치된 크기        : 2.63 MiB
+꾸러미 만든이      : CI (msys2/msys2-autobuild/dad66715/8220363058)
+빌드 날짜          : 2024년 03월 10일 일 오후 4:24:49
+설치 날짜          : 2024년 08월 27일 화 오전 9:48:31
+설치 이유          : 명시적으로 설치했습니다
+설치 스크립트      : 아니요
+유효검사자         : SHA-256 합  서명
+
+# autoreconf -if
+Copying file build-aux/config.rpath
+Copying file po/Makefile.in.in
+libtoolize: putting auxiliary files in AC_CONFIG_AUX_DIR, 'build-aux'.
+libtoolize: copying file 'build-aux/ltmain.sh'
+libtoolize:   error: '/mingw64/share/aclocal/libtool.m4' does not exist.
+autoreconf-2.72: error: libtoolize failed with exit status: 1
+libtoolize:   error: '/mingw64/share/aclocal/libtool.m4' does not exist.
+cp /usr/share/aclocal/libtool.m4 /mingw64/share/aclocal/
+
+# pacman -Ql libtool | grep libtool.m4
+libtool /usr/share/aclocal/libtool.m4
+
+autoreconf-2.72: running: intltoolize --copy --force
+autoreconf-2.72: running: gtkdocize --copy
+cp: cannot create regular file './/mingw64/share/aclocal/': No such file or directory
+autoreconf-2.72: error: gtkdocize failed with exit status: 1
+cd /c/libidn2
+폴더를 생성
+mkdir -p .//mingw64/share/aclocal/
+ls -l .//mingw64/share/aclocal/
+0개
+autoreconf는 소프트웨어 프로젝트의 설정 및 빌드를 위한 자동화 도구인 
+autoconf, automake, libtool 등을 업데이트하는 과정
+프로젝트의 빌드 및 설정을 위해 필요한 파일을 준비하고 갱신
+# autoreconf -if --verbose
+# ls -l .//mingw64/share/aclocal/
+합계 8
+-rw-r--r-- 1 nayou nayou 4528  8월 27 13:19 gtk-doc.m4
+gtkdocize가 잘못된 경로를 참조하는지 확인
+gtkdocize --copy
+성공!
+(autoreconf)
+configure.ac 또는 configure.in 파일과 같은 입력 파일을 기반으로 configure 스크립트를 생성하거나 갱신합니다.
+configure 스크립트는 시스템 환경을 검사하여 적절한 Makefile과 기타 빌드 설정 파일을 생성
+aclocal: aclocal.m4 파일을 생성하고, 필요한 m4 매크로 파일을 포함합니다.
+autoconf: configure 스크립트를 생성합니다.
+autoheader: config.h 헤더 파일을 생성합니다.
+automake: Makefile.in 파일을 생성합니다.
+libtoolize: libtool 관련 파일을 생성합니다.
+-i 옵션은 autoreconf가 aclocal.m4와 같은 필수 파일을 설치하도록 지시
+
+autoreconf가 생성하거나 갱신한 configure 스크립트를 실행하여 프로젝트의 빌드 환경을 설정
+./configure
+셸 스크립트를 run_configure.sh라는 파일생성
+#!/bin/bash
+
+# 로그 파일 설정
+LOG_FILE="configure.log"
+
+# ./configure 실행 및 로그 파일에 기록
+./configure &> "$LOG_FILE"
+
+# 로그 파일에서 ./configure 또는 : error로 시작하는 줄만 출력
+grep -E '^./configure|^: error' "$LOG_FILE"
+저장
+chmod +x run_configure.sh
+./run_configure.sh
