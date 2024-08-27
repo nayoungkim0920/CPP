@@ -2192,15 +2192,110 @@ libtoolize:   error: '/mingw64/share/aclocal/libtool.m4' does not exist.
 notepad ~./bashrc
 # aclocal 경로 추가
 export PATH="/usr/share/aclocal:/mingw64/share/aclocal:$PATH"
+source ~/.bashrc
 autoreconf -if
+# autoreconf -if
+FIND: 매개 변수 형식이 틀립니다.
+autopoint: *** infrastructure files for version 0.19.8 not found; this is autopoint from GNU gettext-tools 0.22.4
+autopoint: *** Stop.
+autoreconf-2.72: error: autopoint failed with exit status: 1
+autopoint 도구가 필요한 파일들을 찾지 못해 발생하는 문제
+autopoint는 gettext 패키지의 일부이며, 인프라 파일들 (예: config.guess, config.sub 등)이 
+특정 버전과 일치하지 않거나 누락된 경우
+# gettext --version
+gettext (GNU gettext-runtime) 0.22.4
+Copyright (C) 1995-2023 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Ulrich Drepper이(가) 만들었습니다.
+# autopoint --version
+/bin/autopoint (GNU gettext-tools) 0.22.4
+This binary is configured to use a versions archive in dirxz format.
 
+Copyright (C) 2002-2023 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Written by Bruno Haible
 
+버전 아카이브를 재설치하거나 갱신
+autopoint --force
+# autopoint --force
+FIND: 매개 변수 형식이 틀립니다.
+autopoint: *** infrastructure files for version 0.19.8 not found; this is autopoint from GNU gettext-tools 0.22.4
+autopoint: *** Stop.
 
+# which find
+/c/Windows/System32/find
 
+~/.bashrc 수정
+export PATH="/mingw64/bin:/usr/bin:/usr/share/aclocal:/mingw64/share/aclocal:/c/Program Files/Java/jdk-21/bin:/usr/local/bin:/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/c/Users/nayou/AppData/Local/Programs/Python/Python312"
+source ~/.bashrc
+which find
+/usr/bin/find (성공!)
 
+프로젝트에 필요한 gettext 인프라 파일들을 가져오고 설정
+autopoint --force
 
+autotools를 사용하는 프로젝트에서 configure 스크립트와 
+관련된 모든 파일들을 생성하거나 업데이트하는 데 사용
+configure.ac 또는 configure.in 파일을 기반으로 
+configure 스크립트와 기타 관련 파일을 자동으로 생성하거나 갱신하는 역할
+autoreconf -if (install, force)
+autoreconf -if는 더 포괄적인 작업을 수행
 
+libtoolize: putting auxiliary files in AC_CONFIG_AUX_DIR, 'build-aux'.
+libtoolize: copying file 'build-aux/ltmain.sh'
+libtoolize:   error: '/mingw64/share/aclocal/libtool.m4' does not exist.
+autoreconf-2.72: error: libtoolize failed with exit status: 1
 
+libtool 설치 확인
+pacman -Q libtool
+# pacman -Q libtool
+libtool 2.4.7-4
+libtoolize --force
+/mingw64/share/aclocal/libtool.m4 파일이 여전히 없거나 문제가 계속된다면,
+libtool의 설치 상태를 점검하고 필요한 파일이 포함된 패키지를 재설치하거나 업데이트한다.
+# pacman -Fy
+:: 꾸러미 데이터베이스 동기화 중...
+ clangarm64              3.7 MiB   726 KiB/s 00:05 [#########################] 100%
+ mingw32              1454.7 KiB   744 KiB/s 00:02 [#########################] 100%
+ mingw64                 4.7 MiB   909 KiB/s 00:05 [#########################] 100%
+ ucrt64                  5.0 MiB  1772 KiB/s 00:03 [#########################] 100%
+ clang32              1281.8 KiB   294 KiB/s 00:04 [#########################] 100%
+ clang64                 4.8 MiB  1063 KiB/s 00:05 [#########################] 100%
+ msys                 1188.5 KiB  1776 KiB/s 00:01 [#########################] 100%
 
+pacman -F libtool.m4
+clangarm64/mingw-w64-clang-aarch64-libtool 2.4.7-2
+    clangarm64/share/aclocal/libtool.m4
+mingw32/mingw-w64-i686-libtool 2.4.7-2
+    mingw32/share/aclocal/libtool.m4
+mingw64/mingw-w64-x86_64-libtool 2.4.7-2 [설치함]
+    mingw64/share/aclocal/libtool.m4
+ucrt64/mingw-w64-ucrt-x86_64-libtool 2.4.7-2
+    ucrt64/share/aclocal/libtool.m4
+clang32/mingw-w64-clang-i686-libtool 2.4.7-2
+    clang32/share/aclocal/libtool.m4
+clang64/mingw-w64-clang-x86_64-libtool 2.4.7-2
+    clang64/share/aclocal/libtool.m4
+msys/libtool 2.4.7-4 [설치함]
+    usr/share/aclocal/libtool.m4
+
+pacman -S libtool
+
+nayou@kimnayooung MINGW64 /c/libidn2
+# ls -l /mingw64/share/aclocal/libtool.m4
+-rw-r--r-- 1 nayou nayou 307384  8월 27 19:30 /mingw64/share/aclocal/libtool.m4
+
+nayou@kimnayooung MINGW64 /c/libidn2
+# autoreconf -if
+libtoolize: putting auxiliary files in AC_CONFIG_AUX_DIR, 'build-aux'.
+libtoolize: copying file 'build-aux/ltmain.sh'
+libtoolize:   error: '/mingw64/share/aclocal/libtool.m4' does not exist.
+autoreconf-2.72: error: libtoolize failed with exit status: 1
+
+nayou@kimnayooung MINGW64 /c/libidn2
 
 
