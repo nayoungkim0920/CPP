@@ -1951,3 +1951,256 @@ grep -E '^./configure|^: error' "$LOG_FILE"
 저장
 chmod +x run_configure.sh
 ./run_configure.sh
+(참고)
+./configure &> configure.log
+grep -E '^./configure|^: error' configure.log | sort | uniq
+nayou@kimnayooung MINGW64 /c/libidn2
+# ./run_configure.sh
+./configure: line 13736: as_fn_executable_p: command not found
+./configure: line 13837: as_fn_executable_p: command not found
+./configure: line 13882: as_fn_executable_p: command not found
+./configure: line 13930: as_fn_executable_p: command not found
+./configure: line 13980: as_fn_executable_p: command not found
+./configure: line 14303: as_fn_executable_p: command not found
+./configure: line 1614: as_fn_set_status: command not found
+./configure: line 17405: `        gl_WARN_ADD("-W$w")'
+./configure: line 17405: syntax error near unexpected token `"-W$w"'
+./configure: line 1800: as_fn_set_status: command not found
+./configure: line 2856: as_fn_executable_p: command not found
+./configure: line 2962: as_fn_executable_p: command not found
+./configure: line 3076: as_fn_executable_p: command not found
+./configure: line 3184: as_fn_executable_p: command not found
+./configure: line 3912: as_fn_executable_p: command not found
+./configure: line 411: as_fn_exit: command not found
+./configure: line 4354: as_fn_executable_p: command not found
+./configure: line 4405: as_fn_executable_p: command not found
+./configure: line 5208: as_fn_executable_p: command not found
+./configure: line 5292: as_fn_executable_p: command not found
+./configure: line 5366: as_fn_executable_p: command not found
+./configure: line 5443: as_fn_executable_p: command not found
+./configure: line 6232: as_fn_executable_p: command not found
+./configure: line 6342: as_fn_executable_p: command not found
+./configure: line 6697: as_fn_executable_p: command not found
+./configure: line 6855: as_fn_executable_p: command not found
+./configure: line 7051: as_fn_executable_p: command not found
+./configure: line 7162: as_fn_executable_p: command not found
+./configure: line 7661: as_fn_executable_p: command not found
+./configure: line 8061: as_fn_executable_p: command not found
+./configure: line 8934: as_fn_executable_p: command not found
+: error: C compiler cannot create executables
+: error: C preprocessor "/lib/cpp" fails sanity check
+: error: cannot compute suffix of executables: cannot compile and link
+: error: cannot compute suffix of object files: cannot compile
+: error: cannot run C compiled programs.
+: error: in '/c/libidn2':
+: error: no acceptable C compiler found in $PATH
+: error: no acceptable egrep could be found in /usr/bin:/mingw64/bin:/c/Program Files/Java/jdk-21/bin:/c/bazel:/c/Users/nayou/AppData/Local/Programs/Python/Python312:/mingw64/bin:/usr/local/bin:/usr/bin:/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0/:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/usr/xpg4/bin
+: error: no acceptable fgrep could be found in /usr/bin:/mingw64/bin:/c/Program Files/Java/jdk-21/bin:/c/bazel:/c/Users/nayou/AppData/Local/Programs/Python/Python312:/mingw64/bin:/usr/local/bin:/usr/bin:/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0/:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/usr/xpg4/bin
+: error: no acceptable grep could be found in /usr/bin:/mingw64/bin:/c/Program Files/Java/jdk-21/bin:/c/bazel:/c/Users/nayou/AppData/Local/Programs/Python/Python312:/mingw64/bin:/usr/local/bin:/usr/bin:/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0/:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/usr/xpg4/bin
+: error: no acceptable sed could be found in $PATH
+# gcc --version
+g++ --version
+make --version
+gcc.exe (Rev1, Built by MSYS2 project) 14.2.0
+Copyright (C) 2024 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+g++.exe (Rev1, Built by MSYS2 project) 14.2.0
+Copyright (C) 2024 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+GNU Make 4.4.1
+x86_64-pc-msys 빌드
+Copyright (C) 1988-2023 Free Software Foundation, Inc.
+라이선스 GPLv3+: GNU GPL 버전 3 또는 이후 <https://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+# grep --version
+sed --version
+grep (GNU grep) 3.0
+Copyright (C) 2017 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+Written by Mike Haertel and others, see <http://git.sv.gnu.org/cgit/grep.git/tree/AUTHORS>.
+sed (GNU sed) 4.9
+Copyright (C) 2022 Free Software Foundation, Inc.
+GPLv3+ 라이선스: GNU GPL 버전 3 이상 <https://gnu.org/licenses/gpl.html>.
+이 프로그램은 자유 소프트웨어입니다: 자유롭게 바꾸고 재배포할 수 있습니다.
+법률이 허용하는 모든 범위내의 보증은 없습니다.
+
+Jay Fenlason와(과) Tom Lord, Ken Pizzini,
+Paolo Bonzini, Jim Meyering, Assaf Gordon이(가) 작성함.
+
+이 sed 프로그램은 SELinux 기능을 제외하고 빌드했습니다.
+
+GNU sed 홈 페이지: <https://www.gnu.org/software/sed/>.
+GNU 소프트웨어 활용 일반 도움말: <https://www.gnu.org/gethelp/>.
+버그 보고 전자메일 주소: <bug-sed@gnu.org>.
+
+# echo $PATH
+/usr/bin:/mingw64/bin:/c/Program Files/Java/jdk-21/bin:/c/bazel:/c/Users/nayou/AppData/Local/Programs/Python/Python312:/mingw64/bin:/usr/local/bin:/usr/bin:/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0/:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl
+
+autoconf, automake, libtool 재설치 및 업데이트
+autoreconf 명령어를 사용하여 configure 스크립트를 다시 생성
+autoreconf -fi
+# autoreconf -fi
+Copying file po/Makefile.in.in
+libtoolize: putting auxiliary files in AC_CONFIG_AUX_DIR, 'build-aux'.
+libtoolize: copying file 'build-aux/ltmain.sh'
+libtoolize: putting macros in AC_CONFIG_MACRO_DIRS, '/mingw64/share/aclocal'.
+libtoolize: copying file '/mingw64/share/aclocal/libtool.m4'
+libtoolize: copying file '/mingw64/share/aclocal/ltoptions.m4'
+libtoolize: copying file '/mingw64/share/aclocal/ltsugar.m4'
+libtoolize: copying file '/mingw64/share/aclocal/ltversion.m4'
+libtoolize: copying file '/mingw64/share/aclocal/lt~obsolete.m4'
+configure.ac:65: installing 'build-aux/compile'
+configure.ac:67: installing 'build-aux/missing'
+examples/Makefile.am: installing 'build-aux/depcomp'
+
+./configure &> configure.log
+
+nayou@kimnayooung MINGW64 /c/libidn2
+# export CC=/usr/bin/gcc
+export CXX=/usr/bin/g++
+
+nayou@kimnayooung MINGW64 /c/libidn2
+# which egrep
+which fgrep
+/usr/bin/egrep
+/usr/bin/fgrep
+
+autoreconf -i
+nayou@kimnayooung MINGW64 /c/libidn2
+# autoreconf -i
+autopoint: File po/Makefile.in.in has been locally modified.
+autopoint: *** Some files have been locally modified. Not overwriting them because --force has not been specified. For your convenience, you find the local modifications in the file '/tmp/arMvdyxx/gtNCTlWp/autopoint.diff'.
+autopoint: *** Stop.
+autoreconf-2.72: error: autopoint failed with exit status: 1
+
+configure 스크립트 다시생
+grep -E '^./configure|^: error' configure.log | sort | uniq
+
+nayou@kimnayooung MINGW64 /c/libidn2
+# autoreconf -if
+Copying file po/Makefile.in.in
+libtoolize: putting auxiliary files in AC_CONFIG_AUX_DIR, 'build-aux'.
+libtoolize: copying file 'build-aux/ltmain.sh'
+libtoolize: putting macros in AC_CONFIG_MACRO_DIRS, '/mingw64/share/aclocal'.
+libtoolize: copying file '/mingw64/share/aclocal/libtool.m4'
+libtoolize: copying file '/mingw64/share/aclocal/ltoptions.m4'
+libtoolize: copying file '/mingw64/share/aclocal/ltsugar.m4'
+libtoolize: copying file '/mingw64/share/aclocal/ltversion.m4'
+libtoolize: copying file '/mingw64/share/aclocal/lt~obsolete.m4'
+configure.ac:65: installing 'build-aux/compile'
+configure.ac:67: installing 'build-aux/missing'
+examples/Makefile.am: installing 'build-aux/depcomp'
+./configure &> configure.log
+# which gcc
+which g++
+which make
+which grep
+which sed
+/mingw64/bin/gcc
+/mingw64/bin/g++
+/usr/bin/make
+/usr/bin/grep
+/usr/bin/sed
+notepad ~/.bashrc에 추가
+export PATH=/mingw64/bin/gcc:/mingw64/bin/g++:/usr/bin/make:/usr/bin/grep:/usr/bin/sed:$PATH # 추가
+적용
+source ~/.bashrc
+# echo $PATH
+/mingw64/bin/gcc:/mingw64/bin/g++:/usr/bin/make:/usr/bin/grep:/usr/bin/sed:/usr/bin:/mingw64/bin:/c/Program Files/Java/jdk-21/bin:/c/bazel:/c/Users/nayou/AppData/Local/Programs/Python/Python312:/mingw64/bin/gcc:/mingw64/bin/g++:/usr/bin/make:/usr/bin/grep:/usr/bin/sed:/usr/bin:/mingw64/bin:/c/Program Files/Java/jdk-21/bin:/c/bazel:/c/Users/nayou/AppData/Local/Programs/Python/Python312:/usr/bin:/mingw64/bin:/c/Program Files/Java/jdk-21/bin:/c/bazel:/c/Users/nayou/AppData/Local/Programs/Python/Python312:/mingw64/bin:/usr/local/bin:/usr/bin:/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0/:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl
+autoreconf를 사용하여 configure 스크립트 재생성
+
+# autoconf --version
+automake --version
+libtool --version
+autoconf (GNU Autoconf) 2.72
+Copyright (C) 2023 Free Software Foundation, Inc.
+License GPLv3+/Autoconf: GNU GPL version 3 or later
+<https://gnu.org/licenses/gpl.html>, <https://gnu.org/licenses/exceptions.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+Written by David J. MacKenzie and Akim Demaille.
+automake (GNU automake) 1.17
+Features: subsecond-mtime
+
+Copyright (C) 2024 Free Software Foundation, Inc.
+License GPLv2+: GNU GPL version 2 or later
+  <https://gnu.org/licenses/gpl-2.0.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+Written by Tom Tromey <tromey@redhat.com>
+       and Alexandre Duret-Lutz <adl@gnu.org>.
+libtool (GNU libtool) 2.4.7
+Written by Gordon Matzigkeit, 1996
+
+Copyright (C) 2014 Free Software Foundation, Inc.
+
+autoreconf 명령을 사용하여 configure 스크립트를 재생성 
+-i 플래그는 필요한 파일을 설치하고, -f 플래그는 강제로 재생성을 수행
+configure 스크립트와 관련된 모든 필요한 파일을 재생성하고 업데이트
+autoreconf -i -f
+configure 스크립트 실행
+./configure
+
+notepad ~./bashrc
+~./bashrc 수정
+# MinGW 64-bit 경로 추가
+export PATH="/mingw64/bin:$PATH"
+
+# 기본 유틸리티 경로 추가
+export PATH="/usr/bin:$PATH"
+
+# Java 설치 경로
+export JAVA_HOME="/c/Program Files/Java/jdk-21"
+export PATH="$JAVA_HOME/bin:$PATH"
+
+# gRPC Java Plugin 경로
+export GRPC_JAVA_PLUGIN="/c/grpc-java/build/gradle/wrapper/protoc-gen-grpc-java.exe"
+
+# 기본 유틸리티 경로
+export PATH="/usr/local/bin:/bin:$PATH"
+
+# Windows 시스템 경로
+export PATH="/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0:$PATH"
+
+# Perl 모듈 경로
+export PATH="/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:$PATH"
+
+# Python 경로
+export PATH="/c/Users/nayou/AppData/Local/Programs/Python/Python312:$PATH"
+
+/c/libidn2
+autoreconf -if
+run_configure.sh #./configure
+
+환경설정 
+export PATH="/c/Program Files/Java/jdk-21/bin:/c/bazel:/c/Users/nayou/AppData/Local/Programs/Python/Python312:/mingw64/bin:/usr/local/bin:/usr/bin:/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0/:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl"
+/c/libidn2
+autoreconf -if
+run_configure.sh #./configure
+libtoolize:   error: '/mingw64/share/aclocal/libtool.m4' does not exist.
+
+notepad ~./bashrc
+# aclocal 경로 추가
+export PATH="/usr/share/aclocal:/mingw64/share/aclocal:$PATH"
+autoreconf -if
+
+
+
+
+
+
+
+
+
+
+
