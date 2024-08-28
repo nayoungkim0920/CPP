@@ -3365,3 +3365,53 @@ Perhaps you should add the directory containing `gettext.pc'
 to the PKG_CONFIG_PATH environment variable
 Package 'gettext' not found
 
+일반적으로 MSYS2에서는 /mingw64/lib/pkgconfig 경로에 pkg-config 파일들이 위치
+export PKG_CONFIG_PATH=/mingw64/lib/pkgconfig:$PKG_CONFIG_PATH
+
+nayou@kimnayooung MINGW64 /c/libidn2
+# find /mingw64 -name gettext.pc
+
+nayou@kimnayooung MINGW64 /mingw64/lib/pkgconfig
+# ls -l /mingw64/lib/pkgconfig/gettext.pc
+ls: cannot access '/mingw64/lib/pkgconfig/gettext.pc': No such file or directory
+
+nayou@kimnayooung MINGW64 /c/libidn2
+# pacman -Q mingw-w64-x86_64-gettext
+mingw-w64-x86_64-gettext-tools 0.22.5-2
+=> gettext가아닌 gettexttools 
+
+https://mlocati.github.io/articles/gettext-iconv-windows.html
+gettext 0.21 and iconv 1.16 - Binaries for Windows
+0.21	1.16	64 bit	static2	Setup ZIP
+
+https://www.gnu.org/software/gettext/
+https://ftp.gnu.org/pub/gnu/gettext/gettext-0.22.5.tar.gz
+
+wget https://ftp.gnu.org/pub/gnu/gettext/gettext-0.22.5.tar.gz
+tar xzf gettext-0.22.5.tar.gz
+cd gettext-0.22.5
+./configure --prefix=/c/libidn2/gettext-0.22.5
+(오류)
+환경설정변수 추가
+~/.bashrc
+export C_INCLUDE_PATH=/mingw64/include
+export CPLUS_INCLUDE_PATH=/mingw64/include
+source ~/.bashrc
+3가지설치하기
+pacman -S mingw-w64-x86_64-libtextstyle mingw-w64-x86_64-iconv mingw-w64-x86_64-gettext
+오류: 대상이 없습니다: mingw-w64-x86_64-libtextstyle
+경고: mingw-w64-x86_64-gettext-tools-0.22.5-2는 최신 버전입니다. -- 재설치
+
+nayou@kimnayooung MINGW64 /c/libidn2
+# find / -name gettext-0.22.5
+/mingw64/share/gettext-0.22.5
+# wget https://ftp.gnu.org/gnu/gettext/gettext-0.22.5.tar.gz
+nayou@kimnayooung MINGW64 /c/libidn2
+# tar xzf gettext-0.22.5.tar.gz
+/mingw64: MSYS2 환경에서 사용하는 표준 경로입니다. MSYS2 패키지 관리 시스템에 의해 관리되며, 
+소프트웨어와 라이브러리를 이 경로에 설치하면 다른 패키지와의 충돌을 방지할 수 있습니다.
+c/libidn2: 특정 프로젝트나 소스 코드에 관련된 별도의 디렉터리입니다. 일반적으로 패키지 관리와는 무관하며,
+특정 프로젝트나 라이브러리만을 위한 경로입니다.
+./configure --prefix=/mingw64
+
+make 2>&1 | grep -i -e 'error' -e 'warning' -e 'not' | sort | uniq
