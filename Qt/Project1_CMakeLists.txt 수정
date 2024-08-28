@@ -2702,7 +2702,7 @@ libtoolize: linking file 'build-aux/ltmain.sh'
 libtoolize:   error: '/mingw64/share/aclocal/libtool.m4' does not exist.
 
 nayou@kimnayooung MINGW64 /c/libidn2
-# which libtoolize
+# which
 /c/libidn2/libtool-2.4.6/libtoolize
 
 nayou@kimnayooung MINGW64 /c/libidn2
@@ -2717,11 +2717,651 @@ nayou@kimnayooung MINGW64 /c/libidn2/libtool-2.4.6
   pkgauxdir="/mingw64/share/libtool/build-aux"
   pkgltdldir="/mingw64/share/libtool"
   aclocaldir="/mingw64/share/aclocal"
+=>
+  #aclocaldir="/mingw64/share/aclocal"
+  aclocaldir="/usr/share/aclocal"
 
+다시 돌아와서
+cd /c/libidn2
+필요한 파일들을 생성 및 재생성
+# autoreconf -if
+libtoolize: putting auxiliary files in AC_CONFIG_AUX_DIR, 'build-aux'.
+libtoolize: copying file 'build-aux/ltmain.sh'
+libtoolize: putting macros in AC_CONFIG_MACRO_DIRS, '/mingw64/share/aclocal'.
+libtoolize: copying file '/mingw64/share/aclocal/libtool.m4'
+libtoolize: copying file '/mingw64/share/aclocal/ltoptions.m4'
+libtoolize: copying file '/mingw64/share/aclocal/ltsugar.m4'
+libtoolize: copying file '/mingw64/share/aclocal/ltversion.m4'
+libtoolize: copying file '/mingw64/share/aclocal/lt~obsolete.m4'
+configure.ac:65: installing 'build-aux/compile'
+configure.ac:67: installing 'build-aux/missing'
+examples/Makefile.am: installing 'build-aux/depcomp'
 
+프로젝트의 빌드 환경 설정 및 Makefile 생성
+#./configure
+# ./run_configure.sh
+./configure: line 13736: as_fn_executable_p: command not found
+./configure: line 13837: as_fn_executable_p: command not found
+./configure: line 13882: as_fn_executable_p: command not found
+./configure: line 13930: as_fn_executable_p: command not found
+./configure: line 13980: as_fn_executable_p: command not found
+./configure: line 14303: as_fn_executable_p: command not found
+./configure: line 1614: as_fn_set_status: command not found
+./configure: line 17405: `        gl_WARN_ADD("-W$w")'
+./configure: line 17405: syntax error near unexpected token `"-W$w"'
+./configure: line 1800: as_fn_set_status: command not found
+./configure: line 2856: as_fn_executable_p: command not found
+./configure: line 2962: as_fn_executable_p: command not found
+./configure: line 3076: as_fn_executable_p: command not found
+./configure: line 3184: as_fn_executable_p: command not found
+./configure: line 3912: as_fn_executable_p: command not found
+./configure: line 411: as_fn_exit: command not found
+./configure: line 4354: as_fn_executable_p: command not found
+./configure: line 4405: as_fn_executable_p: command not found
+./configure: line 5208: as_fn_executable_p: command not found
+./configure: line 5292: as_fn_executable_p: command not found
+./configure: line 5366: as_fn_executable_p: command not found
+./configure: line 5443: as_fn_executable_p: command not found
+./configure: line 6232: as_fn_executable_p: command not found
+./configure: line 6342: as_fn_executable_p: command not found
+./configure: line 6697: as_fn_executable_p: command not found
+./configure: line 6855: as_fn_executable_p: command not found
+./configure: line 7051: as_fn_executable_p: command not found
+./configure: line 7162: as_fn_executable_p: command not found
+./configure: line 7661: as_fn_executable_p: command not found
+./configure: line 8061: as_fn_executable_p: command not found
+./configure: line 8934: as_fn_executable_p: command not found
+: error: C compiler cannot create executables
+: error: C preprocessor "/lib/cpp" fails sanity check
+: error: cannot compute suffix of executables: cannot compile and link
+: error: cannot compute suffix of object files: cannot compile
+: error: cannot run C compiled programs.
+: error: in '/c/libidn2':
+: error: no acceptable C compiler found in $PATH
+: error: no acceptable egrep could be found in /c/libidn2/libtool-2.4.6:/mingw64/bin:/usr/bin:/usr/share/aclocal:/mingw64/share/aclocal:/c/Program Files/Java/jdk-21/bin:/usr/local/bin:/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/c/Users/nayou/AppData/Local/Programs/Python/Python312:/usr/xpg4/bin
+: error: no acceptable fgrep could be found in /c/libidn2/libtool-2.4.6:/mingw64/bin:/usr/bin:/usr/share/aclocal:/mingw64/share/aclocal:/c/Program Files/Java/jdk-21/bin:/usr/local/bin:/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/c/Users/nayou/AppData/Local/Programs/Python/Python312:/usr/xpg4/bin
+: error: no acceptable grep could be found in /c/libidn2/libtool-2.4.6:/mingw64/bin:/usr/bin:/usr/share/aclocal:/mingw64/share/aclocal:/c/Program Files/Java/jdk-21/bin:/usr/local/bin:/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/c/Users/nayou/AppData/Local/Programs/Python/Python312:/usr/xpg4/bin
+: error: no acceptable sed could be found in $PATH
 
+(오류처리)
+as_fn_executable_p as_fn_set_status as_fn_executable_p not found
+configure 스크립트가 제대로 생성되지 않았거나, 필요한 매크로들이 포함되지 않았기 때문에 발생
+autoconf, automake, libtool 등을 최신 버전으로 업데이트
+pacman -Syu autoconf automake libtool
 
+# grep "as_fn_executable_p ()" /c/libidn2/configure
+as_fn_executable_p ()
+nayou@kimnayooung MINGW64 /c/libidn2
+# notepad configure
+정의없이 바로 
+if as_fn_executable_p "$as_dir$ac_word$ac_exec_ext"; then
+    ac_cv_prog_CC="${ac_tool_prefix}gcc"
+    printf "%s\n" "$as_me:${as_lineno-$LINENO}: found $as_dir$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+정의가 없다면, configure 스크립트가 손상된 것이므로 다시 생성
+configure 스크립트 재생성
+rm -f /c/libidn2/configure
+#configure 스크립트를 다시 생성하거나 갱신할 때 사용하는 명령어
+-f (--force): 강제로 모든 파일을 다시 생성합니다. 
+-i (--install): 필요한 파일들을 자동으로 설치합니다.
+-v (--verbose): 실행 과정을 자세히 출력합니다. 
+autoreconf -fiv
+설치내역
+# pacman -Q | grep -E 'autoconf|automake|libtool'
+autoconf-wrapper 20240607-1
+autoconf2.13 2.13-6
+autoconf2.69 2.69-4
+autoconf2.71 2.71-3
+autoconf2.72 2.72-1
+automake-wrapper 20240607-1
+automake1.11 1.11.6-6
+automake1.12 1.12.6-6
+automake1.13 1.13.4-7
+automake1.14 1.14.1-6
+automake1.15 1.15.1-4
+automake1.16 1.16.5-1
+automake1.17 1.17-1
+libtool 2.4.7-4
+mingw-w64-x86_64-libtool 2.4.7-2
+패키지 제거
+pacman -R autoconf-wrapper autoconf2.13 autoconf2.69 autoconf2.71 autoconf2.72
+pacman -R automake-wrapper automake1.11 automake1.12 automake1.13 automake1.14 automake1.15 automake1.16 automake1.17
+pacman -R libtool mingw-w64-x86_64-libtool
+패키지 재설치
+pacman -S autoconf-wrapper autoconf2.72 automake-wrapper automake1.17 libtool mingw-w64-x86_64-libtool
+최신 패키지 업데이트
+pacman -Syu
+기본적인 빌드 도구(예: gcc, make)가 설치되어 있는지 확인
+pacman -S base-devel
+echo $PATH
+/usr/bin 및 mingw64/bin 디렉토리가 포함
+Autoconf 및 관련 도구의 설치 상태
+# which autoconf
+which automake
+which libtool
+/usr/bin/autoconf
+/usr/bin/automake
+/c/libidn2/libtool-2.4.6/libtool
 
+# autoreconf -fiv
+autoreconf-2.72: export WARNINGS=
+autoreconf-2.72: Entering directory '.'
+autoreconf-2.72: running: autopoint --force
+Copying file po/Makefile.in.in
+autoreconf-2.72: running: aclocal --force
+autoreconf-2.72: configure.ac: tracing
+autoreconf-2.72: running: libtoolize --copy --force
+libtoolize: putting auxiliary files in AC_CONFIG_AUX_DIR, 'build-aux'.
+libtoolize: copying file 'build-aux/ltmain.sh'
+libtoolize: putting macros in AC_CONFIG_MACRO_DIRS, '/mingw64/share/aclocal'.
+libtoolize: copying file '/mingw64/share/aclocal/libtool.m4'
+libtoolize: copying file '/mingw64/share/aclocal/ltoptions.m4'
+libtoolize: copying file '/mingw64/share/aclocal/ltsugar.m4'
+libtoolize: copying file '/mingw64/share/aclocal/ltversion.m4'
+libtoolize: copying file '/mingw64/share/aclocal/lt~obsolete.m4'
+libtoolize: Consider adding '-I /mingw64/share/aclocal' to ACLOCAL_AMFLAGS in Makefile.am.
+autoreconf-2.72: running: intltoolize --copy --force
+autoreconf-2.72: running: gtkdocize --copy
+autoreconf-2.72: running: aclocal --force
+autoreconf-2.72: running: /usr/bin/autoconf-2.72 --force
+autoreconf-2.72: running: /usr/bin/autoheader-2.72 --force
+autoreconf-2.72: running: automake --add-missing --copy --force-missing
+configure.ac:65: installing 'build-aux/compile'
+configure.ac:67: installing 'build-aux/missing'
+examples/Makefile.am: installing 'build-aux/depcomp'
+autoreconf-2.72: Leaving directory '.'
 
+Autoconf가 올바르게 설치되어 있는지 확인
+# pacman -Ql autoconf-wrapper | grep bin
+autoconf-wrapper /usr/bin/
+autoconf-wrapper /usr/bin/autoconf
+autoconf-wrapper /usr/bin/autoheader
+autoconf-wrapper /usr/bin/autom4te
+autoconf-wrapper /usr/bin/autoreconf
+autoconf-wrapper /usr/bin/autoscan
+autoconf-wrapper /usr/bin/autoupdate
+autoconf-wrapper /usr/bin/ifnames
+패키지 데이터베이스 업데이트
+pacman -Syu
+Autoconf 설치
+pacman -S autoconf
+autoconf --version
+autoconf (GNU Autoconf) 2.72
+Copyright (C) 2023 Free Software Foundation, Inc.
+License GPLv3+/Autoconf: GNU GPL version 3 or later
+<https://gnu.org/licenses/gpl.html>, <https://gnu.org/licenses/exceptions.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Written by David J. MacKenzie and Akim Demaille.
 
+Autoconf의 직접 다운로드 및 설치
+https://ftp.gnu.org/gnu/autoconf/
+autoconf-latest.tar.gz
+/c/libidn2
+wget https://ftp.gnu.org/gnu/autoconf/autoconf-2.72.tar.gz
+tar -xzvf autoconf-2.72.tar.gz
+cd autoconf-2.72
+/c/libidn2/autoconf-2.72
+./configure
+make
+make install
+notepad ~/.bashrc
+PATH에 추가
+/c/libidn2/autoconf-2.72/bin
+
+nayou@kimnayooung MINGW64 /c/libidn2
+# which autoconf
+/mingw64/bin/autoconf
+
+nayou@kimnayooung MINGW64 /c/libidn2
+# source ~/.bashrc
+
+nayou@kimnayooung MINGW64 /c/libidn2
+# which autoconf
+/c/libidn2/autoconf-2.72/bin/autoconf
+
+# autoreconf -fiv
+# ./configure
+동일한에러발생
+
+# pacman -S --needed mingw-w64-x86_64-gcc
+경고: mingw-w64-x86_64-gcc-14.2.0-1는 최신 버전입니다 -- 건너뜀
+ 할 일이 없습니다
+PATH /mingw64/bin 있는지 확인 없으면 등록 C++, C 컴파일러경
+컴파일러 작동 확
+gcc는 C 코드에 대한 컴파일을 처리
+
+# gcc --version 
+g++ --version
+
+gcc**는 C 언어 소스 코드를 컴파일하는 도구
+C 전용 라이브러리 및 옵션을 기본적으로 설정
+gcc hello.c -o hello
+./hello
+gcc.exe (Rev1, Built by MSYS2 project) 14.2.0
+Copyright (C) 2024 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+g++ hello.cpp -o hello
+./hello
+g++는 C++ 코드에 대한 컴파일을 처리, C++ 언어 소스 코드를 컴파일하는 도구
+C++ 표준 라이브러리 및 C++ 전용 컴파일 옵션을 기본적으로 설정
+g++.exe (Rev1, Built by MSYS2 project) 14.2.0
+Copyright (C) 2024 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+# C 컴파일러 테스트
+nayou@kimnayooung MINGW64 /c/libidn2
+# echo -e '#include <stdio.h> \nint main() {printf("Hello\\n"); return 0;}' > test.c
+
+nayou@kimnayooung MINGW64 /c/libidn2
+# gcc test.c -o test
+
+nayou@kimnayooung MINGW64 /c/libidn2
+# ./test
+Hello
+
+# C++ 컴파일러 테스트
+nayou@kimnayooung MINGW64 /c/libidn2
+# echo -e '#include <iostream> \nint main(){std::cout << "Hello\\n";return 0;}' > test.cpp
+
+nayou@kimnayooung MINGW64 /c/libidn2
+# g++ test.cpp -o test
+
+nayou@kimnayooung MINGW64 /c/libidn2
+# ./test
+Hello
+
+no acceptable egrep could be found in /c/libidn2/autoconf-2.72/bin:/c/libidn2/libtool-2.4.6:/mingw64/bin:/usr/bin:/usr/share/aclocal:/mingw64/share/aclocal:/c/Program Files/Java/jdk-21/bin:/usr/local/bin:/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/c/Users/nayou/AppData/Local/Programs/Python/Python312:/usr/xpg4/bin
+pacman -S grep
+/usr/bin/egrep
+
+(오류)
+./configure: line 17405: `        gl_WARN_ADD("-W$w")'
+./configure: line 17405: syntax error near unexpected token `"-W$w"'
+
+/c/libidn2
+notepad configure.ac
+(수정)
+# Correct way to call gl_MANYWARN_COMPLEMENT
+gl_MANYWARN_COMPLEMENT "$desired_warning_options" "$possible_warning_options"
+gl_MANYWARN_COMPLEMENT "$remaining_undesired_warning_options" "$nw"
+
+# Process desired warning options
+for w in $desired_warning_options; do
+    gl_WARN_ADD $w
+done
+
+# Process remaining undesired warning options
+for w in `echo "$remaining_undesired_warning_options" | sed -e 's/-W/-Wno-/g'`; do
+   gl_WARN_ADD $w
+done
+
+(오류)
+: error: no acceptable egrep, fgrep, grep could be found in 
+/c/libidn2/autoconf-2.72/bin:/c/libidn2/libtool-2.4.6:/mingw64/bin:
+/usr/bin:
+/usr/share/aclocal:/mingw64/share/aclocal:
+/c/Program Files/Java/jdk-21/bin:/usr/local/bin:
+/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:
+/c/Windows/System32/WindowsPowerShell/v1.0:/usr/bin/site_perl:
+/usr/bin/vendor_perl:/usr/bin/core_perl:
+/c/Users/nayou/AppData/Local/Programs/Python/Python312:/usr/xpg4/bin
+
+# echo $PATH (위와 내용이 다름)
+/mingw64/bin:/usr/bin:/bin:/usr/share/aclocal:/mingw64/share/aclocal:/c/libidn2/autoconf-2.72/bin:/c/libidn2/libtool-2.4.6:/c/Program Files/Java/jdk-21/bin:/usr/local/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/c/Users/nayou/AppData/Local/Programs/Python/Python312
+
+환경변수갱신
+# source ~/.bashrc
+
+nayou@kimnayooung MINGW64 /c/libidn2
+# notepad configure
+
+nayou@kimnayooung MINGW64 /c/libidn2
+# which egrep
+/usr/bin/egrep
+
+nayou@kimnayooung MINGW64 /c/libidn2
+# which fgrep
+/usr/bin/fgrep
+
+nayou@kimnayooung MINGW64 /c/libidn2
+# which grep
+/usr/bin/grep
+
+환경변수조사
+# printenv
+ProgramFiles(x86)=C:\Program Files (x86)
+CommonProgramFiles(x86)=C:\Program Files (x86)\Common Files
+SHELL=/usr/bin/bash
+NUMBER_OF_PROCESSORS=16
+PROCESSOR_LEVEL=6
+TERM_PROGRAM_VERSION=3.7.4
+MINGW_PREFIX=/mingw64
+NVCUDASAMPLES11_5_ROOT=C:\ProgramData\NVIDIA Corporation\CUDA Samples\v11.8
+OPENCV_ENABLE_TBB=ON
+PKG_CONFIG_PATH=/mingw64/lib/pkgconfig:/mingw64/share/pkgconfig
+USERDOMAIN_ROAMINGPROFILE=KIMNAYOOUNG
+HOSTNAME=kimnayooung
+PROGRAMFILES=C:\Program Files
+PROTOBUF_HOME=C:\protobuf
+MSYSTEM=MINGW64
+PATHEXT=.COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC
+JAVA_HOME=C:\Program Files\Java\jdk-17;
+CUDNN_LIBRARY=C:\Program Files\NVIDIA\CUDNN\v9.1\lib\12.4\x64
+ORIGINAL_TEMP=/c/Users/nayou/AppData/Local/Temp
+CUDA_PATH_V12_1=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.1
+MINGW_CHOST=x86_64-w64-mingw32
+OS=Windows_NT
+HOMEDRIVE=C:
+MSYSTEM_CARCH=x86_64
+TBB_DIR=C:\Program Files (x86)\Intel\oneAPI\tbb\2021.12\bin
+USERDOMAIN=KIMNAYOOUNG
+TORCH_CUDA_HOME=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.1
+PWD=/c/libidn2
+GIT_LFS_PATH=C:\Program Files\Git LFS
+USERPROFILE=C:\Users\nayou
+TBB_ROOT=C:\Program Files (x86)\Intel\oneAPI\tbb\2021.12\bin
+OneDriveConsumer=C:\Users\nayou\OneDrive
+CUDNN_HOME=C:\Program Files\NVIDIA\CUDNN\v9.1
+MANPATH=/mingw64/local/man:/mingw64/share/man:/usr/local/man:/usr/share/man:/usr/man:/share/man
+TESSDATA_PREFIX=C:\Program Files (x86)\Tesseract-OCR\
+PRINTER=Kyocera ECOSYS M5521cdn
+CUDA_BIN_PATH=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.1\bin
+JAVA_HOME_21=C:\Program Files\Java\jdk-21
+VS140COMNTOOLS=C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\Tools\
+TZ=Asia/Seoul
+include=C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\um\x86;C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\lib\x86;C:\Program Files (x86)\Windows Kits\10\Lib\10.0.19041.0\ucrt\x86;C:\VulkanSDK\1.3.290.0\Include;C:\abseil-cpp\build\install\include;
+MINGW_PACKAGE_PREFIX=mingw-w64-x86_64
+ALLUSERSPROFILE=C:\ProgramData
+ORIGINAL_PATH=/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0/
+CommonProgramW6432=C:\Program Files\Common Files
+HOME=/home/nayou
+USERNAME=nayou
+VULKAN_SDK=C:\VulkanSDK\1.3.290.0
+LANG=ko_KR.UTF-8
+OneDrive=C:\Users\nayou\OneDrive
+COMSPEC=C:\Windows\system32\cmd.exe
+PROTOC=C:\protobuf\build\install\bin\protoc.exe
+CMAKE_PREFIX_PATH=C:\Qt\6.7.1\msvc2019_64\include
+APPDATA=C:\Users\nayou\AppData\Roaming
+NVCUDASAMPLES_ROOT=C:\ProgramData\NVIDIA Corporation\CUDA Samples\v11.8
+SYSTEMROOT=C:\Windows
+LOCALAPPDATA=C:\Users\nayou\AppData\Local
+CUDA_INCLUDE_PATH=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.1\include
+CUDA_TOOLKIT_ROOT_DIR=C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1
+COMPUTERNAME=KIMNAYOOUNG
+VK_SDK_PATH=C:\VulkanSDK\1.3.290.0
+INFOPATH=/mingw64/local/info:/mingw64/share/info:/usr/local/info:/usr/share/info:/usr/info:/share/info
+PYTHONPATH=C:\Users\nayou\AppData\Local\Programs\Python\Python312
+TERM=xterm
+LOGONSERVER=\\KIMNAYOOUNG
+ZES_ENABLE_SYSMAN=1
+CPLUS_INCLUDE_PATH=C:\Users\nayou\yaml-cpp\include
+ACLOCAL_PATH=/usr/share/aclocal:/mingw64/share/aclocal:/c/libidn2/m4
+NVCODEC_ROOT=C:\Video_Codec_SDK
+USER=nayou
+PSModulePath=C:\Program Files\WindowsPowerShell\Modules;C:\Windows\system32\WindowsPowerShell\v1.0\Modules
+NVTOOLSEXT_PATH=C:\Program Files\NVIDIA Corporation\NvToolsExt\
+LIBRARY_PATH=C:\protobuf\build\install\lib;C:\abseil-cpp\build\install\lib
+CUDA_PATH=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.1
+OPENCV_DIR=C:\opencv\build
+TEMP=/tmp
+BAZEL_SH=C:\msys64\usr\bin\bash.exe
+MSYSTEM_CHOST=x86_64-w64-mingw32
+ORIGINAL_TMP=/c/Users/nayou/AppData/Local/Temp
+SHLVL=1
+PROCESSOR_REVISION=ba02
+DriverData=C:\Windows\System32\Drivers\DriverData
+GRPC_JAVA_PLUGIN=c:\grpc-java\build\gradle\wrapper\protoc-gen-grpc-java.exe
+COMMONPROGRAMFILES=C:\Program Files\Common Files
+LD_LIBRARY_PATH=/c/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.8/lib/x64
+PROCESSOR_IDENTIFIER=Intel64 Family 6 Model 186 Stepping 2, GenuineIntel
+PS1=\[\e]0;\w\a\]\n\[\e[32m\]\u@\h \[\e[35m\]$MSYSTEM\[\e[0m\] \[\e[33m\]\w\[\e[0m\]\n\[\e[1m\]#\[\e[0m\]
+lib=C:\VulkanSDK\1.3.290.0\Lib
+MKLROOT=C:\Program Files (x86)\Intel\oneAPI\mkl
+PKG_CONFIG_SYSTEM_LIBRARY_PATH=/mingw64/lib
+CUDA_HOME=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.1
+HOMEPATH=\Users\nayou
+XDG_DATA_DIRS=/mingw64/share/:/usr/local/share/:/usr/share/
+MSYSCON=mintty.exe
+TMP=/tmp
+CONFIG_SITE=/etc/config.site
+PATH=/mingw64/bin:/usr/bin:/bin:/usr/share/aclocal:/mingw64/share/aclocal:/c/libidn2/autoconf-2.72/bin:/c/libidn2/libtool-2.4.6:/c/Program Files/Java/jdk-21/bin:/usr/local/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/c/Users/nayou/AppData/Local/Programs/Python/Python312
+CUDA_LIB_PATH=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.1\lib\x64
+ProgramW6432=C:\Program Files
+MSYSTEM_PREFIX=/mingw64
+QtMsBuild=C:\Users\nayou\AppData\Local\QtMsBuild
+WINDIR=C:\Windows
+PROCESSOR_ARCHITECTURE=AMD64
+PUBLIC=C:\Users\Public
+PKG_CONFIG_SYSTEM_INCLUDE_PATH=/mingw64/include
+SYSTEMDRIVE=C:
+BAZEL_VS=C:\Program Files (x86)\Microsoft Visual Studio\2019\Community
+OLDPWD=/home/nayou
+TERM_PROGRAM=mintty
+ProgramData=C:\ProgramData
+_=/usr/bin/printenv
+=>/c/libidn2/autoconf-2.72/bin로 시작되는 환경변수없음
+=>다시등록
+# export PATH='/mingw64/bin:/usr/bin:/bin:/usr/share/aclocal:/mingw64/share/aclocal:/c/libidn2/autoconf-2.72/bin:/c/libidn2/libtool-2.4.6:/c/Program Files/Java/jdk-21/bin:/usr/local/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/c/Users/nayou/AppData/Local/Programs/Python/Python312'
+MSYS2 패키지 설치 확인
+pacman -S base-devel mingw-w64-x86_64-toolchain
+
+nayou@kimnayooung MINGW64 /c/libidn2
+# which pkg-config
+/mingw64/bin/pkg-config
+
+nayou@kimnayooung MINGW64 /c/libidn2
+# which sed
+/usr/bin/sed
+
+nayou@kimnayooung MINGW64 /c/libidn2
+# which grep
+/usr/bin/grep
+
+# echo $PATH
+/mingw64/bin:/usr/bin:/bin:/usr/share/aclocal:/mingw64/share/aclocal:/c/libidn2/autoconf-2.72/bin:/c/libidn2/libtool-2.4.6:/c/Program Files/Java/jdk-21/bin:/usr/local/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/c/Users/nayou/AppData/Local/Programs/Python/Python312
+# pacman -S pkg-config sed grep egrep fgrep
+경고: pkgconf-2.3.0-1는 최신 버전입니다. -- 재설치
+경고: sed-4.9-1는 최신 버전입니다. -- 재설치
+경고: grep-1~3.0-6는 최신 버전입니다. -- 재설치
+grep)오류: 대상이 없습니다: egrep
+grep)오류: 대상이 없습니다: fgrep
+
+notepad ~/.bashrc
+#추가
+export CPP=/mingw64/bin/cpp
+export CC=/mingw64/bin/gcc
+export CXX=/mingw64/bin/g++
+./run_configure.sh
+C preprocessor /mingw64/bin/cpp fails sanity check" 오류는 cpp 명령어가 올바르게 작동하지 않거나, cpp의 환경 설정이 잘못되어 있다는 것을 의미
+CPP동작확
+nayou@kimnayooung MINGW64 /c/libidn2
+# echo "int main() { return 0; }" | cpp -E -
+# 0 "<stdin>"
+# 0 "<built-in>"
+# 0 "<command-line>"
+# 1 "<stdin>"
+int main() { return 0; }
+오류 메시지가 없다면 cpp는 정상적으로 작동하는 것
+
+gcc와 cpp의 버전이 일치하는지 확인
+# /mingw64/bin/gcc --version
+/mingw64/bin/cpp --version
+\gcc.exe (Rev1, Built by MSYS2 project) 14.2.0
+Copyright (C) 2024 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+cpp.exe (Rev1, Built by MSYS2 project) 14.2.0
+Copyright (C) 2024 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+패키지 확인 및 재설치
+pacman -Syu mingw-w64-x86_64-gcc
+config.log 확인
+
+nayou@kimnayooung MINGW64 /c/libidn2
+# echo $CC
+/mingw64/bin/gcc
+
+nayou@kimnayooung MINGW64 /c/libidn2
+# export CC=/mingw64/bin/gcc
+
+nayou@kimnayooung MINGW64 /c/libidn2
+# echo $CXX
+/mingw64/bin/g++
+
+nayou@kimnayooung MINGW64 /c/libidn2
+# export CXX=/mingw64/bin/g++
+
+(오류)
+pkg-config not found
+export PKG_CONFIG=/mingw64/bin/pkg-config
+
+nayou@kimnayooung MINGW64 /c/libidn2
+# notepad ~/.bashrc
+#추가
+export CPP=/mingw64/bin/cpp
+export CC=/mingw64/bin/gcc
+export CXX=/mingw64/bin/g++
+export PKG_CONFIG=/mingw64/bin/pkg-config
+export SED=/usr/bin/sed
+export GREP=/usr/bin/grep
+export FGREP=/usr/bin/fgrep
+export EGREP=/usr/bin/egrep
+성공!
+(오류)
+: error: C preprocessor "/mingw64/bin/cpp" fails sanity check
+: error: in '/c/libidn2':
+
+nayou@kimnayooung MINGW64 /c/libidn2
+# gcc -v
+Using built-in specs.
+COLLECT_GCC=C:\msys64\mingw64\bin\gcc.exe
+COLLECT_LTO_WRAPPER=C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/lto-wrapper.exe
+Target: x86_64-w64-mingw32
+Configured with: ../gcc-14.2.0/configure --prefix=/mingw64 --with-local-prefix=/mingw64/local --build=x86_64-w64-mingw32 --host=x86_64-w64-mingw32 --target=x86_64-w64-mingw32 --with-native-system-header-dir=/mingw64/include --libexecdir=/mingw64/lib --enable-bootstrap --enable-checking=release --with-arch=nocona --with-tune=generic --enable-languages=c,lto,c++,fortran,ada,objc,obj-c++,rust,jit --enable-shared --enable-static --enable-libatomic --enable-threads=posix --enable-graphite --enable-fully-dynamic-string --enable-libstdcxx-filesystem-ts --enable-libstdcxx-time --disable-libstdcxx-pch --enable-lto --enable-libgomp --disable-libssp --disable-multilib --disable-rpath --disable-win32-registry --disable-nls --disable-werror --disable-symvers --with-libiconv --with-system-zlib --with-gmp=/mingw64 --with-mpfr=/mingw64 --with-mpc=/mingw64 --with-isl=/mingw64 --with-pkgversion='Rev1, Built by MSYS2 project' --with-bugurl=https://github.com/msys2/MINGW-packages/issues --with-gnu-as --with-gnu-ld --disable-libstdcxx-debug --enable-plugin --with-boot-ldflags=-static-libstdc++ --with-stage1-ldflags=-static-libstdc++
+Thread model: posix
+Supported LTO compression algorithms: zlib zstd
+gcc version 14.2.0 (Rev1, Built by MSYS2 project)
+
+C Preprocessor Sanity Check Failed
+nayou@kimnayooung MINGW64 /c/libidn2
+gcc -v와 cpp -v를 실행하여 컴파일러와 전처리기가 올바르게 설정되었는지 확인
+# cpp -v
+Using built-in specs.
+COLLECT_GCC=C:\msys64\mingw64\bin\cpp.exe
+Target: x86_64-w64-mingw32
+Configured with: ../gcc-14.2.0/configure --prefix=/mingw64 --with-local-prefix=/mingw64/local --build=x86_64-w64-mingw32 --host=x86_64-w64-mingw32 --target=x86_64-w64-mingw32 --with-native-system-header-dir=/mingw64/include --libexecdir=/mingw64/lib --enable-bootstrap --enable-checking=release --with-arch=nocona --with-tune=generic --enable-languages=c,lto,c++,fortran,ada,objc,obj-c++,rust,jit --enable-shared --enable-static --enable-libatomic --enable-threads=posix --enable-graphite --enable-fully-dynamic-string --enable-libstdcxx-filesystem-ts --enable-libstdcxx-time --disable-libstdcxx-pch --enable-lto --enable-libgomp --disable-libssp --disable-multilib --disable-rpath --disable-win32-registry --disable-nls --disable-werror --disable-symvers --with-libiconv --with-system-zlib --with-gmp=/mingw64 --with-mpfr=/mingw64 --with-mpc=/mingw64 --with-isl=/mingw64 --with-pkgversion='Rev1, Built by MSYS2 project' --with-bugurl=https://github.com/msys2/MINGW-packages/issues --with-gnu-as --with-gnu-ld --disable-libstdcxx-debug --enable-plugin --with-boot-ldflags=-static-libstdc++ --with-stage1-ldflags=-static-libstdc++
+Thread model: posix
+Supported LTO compression algorithms: zlib zstd
+gcc version 14.2.0 (Rev1, Built by MSYS2 project)
+COLLECT_GCC_OPTIONS='-E' '-v' '-mtune=generic' '-march=nocona'
+ C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/cc1.exe -E -quiet -v -iprefix C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/ -D_REENTRANT - -mtune=generic -march=nocona -dumpbase -
+ignoring nonexistent directory "C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/include"
+ignoring duplicate directory "C:/msys64/mingw64/lib/gcc/../../lib/gcc/x86_64-w64-mingw32/14.2.0/include"
+ignoring nonexistent directory "D:/a/msys64/mingw64/include"
+ignoring nonexistent directory "/mingw64/include"
+ignoring duplicate directory "C:/msys64/mingw64/lib/gcc/../../lib/gcc/x86_64-w64-mingw32/14.2.0/include-fixed"
+ignoring nonexistent directory "C:/msys64/mingw64/lib/gcc/../../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/include"
+ignoring nonexistent directory "D:/a/msys64/mingw64/include"
+#include "..." search starts here:
+#include <...> search starts here:
+ C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/include
+ C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../include
+ C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/include-fixed
+End of search list.
+
+gettext Library Not Found
+pacman -S mingw-w64-x86_64-gettext
+PKG_CONFIG_PATH를 설정
+notepad ~/.bashrc
+export CPP=/mingw64/bin/cpp
+export CC=/mingw64/bin/gcc
+export CXX=/mingw64/bin/g++
+export PKG_CONFIG=/mingw64/bin/pkg-config
+export PKG_CONFIG_PATH=/mingw64/lib/pkgconfig:/usr/lib/pkgconfig
+export SED=/usr/bin/sed
+export GREP=/usr/bin/grep
+export FGREP=/usr/bin/fgrep
+export EGREP=/usr/bin/egrep
+=>soruce ~/.bashrc
+
+iconv Library Not Found
+문자 인코딩 변환을 위해 필요한 라이브러리
+pacman -S mingw-w64-x86_64-gettext mingw-w64-x86_64-libiconv
+
+nayou@kimnayooung MINGW64 /mingw64/lib/pkgconfig
+# notepad iconv.pc
+
+# pacman -Q pkg-config
+pacman -Q mingw-w64-x86_64-libiconv
+pkgconf 2.3.0-1
+mingw-w64-x86_64-libiconv 1.17-4
+=> 이렇게 안나오면 설치 pacman -S pkg-config
+
+notepad /mingw64/lib/pkgconfig/iconv 확인 없으면 생성
+prefix=/mingw64
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: iconv
+Description: libiconv
+URL: https://www.gnu.org/software/libiconv/
+Version: 1.17
+Libs: -L${libdir} -liconv
+Cflags: -I${includedir}
+
+pkg-config가 올바른 .pc 파일을 찾을 수 있도록 설정
+export PKG_CONFIG_PATH=/mingw64/lib/pkgconfig:/usr/lib/pkgconfig
+CFLAGS, CPPFLAGS, LDFLAGS: 헤더 파일과 라이브러리 경로를 올바르게 설정
+nayou@kimnayooung MINGW64 /c/libidn2
+# export CFLAGS="-I/mingw64/include"
+export CPPFLAGS="-I/mingw64/include"
+export LDFLAGS="-L/mingw64/lib"
+pkg-config 명령어 확인
+
+# pkg-config --cflags gettext
+pkg-config --libs gettext
+Package gettext was not found in the pkg-config search path.
+Perhaps you should add the directory containing `gettext.pc'
+to the PKG_CONFIG_PATH environment variable
+Package 'gettext' not found
+Package gettext was not found in the pkg-config search path.
+Perhaps you should add the directory containing `gettext.pc'
+to the PKG_CONFIG_PATH environment variable
+Package 'gettext' not found
+
+nayou@kimnayooung MINGW64 /c/libidn2
+#
+pkg-config --cflags iconv
+pkg-config --libs iconv
+
+-liconv
+
+nayou@kimnayooung MINGW64 /mingw64/lib/pkgconfig
+# ls -l /mingw64/lib/pkgconfig/iconv.pc
+-rw-r--r-- 1 nayou nayou 235  2월  2  2024 /mingw64/lib/pkgconfig/iconv.pc
+
+nayou@kimnayooung MINGW64 /mingw64/lib/pkgconfig
+# ls -l /mingw64/lib/pkgconfiggettext.pc
+ls: cannot access '/mingw64/lib/pkgconfiggettext.pc': No such file or directory
+
+# pkg-config --cflags gettext
+pkg-config --libs gettext
+Package gettext was not found in the pkg-config search path.
+Perhaps you should add the directory containing `gettext.pc'
+to the PKG_CONFIG_PATH environment variable
+Package 'gettext' not found
+Package gettext was not found in the pkg-config search path.
+Perhaps you should add the directory containing `gettext.pc'
+to the PKG_CONFIG_PATH environment variable
+Package 'gettext' not found
 
