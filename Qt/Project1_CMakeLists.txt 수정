@@ -4044,5 +4044,40 @@ echo "Makefile.am : WOE32DLL is set to: $WOE32DLL"
 echo "Makefile.am : WOE32 is set to: $WOE32"
 
 순차실행 에러만 출력
-autoreconf -ivf 2>&1 | grep -i 'error' && ./configure 2>&1 | grep -i 'error' && make 2>&1 | grep -i 'error'
+autoreconf -ivf 2>&1 | grep -Ei 'not|error|오류|undefined|warning' && ./configure 2>&1 | grep -Ei 'not|error|오류|undefined|warning' && make 2>&1 | grep -Ei 'not|error|오류|undefined|warning'
+각 명령어출력후 에러 출력
+echo "Running: autoreconf -ivf" && autoreconf -ivf 2>&1 | tee autoreconf.log | grep -Ei '멈춤|not|error|오류|undefined|warning' && \
+echo "Running: ./configure" && ./configure 2>&1 | tee configure.log | grep -Ei '멈춤|not|error|오류|undefined|warning' && \
+echo "Running: make" && make 2>&1 | tee make.log | grep -Ei '멈춤|not|error|오류|undefined|warning' && \
+echo "Running: make install" && make install 2>&1 | tee make_install.log | grep -Ei '멈춤|not|error|오류|undefined|warning'
 
+Running: autoreconf -ivf
+autoreconf: export WARNINGS=
+autoreconf: configure.ac: not using Gettext
+autoreconf: configure.ac: not using Intltool
+autoreconf: configure.ac: not using Gtkdoc
+Running: ./configure
+checking for error.h... yes
+checking whether C compiler handles -Werror -Wunknown-warning-option... no
+checking for C compiler option to inhibit all warnings... -w
+checking for a sed that does not truncate output... /usr/bin/sed
+checking for error... no
+checking whether error_at_line is declared... no
+checking whether strerror_r is declared... no
+checking whether strerror_r returns char *... no
+checking whether strerror(0) succeeds... yes
+checking for C compiler option to allow warnings... -Wno-error
+checking for C++ compiler option to allow warnings... -Wno-error
+/components.xml: line 1: syntax error near unexpected token `newline'
+Running: make
+Makefile:2522: *** 분리 기호가 빠졌음.  멈춤.
+Running: make install
+Makefile:2522: *** 분리 기호가 빠졌음.  멈춤.
+(디버깅)
+/components.xml: line 1: syntax error near unexpected token `newline'
+파일 지우고 생성함
+touch /components.xml
+Makefile:2522: *** 분리 기호가 빠졌음.  멈춤.
+Makefile 수정
+AM_CONDITIONAL([WOE32DLL], [test $host_os = mingw32])
+=>AM_CONDITIONAL([WOE32DLL], [test "$host_os" = "mingw32"])
