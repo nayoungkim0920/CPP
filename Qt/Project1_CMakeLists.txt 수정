@@ -4031,6 +4031,18 @@ else
   libtextstyle_la_LDFLAGS = -no-undefined
 endif
 
+configure.ac
+AM_CONDITIONAL([WOE32DLL], [test $host_os = mingw32])
+AM_CONDITIONAL([WOE32], [test $host_os = mingw32])
+echo "configure.ac : WOE32DLL is set to: $WOE32DLL"
+echo "configure.ac : WOE32 is set to: $WOE32"
+
+makefile.am
+AM_CONDITIONAL([WOE32DLL], [test $host_os = mingw32])
+AM_CONDITIONAL([WOE32], [test $host_os = mingw32])
+echo "Makefile.am : WOE32DLL is set to: $WOE32DLL"
+echo "Makefile.am : WOE32 is set to: $WOE32"
+
 순차실행 에러만 출력
 autoreconf -ivf 2>&1 | grep -i 'error' && ./configure 2>&1 | grep -i 'error' && make 2>&1 | grep -i 'error'
 
