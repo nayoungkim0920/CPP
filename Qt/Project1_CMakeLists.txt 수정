@@ -3414,4 +3414,246 @@ c/libidn2: 특정 프로젝트나 소스 코드에 관련된 별도의 디렉터
 특정 프로젝트나 라이브러리만을 위한 경로입니다.
 ./configure --prefix=/mingw64
 
-make 2>&1 | grep -i -e 'error' -e 'warning' -e 'not' | sort | uniq
+# make 2>&1 | grep -E "(error|not|오류|warning|undefined)"
+(오류)
+## You can ignore compiler warnings in this directory.  ##
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: hello.o:hello.c:(.text+0x140): undefined reference to `__imp_color_test_mode'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: hello.o:hello.c:(.text+0x15d): undefined reference to `__imp_color_mode'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: hello.o:hello.c:(.text+0x16b): undefined reference to `__imp_color_mode'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: hello.o:hello.c:(.text+0x19b): undefined reference to `__imp_color_mode'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: hello.o:hello.c:(.text+0x1a9): undefined reference to `__imp_style_file_name'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: hello.o:hello.c:(.text+0x1b8): undefined reference to `__imp_style_file_name'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: hello.o:hello.c:(.text+0x1cb): undefined reference to `__imp_style_file_name'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: hello.o:hello.c:(.text+0x1d9): undefined reference to `__imp_color_mode'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: hello.o:hello.c:(.text+0x1e7): undefined reference to `__imp_style_file_name'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: hello.o:hello.c:(.text+0x214): undefined reference to `__imp_style_file_name'
+collect2.exe: error: ld returned 1 exit status
+make[4]: *** [Makefile:1784: hello.exe] 오류 1
+make[3]: *** [Makefile:1999: all-recursive] 오류 1
+make[2]: *** [Makefile:1927: all] 오류 2
+make[1]: *** [Makefile:408: all-recursive] 오류 1
+make: *** [Makefile:364: all] 오류 2
+
+undefined reference to '__imp_color_test_mode'
+특정 심볼(__imp_color_test_mode)에 대한 참조가 정의되지 않았음을 의미
+라이브러리 링크 확인: libtextstyle이 올바르게 링크되었는지 확인
+pacman -S mingw-w64-x86_64-libtextstyle
+오류: 대상이 없습니다: mingw-w64-x86_64-libtextstyle
+https://packages.msys2.org/package/db?repo=msys&variant=x86_64 패키지검색
+없음
+구글 검색 
+https://github.com/autotools-mirror/gettext/tree/master/libtextstyle
+일단 파일이 있는 지 확인
+/c/libidn2/gettext-0.22.5/libtextstyle
+ls
+aclocal.m4   config.h.in    doc              lib          README
+adhoc-tests  config.log     examples         libtool      stamp-h1
+AUTHORS      config.status  gnulib-local     m4           tests
+autogen.sh   configure      gnulib-m4        Makefile     version.sh
+build-aux    configure.ac   HACKING          Makefile.am
+ChangeLog    COPYING        INSTALL          Makefile.in
+config.h     DEPENDENCIES   INSTALL.windows  NEWS
+있어서
+libtextstyle을 빌드하고 설치
+make, gcc, autoconf, automake 등이 필요, MSYS2 패키지 매니저를 사용
+pacman -S base-devel
+
+구성(Configuration)
+시스템에 맞게 패키지 빌드 환경을 설정
+./configure
+
+소스 코드를 컴파일
+make
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# make 2>&1 | grep -E "(error|not|오류|warning|undefined)"
+## You can ignore compiler warnings in this directory.  ##
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: hello.o:hello.c:(.text+0x140): undefined reference to `__imp_color_test_mode'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: hello.o:hello.c:(.text+0x15d): undefined reference to `__imp_color_mode'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: hello.o:hello.c:(.text+0x16b): undefined reference to `__imp_color_mode'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: hello.o:hello.c:(.text+0x19b): undefined reference to `__imp_color_mode'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: hello.o:hello.c:(.text+0x1a9): undefined reference to `__imp_style_file_name'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: hello.o:hello.c:(.text+0x1b8): undefined reference to `__imp_style_file_name'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: hello.o:hello.c:(.text+0x1cb): undefined reference to `__imp_style_file_name'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: hello.o:hello.c:(.text+0x1d9): undefined reference to `__imp_color_mode'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: hello.o:hello.c:(.text+0x1e7): undefined reference to `__imp_style_file_name'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: hello.o:hello.c:(.text+0x214): undefined reference to `__imp_style_file_name'
+collect2.exe: error: ld returned 1 exit status
+make[2]: *** [Makefile:1784: hello.exe] 오류 1
+make[1]: *** [Makefile:1999: all-recursive] 오류 1
+make: *** [Makefile:1927: all] 오류 2
+
+"C:\libidn2\gettext-0.22.5\libtextstyle\Makefile"
+LIBS += -ltextstyle #추가
+LDFLAGS = -L/mingw64/lib -ltextstyle #추가
+nayou@kimnayooung MINGW64 /mingw64/lib
+# ls libtextstyle*
+libtextstyle.a  libtextstyle.la
+libtextstyle.a 파일이 있는 경로가 lib
+기존 빌드 캐시를 정리하고 빌드를 시도
+make clean
+make 2>&1 | grep -E "(error|not|오류|warning|undefined)"
+C:/msys64/mingw64/include/c++/14.2.0/cstdlib:79:15: fatal error: stdlib.h: No such file or directory
+make[6]: *** [Makefile:1475: autosprintf.lo] 오류 1
+make[5]: *** [Makefile:1655: all-recursive] 오류 1
+make[4]: *** [Makefile:1354: all] 오류 2
+make[3]: *** [Makefile:1852: all-recursive] 오류 1
+make[2]: *** [Makefile:1757: all] 오류 2
+make[1]: *** [Makefile:408: all-recursive] 오류 1
+make: *** [Makefile:364: all] 오류 2
+stdlib.h 같은 표준 라이브러리 파일이 누락되었거나 경로 설정이 잘못되었음
+패키지 업데이트
+pacman -Syu
+C++ 컴파일러와 관련 패키지 재설치
+pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-headers mingw-w64-x86_64-crt
+C++ 헤더 파일 경로 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5
+# ls /mingw64/include/stdlib.h
+/mingw64/include/stdlib.h
+
+PATH에 /mingw64/bin포함확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5
+# echo $PATH
+/mingw64/bin:/usr/bin:/bin:/usr/share/aclocal:/mingw64/share/aclocal:/c/libidn2/autoconf-2.72/bin:/c/libidn2/libtool-2.4.6:/c/Program Files/Java/jdk-21/bin:/usr/local/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/c/Users/nayou/AppData/Local/Programs/Python/Python312
+# echo $C_INCLUDE_PATH
+/mingw64/include
+# echo $CPLUS_INCLUDE_PATH
+/mingw64/include
+# gcc --version
+g++ --version
+gcc.exe (Rev1, Built by MSYS2 project) 14.2.0
+Copyright (C) 2024 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+g++.exe (Rev1, Built by MSYS2 project) 14.2.0
+Copyright (C) 2024 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+MSYS2 패키지 설치
+pacman -S mingw-w64-x86_64-toolchain
+컴파일 옵션 및 설정 확인
+"C:\libidn2\gettext-0.22.5\libtextstyle\Makefile"
+CFLAGS = -I/mingw64/include
+CXX = /mingw64/bin/g++
+CXXFLAGS = -I/mingw64/include
+컴파일러직접정하기 예)g++ -I/mingw64/include -o myprogram myprogram.cpp
+MSYS2 패키지 재설치
+pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-headers mingw-w64-x86_64-crt
+컴파일러 및 라이브러리 재설치
+pacman -Syu mingw-w64-x86_64-toolchain
+패키지 관리 데이터베이스 갱신
+pacman -Syu
+빌드 캐시 정리
+make clean
+빌드 재시도
+make 2>&1 | grep -E "(error|not|오류|warning|undefined)"
+(에러)
+...
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: hello.o:hello.c:(.text+0x140): undefined reference to __imp_color_test_mode'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: hello.o:hello.c:(.text+0x15d): undefined reference to __imp_color_mode'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: hello.o:hello.c:(.text+0x16b): undefined reference to __imp_color_mode'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: hello.o:hello.c:(.text+0x19b): undefined reference to __imp_color_mode'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: hello.o:hello.c:(.text+0x1a9): undefined reference to __imp_style_file_name'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: hello.o:hello.c:(.text+0x1b8): undefined reference to __imp_style_file_name'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: hello.o:hello.c:(.text+0x1cb): undefined reference to __imp_style_file_name'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: hello.o:hello.c:(.text+0x1d9): undefined reference to __imp_color_mode'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: hello.o:hello.c:(.text+0x1e7): undefined reference to __imp_style_file_name'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: hello.o:hello.c:(.text+0x214): undefined reference to __imp_style_file_name'
+collect2.exe: error: ld returned 1 exit status
+make[2]: *** [Makefile:1784: hello.exe] 오류 1
+make[1]: *** [Makefile:2003: all-recursive] 오류 1
+make: *** [Makefile:1931: all] 오류 2
+심볼 정의가 포함된 헤더 파일을 찾고, 헤더 파일이 코드와 일치하는지 확인
+헤더 파일 위치 확인
+color_test_mode라는 심볼이 정의된 파일
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# echo $C_INCLUDE_PATH
+/mingw64/include
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# find $C_INCLUDE_PATH -name "*.h" | grep "color"
+/mingw64/include/colordlg.h
+/mingw64/include/gdiplus/gdipluscolor.h
+/mingw64/include/gdiplus/gdipluscolormatrix.h
+없음
+
+__imp_color_test_mode, __imp_color_mode, __imp_style_file_name 라이브러리를 찾을 수 없음
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls /mingw64/include/textstyle
+stdbool.h  version.h  woe32dll.h
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -r "color_test_mode" /mingw64/include/textstyle
+grep -r "color_mode" /mingw64/include/textstyle
+grep -r "style_file_name" /mingw64/include/textstyle
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# nm -g /mingw64/lib/libtextstyle.a | grep "color_test_mode"
+nm -g /mingw64/lib/libtextstyle.a | grep "color_mode"
+nm -g /mingw64/lib/libtextstyle.a | grep "style_file_name"
+0000000000000000 B color_test_mode
+0000000000000000 D color_mode
+0000000000000008 B style_file_name
+libtextstyle.a 라이브러리 파일에서 color_test_mode, color_mode, style_file_name 기호를 찾을 수 있다는 것은 
+이 라이브러리가 이러한 기호를 정의하고 있음을 나타낸다
+undefined reference 오류가 발생하는 이유는 링크 시에 올바른 기호를 참조하지 못하거나, 
+링크 시 순서나 설정이 올바르지 않기 때문
+종속성이 있는 라이브러리를 먼저 링크하고, 그에 의존하는 라이브러리를 나중에 링크
+nm 명령어의 결과에서 기호가 B (BSS 섹션, 초기화되지 않은 데이터) 또는 D (데이터 섹션)로 표시되는 것을 확인할 수 있습니다. 
+이들은 전역 변수가 선언된 위치를 나타낸다.
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# find . -name "hello.o"
+./adhoc-tests/hello.o
+libtextstyle이 정확히 링크되고 있는지 확인
+libtextstyle이 동적라이브러리로 컴파일되었는데 정적라이브러리를 사용하려다보니 충돌이 일어난것
+libtextstyle을 정적라이브러리로 컴파일하기로함
+libtextstyle의 소스 코드가 있는 디렉터리로 이동
+./configure --enable-static --disable-shared
+make
+make install
+확인
+정적 라이브러리 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls /mingw64/lib/libtextstyle.a
+/mingw64/lib/libtextstyle.a
+링커 명령어 확인(라이브러리를 링크하는 순서가 중요, -Wl,--no-as-needed 플래그를 추가하여 링커가 필요 없는 라이브러리를 제외하지 않도록 설정)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# gcc -o hello ./adhoc-tests/hello.o -L/mingw64/lib -ltextstyle -lncurses -lws2_32 -lkernel32 -luser32 -lgdi32
+(gcc -o hello ./adhoc-tests/hello.o -L/mingw64/lib -lncurses -lws2_32 -ltextstyle)
+헤더 파일과 심볼 확인
+find /mingw64/include -name "textstyle.h"
+(만약 누락되었다면 
+find /c/libidn2/gettext-0.22.5/libtextstyle -name "textstyle.h"
+cp /c/libidn2/gettext-0.22.5/libtextstyle/textstyle.h /mingw64/include/)
+/mingw64/include/textstyle.h
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep "color_test_mode" /mingw64/include/textstyle.h
+grep "color_mode" /mingw64/include/textstyle.h
+grep "style_file_name" /mingw64/include/textstyle.h
+extern LIBTEXTSTYLE_DLL_VARIABLE bool color_test_mode;
+extern LIBTEXTSTYLE_DLL_VARIABLE enum color_option color_mode;
+extern LIBTEXTSTYLE_DLL_VARIABLE const char *style_file_name;
+/* Assign a default value to style_file_name if necessary.
+
+hello.o의 심볼
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# nm -g ./adhoc-tests/hello.o | grep "color_test_mode"
+nm -g ./adhoc-tests/hello.o | grep "color_mode"
+nm -g ./adhoc-tests/hello.o | grep "style_file_name"
+0000000000000000 R .refptr.color_test_mode
+                 U color_test_mode
+0000000000000000 R .refptr.color_mode
+                 U color_mode
+0000000000000000 R .refptr.style_file_name
+                 U style_file_name
+
+libtextstyle.a 파일의 심볼 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# nm -g /mingw64/lib/libtextstyle.a | grep "color_test_mode"
+nm -g /mingw64/lib/libtextstyle.a | grep "color_mode"
+nm -g /mingw64/lib/libtextstyle.a | grep "style_file_name"
+0000000000000000 B color_test_mode
+0000000000000000 D color_mode
+0000000000000008 B style_file_name
+
+make 2>&1 | grep -E "(error|not|오류|warning|undefined)"
