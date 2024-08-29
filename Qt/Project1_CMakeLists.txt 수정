@@ -3657,3 +3657,154 @@ nm -g /mingw64/lib/libtextstyle.a | grep "style_file_name"
 0000000000000008 B style_file_name
 
 make 2>&1 | grep -E "(error|not|오류|warning|undefined)"
+(에러)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# cp /mingw64/lib/libtextstyle.la /c/libidn2/gettext-0.22.5/libtextstyle/lib/
+/c/libidn2/gettext-0.22.5/libtextstyle/lib/libtextstyle.a 생성되야함
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5
+# make 2>&1 | grep -E "(error|not|오류|warning|undefined)"
+## You can ignore compiler warnings in this directory.  ##
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: hello.o:hello.c:(.text+0x140): undefined reference to `__imp_color_test_mode'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: hello.o:hello.c:(.text+0x15d): undefined reference to `__imp_color_mode'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: hello.o:hello.c:(.text+0x16b): undefined reference to `__imp_color_mode'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: hello.o:hello.c:(.text+0x19b): undefined reference to `__imp_color_mode'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: hello.o:hello.c:(.text+0x1a9): undefined reference to `__imp_style_file_name'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: hello.o:hello.c:(.text+0x1b8): undefined reference to `__imp_style_file_name'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: hello.o:hello.c:(.text+0x1cb): undefined reference to `__imp_style_file_name'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: hello.o:hello.c:(.text+0x1d9): undefined reference to `__imp_color_mode'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: hello.o:hello.c:(.text+0x1e7): undefined reference to `__imp_style_file_name'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: hello.o:hello.c:(.text+0x214): undefined reference to `__imp_style_file_name'
+collect2.exe: error: ld returned 1 exit status
+make[4]: *** [Makefile:1784: hello.exe] 오류 1
+make[3]: *** [Makefile:1999: all-recursive] 오류 1
+make[2]: *** [Makefile:1927: all] 오류 2
+make[1]: *** [Makefile:408: all-recursive] 오류 1
+make: *** [Makefile:364: all] 오류 2
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5
+# cd libtextstyle
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+aclocal은 configure.ac 파일에 정의된 매크로를 처리하여 aclocal.m4 파일을 생성
+# aclocal
+configure.ac:25: error: AC_INIT should be called with package and version arguments
+/usr/share/aclocal-1.16/init.m4:29: AM_INIT_AUTOMAKE is expanded from...
+configure.ac:25: the top level
+autom4te: error: /usr/bin/m4 failed with exit status: 1
+aclocal-1.16: error: autom4te failed with exit status: 1
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# aclocal
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+configure.ac 또는 configure.in 파일을 바탕으로 configure 스크립트를 생성
+# autoconf
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+automake는 Makefile.am 파일을 바탕으로 Makefile.in 파일을 생성
+# automake --add-missing
+(오류)
+C:\libidn2\gettext-0.22.5\libtextstyle
+Makefile.am과 Makefile.gnulib 오류
+
+Makefile.am 수정
+subdir-objects 옵션이 활성화
+Makefile.am 파일 Makefile.am 파일의 최상단에 추가
+AM_DEFAULT_OPTIONS = subdir-objects
+=> AUTOMAKE_OPTIONS = subdir-objects 수정
+#추가 configure.ac 와 맞춰준다
+# 조건부 설정: WOE32 조건이 활성화되면 추가 소스 파일을 포함합니다.
+if WOE32
+libtextstyle_la_SOURCES += lib/woe32-specific.c
+endif
+
+# 조건부 설정: WOE32DLL 조건이 활성화되면 DLL 관련 설정을 추가합니다.
+if WOE32DLL
+libtextstyle_la_LDFLAGS = -export-dynamic
+endif
+
+configure.ac 수정
+AC_INIT([libtextstyle], [0.1], [bug-libtextstyle@example.com]) #수정
+
+# Check for host type and setup conditionals.
+case "$host_os" in
+  mingw* | cygwin*) is_woe32=yes ;;
+  *) is_woe32=no ;;
+esac
+AM_CONDITIONAL([WOE32], [test $is_woe32 = yes])
+
+if test "$enable_shared" = yes; then
+  case "$host_os" in
+    mingw* | cygwin*) is_woe32dll=yes ;;
+    *) is_woe32dll=no ;;
+  esac
+else
+  is_woe32dll=no
+fi
+AM_CONDITIONAL([WOE32DLL], [test $is_woe32dll = yes])
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# automake --add-missing
+Makefile.am:32: but option 'subdir-objects' is disabled
+#AM_DEFAULT_OPTIONS = subdir-objects #추가 subdir-objects 옵션이 활성화
+AUTOMAKE_OPTIONS = subdir-objects
+Makefile.am:32: warning: source file 'lib/foo.c' is in a subdirectory,
+libtool을 사용하는 라이브러리와 일반 컴파일 설정 간의 충돌로 인해 오브젝트 파일이 두 번 생성되었음을 의미
+모든 라이브러리와 프로그램 설정이 libtool을 사용하도록 되어 있는지 확인
+Makefile.am의 lib_LTLIBRARIES, noinst_LTLIBRARIES 또는 기타 관련 설정을 검토
+Automake의 Makefile.am에서 라이브러리의 설치 및 관리 방법을 정의하는데 사용되는 변수
+lib_LTLIBRARIES = libtextstyle.la
+noinst_LTLIBRARIES = # 단순히 설정하지 않은 것
+=>noinst_LTLIBRARIES = foo.la bar.la #foo와 bar라는 라이브러리는 설치되지 않지만 빌드시엔 사용될 수 있다.
+lib/Makefile.am:48: error: INCLUDED_LIBXML does not appear in AM_CONDITIONAL
+AM_CONDITIONAL에 정의된 조건이 Makefile.am에서 사용되지 않거나, 해당 조건이 정의되지 않은 경우
+configure.ac에서 조건 정의 확인
+#수정 시작
+# Check for host type and setup conditionals.
+case "$host_os" in
+  mingw* | cygwin*) is_woe32=yes ;;
+  *) is_woe32=no ;;
+esac
+AM_CONDITIONAL([WOE32], [test $is_woe32 = yes])
+
+# Check if shared libraries are enabled
+if test "$enable_shared" = yes; then
+  case "$host_os" in
+    mingw* | cygwin*) is_woe32dll=yes ;;
+    *) is_woe32dll=no ;;
+  esac
+else
+  is_woe32dll=no
+fi
+AM_CONDITIONAL([WOE32DLL], [test $is_woe32dll = yes])
+
+# For substitution in woe32dll.in.h
+if test $is_woe32dll = yes; then
+  DLL_VARIABLE='__declspec (dllimport)'
+else
+  DLL_VARIABLE=
+fi
+AC_SUBST([DLL_VARIABLE])
+
+# Initialize GNU libtool
+LT_INIT
+
+#수정 끝
+makefile.am
+# 수정시작
+lib_LTLIBRARIES = libtextstyle.la 
+
+# Add a static library rule
+noinst_LIBRARIES = libtextstyle.a
+
+# Conditional source files and flags
+if WOE32
+libtextstyle_la_SOURCES += lib/woe32-specific.c
+endif
+
+if WOE32DLL
+libtextstyle_la_LDFLAGS = -export-dynamic
+endif
+
+# Example of conditional inclusion based on external requirements
+if INCLUDED_LIBXML
+libtextstyle_la_SOURCES += lib/xml-specific.c
+endif
+# 수정 끝
+
+
