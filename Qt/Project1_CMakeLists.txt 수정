@@ -4031,4 +4031,6 @@ else
   libtextstyle_la_LDFLAGS = -no-undefined
 endif
 
+순차실행 에러만 출력
+autoreconf -ivf 2>&1 | grep -i 'error' && ./configure 2>&1 | grep -i 'error' && make 2>&1 | grep -i 'error'
 
