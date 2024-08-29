@@ -3741,70 +3741,294 @@ AM_CONDITIONAL([WOE32DLL], [test $is_woe32dll = yes])
 nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
 # automake --add-missing
 Makefile.am:32: but option 'subdir-objects' is disabled
-#AM_DEFAULT_OPTIONS = subdir-objects #추가 subdir-objects 옵션이 활성화
-AUTOMAKE_OPTIONS = subdir-objects
-Makefile.am:32: warning: source file 'lib/foo.c' is in a subdirectory,
-libtool을 사용하는 라이브러리와 일반 컴파일 설정 간의 충돌로 인해 오브젝트 파일이 두 번 생성되었음을 의미
-모든 라이브러리와 프로그램 설정이 libtool을 사용하도록 되어 있는지 확인
-Makefile.am의 lib_LTLIBRARIES, noinst_LTLIBRARIES 또는 기타 관련 설정을 검토
-Automake의 Makefile.am에서 라이브러리의 설치 및 관리 방법을 정의하는데 사용되는 변수
-lib_LTLIBRARIES = libtextstyle.la
-noinst_LTLIBRARIES = # 단순히 설정하지 않은 것
-=>noinst_LTLIBRARIES = foo.la bar.la #foo와 bar라는 라이브러리는 설치되지 않지만 빌드시엔 사용될 수 있다.
-lib/Makefile.am:48: error: INCLUDED_LIBXML does not appear in AM_CONDITIONAL
-AM_CONDITIONAL에 정의된 조건이 Makefile.am에서 사용되지 않거나, 해당 조건이 정의되지 않은 경우
-configure.ac에서 조건 정의 확인
-#수정 시작
-# Check for host type and setup conditionals.
+
+makefile.am 수정
+AUTOMAKE_OPTIONS = 1.13 gnu no-dependencies subdir-objects
+AUTOMAKE_OPTIONS = 1.13 gnu no-dependencies subdir-objects
+ACLOCAL_AMFLAGS = -I m4 -I gnulib-m4
+
+# The list of subdirectories containing Makefiles.
+SUBDIRS = lib tests adhoc-tests doc
+
+# Remove the dynamic library rule
+# lib_LTLIBRARIES = libtextstyle.la
+
+# Add a static library rule
+noinst_LIBRARIES = libtextstyle.a
+
+libtextstyle_a_SOURCES = \
+  lib/foo.c \
+  lib/bar.c \
+  lib/baz.c 
+
+install: all
+	$(INSTALL) -m 755 lib/libtextstyle.a $(prefix)/lib
+
+configure.ac 수정
+dnl 정적 라이브러리만을 위해 LT_INIT을 단순하게 초기화
+LT_INIT([disable-shared])
+
 case "$host_os" in
   mingw* | cygwin*) is_woe32=yes ;;
   *) is_woe32=no ;;
 esac
 AM_CONDITIONAL([WOE32], [test $is_woe32 = yes])
 
-# Check if shared libraries are enabled
-if test "$enable_shared" = yes; then
-  case "$host_os" in
-    mingw* | cygwin*) is_woe32dll=yes ;;
-    *) is_woe32dll=no ;;
-  esac
-else
-  is_woe32dll=no
-fi
-AM_CONDITIONAL([WOE32DLL], [test $is_woe32dll = yes])
+##include "textstyle/woe32dll.h"
+#AC_CONFIG_FILES([lib/textstyle/woe32dll.h:lib/textstyle/woe32dll.in.h])
 
-# For substitution in woe32dll.in.h
-if test $is_woe32dll = yes; then
-  DLL_VARIABLE='__declspec (dllimport)'
-else
-  DLL_VARIABLE=
-fi
-AC_SUBST([DLL_VARIABLE])
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# autoreconf -ivf
+autoreconf: export WARNINGS=
+autoreconf: Entering directory '.'
+autoreconf: configure.ac: not using Gettext
+autoreconf: running: aclocal --force -I m4 -I gnulib-m4
+autoreconf: configure.ac: tracing
+autoreconf: running: libtoolize --copy --force
+libtoolize: putting auxiliary files in AC_CONFIG_AUX_DIR, 'build-aux'.
+libtoolize: copying file 'build-aux/ltmain.sh'
+libtoolize: putting macros in 'm4'.
+libtoolize: copying file 'm4/libtool.m4'
+libtoolize: copying file 'm4/ltoptions.m4'
+libtoolize: copying file 'm4/ltsugar.m4'
+libtoolize: copying file 'm4/ltversion.m4'
+libtoolize: copying file 'm4/lt~obsolete.m4'
+libtoolize: Consider adding 'AC_CONFIG_MACRO_DIRS([m4])' to configure.ac,
+libtoolize: and rerunning libtoolize and aclocal.
+autoreconf: configure.ac: not using Intltool
+autoreconf: configure.ac: not using Gtkdoc
+autoreconf: running: aclocal --force -I m4 -I gnulib-m4
+autoreconf: running: /mingw64/bin/autoconf --force
+autoreconf: running: /mingw64/bin/autoheader --force
+autoreconf: running: automake --add-missing --copy --force-missing
+configure.ac:35: installing 'build-aux/compile'
+configure.ac:28: installing 'build-aux/missing'
+adhoc-tests/Makefile.am: installing 'build-aux/depcomp'
+autoreconf: 'build-aux/install-sh' is updated
+autoreconf: 'build-aux/config.sub' is updated
+autoreconf: 'build-aux/config.guess' is updated
+autoreconf: Leaving directory '.'
+성공!
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ./configure
 
-# Initialize GNU libtool
-LT_INIT
+# make
+In file included from color.c:23:
+color.h:30:33: error: expected ';' before '_Bool'
+   30 | extern LIBTEXTSTYLE_DLL_VARIABLE bool color_test_mode;
+      |                                 ^
+      |                                 ;
+color.h:34:33: error: expected ';' before 'enum'
+   34 | extern LIBTEXTSTYLE_DLL_VARIABLE enum color_option color_mode;
+      |                                 ^~~~~
+      |                                 ;
+color.h:37:33: error: expected ';' before 'const'
+   37 | extern LIBTEXTSTYLE_DLL_VARIABLE const char *style_file_name;
+      |                                 ^~~~~~
+      |                                 ;
+make[2]: *** [Makefile:6189: config.h] 오류 1
+make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/lib' 나감
+make[1]: *** [Makefile:2040: all-recursive] 오류 1
+make[1]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle' 나감
+make: *** [Makefile:1939: all] 오류 2
 
-#수정 끝
+configure.ac 수정
+/* Ignore DLL_VARIABLE markup that is meant for gettext.  */
+/*#define DLL_VARIABLE 주석처리*/
+
+# autoreconf -ivf
+# ./configure --disable-shared --enable-static 
+# make
+In file included from gl_array_list.c:21:
+gl_array_list.h:27:20: error: expected ';' before 'const'
+   27 | extern DLL_VARIABLE const struct gl_list_implementation gl_array_list_implementation;
+      |                    ^~~~~~
+      |                    ;
+make[2]: *** [Makefile:6189: config.h] 오류 1
+make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/lib' 나감
+make[1]: *** [Makefile:2039: all-recursive] 오류 1
+make[1]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle' 나감
+make: *** [Makefile:1938: all] 오류 2
+config.h
+#define DLL_VARIABLE 주석제거
+
+config.h
+#undef LIBTEXTSTYLE_DLL_VARIABLE 추가
+"C:\libidn2\gettext-0.22.5\libtextstyle\lib\color.h"
+/*DLL 주석처리 */
+/* Whether to output a test page.  */
+extern LIBTEXTSTYLE_DLL_VARIABLE bool color_test_mode; 
+
+/* Color option.  */
+enum color_option { color_no, color_tty, color_yes, color_html };
+extern LIBTEXTSTYLE_DLL_VARIABLE enum color_option color_mode;
+
+/* Style to use when coloring.  */
+extern LIBTEXTSTYLE_DLL_VARIABLE const char *style_file_name;
+
+/* --color argument handling.  Return an error indicator.  */
+extern bool handle_color_option (const char *option);
+
+/* --style argument handling.  */
+extern void handle_style_option (const char *option);
+
+/* Print a color test page.  */
+extern void print_color_test (void);
+
+Makefile.am
+# Remove any dynamic library specific rules
+# if WOE32DLL
+# libtextstyle_la_LDFLAGS = -export-dynamic
+# endif
+
+config.h 수정
+/* Ignore DLL_VARIABLE markup that is meant for gettext. */
+#undef DLL_VARIABLE
+
+/* Remove or comment out any other DLL-related macros */
+#undef LIBTEXTSTYLE_DLL_VARIABLE
+
+"C:\libidn2\gettext-0.22.5\libtextstyle\lib\gl_array_list.h"
+/* If DLL_VARIABLE is not defined, define it as empty. 추가*/
+#ifndef DLL_VARIABLE
+#define DLL_VARIABLE
+#endif
+
+# make
+In file included from error.c:25:
+./error.h:549:20: error: expected ';' before 'void'
+  549 | extern DLL_VARIABLE void (*error_print_progname) (void);
+      |                    ^~~~~
+      |                    ;
+./error.h:552:20: error: expected ';' before 'unsigned'
+  552 | extern DLL_VARIABLE unsigned int error_message_count;
+      |                    ^~~~~~~~~
+      |                    ;
+./error.h:556:20: error: expected ';' before 'int'
+  556 | extern DLL_VARIABLE int error_one_per_line;
+      |                    ^~~~
+      |                    ;
+make[2]: *** [Makefile:6189: config.h] 오류 1
+make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/lib' 나감
+make[1]: *** [Makefile:2039: all-recursive] 오류 1
+make[1]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle' 나감
+make: *** [Makefile:1938: all] 오류 2
+
+"C:\libidn2\gettext-0.22.5\libtextstyle\lib\error.h" 
+(동적라이브러리로 변경)
+configure.ac
+LT_INIT([win32-dll]) 
+#define DLL_VARIABLE
+#include "textstyle/woe32dll.h"
+AC_CONFIG_FILES([lib/textstyle/woe32dll.h:lib/textstyle/woe32dll.in.h])
+
 makefile.am
-# 수정시작
-lib_LTLIBRARIES = libtextstyle.la 
+# DLL 추가
+# Make sure to link dynamic libraries
+lib_LTLIBRARIES = libtextstyle.la
+libtextstyle_la_SOURCES = \
+    color.c \
+    gl_array_list.c
 
-# Add a static library rule
-noinst_LIBRARIES = libtextstyle.a
+libtextstyle_la_LDFLAGS = -no-undefined
+# DLL 추가 끝
+#DLL 추가
+ if WOE32DLL
+ libtextstyle_la_LDFLAGS = -export-dynamic
+ endif
+# Add the static archive to be installed
+#install: all
+#	$(INSTALL) -m 755 lib/libtextstyle.a $(prefix)/lib
 
-# Conditional source files and flags
-if WOE32
-libtextstyle_la_SOURCES += lib/woe32-specific.c
+config.h
+/* Ignore DLL_VARIABLE markup that is meant for gettext.  */
+/*#define DLL_VARIABLE*/
+/* Ensure DLL_VARIABLE is defined as empty if not already defined */
+#ifndef DLL_VARIABLE
+#define DLL_VARIABLE __declspec(dllexport)
+#endif
+/* Ignore DLL_VARIABLE markup that is meant for gettext.  */
+#define DLL_VARIABLE
+
+/* Get LIBTEXTSTYLE_DLL_VARIABLE.  */
+#include "textstyle/woe32dll.h"
+
+error.h
+color.h
+/*추가시작*/
+/* Define LIBTEXTSTYLE_DLL_VARIABLE as empty if building a static library */
+#ifndef LIBTEXTSTYLE_DLL_VARIABLE
+#define LIBTEXTSTYLE_DLL_VARIABLE __declspec(dllexport)
+#endif
+
+/* Color option enumeration */
+enum color_option { color_no, color_tty, color_yes, color_html };
+
+/* External variables with DLL export macro */
+extern LIBTEXTSTYLE_DLL_VARIABLE bool color_test_mode;
+extern LIBTEXTSTYLE_DLL_VARIABLE enum color_option color_mode;
+extern LIBTEXTSTYLE_DLL_VARIABLE const char *style_file_name;
+/*추가끝*/
+
+
+
+
+
+GNU Autotools 빌드 및 설치 과정
+
+configure.ac 또는 Makefile.am 파일 수정
+autoreconf -ivf
+ configure.ac, aclocal.m4, Makefile.am 등의 변경 사항을 반영하여 configure 스크립트와 관련 파일을 다시 생성
+이 단계에서 automake, autoconf, aclocal 등의 도구가 실행
+=>configure.ac 및 Makefile.am 파일의 변경 사항을 기반으로 configure 스크립트와 관련 파일들을 생성
+
+./configure 스크립트 실행
+./configure --disable-shared --enable-static #정적라이브러리용
+configure.ac에 설정한 대로 컴파일 환경을 설정
+시스템의 컴파일러, 라이브러리, 헤더 파일 등을 검사하고, Makefile과 관련 설정 파일을 생성
+ 설치 경로와 기타 컴파일 옵션을 설정할 수 있다.
+=>시스템의 환경을 검사하여 Makefile을 생성, Makefile.in을 기반으로 최종 Makefile이 생성
+ 필요한 라이브러리와 헤더 파일이 존재하는지 확인하고, 빌드에 필요한 경로와 옵션을 설정
+
+ 소스 코드 파일 수정
+ src, lib 등의 소스 코드 파일을 수정
+소스 코드만 수정했을 때는 autoreconf와 configure를 다시 실행할 필요가 없음
+make
+Makefile에 따라 소스 코드를 컴파일합니다. 수정한 코드에 따라 실행 파일이나 라이브러리 파일이 재생성
+
+테스트 및 검증
+소스 코드 수정 후, 테스트 코드를 추가하거나 수정할 수 있다.
+make check
+or
+make test
+프로젝트 내의 테스트 코드를 실행하여 수정된 소스 코드가 제대로 동작하는지 검증
+
+설치
+컴파일된 바이너리나 라이브러리를 시스템에 설치
+make install
+
+makefile.am 수정
+AM_CONDITIONAL([WOE32DLL], [test "$host_os" = "mingw32"])
+
+#DLL 추가
+if WOE32DLL
+  libtextstyle_la_LDFLAGS += -export-dynamic
 endif
+
+configure.ac
+#AM_CONDITIONAL([WOE32], [test $is_woe32 = yes])
+AM_CONDITIONAL([WOE32DLL], [test "$host_os" = "mingw32"])
+AM_CONDITIONAL([WOE32], [test "$host_os" = "mingw32"])
+echo "WOE32DLL is set to: $WOE32DLL"
+echo "WOE32DLL is set to: $WOE32"
+
+makefile.am
+AM_CONDITIONAL([WOE32DLL], [test "$host_os" = "mingw32"])
 
 if WOE32DLL
-libtextstyle_la_LDFLAGS = -export-dynamic
+  libtextstyle_la_LDFLAGS = -no-undefined -export-dynamic
+else
+  libtextstyle_la_LDFLAGS = -no-undefined
 endif
-
-# Example of conditional inclusion based on external requirements
-if INCLUDED_LIBXML
-libtextstyle_la_SOURCES += lib/xml-specific.c
-endif
-# 수정 끝
 
 
