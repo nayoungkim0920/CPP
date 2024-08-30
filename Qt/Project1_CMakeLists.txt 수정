@@ -4081,3 +4081,135 @@ Makefile:2522: *** 분리 기호가 빠졌음.  멈춤.
 Makefile 수정
 AM_CONDITIONAL([WOE32DLL], [test $host_os = mingw32])
 =>AM_CONDITIONAL([WOE32DLL], [test "$host_os" = "mingw32"])
+https://miind.tistory.com/21
+1. 분리 기호 (tab) 이 잘 들어가있나 확인한다.
+2. 그래도 에러가 나는 경우 .vimrc 에서 에디터 설정을 확인해야한다.
+$ cd ~ // 홈 디렉토리로 이동
+$ vim .vimrc // 에디터 설정
+간혹 편집기가 탭 키를 스페이스로 바꿔버리는 경우가 있다. 
+그런 경우 다음과 같은 줄이 있을 것이다.
+set expandtab  // tab을 space로 처리
+이것을 다음과 같이 바꿔준다
+set noexpandtab
+
+nayou@kimnayooung MINGW64 ~
+# find / -name ".vimrc" 2>/dev/null
+/etc/skel/.vimrc
+vim /etc/skel/.vimrc
+" 추가
+"set expandtab  // tab을 space로 처리
+set noexpandtab
+
+# file /components.xml
+/components.xml: XML 1.0 document, ASCII text, with CRLF line terminators
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# dos2unix /components.xml
+dos2unix: /components.xml 파일을 유닉스 형식으로 변환중...
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# file /components.xml
+/components.xml: XML 1.0 document, ASCII text
+# export CPLUS_INCLUDE_PATH=/mingw64/include/c++/14.2.0:$CPLUS_INCLUDE_PATH
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <cstring>  // For strerror
+#include <cerrno>   // For errno
+
+void convert_ascii_to_utf8(const std::string& input_file, const std::string& output_file) {
+    std::cout << "Trying to open input file: " << input_file << std::endl;
+
+    // Open the input file
+    std::ifstream infile(input_file, std::ios::binary);
+    if (!infile.is_open()) {
+        std::cerr << "Error opening input file: " << input_file << std::endl;
+        std::cerr << "Error reason: " << std::strerror(errno) << std::endl;
+        return;
+    }
+
+    // Read the input file into a string
+    std::stringstream buffer;
+    buffer << infile.rdbuf();
+    std::string content = buffer.str();
+    infile.close();
+
+    std::cout << "Input file opened successfully." << std::endl;
+
+    // Open the output file
+    std::ofstream outfile(output_file, std::ios::binary);
+    if (!outfile.is_open()) {
+        std::cerr << "Error opening output file: " << output_file << std::endl;
+        std::cerr << "Error reason: " << std::strerror(errno) << std::endl;
+        return;
+    }
+
+    // Write BOM for UTF-8 encoding
+    unsigned char bom[] = {0xEF, 0xBB, 0xBF}; // UTF-8 BOM
+    outfile.write(reinterpret_cast<char*>(bom), sizeof(bom));
+
+    // Write the content to the output file
+    outfile << content;
+    outfile.close();
+
+    std::cout << "Output file created successfully." << std::endl;
+}
+
+int main() {
+    std::string input_file = "C:/msys64/components.xml";       // Absolute path in Windows style
+    std::string output_file = "C:/msys64/components_utf8.xml"; // Absolute path in Windows style
+
+    convert_ascii_to_utf8(input_file, output_file);
+
+    return 0;
+}
+
+g++ -o encoding_utf8 encoding_utf8.cpp
+./encoding_utf8
+Trying to open input file: C:/msys64/components.xml
+Input file opened successfully.
+Output file created successfully.
+# file -i /components_utf8.xml
+/components_utf8.xml: text/html; charset=utf-8
+cp /c/msys64/components_utf8.xml /c/msys64/components.xml
+# file -i /components.xml
+/components.xml: text/html; charset=utf-8
+
+vscode에서 tab을 space로 변환 그반대도 제공하고 아예 off할 수 있다고 함
+File > Preferences > Settings
+검색창에 detect indentation을 입력
+Editor: Detect Indentation 설정을 찾아 체크박스를 비활성화
+insert spaces 검색 > Editor: Insert Spaces 비활성
+
+VS Code에서 파일을 열고 
+Ctrl + Shift + P를 눌러 Command Palette를 열고 Convert Indentation to Tabs
+
+xml newling 에러
+https://ant.apache.org/bindownload.cgi
+C:\Users\nayou\Downloads\apache-ant-1.10.15-bin\apache-ant-1.10.15
+C:\apache-ant-1.10.15 이동
+환경변수설정
+ANT_HOEM : C:\apache-ant-1.10.15
+Path : %ANT_HOME%\bin
+# export ANT_HOME=/c/apache-ant-1.10.15
+# export PATH=$ANT_HOME/bin:$PATH
+# java -version
+java version "21.0.4" 2024-07-16 LTS
+Java(TM) SE Runtime Environment (build 21.0.4+8-LTS-274)
+Java HotSpot(TM) 64-Bit Server VM (build 21.0.4+8-LTS-274, mixed mode, sharing)
+ant는 build.xml 전용으로
+아래 xmllint로 하기로
+# xmllint --noout /components.xml
+/components.xml:1: parser error : Start tag expected, '<' not found
+<?xml version="1.0" encoding="UTF-8"?>
+   ^ㅣ
+vscode에서 하단 오른쪽에 Encoding 을 누르면 상단 가운데에 save with encoding을 누르면 
+원하는 encoding을 선택하면 그 선택한 encoding으로 저장됨
+
+
+
+
+
+
+
+
