@@ -3510,6 +3510,7 @@ nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5
 # ls /mingw64/include/stdlib.h
 /mingw64/include/stdlib.h
 
+"C:\msys64\mingw64\include\stdlib.h"
 PATH에 /mingw64/bin포함확인
 nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5
 # echo $PATH
@@ -4320,7 +4321,49 @@ gl_EARLY
 Makefile.am 수정
 EXTRA_DIST m4/gnulib-cache.m4 \ #추가
 
+/c/gnulib/gnulib-tool --add-import 자동복사가 안돼서 수동으로 복사
+cp /c/gnulib/m4 /c/libidn2/gettext-0.22.5/libtextstyle/m4
+
 echo "Running: autoreconf -ivf" && autoreconf -ivf 2>&1 | tee autoreconf.log | grep -Ei '멈춤|not|error|오류|undefined|warning' | sort | uniq  && \
 echo "Running: ./configure" && ./configure 2>&1 | tee configure.log | grep -Ei '멈춤|not|error|오류|undefined|warning' | sort | uniq  && \
 echo "Running: make" && make 2>&1 | tee make.log | grep -Ei '멈춤|not|error|오류|undefined|warning' | sort | uniq && \
 echo "Running: make install" && make install 2>&1 | tee make_install.log | grep -Ei '멈춤|not|error|오류|undefined|warning' | sort | uniq 
+
+xml파일 encoding 
+/c/libidn2/gettext-0.22.5/libtextstyle>
+#./encoding_utf8 
+#cp /components_utf8.xml /components.xml
+#file -i /components.xml
+=>utf-8
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# xmllint --noout /c/msys64/components.xml
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+#
+계속적으로 
+/components.xml: line 1: syntax error near unexpected token `newline'
+/components.xml: line 1: `﻿<?xml version="1.0" encoding="UTF-8"?>'
+오류발생
+
+"C:\msys64\mingw64\include\c++\14.2.0\cstdlib"
+//#include_next <stdlib.h>
+#include <stdlib.h>
+C:/msys64/mingw64/include/c++/14.2.0/bits/std_abs.h
+//#include_next <stdlib.h>
+#include <stdlib.h>
+수정 후 
+# g++ -o encoding_utf8 encoding_utf8.cpp
+# ./encoding_utf8
+Trying to open input file: C:/msys64/components.xml
+Input file opened successfully.
+Output file created successfully.
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# file -i /components_utf8.xml
+/components_utf8.xml: text/xml; charset=utf-8
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# cp /components_utf8.xml /components.xml
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# file -i /components.xml
+/components.xml: text/xml; charset=utf-8
+# autoreconf -ivf
+# ./configure
