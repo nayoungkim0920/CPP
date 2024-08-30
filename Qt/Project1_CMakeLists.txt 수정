@@ -4367,3 +4367,36 @@ nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
 /components.xml: text/xml; charset=utf-8
 # autoreconf -ivf
 # ./configure
+
+configure.ac
+# 호스트 OS 확인
+AC_CANONICAL_HOST
+echo "configure.ac: Configured host OS: $host_os"
+
+# 조건부 매크로 정의
+if test "$host_os" = "mingw32"; then
+    AM_CONDITIONAL([WOE32DLL], true)
+    AM_CONDITIONAL([WOE32], true)
+    echo "WOE32DLL and WOE32 are enabled."
+	LDFLAGS="-no-undefined -export-dynamic"
+else
+    AM_CONDITIONAL([WOE32DLL], false)
+    AM_CONDITIONAL([WOE32], false)
+    echo "WOE32DLL and WOE32 are disabled."
+	LDFLAGS="-no-undefined"
+fi
+
+makefile.am
+libtextstyle_la_LDFLAGS = $(LDFLAGS)
+Makefile:2425: *** 분리 기호가 빠졌음.  멈춤. => 성공
+
+(에러)
+./stddef.h:133:6: error: operator '!' has no right operand
+  133 | #if !
+/c/libidn2/gettext-0.22.5/libtextstyle/lib/stddef.h 수정
+/*#if !
+# define wchar_t int
+#endif*/
+#ifndef wchar_t
+# define wchar_t int
+#endif
