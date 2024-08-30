@@ -4184,7 +4184,7 @@ insert spaces 검색 > Editor: Insert Spaces 비활성
 VS Code에서 파일을 열고 
 Ctrl + Shift + P를 눌러 Command Palette를 열고 Convert Indentation to Tabs
 
-xml newling 에러
+xml newline 에러
 https://ant.apache.org/bindownload.cgi
 C:\Users\nayou\Downloads\apache-ant-1.10.15-bin\apache-ant-1.10.15
 C:\apache-ant-1.10.15 이동
@@ -4205,11 +4205,122 @@ ant는 build.xml 전용으로
    ^ㅣ
 vscode에서 하단 오른쪽에 Encoding 을 누르면 상단 가운데에 save with encoding을 누르면 
 원하는 encoding을 선택하면 그 선택한 encoding으로 저장됨
+nayou@kimnayooung MINGW64 /c/libidn2
+# xmllint --noout /components.xml
 
+nayou@kimnayooung MINGW64 /c/libidn2
+# file -i /components.xml
+/components.xml: text/xml; charset=utf-8
+# head -n 10 /components.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+<Packages>
+    <ApplicationName>MSYS2</ApplicationName>
+    <ApplicationVersion>1.0.0</ApplicationVersion>
+    <Package>
+        <Name>com.msys2.root</Name>
+        <Title>MSYS2</Title>
+        <Description>Cygwin-derived Posix-like env. for Windows with Arch Linux's Pacman</Description>
+        <SortingPriority>0</SortingPriority>
+다시 실행
+echo "Running: autoreconf -ivf" && autoreconf -ivf 2>&1 | tee autoreconf.log | grep -Ei '멈춤|not|error|오류|undefined|warning' | sort | uniq  && \
+echo "Running: ./configure" && ./configure 2>&1 | tee configure.log | grep -Ei '멈춤|not|error|오류|undefined|warning' | sort | uniq  && \
+echo "Running: make" && make 2>&1 | tee make.log | grep -Ei '멈춤|not|error|오류|undefined|warning' | sort | uniq && \
+echo "Running: make install" && make install 2>&1 | tee make_install.log | grep -Ei '멈춤|not|error|오류|undefined|warning' | sort | uniq 
 
+nayou@kimnayooung MINGW64 ~
+# autoconf --version
+autoconf (GNU Autoconf) 2.72
+Copyright (C) 2023 Free Software Foundation, Inc.
+License GPLv3+/Autoconf: GNU GPL version 3 or later
+<https://gnu.org/licenses/gpl.html>, <https://gnu.org/licenses/exceptions.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
 
+Written by David J. MacKenzie and Akim Demaille.
 
+nayou@kimnayooung MINGW64 ~
+# ^C
 
+nayou@kimnayooung MINGW64 ~
+# automake --version
+automake (GNU automake) 1.17
+Features: subsecond-mtime
 
+Copyright (C) 2024 Free Software Foundation, Inc.
+License GPLv2+: GNU GPL version 2 or later
+  <https://gnu.org/licenses/gpl-2.0.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
 
+Written by Tom Tromey <tromey@redhat.com>
+       and Alexandre Duret-Lutz <adl@gnu.org>.
 
+nayou@kimnayooung MINGW64 ~
+# ^C
+
+nayou@kimnayooung MINGW64 ~
+# cd /c/libidn2
+
+nayou@kimnayooung MINGW64 /c/libidn2
+# cd gettext-0.22.5/libtextstyle/
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# rm -f configure aclocal.m4 config.log config.status
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# aclocal
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# autoconf
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# automake --add-missing
+lib/Makefile.am:48: error: INCLUDED_LIBXML does not appear in AM_CONDITIONAL
+lib/Makefile.gnulib:104: error: GL_GENERATE_ALLOCA_H does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:132: error: GL_GENERATE_ASSERT_H does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:218: error: GL_COND_OBJ_CLOSE does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:234: error: GL_COND_OBJ_DUP2 does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:246: error: GL_GENERATE_ERRNO_H does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:274: error: GL_COND_OBJ_ERROR does not appear in AM_CONDITIONAL
+
+Makefile.am과 Makefile.gnulib 파일에서 조건부 빌드 설정(AM_CONDITIONAL)이 누락되었음
+gnulib-tool을 사용하여 gnulib 모듈 재생성
+gnulib 라이브러리와의 통합 과정에서 발생할 수 있으며, 이는 Makefile에서 조건부 정의가 필요한 상황에서 발생
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# gnulib-tool --add-import
+-bash: gnulib-tool: 명령어를 찾을 수 없음
+Gnulib 설치
+nayou@kimnayooung MINGW64 /c
+# git clone https://git.savannah.gnu.org/git/gnulib.git
+'gnulib'에 복제합니다...
+remote: Counting objects: 308524, done.
+remote: Compressing objects: 100% (35319/35319), done.
+remote: Total 308524 (delta 273515), reused 307924 (delta 273093)
+오브젝트를 받는 중: 100% (308524/308524), 81.11 MiB | 3.18 MiB/s, 완료.
+델타를 알아내는 중: 100% (273515/273515), 완료.
+Updating files: 100% (11851/11851), 완료.
+export PATH=$PATH:/c/gnulib
+Gnulib 통합
+nayou@kimnayooung MINGW64 /c/gnulib
+cd /c/libidn2/gettext-0.22.5/libtextstyle
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# /c/gnulib/gnulib-tool --add-import
+autoreconf 및 automake 재실행
+configure.ac 수정
+#추가
+gl_INIT
+gl_EARLY
+
+Makefile.am 수정
+EXTRA_DIST m4/gnulib-cache.m4 \ #추가
+
+echo "Running: autoreconf -ivf" && autoreconf -ivf 2>&1 | tee autoreconf.log | grep -Ei '멈춤|not|error|오류|undefined|warning' | sort | uniq  && \
+echo "Running: ./configure" && ./configure 2>&1 | tee configure.log | grep -Ei '멈춤|not|error|오류|undefined|warning' | sort | uniq  && \
+echo "Running: make" && make 2>&1 | tee make.log | grep -Ei '멈춤|not|error|오류|undefined|warning' | sort | uniq && \
+echo "Running: make install" && make install 2>&1 | tee make_install.log | grep -Ei '멈춤|not|error|오류|undefined|warning' | sort | uniq 
