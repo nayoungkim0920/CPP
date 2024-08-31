@@ -4400,3 +4400,269 @@ Makefile:2425: *** 분리 기호가 빠졌음.  멈춤. => 성공
 #ifndef wchar_t
 # define wchar_t int
 #endif
+
+lib/stddef.h를 생성하는 파일을 수정하기로함
+# find /c/libidn2/gettext-0.22.5/libtextstyle/ -maxdepth 1 -type f -exec grep -nH "#if !" {} +
+/c/libidn2/gettext-0.22.5/libtextstyle/config.h:1179:#if !(defined __STDC_WANT_LIB_EXT1__ && __STDC_WANT_LIB_EXT1__)
+/c/libidn2/gettext-0.22.5/libtextstyle/config.h:1825:#if !(defined _GL_ATTRIBUTE_ERROR && defined _GL_ATTRIBUTE_WARNING)
+/c/libidn2/gettext-0.22.5/libtextstyle/config.h:2309:#if !defined HAVE_C_ALIGNASOF \
+/c/libidn2/gettext-0.22.5/libtextstyle/config.h.in:1178:#if !(defined __STDC_WANT_LIB_EXT1__ && __STDC_WANT_LIB_EXT1__)
+...
+생성하는 파일인거 같은 파일을 찾아 수정 
+configure.ac configure 스크립트를 생성하는 메타 파일
+ 이 파일에서 config.h의 내용을 결정짓는 매크로를 설정
+# if ! 방지용
+# Check for wchar_t type
+AC_CHECK_TYPE([wchar_t], 
+    [AC_DEFINE([HAVE_WCHAR_T], [1], [Define to 1 if you have the `wchar_t` type])], 
+    [AC_DEFINE([HAVE_WCHAR_T], [0], [Define to 0 if you do not have the `wchar_t` type])])
+수정 후
+aclocal을 실행하여 aclocal.m4 파일을 업데이트
+aclocal
+autoconf를 실행하여 configure 스크립트를 생성하거나 업데이트
+autoconf
+configure 스크립트를 실행하여 config.h 파일을 생성
+./configure
+config.h 파일이 생성되고, HAVE_WCHAR_T가 정의된 상태로 확인
+/* Define if you have wchar_t */
+#define HAVE_WCHAR_T 1
+
+configure: creating ./config.status
+config.status: creating Makefile
+config.status: creating doc/Makefile
+config.status: creating lib/Makefile
+config.status: creating lib/exported.sh
+config.status: creating lib/textstyle/version.h
+config.status: creating lib/textstyle/woe32dll.h
+config.status: creating tests/Makefile
+config.status: creating adhoc-tests/Makefile
+config.status: creating config.h
+config.status: executing depfiles commands
+config.status: executing libtool commands
+
+# make
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# make
+ cd . && /bin/sh /c/libidn2/gettext-0.22.5/libtextstyle/build-aux/missing automake-1.16 --gnu
+Makefile.am:49: warning: whitespace following trailing backslash
+lib/Makefile.am:48: error: INCLUDED_LIBXML does not appear in AM_CONDITIONAL
+lib/Makefile.gnulib:104: error: GL_GENERATE_ALLOCA_H does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:132: error: GL_GENERATE_ASSERT_H does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:218: error: GL_COND_OBJ_CLOSE does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:234: error: GL_COND_OBJ_DUP2 does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:246: error: GL_GENERATE_ERRNO_H does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:274: error: GL_COND_OBJ_ERROR does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:320: error: GL_COND_OBJ_FCNTL does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:442: error: GL_GENERATE_FLOAT_H does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:459: error: GL_COND_OBJ_FLOAT does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:462: error: GL_COND_OBJ_ITOLD does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:479: error: GL_COND_OBJ_FREE does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:505: error: GL_COND_OBJ_FSTAT does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:517: error: GL_COND_OBJ_FSYNC does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:562: error: GL_COND_OBJ_GETDTABLESIZE does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:570: error: GL_COND_OBJ_GETHOSTNAME does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:580: error: GL_COND_OBJ_GETPROGNAME does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:596: error: GL_COND_OBJ_GETTIMEOFDAY does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:762: error: GL_COND_OBJ_ISATTY does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:770: error: GL_COND_OBJ_ISINF does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:834: error: INCLUDED_LIBCROCO does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:873: error: GL_COND_LIBTOOL does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:885: error: INCLUDED_LIBGLIB does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:984: error: GL_COND_LIBTOOL does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:996: error: INCLUDED_LIBXML does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:1439: error: GL_COND_LIBTOOL does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:1455: error: GL_GENERATE_LIMITS_H does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:1489: error: GL_COND_OBJ_LOG10 does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:1859: error: GL_COND_OBJ_MEMCHR does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:1914: error: GL_COND_OBJ_MSVC_INVAL does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:1924: error: GL_COND_OBJ_MSVC_NOTHROW does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:1967: error: GL_GENERATE_OBSTACK_H does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:1979: error: GL_COND_OBJ_OBSTACK does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:1989: error: GL_COND_OBJ_OPEN does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:2051: error: GL_COND_OBJ_RAISE does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:2059: error: GL_COND_OBJ_READ does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:2085: error: GL_COND_OBJ_REALLOCARRAY does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:2117: error: GL_COND_OBJ_SIGACTION does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:2168: error: GL_COND_OBJ_SIGNBIT3 does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:2178: error: GL_COND_OBJ_SIGPROCMASK does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:2257: error: GL_COND_OBJ_STAT does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:2281: error: GL_GENERATE_STDARG_H does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:2307: error: GL_GENERATE_STDCKDINT_H does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:2328: error: GL_GENERATE_STDDEF_H does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:2357: error: GL_GENERATE_STDINT_H does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:2537: error: GL_COND_OBJ_STDIO_READ does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:2540: error: GL_COND_OBJ_STDIO_WRITE does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:2718: error: GL_COND_OBJ_STPCPY does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:2726: error: GL_COND_OBJ_STRERROR does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:2734: error: GL_COND_OBJ_STRERROR_OVERRIDE does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:3484: error: LIBUNISTRING_COMPILE_UNISTR_U8_MBTOUC does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:3674: error: GL_COND_OBJ_WINDOWS_MUTEX does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:3684: error: GL_COND_OBJ_WINDOWS_ONCE does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:3694: error: GL_COND_OBJ_WINDOWS_RECMUTEX does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:3704: error: GL_COND_OBJ_WINDOWS_RWLOCK does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.gnulib:3714: error: GL_COND_OBJ_WRITE does not appear in AM_CONDITIONAL
+lib/Makefile.am:63:   'lib/Makefile.gnulib' included from here
+lib/Makefile.am:201: error: INCLUDED_LIBCROCO does not appear in AM_CONDITIONAL
+lib/Makefile.am:204: error: INCLUDED_LIBXML does not appear in AM_CONDITIONAL
+lib/Makefile.am:207: error: INCLUDED_LIBGLIB does not appear in AM_CONDITIONAL
+make: *** [Makefile:1997: Makefile.in] 오류 1
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# automake --version
+autoconf --version
+automake (GNU automake) 1.16.5
+Copyright (C) 2021 Free Software Foundation, Inc.
+License GPLv2+: GNU GPL version 2 or later <https://gnu.org/licenses/gpl-2.0.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+Written by Tom Tromey <tromey@redhat.com>
+       and Alexandre Duret-Lutz <adl@gnu.org>.
+autoconf (GNU Autoconf) 2.72
+Copyright (C) 2023 Free Software Foundation, Inc.
+License GPLv3+/Autoconf: GNU GPL version 3 or later
+<https://gnu.org/licenses/gpl.html>, <https://gnu.org/licenses/exceptions.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+Written by David J. MacKenzie and Akim Demaille.
+
+configure.ac
+# 추가
+AM_CONDITIONAL([INCLUDED_LIBXML], [test "x$have_libxml" = "xyes"])
+
+#추가
+# Check for gnulib modules
+GL_GNU_SOURCE
+GL_REQUIRE_VERSION([2.0])
+
+gnulib 모듈 업데이트
+export PATH=$PATH:/c/gnulib
+nayou@kimnayooung MINGW64 /c/gnulib
+# gnulib-tool --update
+1 out of 1 hunk FAILED -- saving rejects to file C:/msys64/tmp/glpy7noks9h3/lib/exitfail.h.rej
+C:/gnulib/gnulib-tool.py: *** patch file lib/exitfail.h didn't apply cleanly
+C:/gnulib/gnulib-tool.py: *** Stop.
+gnulib 최신 버전으로 업데이트
+cd /c/gnulib
+git pull origin master
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# gnulib-tool --import
+# make
+CDPATH="${ZSH_VERSION+.}:" && cd . && /bin/sh '/c/libidn2/gettext-0.22.5/libtextstyle/build-aux/missing' aclocal-1.16 -I m4 -I gnulib-m4
+ cd . && /bin/sh /c/libidn2/gettext-0.22.5/libtextstyle/build-aux/missing automake-1.16 --gnu
+Makefile.am:54: warning: whitespace following trailing backslash
+CDPATH="${ZSH_VERSION+.}:" && cd . && /bin/sh '/c/libidn2/gettext-0.22.5/libtextstyle/build-aux/missing' autoconf
+configure.ac:77: warning: AC_COMPILE_IFELSE was called before AC_USE_SYSTEM_EXTENSIONS
+gnulib-m4/gnulib-comp.m4:34: lts_EARLY is expanded from...
+configure.ac:77: the top level
+configure.ac:77: warning: AC_CHECK_INCLUDES_DEFAULT was called before AC_USE_SYSTEM_EXTENSIONS
+gnulib-m4/gnulib-comp.m4:34: lts_EARLY is expanded from...
+configure.ac:77: the top level
+/bin/sh ./config.status --recheck
+running CONFIG_SHELL=/bin/sh /bin/sh ./configure CC=/mingw64/bin/gcc CFLAGS=-I/mingw64/include LDFLAGS=-L/mingw64/lib CPPFLAGS=-I/mingw64/include CPP=/mingw64/bin/cpp --no-create --no-recursion
+configure: loading site script /etc/config.site
+./configure: line 4901: GL_GNU_SOURCE: command not found
+./configure: line 4902: syntax error near unexpected token `2.0'
+./configure: line 4902: `GL_REQUIRE_VERSION(2.0)'
+make: *** [Makefile:2020: config.status] 오류 2
+configure:4678: error: possibly undefined macro: gl_CC_GNULIB_WARNINGS
+      If this token and others are legitimate, please use m4_pattern_allow.
+      See the Autoconf documentation.
+configure:4699: error: possibly undefined macro: gl_COMMON
+configure:4744: error: possibly undefined macro: gl_PROG_AR_RANLIB
+autoreconf: error: /mingw64/bin/autoconf failed with exit status: 1
+
+configure:4678: error: possibly undefined macro: gl_CC_GNULIB_WARNINGS
+      If this token and others are legitimate, please use m4_pattern_allow.
+      See the Autoconf documentation.
+configure:4699: error: possibly undefined macro: gl_COMMON
+configure:4744: error: possibly undefined macro: gl_PROG_AR_RANLIB
+autoreconf: error: /mingw64/bin/autoconf failed with exit status: 1
+
+#추가
+# 먼저 시스템 확장 기능을 활성화합니다.
+AC_USE_SYSTEM_EXTENSIONS
+# 그 다음에 기본 헤더 파일을 체크합니다.
+AC_CHECK_INCLUDES_DEFAULT
+
+configure.ac
+#추가
+# Allow usage of specific macros if they are not yet recognized
+m4_pattern_allow([gl_CC_GNULIB_WARNINGS])
+m4_pattern_allow([gl_COMMON])
+m4_pattern_allow([gl_PROG_AR_RANLIB])
+
+aclocal.m4 파일을 업데이트
+m4 매크로 파일을 포함하여 configure 스크립트를 생성
+# aclocal
+# autoreconf -ivf
+# ./configure
+# make
+
+
+
+
+
+
+
+
+
+
+
+
