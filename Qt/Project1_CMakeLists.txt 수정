@@ -4730,9 +4730,23 @@ make: *** [Makefile:2003: all] 오류 2
 
 nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
 # rm -rf autom4te.cache
-
-
-
+# autoreconf -ivf
+# ./configure
+# make
+CDPATH="${ZSH_VERSION+.}:" && cd . && /bin/sh '/c/libidn2/gettext-0.22.5/libtextstyle/build-aux/missing' aclocal-1.16 -I m4 -I gnulib-m4
+configure.ac:22: error: AC_INIT should be called with package and version arguments
+/usr/share/aclocal-1.16/init.m4:29: AM_INIT_AUTOMAKE is expanded from...
+configure.ac:22: the top level
+autom4te: error: /usr/bin/m4 failed with exit status: 1
+aclocal-1.16: error: autom4te failed with exit status: 1
+make: *** [Makefile:2039: aclocal.m4] 오류 1
+configure.ac 수정
+최상단(아래순서대로작성해야함)
+AC_PREREQ([2.64])
+AC_INIT([libtextstyle], [0.1], [bug-libtextstyle@example.com])
+AM_INIT_AUTOMAKE([1.13 silent-rules]) #추가
+AC_CONFIG_HEADERS([config.h])
+#autoreconf -ivf
 
 
 
