@@ -4653,13 +4653,83 @@ m4 매크로 파일을 포함하여 configure 스크립트를 생성
 # aclocal
 # autoreconf -ivf
 # ./configure
-# make
+configure: loading site script /etc/config.site
+./configure: line 4678: gl_CC_GNULIB_WARNINGS: command not found
+./configure: line 4699: gl_COMMON: command not found
+./configure: line 4721: gl_COMMON: command not found
+./configure: line 4744: gl_PROG_AR_RANLIB: command not found
+./configure: line 4981: syntax error near unexpected token `2.0'
+./configure: line 4981: `GL_REQUIRE_VERSION(2.0)'
 
+configure.ac 수정
+GL_REQUIRE_VERSION"([2.0])"
 
+#make
+make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/adhoc-tests' 들어감
+/mingw64/bin/gcc -DHAVE_CONFIG_H -I. -I..  -I. -I. -I.. -I../lib -I./../lib -DSRCDIR=\"./\" -I/mingw64/include  -I/mingw64/include -MT hello.o -MD -MP -MF .deps/hello.Tpo -c -o hello.o hello.c
+In file included from ../lib/textstyle.h:23,
+                 from hello.c:20:
+../lib/stddef.h:133:6: error: operator '!' has no right operand
+  133 | #if !
+      |      ^
+In file included from ../config.h:2463,
+                 from hello.c:18:
+../lib/textstyle/woe32dll.h:27:36: error: stray '@' in program
+   27 | # define LIBTEXTSTYLE_DLL_VARIABLE @DLL_VARIABLE@
+      |                                    ^
+../lib/textstyle/version.h:32:8: note: in expansion of macro 'LIBTEXTSTYLE_DLL_VARIABLE'
+   32 | extern LIBTEXTSTYLE_DLL_VARIABLE const int _libtextstyle_version; /* Likewise */
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~
+../lib/textstyle/woe32dll.h:27:49: error: stray '@' in program
+   27 | # define LIBTEXTSTYLE_DLL_VARIABLE @DLL_VARIABLE@
+      |                                                 ^
+../lib/textstyle/version.h:32:8: note: in expansion of macro 'LIBTEXTSTYLE_DLL_VARIABLE'
+   32 | extern LIBTEXTSTYLE_DLL_VARIABLE const int _libtextstyle_version; /* Likewise */
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~
+../lib/textstyle/woe32dll.h:27:36: error: stray '@' in program
+   27 | # define LIBTEXTSTYLE_DLL_VARIABLE @DLL_VARIABLE@
+      |                                    ^
+../lib/textstyle.h:621:8: note: in expansion of macro 'LIBTEXTSTYLE_DLL_VARIABLE'
+  621 | extern LIBTEXTSTYLE_DLL_VARIABLE bool color_test_mode;
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~
+../lib/textstyle/woe32dll.h:27:49: error: stray '@' in program
+   27 | # define LIBTEXTSTYLE_DLL_VARIABLE @DLL_VARIABLE@
+      |                                                 ^
+../lib/textstyle.h:621:8: note: in expansion of macro 'LIBTEXTSTYLE_DLL_VARIABLE'
+  621 | extern LIBTEXTSTYLE_DLL_VARIABLE bool color_test_mode;
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~
+../lib/textstyle/woe32dll.h:27:36: error: stray '@' in program
+   27 | # define LIBTEXTSTYLE_DLL_VARIABLE @DLL_VARIABLE@
+      |                                    ^
+../lib/textstyle.h:625:8: note: in expansion of macro 'LIBTEXTSTYLE_DLL_VARIABLE'
+  625 | extern LIBTEXTSTYLE_DLL_VARIABLE enum color_option color_mode;
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~
+../lib/textstyle/woe32dll.h:27:49: error: stray '@' in program
+   27 | # define LIBTEXTSTYLE_DLL_VARIABLE @DLL_VARIABLE@
+      |                                                 ^
+../lib/textstyle.h:625:8: note: in expansion of macro 'LIBTEXTSTYLE_DLL_VARIABLE'
+  625 | extern LIBTEXTSTYLE_DLL_VARIABLE enum color_option color_mode;
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~
+../lib/textstyle/woe32dll.h:27:36: error: stray '@' in program
+   27 | # define LIBTEXTSTYLE_DLL_VARIABLE @DLL_VARIABLE@
+      |                                    ^
+../lib/textstyle.h:628:8: note: in expansion of macro 'LIBTEXTSTYLE_DLL_VARIABLE'
+  628 | extern LIBTEXTSTYLE_DLL_VARIABLE const char *style_file_name;
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~
+../lib/textstyle/woe32dll.h:27:49: error: stray '@' in program
+   27 | # define LIBTEXTSTYLE_DLL_VARIABLE @DLL_VARIABLE@
+      |                                                 ^
+../lib/textstyle.h:628:8: note: in expansion of macro 'LIBTEXTSTYLE_DLL_VARIABLE'
+  628 | extern LIBTEXTSTYLE_DLL_VARIABLE const char *style_file_name;
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~
+make[2]: *** [Makefile:1832: hello.o] 오류 1
+make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/adhoc-tests' 나감
+make[1]: *** [Makefile:2129: all-recursive] 오류 1
+make[1]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle' 나감
+make: *** [Makefile:2003: all] 오류 2
 
-
-
-
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# rm -rf autom4te.cache
 
 
 
