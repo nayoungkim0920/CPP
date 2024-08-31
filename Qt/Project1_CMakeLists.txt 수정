@@ -4747,6 +4747,214 @@ AC_INIT([libtextstyle], [0.1], [bug-libtextstyle@example.com])
 AM_INIT_AUTOMAKE([1.13 silent-rules]) #추가
 AC_CONFIG_HEADERS([config.h])
 #autoreconf -ivf
+../lib/stddef.h:107:3: error: #error "Please include config.h first."
+  107 |  #error "Please include config.h first."
+      |   ^~~~~
+../lib/stddef.h:133:6: error: operator '!' has no right operand
+  133 | #if !
+      |      ^
+In file included from ../lib/textstyle.h:24:
+../lib/stdio.h:71:3: error: #error "Please include config.h first."
+   71 |  #error "Please include config.h first."
+      |   ^~~~~
+In file included from ../lib/stdio.h:82:
+../lib/sys/types.h:28:3: error: #error "Please include config.h first."
+   28 |  #error "Please include config.h first."
+      |   ^~~~~
+In file included from ../lib/textstyle.h:26:
+../lib/textstyle/woe32dll.h:27:36: error: stray '@' in program
+   27 | # define LIBTEXTSTYLE_DLL_VARIABLE @DLL_VARIABLE@
+      |                                    ^
+../lib/textstyle/version.h:32:8: note: in expansion of macro 'LIBTEXTSTYLE_DLL_VARIABLE'
+   32 | extern LIBTEXTSTYLE_DLL_VARIABLE const int _libtextstyle_version; /* Likewise */
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~
+../lib/textstyle/woe32dll.h:27:49: error: stray '@' in program
+   27 | # define LIBTEXTSTYLE_DLL_VARIABLE @DLL_VARIABLE@
+      |                                                 ^
+../lib/textstyle/version.h:32:8: note: in expansion of macro 'LIBTEXTSTYLE_DLL_VARIABLE'
+   32 | extern LIBTEXTSTYLE_DLL_VARIABLE const int _libtextstyle_version; /* Likewise */
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from ../lib/textstyle.h:29:
+../lib/textstyle/version.h:32:34: error: expected ';' before 'const'
+   32 | extern LIBTEXTSTYLE_DLL_VARIABLE const int _libtextstyle_version; /* Likewise */
+      |                                  ^~~~~
+../lib/textstyle/woe32dll.h:27:36: error: stray '@' in program
+   27 | # define LIBTEXTSTYLE_DLL_VARIABLE @DLL_VARIABLE@
+      |                                    ^
+../lib/textstyle.h:621:8: note: in expansion of macro 'LIBTEXTSTYLE_DLL_VARIABLE'
+  621 | extern LIBTEXTSTYLE_DLL_VARIABLE bool color_test_mode;
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~
+../lib/textstyle/woe32dll.h:27:49: error: stray '@' in program
+   27 | # define LIBTEXTSTYLE_DLL_VARIABLE @DLL_VARIABLE@
+      |                                                 ^
+../lib/textstyle.h:621:8: note: in expansion of macro 'LIBTEXTSTYLE_DLL_VARIABLE'
+  621 | extern LIBTEXTSTYLE_DLL_VARIABLE bool color_test_mode;
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from ../lib/textstyle/stdbool.h:4,
+                 from ../lib/textstyle.h:25:
+../lib/textstyle.h:621:34: error: expected ';' before '_Bool'
+  621 | extern LIBTEXTSTYLE_DLL_VARIABLE bool color_test_mode;
+      |                                  ^~~~
+../lib/textstyle/woe32dll.h:27:36: error: stray '@' in program
+   27 | # define LIBTEXTSTYLE_DLL_VARIABLE @DLL_VARIABLE@
+      |                                    ^
+../lib/textstyle.h:625:8: note: in expansion of macro 'LIBTEXTSTYLE_DLL_VARIABLE'
+  625 | extern LIBTEXTSTYLE_DLL_VARIABLE enum color_option color_mode;
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~
+../lib/textstyle/woe32dll.h:27:49: error: stray '@' in program
+   27 | # define LIBTEXTSTYLE_DLL_VARIABLE @DLL_VARIABLE@
+      |                                                 ^
+../lib/textstyle.h:625:8: note: in expansion of macro 'LIBTEXTSTYLE_DLL_VARIABLE'
+  625 | extern LIBTEXTSTYLE_DLL_VARIABLE enum color_option color_mode;
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~
+../lib/textstyle.h:625:34: error: expected ';' before 'enum'
+  625 | extern LIBTEXTSTYLE_DLL_VARIABLE enum color_option color_mode;
+      |                                  ^~~~
+../lib/textstyle/woe32dll.h:27:36: error: stray '@' in program
+   27 | # define LIBTEXTSTYLE_DLL_VARIABLE @DLL_VARIABLE@
+      |                                    ^
+../lib/textstyle.h:628:8: note: in expansion of macro 'LIBTEXTSTYLE_DLL_VARIABLE'
+  628 | extern LIBTEXTSTYLE_DLL_VARIABLE const char *style_file_name;
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~
+../lib/textstyle/woe32dll.h:27:49: error: stray '@' in program
+   27 | # define LIBTEXTSTYLE_DLL_VARIABLE @DLL_VARIABLE@
+      |                                                 ^
+../lib/textstyle.h:628:8: note: in expansion of macro 'LIBTEXTSTYLE_DLL_VARIABLE'
+  628 | extern LIBTEXTSTYLE_DLL_VARIABLE const char *style_file_name;
+      |        ^~~~~~~~~~~~~~~~~~~~~~~~~
+../lib/textstyle.h:628:34: error: expected ';' before 'const'
+  628 | extern LIBTEXTSTYLE_DLL_VARIABLE const char *style_file_name;
+      |                                  ^~~~~
+In file included from C:/msys64/mingw64/include/io.h:10,
+                 from ../lib/textstyle.h:687:
+../lib/string.h:52:3: error: #error "Please include config.h first."
+   52 |  #error "Please include config.h first."
+      |   ^~~~~
+In file included from C:/msys64/mingw64/include/sec_api/stdlib_s.h:9,
+                 from C:/msys64/mingw64/include/stdlib.h:658,
+                 from ../lib/stdlib.h:36,
+                 from hello.c:23:
+../lib/stdlib.h:45:3: error: #error "Please include config.h first."
+   45 |  #error "Please include config.h first."
+      |   ^~~~~
+In file included from C:/msys64/mingw64/include/process.h:13,
+                 from C:/msys64/mingw64/include/unistd.h:11,
+                 from ../lib/unistd.h:40,
+                 from hello.c:25:
+../lib/sys/types.h:28:3: error: #error "Please include config.h first."
+   28 |  #error "Please include config.h first."
+      |   ^~~~~
+In file included from C:/msys64/mingw64/include/unistd.h:50:
+../lib/sys/types.h:28:3: error: #error "Please include config.h first."
+   28 |  #error "Please include config.h first."
+      |   ^~~~~
+../lib/unistd.h:76:3: error: #error "Please include config.h first."
+   76 |  #error "Please include config.h first."
+      |   ^~~~~
+In file included from ../lib/unistd.h:165:
+../lib/sys/types.h:28:3: error: #error "Please include config.h first."
+   28 |  #error "Please include config.h first."
+      |   ^~~~~
+../lib/unistd.h:717:24: error: expected ';' before 'extern'
+  717 | _GL_INLINE_HEADER_BEGIN
+      |                        ^
+      |                        ;
+../lib/unistd.h:2953:22: error: expected ';' before 'int'
+ 2953 | _GL_INLINE_HEADER_END
+      |                      ^
+      |                      ;
+make[2]: *** [Makefile:396: hello.o] 오류 1
+make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/adhoc-tests' 나감
+make[1]: *** [Makefile:692: all-recursive] 오류 1
+make[1]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle' 나감
+make: *** [Makefile:566: all] 오류 2
 
+=> 모든 .c, .h, .in.h 파일에 최상단에 #include "config.h" 를 추가해줘야함 
+
+auto_include_config_h.sh생성
+#!/bin/bash
+
+# 현재 디렉토리와 하위 디렉토리에서 .c 및 .h 파일 찾기
+find . -name '*.c' -o -name '*.h' | while read -r file; do
+  # 파일의 첫 번째 줄에 #include "config.h"가 포함되어 있는지 확인
+  if grep -q '#include "config.h"' "$file"; then
+    echo "$file에는 이미 #include \"config.h\"가 포함되어 있습니다."
+  else
+    echo "$file에 #include \"config.h\"를 추가합니다."
+    # 임시 파일을 생성하여 #include "config.h"를 추가
+    temp_file=$(mktemp)
+    echo '#include "config.h"' > "$temp_file"
+    cat "$file" >> "$temp_file"
+    mv "$temp_file" "$file"
+  fi
+done
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# chmod +x auto_include_config_h.sh
+# ./auto_include_config_h.sh
+...
+./lib/xvasprintf.h에 #include "config.h"를 추가합니다.
+./lib/_Noreturn.h에 #include "config.h"를 추가합니다.
+./tests/arg-nonnull.h에 #include "config.h"를 추가합니다.
+./tests/c++defs.h에 #include "config.h"를 추가합니다.
+./tests/dummy.c에 #include "config.h"를 추가합니다.
+./tests/test-accessors.c에 #include "config.h"를 추가합니다.
+./tests/test-instanceof.c에 #include "config.h"를 추가합니다.
+./tests/test-memory-ostream.c에 #include "config.h"를 추가합니다.
+./tests/test-term-ostream.c에 #include "config.h"를 추가합니다.
+...
+
+#make
+./configure: line 6805: syntax error near unexpected token `('
+./configure: line 6805: `    DLL_VARIABLE=__declspec(dllexport)'
+make: *** [Makefile:596: config.status] 오류 2
+
+configure.ac 수정
+# Windows-specific settings for mingw and Cygwin
+case "$host_os" in
+  mingw* | cygwin*) 
+    is_woe32=yes
+    ;;
+  *) 
+    is_woe32=no
+    ;;
+esac
+
+if test "$is_woe32" = "yes"; then
+    AM_CONDITIONAL([WOE32DLL], true)
+    AM_CONDITIONAL([WOE32], true)
+    echo "WOE32DLL and WOE32 are enabled."
+    LDFLAGS="-no-undefined -export-dynamic"
+    AC_SUBST([DLL_VARIABLE], [__declspec(dllexport)])
+else
+    AM_CONDITIONAL([WOE32DLL], false)
+    AM_CONDITIONAL([WOE32], false)
+    echo "WOE32DLL and WOE32 are disabled."
+    LDFLAGS="-no-undefined"
+    AC_SUBST([DLL_VARIABLE], [])
+fi
+
+#make
+checking for /mingw64/bin/gcc option to enable C23 features... (cached) unupported
+checking for /mingw64/bin/gcc option to enable C11 features... (cached) noe needed
+checking dependency style of /mingw64/bin/gcc... (cached) gcc3
+checking how to run the C preprocessor... /mingw64/bin/cpp
+checking build system type... x86_64-w64-mingw32
+checking host system type... x86_64-w64-mingw32
+configure.ac: Configured host OS: mingw32
+./configure: line 6805: syntax error near unexpected token `('
+./configure: line 6805: `    DLL_VARIABLE=__declspec(dllexport)'
+
+#configure.ac 수정
+# Read version number from version.sh
+. $srcdir/version.sh
+gl_INIT_PACKAGE([libtextstyle], [$VERSION_NUMBER])
+# Initialize Automake (위치변경)
+AM_INIT_AUTOMAKE([1.13 silent-rules])
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# autoconf
+# autoreconf -ivf
+# ./configure
+# make
 
 
