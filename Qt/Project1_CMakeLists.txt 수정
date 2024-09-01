@@ -5133,3 +5133,24 @@ make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle' 나감
 make[1]: *** [Makefile:703: all-recursive] 오류 1
 make[1]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle' 나감
 make: *** [Makefile:569: all] 오류 2
+
+(수정)
+lib/color.h
+enum color_option { color_no, color_tty, color_yes, color_html };
+중복정의되어있어 하나 삭제
+
+lib/term_style_control.h
+_GL_ASYNC_SAFE 선언이있는지 확인
+선언이 없어서 검색
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -r -n "define _GL_ASYNC_SAFE" .
+./autom4te.cache/traces.0:24717:#define _GL_ASYNC_SAFE
+./autom4te.cache/traces.3:4260:#define _GL_ASYNC_SAFE
+./gnulib-m4/gnulib-common.m4:883:#define _GL_ASYNC_SAFE
+./gnulib-m4/gnulib-common.m4~:616:#define _GL_ASYNC_SAFE
+./m4/gnulib-common.m4:883:#define _GL_ASYNC_SAFE
+config.h 수정
+/* Define _GL_ASYNC_SAFE lib/term_style_control.h 필요 */
+#ifndef _GL_ASYNC_SAFE
+#define _GL_ASYNC_SAFE
+#endif
