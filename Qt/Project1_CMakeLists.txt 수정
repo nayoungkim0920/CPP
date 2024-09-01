@@ -5154,3 +5154,94 @@ config.h 수정
 #ifndef _GL_ASYNC_SAFE
 #define _GL_ASYNC_SAFE
 #endif
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -r -n -E "#define _GL_ATTRIBUTE_MALLOC|#define _GL_ATTRIBUTE_DEALLOC_FREE" .
+찾을수없음
+config.h 수정
+#ifndef _GL_ATTRIBUTE_MALLOC
+#define _GL_ATTRIBUTE_MALLOC /* 정의할 내용 */
+#endif
+
+#ifndef _GL_ATTRIBUTE_DEALLOC_FREE
+#define _GL_ATTRIBUTE_DEALLOC_FREE /* 정의할 내용 */
+#endif
+
+# autoreconf -ivf && ./configure && make
+
+config.h와 config.h.in에 추가해도 계속 초기화가 되서
+configure.ac에 추가함
+# Define _GL_ASYNC_SAFE if necessary
+AC_DEFINE([_GL_ASYNC_SAFE], [], [Define to enable async safe functions])
+
+# Define _GL_ATTRIBUTE_MALLOC if necessary
+AC_DEFINE([_GL_ATTRIBUTE_MALLOC], [], [Define to enable malloc attributes])
+
+# Define _GL_ATTRIBUTE_DEALLOC_FREE if necessary
+AC_DEFINE([_GL_ATTRIBUTE_DEALLOC_FREE], [], [Define to enable dealloc free attributes])
+
+# autoreconf -ivf && ./configure && make
+(오류)
+In file included from ../lib/stdio.h:1,
+                 from hello.c:23:
+../config.h:174:9: warning: "_GL_ATTRIBUTE_DEALLOC_FREE" redefined
+  174 | #define _GL_ATTRIBUTE_DEALLOC_FREE /**/
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from C:/msys64/mingw64/include/io.h:10,
+                 from ../lib/textstyle.h:688,
+                 from hello.c:21:
+../lib/string.h:699:11: note: this is the location of the previous definition
+  699 | #  define _GL_ATTRIBUTE_DEALLOC_FREE _GL_ATTRIBUTE_DEALLOC (rpl_free, 1)
+      |           ^~~~~~~~~~~~~~~~~~~~~~~~~~
+mv -f .deps/hello.Tpo .deps/hello.Po
+/bin/sh ../libtool  --tag=CC   --mode=link /mingw64/bin/gcc  -I/mingw64/include  -no-undefined -export-dynamic -o hello.exe hello.o ../lib/libtextstyle.la
+libtool: link: /mingw64/bin/gcc -I/mingw64/include -o .libs/hello.exe hello.o -Wl,--export-all-symbols  /mingw64/lib/libtextstyle.a -L/mingw64/lib -lws2_32 -liconv -lncurses
+make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/adhoc-tests' 나감
+Making all in doc
+make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/doc' 들어감
+make[2]: 'all'을(를) 위해 할 일이 없습니다.
+make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/doc' 나감
+make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle' 들어감
+/bin/sh ./libtool  --tag=CC   --mode=compile /mingw64/bin/gcc -DHAVE_CONFIG_H -I.   -I/mingw64/include  -I/mingw64/include -c -o lib/color.lo lib/color.c
+libtool: compile:  /mingw64/bin/gcc -DHAVE_CONFIG_H -I. -I/mingw64/include -I/mingw64/include -c lib/color.c  -DDLL_EXPORT -DPIC -o lib/.libs/color.o
+In file included from lib/color.c:35:
+lib/concat-filename.h: In function 'xconcatenated_filename':
+lib/concat-filename.h:45:3: error: expected declaration specifiers before '_GL_ATTRIBUTE_RETURNS_NONNULL'
+   45 |   _GL_ATTRIBUTE_RETURNS_NONNULL;
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+lib/color.c:42:6: error: parameter 'color_mode' is initialized
+   42 | enum color_option color_mode = color_tty;
+      |      ^~~~~~~~~~~~
+lib/color.c:50:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+   50 | {
+      | ^
+lib/color.c:78:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+   78 | {
+      | ^
+lib/color.c:85:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+   85 | {
+      | ^
+lib/color.c:391:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  391 | {
+      | ^
+lib/color.c:423:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  423 | {
+      | ^
+lib/concat-filename.h:42:14: error: old-style parameter declarations in prototyped function definition
+   42 | extern char *xconcatenated_filename (const char *directory,
+      |              ^~~~~~~~~~~~~~~~~~~~~~
+lib/color.c:451: error: expected '{' at end of input
+make[2]: *** [Makefile:684: lib/color.lo] 오류 1
+make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle' 나감
+make[1]: *** [Makefile:703: all-recursive] 오류 1
+make[1]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle' 나감
+make: *** [Makefile:569: all] 오류 2
+(수정)
+_GL_ATTRIBUTE_DEALLOC_FREE 매크로가 config.h와 lib/string.h에서 각각 정의
+# Define _GL_ATTRIBUTE_DEALLOC_FREE if necessary
+# 중복선언주석처리 lib/string.h
+#AC_DEFINE([_GL_ATTRIBUTE_DEALLOC_FREE], [], [Define to enable dealloc free attributes])
+# Define _GL_ATTRIBUTE_RETURNS_NONNULL if necessary
+# 추가
+AC_DEFINE([_GL_ATTRIBUTE_RETURNS_NONNULL], [], [Define to enable returns nonnull attributes])
+
