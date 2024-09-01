@@ -4956,5 +4956,107 @@ nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
 # autoreconf -ivf
 # ./configure
 # make
+../lib/stddef.h:108:3: error: #error "Please include config.h first."
+  108 |  #error "Please include config.h first."
+      |   ^~~~~
+../lib/stddef.h:134:6: error: operator '!' has no right operand
+  134 | #if !
+      |      ^
+....
+configure.ac 수정
+AC_DEFINE([_GL_CONFIG_H_INCLUDED], [1], [Define to prevent multiple inclusion])
 
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -r -l "Some platforms lack wchar_t" .                             
+./lib/stddef.h
+./lib/stddef.in.h
 
+c:\libidn2\gettext-0.22.5\libtextstyle>findstr /s /m /c:"Some platforms lack wchar_t" *.*
+lib\stddef.h
+lib\stddef.in.h
+
+/c/libidn2/gettext-0.22.5/libtextstyle/configure.ac
+# Check for wchar_t type
+AC_CHECK_TYPE([wchar_t],
+  [AC_DEFINE([HAVE_WCHAR_T], [1], [Define to 1 if you have wchar_t])],
+  [AC_DEFINE([HAVE_WCHAR_T], [0], [Define to 0 if you do not have wchar_t])]
+)
+
+/c/libidn2/gettext-0.22.5/libtextstyle/lib/stddef.h
+/* Some platforms lack wchar_t.  */
+#if !
+# define wchar_t int
+#endif
+
+/c/libidn2/gettext-0.22.5/libtextstyle/lib/stddef.in.h
+/* Some platforms lack wchar_t.  */
+#if !@HAVE_WCHAR_T@
+# define wchar_t int
+#endif
+
+결론)
+stddef.h
+/* Some platforms lack wchar_t.  */
+/*#if !
+# define wchar_t int
+#endif*/
+
+stddef.in.h
+/* Some platforms lack wchar_t.  */
+/*#if !@HAVE_WCHAR_T@
+# define wchar_t int
+#endif*/
+
+/* Some platforms lack wchar_t.  */
+/*#if !@HAVE_WCHAR_T@
+  #define wchar_t int
+#endif*/
+
+# autoreconf -ivf && ./configure && make
+make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/doc' 들어감
+make[2]: 'all'을(를) 위해 할 일이 없습니다.
+make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/doc' 나감
+make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle' 들어감
+make[2]: *** 'color.lo'에서 필요한 'color.c' 타겟을 만들 규칙이 없습니다.  멈춤.
+make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle' 나감
+make[1]: *** [Makefile:694: all-recursive] 오류 1
+make[1]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle' 나감
+make: *** [Makefile:568: all] 오류 2
+
+파일확인
+"C:\libidn2\gettext-0.22.5\libtextstyle\lib\color.h"
+"C:\libidn2\gettext-0.22.5\libtextstyle\lib\color.c"
+
+Makefile.in
+AUTOMAKE_OPTIONS = 1.13 gnu no-dependencies subdir-objects
+libtextstyle_la_SOURCES = \
+	color.c \
+	gl_array_list.c
+AUTOCONF = @AUTOCONF@
+	$(am__cd) $(srcdir) && $(AUTOCONF)
+
+Makefile.am
+AUTOMAKE_OPTIONS = 1.13 gnu no-dependencies subdir-objects
+libtextstyle_la_SOURCES = \
+	color.c \
+	gl_array_list.c 
+AUTOCONF 없음
+
+configure.ac
+AC_CONFIG_SRCDIR([lib/color.c])
+
+(수정)
+Makefile.in
+libtextstyle_la_SOURCES = \
+	lib/color.c \
+	lib/gl_array_list.c 
+
+Makefile.am
+libtextstyle_la_SOURCES = \
+	lib/color.c \
+	lib/gl_array_list.c
+
+configure.ac
+없음
+
+# autoreconf -ivf && ./configure && make
