@@ -5060,3 +5060,76 @@ configure.ac
 없음
 
 # autoreconf -ivf && ./configure && make
+(오류)
+lib/color.h:49:6: error: redeclaration of 'enum color_option'
+   49 | enum color_option { color_no, color_tty, color_yes, color_html };
+      |      ^~~~~~~~~~~~
+lib/color.h:36:6: note: originally defined here
+   36 | enum color_option { color_no, color_tty, color_yes, color_html };
+      |      ^~~~~~~~~~~~
+lib/color.h:49:21: error: redeclaration of enumerator 'color_no'
+   49 | enum color_option { color_no, color_tty, color_yes, color_html };
+      |                     ^~~~~~~~
+lib/color.h:36:21: note: previous definition of 'color_no' with type 'enum color_option'
+   36 | enum color_option { color_no, color_tty, color_yes, color_html };
+      |                     ^~~~~~~~
+lib/color.h:49:31: error: redeclaration of enumerator 'color_tty'
+   49 | enum color_option { color_no, color_tty, color_yes, color_html };
+      |                               ^~~~~~~~~
+lib/color.h:36:31: note: previous definition of 'color_tty' with type 'enum color_option'
+   36 | enum color_option { color_no, color_tty, color_yes, color_html };
+      |                               ^~~~~~~~~
+lib/color.h:49:42: error: redeclaration of enumerator 'color_yes'
+   49 | enum color_option { color_no, color_tty, color_yes, color_html };
+      |                                          ^~~~~~~~~
+lib/color.h:36:42: note: previous definition of 'color_yes' with type 'enum color_option'
+   36 | enum color_option { color_no, color_tty, color_yes, color_html };
+      |                                          ^~~~~~~~~
+lib/color.h:49:53: error: redeclaration of enumerator 'color_html'
+   49 | enum color_option { color_no, color_tty, color_yes, color_html };
+      |                                                     ^~~~~~~~~~
+lib/color.h:36:53: note: previous definition of 'color_html' with type 'enum color_option'
+   36 | enum color_option { color_no, color_tty, color_yes, color_html };
+      |                                                     ^~~~~~~~~~
+In file included from term-ostream.oo.h:65,
+                 from lib/color.c:32:
+lib/term-style-control.h:86:3: error: expected specifier-qualifier-list before '_GL_ASYNC_SAFE'
+   86 |   _GL_ASYNC_SAFE void (*async_restore) (struct term_style_user_data *);
+      |   ^~~~~~~~~~~~~~
+In file included from lib/color.c:35:
+lib/concat-filename.h: In function 'concatenated_filename':
+lib/concat-filename.h:38:3: error: unknown type name '_GL_ATTRIBUTE_MALLOC'
+   38 |   _GL_ATTRIBUTE_MALLOC _GL_ATTRIBUTE_DEALLOC_FREE;
+      |   ^~~~~~~~~~~~~~~~~~~~
+lib/concat-filename.h:44:3: error: expected '=', ',', ';', 'asm' or '__attribute__' before '_GL_ATTRIBUTE_MALLOC'
+   44 |   _GL_ATTRIBUTE_MALLOC _GL_ATTRIBUTE_DEALLOC_FREE
+      |   ^~~~~~~~~~~~~~~~~~~~
+lib/color.c:42:6: error: parameter 'color_mode' is initialized
+   42 | enum color_option color_mode = color_tty;
+      |      ^~~~~~~~~~~~
+lib/color.c:50:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+   50 | {
+      | ^
+lib/color.c:78:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+   78 | {
+      | ^
+lib/color.c:85:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+   85 | {
+      | ^
+lib/color.c:391:1: error: expected '=', ',', ';', 'asm' or '__attribute_
+' before '{' token
+  391 | {
+      | ^
+lib/color.c:423:1: error: expected '=', ',', ';', 'asm' or '__attribute_
+' before '{' token
+  423 | {
+      | ^
+lib/concat-filename.h:36:14: error: old-style parameter declarations in prototyped function definition
+   36 | extern char *concatenated_filename (const char *directory,
+      |              ^~~~~~~~~~~~~~~~~~~~~
+lib/color.c:451: error: expected '{' at end of input
+make[2]: *** [Makefile:684: lib/color.lo] 오류 1
+make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle' 나감
+make[1]: *** [Makefile:703: all-recursive] 오류 1
+make[1]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle' 나감
+make: *** [Makefile:569: all] 오류 2
