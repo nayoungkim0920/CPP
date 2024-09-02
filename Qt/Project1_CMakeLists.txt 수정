@@ -5244,4 +5244,223 @@ _GL_ATTRIBUTE_DEALLOC_FREE 매크로가 config.h와 lib/string.h에서 각각 �
 # Define _GL_ATTRIBUTE_RETURNS_NONNULL if necessary
 # 추가
 AC_DEFINE([_GL_ATTRIBUTE_RETURNS_NONNULL], [], [Define to enable returns nonnull attributes])
+concat-filename.h 수정
+/* undefine error 추가 */
+#ifndef _GL_ATTRIBUTE_DEALLOC_FREE
+#define _GL_ATTRIBUTE_DEALLOC_FREE
+#endif
+color.c에서 선언되지않은 xstrdup함수사용
+color.h 수정
+#include "xstrdup.h" 
+lib/xstrdup.h생성
+#ifndef XSTRDUP_H
+#define XSTRDUP_H
 
+#include <stddef.h>  // for size_t
+
+// Function declaration for xstrdup
+char *xstrdup(const char *s);
+
+#endif /* XSTRDUP_H */
+
+lib/xstrdup.c 생성
+#include "xstrdup.h"
+#include <stdlib.h>  // for malloc, free
+#include <string.h>  // for strlen, strcpy
+
+// Function implementation for xstrdup
+char *xstrdup(const char *s) {
+    if (s == NULL) {
+        return NULL;  // Handle NULL pointer input
+    }
+
+    // Allocate memory for the duplicated string
+    char *dup = (char *)malloc(strlen(s) + 1);
+    if (dup == NULL) {
+        return NULL;  // Memory allocation failed
+    }
+
+    // Copy the string into the allocated memory
+    strcpy(dup, s);
+    return dup;
+}
+
+typedef bool (*gl_listelement_equals_fn) bool 타입이 정의되지 않았습니다
+lib/gl_list.h 수정
+#include <stdbool.h>/*추가*/
+
+lib/gl_list.h:34:25: error: unknown type name '_GL_INLINE'
+   34 | # define GL_LIST_INLINE _GL_INLINE
+configure.ac 수정
+AC_DEFINE([_GL_INLINE],[],[Define for inline]) /*추가*/
+
+lib/gl_list.h:648:24: error: expected ';' before 'int'
+  648 | _GL_ATTRIBUTE_NODISCARD GL_LIST_INLINE int
+      |                        ^               ~~~
+      |                        ;
+configure.ac 수정
+# Define macros for inline header
+AC_DEFINE([_GL_INLINE],[inline],[Define for inline]) /*추가*/
+AC_DEFINE([_GL_INLINE_HEADER_BEGIN], [], [Define for inline header start])
+AC_DEFINE([_GL_INLINE_HEADER_END], [], [Define for inline header end])
+AC_DEFINE([_GL_CONFIG_H_INCLUDED], [1], [Define to prevent multiple inclusion])
+AC_DEFINE([_GL_ATTRIBUTE_NODISCARD], [], [Define for attribute nodiscard])
+AC_DEFINE([_GL_LIST_INLINE], [], [Define for list inline])
+
+lib/xsize.h:66:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before 'xsum'
+   66 | xsum (size_t size1, size_t size2)
+      | ^~~~
+확인할사항
+config.h
+/* Define for inline */
+#define _GL_INLINE /**/
+
+lib/attribute.h
+#define ATTRIBUTE_PURE _GL_ATTRIBUTE_PURE
+
+lib/xsize.h
+/* Get ATTRIBUTE_PURE.  */
+#include "attribute.h"
+#include <stdbool.h> /* 추가 bool타입 사용*/
+
+lib/xsize.h:68:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before 'xsum'
+   68 | xsum (size_t size1, size_t size2)
+      | ^~~~
+lib/xsize.h:76:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before 'xsum3'
+   76 | xsum3 (size_t size1, size_t size2, size_t size3)
+      | ^~~~~
+lib/xsize.h:83:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before 'xsum4'
+   83 | xsum4 (size_t size1, size_t size2, size_t size3, size_t size4)
+      | ^~~~~
+lib/xsize.h:90:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before 'xmax'
+   90 | xmax (size_t size1, size_t size2)
+      | ^~~~
+
+configure.ac 수정
+AC_DEFINE([_GL_ATTRIBUTE_PURE], [__attribute__((pure))], [Define to __attribute__((pure))])
+
+(오류)
+lib/gl_array_list.c:531:25: error: unknown type name '_GL_ATTRIBUTE_MAYBE_UNUSED'
+  531 | gl_array_iterator_free (_GL_ATTRIBUTE_MAYBE_UNUSED gl_list_iterator_t *iterator)
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~
+lib/gl_array_list.c:691:5: error: 'gl_array_iterator_free' undeclared here (not in a function); did you mean 'gl_array_iterator_next'?
+  691 |     gl_array_iterator_free,
+      |     ^~~~~~~~~~~~~~~~~~~~~~
+      |     gl_array_iterator_next
+make[2]: *** [Makefile:684: lib/gl_array_list.lo] 오류 1
+make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle' 나감
+make[1]: *** [Makefile:703: all-recursive] 오류 1
+make[1]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle' 나감
+make: *** [Makefile:569: all] 오류 2
+
+(수정)
+configure.ac 수정
+AC_DEFINE([_GL_ATTRIBUTE_MAYBE_UNUSED], [__attribute__((unused))], [Define to __attribute__((unused))])
+
+(오류)
+lib/gl_array_list.c:692:9: error: initialization of 'void (*)(gl_list_iterator_t *)' 
+from incompatible pointer type '_Bool (*)(gl_list_iterator_t *, const void **, struct gl_list_node_impl **)' [-Wincompatible-pointer-types]
+  692 |         gl_array_iterator_next, /* ??         ^~~~~~~~~~~~~~~~~~~~~
+lib/gl_array_list.c:692:9: note: (near initialization for 'gl_array_list_implementation.iterator_free')
+
+(수정)
+static bool gl_array_iterator_next (gl_list_iterator_t *iterator, const void **eltp, gl_list_node_t *nodep)
+static void gl_array_iterator_free (_GL_ATTRIBUTE_MAYBE_UNUSED gl_list_iterator_t *iterator)
+gl_array_iterator_next가 iterator_free 함수 포인터와 일치하지 않음
+
+(오류)
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: lib/.libs/color.o:color.c:(.text+0x1cb): undefined reference to `term_ostream_create'
+(수정)
+선언된파일찾아 포함하기
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -rn 'term_ostream_create' .
+Binary file ./adhoc-tests/.libs/hello.exe matches
+Binary file ./doc/libtextstyle.info matches
+./doc/libtextstyle.texi:1000:@deftypefn Function term_ostream_t term_ostream_create (int@tie{}@var{fd}, const@tie{}char@tie{}*@var{filename}, ttyctl_t@tie{}@var{tty_control})
+./doc/libtextstyle_3.html:534:<dt><u>Function:</u> term_ostream_t <b>term_ostream_create</b><i> (int&nbsp;<var>fd</var>, const&nbsp;char&nbsp;*<var>filename</var>, ttyctl_t&nbsp;<var>tty_control</var>)</i>
+./doc/libtextstyle_5.html:155:<tr><td></td><td valign="top"><a href="libtextstyle_3.html#IDX32"><code>term_ostream_create</code></a></td><td valign="top"><a href="libtextstyle_3.html#SEC27">3.5.3.3 The <code>term_ostream</code> class</a></td></tr>
+./gnulib-local/lib/term-ostream.oo.c:2377:term_ostream_create (int fd, const char *filename, ttyctl_t tty_control)
+./gnulib-local/lib/term-ostream.oo.h:132:       term_ostream_create (int fd, const char *filename, ttyctl_t tty_control);
+./gnulib-local/lib/term-styled-ostream.oo.c:651:  stream->destination = term_ostream_create (fd, filename, tty_control);
+./gnulib-local/tests/test-term-ostream.c:30:  stream = term_ostream_create (1, "stdout", TTYCTL_AUTO);
+Binary file ./hello.exe matches
+Binary file ./lib/.libs/color.o matches
+Binary file ./lib/.libs/libtextstyle.a matches
+Binary file ./lib/.libs/libtextstyle_la-color.o matches
+Binary file ./lib/.libs/libtextstyle_la-term-ostream.o matches
+Binary file ./lib/.libs/libtextstyle_la-term-styled-ostream.o matches
+./lib/color.c:103:  stream = term_ostream_create (1, "stdout", TTYCTL_AUTO);
+Binary file ./lib/color.o matches
+./lib/libtextstyle.sym:96:term_ostream_create
+./lib/libtextstyle.sym.in:96:term_ostream_create
+Binary file ./lib/libtextstyle_la-color.o matches
+Binary file ./lib/libtextstyle_la-term-ostream.o matches
+Binary file ./lib/libtextstyle_la-term-styled-ostream.o matches
+(찾음) ./lib/term-ostream.c:2317:term_ostream_create (int fd, const char *filename, ttyctl_t tty_control)
+(찾음) ./lib/term-ostream.h:370:       term_ostream_create (int fd, const char *filename, ttyctl_t tty_control);
+./lib/term-ostream.oo.c:2377:term_ostream_create (int fd, const char *filename, ttyctl_t tty_control)
+./lib/term-ostream.oo.h:132:       term_ostream_create (int fd, const char *filename, ttyctl_t tty_control);
+./lib/term-styled-ostream.c:646:  stream->destination = term_ostream_create (fd, filename, tty_control);
+./lib/term-styled-ostream.oo.c:651:  stream->destination = term_ostream_create (fd, filename, tty_control);
+./lib/textstyle.h:327:       term_ostream_create (int fd, const char *filename, ttyctl_t tty_control);
+./tests/test-accessors.c:34:    ostream_t stream = term_ostream_create (1, "(stdout)", TTYCTL_AUTO);
+./tests/test-instanceof.c:18:  ostream_t stream3 = term_ostream_create (1, "(stdout)", TTYCTL_AUTO);
+./tests/test-term-ostream.c:30:  stream = term_ostream_create (1, "stdout", TTYCTL_AUTO);
+
+링커오류가났으므로
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# gcc -I /c/libidn2/gettext-0.22.5/libtextstyle -std=gnu99 -D_GNU_SOURCE -c lib/term-ostream.c -o lib/term-ostream.o
+
+(오류)
+lib/error.h:477:19: error: unknown type name '_GL_ATTRIBUTE_COLD'
+  477 |                   _GL_ATTRIBUTE_COLD
+      |                   ^~~~~~~~~~~~~~~~~~
+(수정)
+configure.ac
+AC_DEFINE([_GL_ATTRIBUTE_COLD], [__attribute__((cold))], [Define to __attribute__((cold))])
+configure.ac 를 수정했기때문에 config.h파일을 재생성하려면
+autoreconf -ivf -> ./configure -> make ->config.h 생성
+gcc -I /c/libidn2/gettext-0.22.5/libtextstyle -std=gnu99 -D_GNU_SOURCE -c lib/term-ostream.c -o lib/term-ostream.o
+
+(오류)
+lib/error.h:478:41: error: expected declaration specifiers or '...' before
+(' token
+  478 |                   _GL_ATTRIBUTE_FORMAT ((_GL_ATTRIBUTE_SPEC_PRINTF_ERROR, 3, 4)));
+
+(수정)
+configure.ac 수정
+AC_DEFINE([_GL_ATTRIBUTE_FORMAT], [__attribute__((format))], [Define to __attribute__((format))])
+AC_DEFINE([_GL_ATTRIBUTE_SPEC_PRINTF_ERROR], [__attribute__((format(printf, 1, 2)))], [Define to __attribute__((format(printf, 1, 2)))])
+
+(오류)
+lib/error.h:478:73: error: expected ')' before ',' token
+  478 |                   _GL_ATTRIBUTE_FORMAT ((_GL_ATTRIBUTE_SPEC_PRINTF_ERROR, 3, 4)));
+      |
+    ^
+(수정)
+__attribute__((format(printf, 1, 2)))를 사용하는 것이 좋음
+lib/error.h 409 수정
+#ifndef _GL_ATTRIBUTE_SPEC_PRINTF_ERROR /*추가*/
+#if GNULIB_VFPRINTF_POSIX
+# define _GL_ATTRIBUTE_SPEC_PRINTF_ERROR _GL_ATTRIBUTE_SPEC_PRINTF_STANDARD
+#else
+# define _GL_ATTRIBUTE_SPEC_PRINTF_ERROR _GL_ATTRIBUTE_SPEC_PRINTF_SYSTEM
+#endif
+#endif /*추가*/
+configure.ac 수정
+# Define macros for inline header
+AC_DEFINE([_GL_INLINE],[inline],[Define for inline]) /*추가*/
+AC_DEFINE([_GL_INLINE_HEADER_BEGIN], [], [Define for inline header start])
+AC_DEFINE([_GL_INLINE_HEADER_END], [], [Define for inline header end])
+AC_DEFINE([_GL_CONFIG_H_INCLUDED], [1], [Define to prevent multiple inclusion])
+AC_DEFINE([_GL_ATTRIBUTE_NODISCARD], [__attribute__((nodiscard))], [Define for attribute nodiscard])
+AC_DEFINE([_GL_LIST_INLINE], [inline], [Define for list inline])
+AC_DEFINE([_GL_ATTRIBUTE_PURE], [__attribute__((pure))], [Define to __attribute__((pure))])
+AC_DEFINE([_GL_ATTRIBUTE_MAYBE_UNUSED], [__attribute__((unused))], [Define to __attribute__((unused))])
+AC_DEFINE([_GL_ATTRIBUTE_COLD], [__attribute__((cold))], [Define to __attribute__((cold))])
+#AC_DEFINE([_GL_ATTRIBUTE_SPEC_PRINTF_ERROR], [__attribute__((format(printf, 3, 4)))], [Define to __attribute__((format(printf, 3, 4)))])
+#AC_DEFINE([_GL_ATTRIBUTE_FORMAT], [_GL_ATTRIBUTE_SPEC_PRINTF_ERROR], [Define to __attribute__((format))])
+
+# Define _GL_ATTRIBUTE_SPEC_PRINTF_ERROR based on the standard or system attributes
+AC_DEFINE_UNQUOTED([_GL_ATTRIBUTE_SPEC_PRINTF_ERROR], [__attribute__((format(printf, 3, 4)))], [Define to __attribute__((format(printf, 3, 4)))])
+AC_DEFINE([_GL_ATTRIBUTE_FORMAT], [_GL_ATTRIBUTE_SPEC_PRINTF_ERROR], [Define to _GL_ATTRIBUTE_SPEC_PRINTF_ERROR])
