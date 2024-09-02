@@ -5440,6 +5440,15 @@ lib/error.h:478:73: error: expected ')' before ',' token
 (수정)
 __attribute__((format(printf, 1, 2)))를 사용하는 것이 좋음
 lib/error.h 409 수정
+# if ! 0
+_GL_FUNCDECL_SYS (error, void,
+                  (int __status, int __errnum, const char *__format, ...),
+                  _GL_ATTRIBUTE_COLD
+                  /*_GL_ATTRIBUTE_FORMAT ((_GL_ATTRIBUTE_SPEC_PRINTF_ERROR, 3, 4))*/
+				  _GL_ATTRIBUTE_FORMAT
+				);
+# endif
+
 #ifndef _GL_ATTRIBUTE_SPEC_PRINTF_ERROR /*추가*/
 #if GNULIB_VFPRINTF_POSIX
 # define _GL_ATTRIBUTE_SPEC_PRINTF_ERROR _GL_ATTRIBUTE_SPEC_PRINTF_STANDARD
@@ -5464,3 +5473,94 @@ AC_DEFINE([_GL_ATTRIBUTE_COLD], [__attribute__((cold))], [Define to __attribute_
 # Define _GL_ATTRIBUTE_SPEC_PRINTF_ERROR based on the standard or system attributes
 AC_DEFINE_UNQUOTED([_GL_ATTRIBUTE_SPEC_PRINTF_ERROR], [__attribute__((format(printf, 3, 4)))], [Define to __attribute__((format(printf, 3, 4)))])
 AC_DEFINE([_GL_ATTRIBUTE_FORMAT], [_GL_ATTRIBUTE_SPEC_PRINTF_ERROR], [Define to _GL_ATTRIBUTE_SPEC_PRINTF_ERROR])
+
+(오류)
+lib/error.h:541:73: error: expected identifier or '(' before ',' token
+  541 |                   _GL_ATTRIBUTE_FORMAT ((_GL_ATTRIBUTE_SPEC_PRINTF_ERROR, 5, 6)));
+      |
+    ^
+(수정)
+lib/error.h 수정
+# if ! 0
+_GL_FUNCDECL_SYS (error_at_line, void,
+                  (int __status, int __errnum, const char *__filename,
+                   unsigned int __lineno, const char *__format, ...),
+                  _GL_ATTRIBUTE_COLD
+                  /*_GL_ATTRIBUTE_FORMAT ((_GL_ATTRIBUTE_SPEC_PRINTF_ERROR, 5, 6))*/
+				  _GL_ATTRIBUTE_FORMAT_ERROR_AT_LINE
+				  );
+# endif
+
+(오류)
+lib/error.h:586:6: error: 'format' attribute argument 3 value '4' does not refer to a variable argument list
+  586 |      _GL_ATTRIBUTE_FORMAT ((_GL_ATTRIBUTE_SPEC_PRINTF_STANDARD, 3, 0));
+      |      ^~~~~~~~~~~~~~~~~~~~
+lib/error.h:586:27: error: expected ',' or ';' before '(' token
+  586 |      _GL_ATTRIBUTE_FORMAT ((_GL_ATTRIBUTE_SPEC_PRINTF_STANDARD, 3, 0));
+      |                           ^
+lib/error.h:606:6: error: 'format' attribute argument 3 value '4' does not refer to a variable argument list
+  606 |      _GL_ATTRIBUTE_FORMAT ((_GL_ATTRIBUTE_SPEC_PRINTF_STANDARD, 5, 0));
+      |      ^~~~~~~~~~~~~~~~~~~~
+lib/error.h:606:27: error: expected ',' or ';' before '(' token
+  606 |      _GL_ATTRIBUTE_FORMAT ((_GL_ATTRIBUTE_SPEC_PRINTF_STANDARD, 5, 0));
+      |                           ^
+(수정)
+configure.ac 수정
+# AC_DEFINE_UNQUOTED는 매크로를 정의할 때 큰따옴표를 자동으로 제거
+AC_DEFINE_UNQUOTED([_GL_ATTRIBUTE_SPEC_PRINTF_ERROR], [__attribute__((format(printf, 3, 4)))], [Define to __attribute__((format(printf, 3, 4)))])
+AC_DEFINE_UNQUOTED([_GL_ATTRIBUTE_FORMAT], [_GL_ATTRIBUTE_SPEC_PRINTF_ERROR], [Define to _GL_ATTRIBUTE_SPEC_PRINTF_ERROR])
+AC_DEFINE_UNQUOTED([_GL_ATTRIBUTE_FORMAT_ERROR_AT_LINE], [__attribute__((format(printf, 5, 6)))], [Define for format attribute with index 5, 6])
+
+(오류)
+lib/error.h:541:73: error: expected identifier or '(' before ',' token
+  541 |                   _GL_ATTRIBUTE_FORMAT ((_GL_ATTRIBUTE_SPEC_PRINTF_ERROR, 5, 6)));
+      |
+    ^
+lib/error.h:189:21: note: in definition of macro '_GL_FUNCDECL_SYS'
+  189 |   _GL_EXTERN_C_FUNC __VA_ARGS__ rettype func parameters
+      |                     ^~~~~~~~~~~
+lib/error.h:584:6: error: 'format' attribute argument 3 value '4' does not refer to a variable argument list
+  584 |      _GL_ATTRIBUTE_FORMAT ((_GL_ATTRIBUTE_SPEC_PRINTF_STANDARD, 3, 0));
+      |      ^~~~~~~~~~~~~~~~~~~~
+lib/error.h:584:27: error: expected ',' or ';' before '(' token
+  584 |      _GL_ATTRIBUTE_FORMAT ((_GL_ATTRIBUTE_SPEC_PRINTF_STANDARD, 3, 0));
+      |                           ^
+lib/error.h:604:6: error: 'format' attribute argument 3 value '4' does not refer to a variable argument list
+  604 |      _GL_ATTRIBUTE_FORMAT ((_GL_ATTRIBUTE_SPEC_PRINTF_STANDARD, 5, 0));
+      |      ^~~~~~~~~~~~~~~~~~~~
+lib/error.h:604:27: error: expected ',' or ';' before '(' token
+  604 |      _GL_ATTRIBUTE_FORMAT ((_GL_ATTRIBUTE_SPEC_PRINTF_STANDARD, 5, 0));
+      |                           ^
+(수정)
+lib/error.h 수정
+_GL_ATTRIBUTE_SPEC_PRINTF_STANDARD_ERROR /*추가*/
+
+configure.ac 수정
+/*추가*/
+AC_DEFINE_UNQUOTED([_GL_ATTRIBUTE_SPEC_PRINTF_STANDARD_ERROR], [__attribute__((format(printf, 3, 0)))], [Define for format attribute with index 3, 0])
+
+lib/error.h 수정
+extern void verror (int __status, int __errnum, const char *__format,
+                    va_list __args)
+     _GL_ATTRIBUTE_COLD
+     /*_GL_ATTRIBUTE_FORMAT ((_GL_ATTRIBUTE_SPEC_PRINTF_STANDARD, 3, 0));*/
+	 _GL_ATTRIBUTE_SPEC_PRINTF_STANDARD_ERROR /*추가*/
+
+(오류)
+lib/error.h:613:1: error: expected ',' or ';' before 'extern'
+  613 | extern void verror_at_line (int __status, int __errnum, const char *__fname,
+      | ^~~~~~
+configure.ac 수정
+AC_DEFINE_UNQUOTED([_GL_ATTRIBUTE_SPEC_PRINTF_STANDARD_ERROR], [__attribute__((format(printf, 3, 0)))], [Define for format attribute with index 3, 0])
+AC_DEFINE_UNQUOTED([_GL_ATTRIBUTE_SPEC_PRINTF_STANDARD_ERROR_AT_LINE], [__attribute__((format(printf, 5, 0)))], [Define for format attribute with index 5, 0])
+
+lib/error.h 수정
+extern void verror (int __status, int __errnum, const char *__format,
+                    va_list __args)
+     _GL_ATTRIBUTE_COLD
+     _GL_ATTRIBUTE_SPEC_PRINTF_STANDARD_ERROR; /*추가*/
+extern void verror_at_line (int __status, int __errnum, const char *__fname,
+                            unsigned int __lineno, const char *__format,
+                            va_list __args)
+     _GL_ATTRIBUTE_COLD
+     _GL_ATTRIBUTE_SPEC_PRINTF_STANDARD_ERROR_AT_LINE;
