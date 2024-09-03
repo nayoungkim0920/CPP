@@ -5943,12 +5943,52 @@ make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/adhoc-tests' 나�
 make[1]: *** [Makefile:941: all-recursive] 오류 1
 make[1]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle' 나감
 make: *** [Makefile:807: all] 오류 2
+(수정)
+configure.ac 수정
+AC_DEFINE_UNQUOTED([_GL_ATTRIBUTE_FORMAT_PRINTF_STANDARD_1_2], [__attribute__((format(printf, 1, 2)))], [Define to use printf format attribute with parameters (1, 2)])
+AC_DEFINE_UNQUOTED([_GL_ATTRIBUTE_FORMAT_PRINTF_STANDARD_2_0], [__attribute__((format(printf, 2, 0)))], [Define to use printf format attribute with parameters (2, 0)])
+AC_DEFINE_UNQUOTED([_GL_ATTRIBUTE_FORMAT_PRINTF_STANDARD_2_3], [__attribute__((format(printf, 2, 3)))], [Define to use printf format attribute with parameters (2, 3)])
+AC_DEFINE_UNQUOTED([_GL_ATTRIBUTE_FORMAT_PRINTF_STANDARD_3_0], [__attribute__((format(printf, 3, 4)))], [Define to use printf format attribute with parameters (3, 0)])
+AC_DEFINE_UNQUOTED([_GL_ATTRIBUTE_FORMAT_PRINTF_STANDARD_3_4], [__attribute__((format(printf, 3, 4)))], [Define to use printf format attribute with parameters (3, 4)])
+AC_DEFINE_UNQUOTED([_GL_ATTRIBUTE_FORMAT_PRINTF_SYSTEM_2_3], [__attribute__((format(printf, 2, 3)))], [Define to use printf format attribute with parameters (2, 3)])
+AC_DEFINE_UNQUOTED([_GL_ATTRIBUTE_FORMAT_PRINTF_SYSTEM_1_0], [__attribute__((format(printf, 1, 0)))], [Define to use printf format attribute with parameters (1, 0)])
+lib/stdio.h, stdio.in.h 수정
+모두 변경
+...
+_GL_ATTRIBUTE_FORMAT_PRINTF_STANDARD_3_4 /*_GL_ATTRIBUTE_FORMAT_PRINTF_STANDARD (3, 4)*/
+...
 
+(오류)
+../lib/stdio.h:2312:1: error: 'format' attribute argument 3 value '4' does not refer to a variable argument list
+ 2312 | _GL_FUNCDECL_RPL (vsnprintf, int,
+      | ^~~~~~~~~~~~~~~~
+In file included from ../lib/stdio.h:1,
+                 from hello.c:23:
+../config.h:328:9: warning: "_GL_ATTRIBUTE_DEALLOC_FREE" redefined
+  328 | #define _GL_ATTRIBUTE_DEALLOC_FREE /**/
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from C:/msys64/mingw64/include/io.h:10,
+                 from ../lib/textstyle.h:688:
+../lib/string.h:699:11: note: this is the location of the previous definition
+  699 | #  define _GL_ATTRIBUTE_DEALLOC_FREE _GL_ATTRIBUTE_DEALLOC (rpl_free, 1)
+(수정)
+configure.ac 수정
+AC_DEFINE_UNQUOTED([_GL_ATTRIBUTE_FORMAT_PRINTF_STANDARD_3_0], [__attribute__((format(printf, 3, 4)))], [Define to use printf format attribute with parameters (3, 0)])
+-> AC_DEFINE_UNQUOTED([_GL_ATTRIBUTE_FORMAT_PRINTF_STANDARD_3_0], [__attribute__((format(printf, 3, 0)))], [Define to use printf format attribute with parameters (3, 0)])
 
+(오류)
+configure.ac:68: error: possibly undefined macro: AC_CHECK_DEFINE
+      If this token and others are legitimate, please use m4_pattern_allow.
+      See the Autoconf documentation.
+configure.ac:70: error: possibly undefined macro: AC_DEFINE
+autoreconf: error: /mingw64/bin/autoconf failed with exit status: 1
 
-
-
-
+(수정)
+config.h.in 수정
+/* Define to enable dealloc free attributes if not already defined. */
+#ifndef _GL_ATTRIBUTE_DEALLOC_FREE /*추가 lib/string.h 중복선언*/
+#define _GL_ATTRIBUTE_DEALLOC_FREE /**/
+#endif
 
 
 
