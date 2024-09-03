@@ -5647,20 +5647,111 @@ term-ostream.oo.c의 상단에 xmalloca.h를 포함
 nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
 # ls -l /c/libidn2/gettext-0.22.5/libtextstyle/lib/xmalloca.h
 -rw-r--r-- 1 nayou nayou 2721  9월  3 09:17 /c/libidn2/gettext-0.22.5/libtextstyle/lib/xmalloca.h
+
+lib/term-ostream.oo.c 수정
 #include "xmalloca.h" /*추가*/
 
 configure.ac 수정
 # Specify the Gnulib modules to use
 gl_MODULES([xmalloca]) /*추가*/
 
+(오류)
+term-ostream.oo.c: In function 'generate_hyperlink_id':
+term-ostream.oo.c:1158:23: error: implicit declaration of function 'xmalloc'; did you mean 'malloc'? [-Wimplicit-function-declaration]
+(수정)
+lib/term-ostream.oo.c 수정
+/*char *id = (char *) xmalloc (128 / 4 + 1);*/
+  char *id = (char *) malloc (128 / 4 + 1);
 
+(오류)
+term-ostream.oo.c: In function 'generate_hyperlink_id':
+term-ostream.oo.c:1158:23: error: implicit declaration of function 'xmalloc'; did you mean 'malloc'? [-Wimplicit-function-declaration]
+(수정)
+lib/term-ostream.c 수정
+/*char *id = (char *) xmalloc (128 / 4 + 1);*/
+  char *id = (char *) malloc (128 / 4 + 1);
 
+(오류)
+term-ostream.oo.c: In function 'out_error':
+lib/error.h:422:22: error: implicit declaration of function 'unreachable' [-Wimplicit-function-declaration]
+  422 |      (status) != 0 ? unreachable () : (void) 0)
+      |                      ^~~~~~~~~~~
+(수정)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# /c/gnulib/gnulib-tool --import unreachable
+gnulib-tool: warning: module unreachable doesn't exist
+Module list with included dependencies (indented):
+File list:
+  lib/dummy.c
+  m4/00gnulib.m4
+  m4/gnulib-common.m4
+  m4/zzgnulib.m4
+Updating m4/gnulib-cache.m4 (backup in m4/gnulib-cache.m4~)
+Updating lib/Makefile.am (backup in lib/Makefile.am~)
+Finished.
 
+You may need to add #include directives for the following .h files.
 
+Don't forget to
+  - add "lib/Makefile" to AC_CONFIG_FILES in ./configure.ac,
+  - mention "lib" in SUBDIRS in Makefile.am,
+  - mention "-I m4" in ACLOCAL_AMFLAGS in Makefile.am
+    or add an AC_CONFIG_MACRO_DIRS([m4]) invocation in ./configure.ac,
+  - mention "m4/gnulib-cache.m4" in EXTRA_DIST in Makefile.am,
+  - invoke gl_EARLY in ./configure.ac, right after AC_PROG_CC,
+  - invoke gl_INIT in ./configure.ac.
 
+정의된 파일 찾기
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -rn 'unreachable' /c/gnulib
+/c/gnulib/lib/stddef.in.h:191:#ifndef unreachable
+/c/gnulib/lib/stddef.in.h:200:#   define _GL_HAS_BUILTIN_UNREACHABLE __has_builtin (__builtin_unreachable)
+/c/gnulib/lib/stddef.in.h:207:#  define unreachable() __builtin_unreachable ()
+/c/gnulib/lib/stddef.in.h:209:#  define unreachable() __assume (0)
+/c/gnulib/lib/stddef.in.h:222:#  define unreachable() abort ()
+/c/libidn2/gettext-0.22.5/libtextstyle/lib/stddef.in.h
+/c/libidn2/gettext-0.22.5/libtextstyle/lib/stddef.h
 
+unreachable() 함수가 사용된 위치에서 이 매크로 또는 함수가 정의되지 않았기 때문에 발생
+lib/unreachable.h 생성
+/* unreachable.h */
+#ifndef UNREACHABLE_H
+#define UNREACHABLE_H
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
 
+#include <stdlib.h>  // For abort()
 
+_Noreturn void abort(void);  // Ensure abort() is declared
 
+#if defined(__cplusplus)
+}
+#endif
+
+#define unreachable() abort()  // Define the unreachable macro to call abort()
+
+#endif /* UNREACHABLE_H */
+
+lib/error.h 수정
+include "unreachable.h"
+
+lib/error.in.h 수정
+include "unreachable.h"
+
+(오류)
+term-ostream.oo.c:2020:37: error: implicit declaration of function 'xrealloc'; did you mean 'realloc'? [-Wimplicit-function-declaration]
+(수정)
+lib/term-ostream.oo.c 수정
+/*stream->buffer = (char *) xrealloc (stream->buffer, new_allocated);*/
+stream->buffer = (char *) realloc (stream->buffer, new_allocated);
+/*stream->attrbuffer =
+            (attributes_t *)
+            xrealloc (stream->attrbuffer,
+                      new_allocated * sizeof (attributes_t));*/
+		  stream->attrbuffer =
+            (attributes_t *)
+            realloc (stream->attrbuffer,
+                      new_allocated * sizeof (attributes_t));
 
