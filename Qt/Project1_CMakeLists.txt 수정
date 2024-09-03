@@ -5741,17 +5741,152 @@ lib/error.in.h 수정
 include "unreachable.h"
 
 (오류)
-term-ostream.oo.c:2020:37: error: implicit declaration of function 'xrealloc'; did you mean 'realloc'? [-Wimplicit-function-declaration]
+term-ostream.oo.c:2020:37: error: implicit declaration of function 'xrealloc'; 
+did you mean 'realloc'? [-Wimplicit-function-declaration]
 (수정)
-lib/term-ostream.oo.c 수정
+lib/term-ostream.oo.c, lib/term-ostream.c 수정
 /*stream->buffer = (char *) xrealloc (stream->buffer, new_allocated);*/
 stream->buffer = (char *) realloc (stream->buffer, new_allocated);
 /*stream->attrbuffer =
-            (attributes_t *)
-            xrealloc (stream->attrbuffer,
-                      new_allocated * sizeof (attributes_t));*/
-		  stream->attrbuffer =
-            (attributes_t *)
-            realloc (stream->attrbuffer,
-                      new_allocated * sizeof (attributes_t));
+	(attributes_t *)
+	xrealloc (stream->attrbuffer,
+	new_allocated * sizeof (attributes_t));*/
+stream->attrbuffer =
+	(attributes_t *)
+	realloc (stream->attrbuffer,
+	new_allocated * sizeof (attributes_t));
+
+(오류)
+term-ostream.oo.c: In function 'term_ostream__flush':
+term-ostream.oo.c:2067:11: error: implicit declaration of function 'fsync' [-Wimplicit-function-declaration]
+(수정)
+term-ostream.oo.c, term-ostream.c 수정
+#include <unistd.h>
+
+gnulib 모듈 설정(/c/gnulib/gnulib-tool --help : 옵션출력)
+fsync 모듈을 포함
+/c/gnulib/gnulib-tool --import fsync
+fsync 모듈을 추가
+/c/gnulib/gnulib-tool --add-import fsync
+
+lib/fsync.c 만 존재함
+lib/fsync.h 생성
+// fsync.h
+#ifndef FSYNC_H
+#define FSYNC_H
+
+int fsync(int fd);
+
+#endif // FSYNC_H
+
+configure.ac 수정
+# Make sure to include the gnulib modules
+gl_MODULES([fsync]) /*추가*/
+echo ">>>>>>>>>>>>>>$(noinst_HEADERS)" /*makefile.am 에서 생성한 변수값출력*/
+
+Makefile.am 수정
+# Add gnulib modules to the sources
+noinst_HEADERS = $(top_srcdir)/lib/fsync.h
+
+# Add gnulib modules to the sources
+noinst_SOURCES = fsync.c
+
+lib/unistd.h 수정
+gnulib 모듈을 사용하여 fsync를 포터블하게 처리하는 방법
+//#if 1
+/* Synchronize changes, including metadata, to a file.
+   Return 0 if successful, otherwise -1 and errno set.
+   See POSIX:2008 specification
+   <https://pubs.opengroup.org/onlinepubs/9699919799/functions/fsync.html>.  */
+/*# if !0
+_GL_FUNCDECL_SYS (fsync, int, (int fd));
+# endif
+_GL_CXXALIAS_SYS (fsync, int, (int fd));
+_GL_CXXALIASWARN (fsync);
+#elif defined GNULIB_POSIXCHECK
+# undef fsync
+# if HAVE_RAW_DECL_FSYNC
+_GL_WARN_ON_USE (fsync, "fsync is unportable - "
+                 "use gnulib module fsync for portability");
+# endif
+#endif*/
+#if defined GNULIB_POSIXCHECK
+/* GNULIB_POSIXCHECK가 정의된 경우 */
+/* fsync가 제공되지 않거나 포터블하지 않을 수 있습니다. 
+   gnulib 모듈을 사용하여 fsync를 포터블하게 처리하세요. */
+# undef fsync
+# if HAVE_RAW_DECL_FSYNC
+_GL_WARN_ON_USE (fsync, "fsync is unportable - "
+                 "use gnulib module fsync for portability");
+# endif
+#else
+/* GNULIB_POSIXCHECK가 정의되지 않은 경우 */
+/* Synchronize changes, including metadata, to a file.
+   Return 0 if successful, otherwise -1 and errno set.
+   See POSIX:2008 specification
+   <https://pubs.opengroup.org/onlinepubs/9699919799/functions/fsync.html>.  */
+_GL_FUNCDECL_SYS (fsync, int, (int fd));
+_GL_CXXALIAS_SYS (fsync, int, (int fd));
+_GL_CXXALIASWARN (fsync);
+#endif
+lib/unistd.in.h 수정
+gnulib 모듈을 사용하여 fsync를 포터블하게 처리하는 방법
+//#if @GNULIB_FSYNC@
+/* Synchronize changes, including metadata, to a file.
+   Return 0 if successful, otherwise -1 and errno set.
+   See POSIX:2008 specification
+   <https://pubs.opengroup.org/onlinepubs/9699919799/functions/fsync.html>.  */
+/*# if !@HAVE_FSYNC@
+_GL_FUNCDECL_SYS (fsync, int, (int fd));
+# endif
+_GL_CXXALIAS_SYS (fsync, int, (int fd));
+_GL_CXXALIASWARN (fsync);
+#elif defined GNULIB_POSIXCHECK
+# undef fsync
+# if HAVE_RAW_DECL_FSYNC
+_GL_WARN_ON_USE (fsync, "fsync is unportable - "
+                 "use gnulib module fsync for portability");
+# endif
+#endif*/
+#if @GNULIB_FSYNC@
+/* Synchronize changes, including metadata, to a file.
+   Return 0 if successful, otherwise -1 and errno set.
+   See POSIX:2008 specification
+   <https://pubs.opengroup.org/onlinepubs/9699919799/functions/fsync.html>.  */
+# if !@HAVE_FSYNC@
+_GL_FUNCDECL_SYS (fsync, int, (int fd));
+# endif
+_GL_CXXALIAS_SYS (fsync, int, (int fd));
+_GL_CXXALIASWARN (fsync);
+#elif defined GNULIB_POSIXCHECK
+/* GNULIB_POSIXCHECK가 정의된 경우 */
+/* fsync가 제공되지 않거나 포터블하지 않을 수 있습니다. 
+   gnulib 모듈을 사용하여 fsync를 포터블하게 처리하세요. */
+# undef fsync
+# if HAVE_RAW_DECL_FSYNC
+_GL_WARN_ON_USE (fsync, "fsync is unportable - "
+                 "use gnulib module fsync for portability");
+# endif
+#endif
+
+co
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
