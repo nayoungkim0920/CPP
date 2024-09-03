@@ -5564,3 +5564,103 @@ extern void verror_at_line (int __status, int __errnum, const char *__fname,
                             va_list __args)
      _GL_ATTRIBUTE_COLD
      _GL_ATTRIBUTE_SPEC_PRINTF_STANDARD_ERROR_AT_LINE;
+
+(오류)
+lib/error.h:637:20: error: expected ';' before 'void'
+  637 | extern DLL_VARIABLE void (*error_print_progname) (void);
+      |                    ^~~~~
+      |                    ;
+lib/error.h:640:20: error: expected ';' before 'unsigned'
+  640 | extern DLL_VARIABLE unsigned int error_message_count;
+      |                    ^~~~~~~~~
+      |                    ;
+lib/error.h:644:20: error: expected ';' before 'int'
+  644 | extern DLL_VARIABLE int error_one_per_line;
+      |                    ^~~~
+      |  
+;
+(수정)
+Makefile.am 수정
+AM_CPPFLAGS = -I${top_builddir} # 전처리기 플래그 설정 추가
+
+configure.ac 수정
+if test "$host_os" = "mingw32"; then # DLL_VARIABLE 정의
+	AC_DEFINE([DLL_VARIABLE], [__declspec(dllexport)], [Define to __declspec(dllexport)])
+else
+	AC_DEFINE([DLL_VARIABLE], [], [Define to nothing for non-Windows platforms])
+fi
+AC_SUBST([DLL_VARIABLE]) # DLL_VARIABLE 매크로 설정 추가
+
+(오류)
+In file included from term-ostream.oo.c:42:
+lib/get_progname_of.h: In function 'get_progname_of':
+lib/get_progname_of.h:38:24: error: expected declaration specifiers before '_GL_ATTRIBUTE_DEALLOC_FREE'
+   38 |   _GL_ATTRIBUTE_MALLOC _GL_ATTRIBUTE_DEALLOC_FRE
+;
+      |                        ^~~~~~~~~~~~~~~~~~~~~~~~~
+(수정)
+configure.ac 수정
+AC_CHECK_HEADERS([attributes.h])
+# 문자열 값 정의
+AC_DEFINE([_GL_ASYNC_SAFE], [], [Define to enable async safe functions])
+AC_DEFINE([_GL_ATTRIBUTE_MALLOC], [], [Define to enable malloc attributes])
+AC_DEFINE([_GL_ATTRIBUTE_DEALLOC_FREE], [], [Define to enable dealloc free attributes])
+AC_DEFINE([_GL_ATTRIBUTE_RETURNS_NONNULL], [], [Define to enable returns nonnull attributes])
+AC_DEFINE([_GL_INLINE],[inline],[Define for inline])
+AC_DEFINE([_GL_INLINE_HEADER_BEGIN], [], [Define for inline header start])
+AC_DEFINE([_GL_INLINE_HEADER_END], [], [Define for inline header end])
+AC_DEFINE([_GL_CONFIG_H_INCLUDED], [1], [Define to prevent multiple inclusion])
+AC_DEFINE([_GL_LIST_INLINE], [inline], [Define for list inline])
+# C 코드조각 직접 삽입 시
+AC_DEFINE_UNQUOTED([_GL_ATTRIBUTE_NODISCARD], [__attribute__((nodiscard))], [Define for attribute nodiscard])
+AC_DEFINE_UNQUOTED([_GL_ATTRIBUTE_PURE], [__attribute__((pure))], [Define to __attribute__((pure))])
+AC_DEFINE_UNQUOTED([_GL_ATTRIBUTE_MAYBE_UNUSED], [__attribute__((unused))], [Define to __attribute__((unused))])
+AC_DEFINE_UNQUOTED([_GL_ATTRIBUTE_COLD], [__attribute__((cold))], [Define to __attribute__((cold))])
+AC_DEFINE_UNQUOTED([_GL_ATTRIBUTE_SPEC_PRINTF_ERROR], [__attribute__((format(printf, 3, 4)))], [Define to __attribute__((format(printf, 3, 4)))])
+AC_DEFINE_UNQUOTED([_GL_ATTRIBUTE_FORMAT], [_GL_ATTRIBUTE_SPEC_PRINTF_ERROR], [Define to _GL_ATTRIBUTE_SPEC_PRINTF_ERROR])
+AC_DEFINE_UNQUOTED([_GL_ATTRIBUTE_FORMAT_ERROR_AT_LINE], [__attribute__((format(printf, 5, 6)))], [Define for format attribute with index 5, 6])
+AC_DEFINE_UNQUOTED([_GL_ATTRIBUTE_SPEC_PRINTF_STANDARD_ERROR], [__attribute__((format(printf, 3, 0)))], [Define for format attribute with index 3, 0])
+AC_DEFINE_UNQUOTED([_GL_ATTRIBUTE_SPEC_PRINTF_STANDARD_ERROR_AT_LINE], [__attribute__((format(printf, 5, 0)))], [Define for format attribute with index 5, 0])
+
+(오류)
+term-ostream.oo.c: In function 'generate_hyperlink_id':
+term-ostream.oo.c:1158:23: error: implicit declaration of function 'xmalloc'; did you mean 'malloc'? [-Wimplicit-function-declaration]
+(수정)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# find /c/gnulib -name "*xmalloc*"
+/c/gnulib/lib/xmalloc.c
+/c/gnulib/lib/xmalloca.c
+/c/gnulib/lib/xmalloca.h
+/c/gnulib/modules/xmalloca
+
+cp /c/gnulib/lib/xmalloca.h /c/libidn2/gettext-0.22.5/libtextstyle/lib
+cp /c/gnulib/lib/xmalloca.c /c/libidn2/gettext-0.22.5/libtextstyle/lib
+cp /c/gnulib/lib/xmalloc.c /c/libidn2/gettext-0.22.5/libtextstyle/lib
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls /c/libidn2/gettext-0.22.5/libtextstyle/lib/xmalloc*
+/c/libidn2/gettext-0.22.5/libtextstyle/lib/xmalloc.c
+/c/libidn2/gettext-0.22.5/libtextstyle/lib/xmalloca.c
+/c/libidn2/gettext-0.22.5/libtextstyle/lib/xmalloca.h
+
+term-ostream.oo.c의 상단에 xmalloca.h를 포함
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l /c/libidn2/gettext-0.22.5/libtextstyle/lib/xmalloca.h
+-rw-r--r-- 1 nayou nayou 2721  9월  3 09:17 /c/libidn2/gettext-0.22.5/libtextstyle/lib/xmalloca.h
+#include "xmalloca.h" /*추가*/
+
+configure.ac 수정
+# Specify the Gnulib modules to use
+gl_MODULES([xmalloca]) /*추가*/
+
+
+
+
+
+
+
+
+
+
+
+
