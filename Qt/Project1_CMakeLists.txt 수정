@@ -5882,12 +5882,67 @@ _GL_WARN_ON_USE (fsync, "fsync is unportable - "
 # endif
 #endif
 
+(오류)
+term-ostream.oo.c: In function 'term_ostream__set_hyperlink':
+term-ostream.oo.c:2209:32: error: implicit declaration of function 'XMALLOC' [-Wimplicit-function-declaration]
 
+(수정)
+메모리 할당을 위한 함수
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle/lib
+grep -rn "XMALLOC" .
+./xalloc.h:115:# define XMALLOC(t) ((t *) xmalloc (sizeof (t)))
 
+Makefile.am 수정
+# Add gnulib modules to the sources
+# $(top_srcdir) : .
+noinst_HEADERS = $(top_srcdir)/lib/fsync.h $(top_srcdir)/lib/xalloc.h
 
+configure.ac 수정
+AC_DEFINE([GNULIB_XALLOC], [1], [Define for gnulib xalloc])
 
+xalloc.h 확인
+xmalloc 함수를 사용하여 주어진 타입 t의 크기만큼 메모리를 할당하고, 그 포인터를 반환
+# define XMALLOC(t) ((t *) xmalloc (sizeof (t))) 
+hyperlink_t *hyperlink = XMALLOC (hyperlink_t);
 
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# autoreconf -ivf && ./configure && gcc -I /c/libidn2/gettext-0.22.5/libtextstyle -std=gnu99 -D_GNU_SOURCE -c lib/term-ostream.c -o lib/term-ostream.o
+성공!
 
+# make
+../lib/stdio.h:1979:19: error: expected ',' or ';' before '(' token
+ 1979 |                   _GL_ATTRIBUTE_FORMAT_PRINTF_STANDARD (3, 4)
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../lib/stdio.h:2116:19: error: expected ',' or ';' before '(' token
+ 2116 |                   _GL_ATTRIBUTE_FORMAT_PRINTF_STANDARD (2, 3)
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../lib/stdio.h:2136:1: error: 'format' attribute argument 3 value '4' does not refer to a variable argument list
+ 2136 | _GL_FUNCDECL_SYS (vasprintf, int,
+      | ^~~~~~~~~~~~~~~~
+../lib/stdio.h:2138:19: error: expected ',' or ';' before '(' token
+ 2138 |                   _GL_ATTRIBUTE_FORMAT_PRINTF_STANDARD (2, 0)
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../lib/stdio.h:2312:1: error: 'format' attribute argument 3 value '4' does not refer to a variable argument list
+ 2312 | _GL_FUNCDECL_RPL (vsnprintf, int,
+      | ^~~~~~~~~~~~~~~~
+../lib/stdio.h:2315:19: error: expected ',' or ';' before '(' token
+ 2315 |                   _GL_ATTRIBUTE_FORMAT_PRINTF_STANDARD (3, 0)
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from ../lib/stdio.h:1,
+                 from hello.c:23:
+../config.h:328:9: warning: "_GL_ATTRIBUTE_DEALLOC_FREE" redefined
+  328 | #define _GL_ATTRIBUTE_DEALLOC_FREE /**/
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from C:/msys64/mingw64/include/io.h:10,
+                 from ../lib/textstyle.h:688:
+../lib/string.h:699:11: note: this is the location of the previous definition
+  699 | #  define _GL_ATTRIBUTE_DEALLOC_FREE _GL_ATTRIBUTE_DEALLOC (rpl_free, 1)
+      |           ^~~~~~~~~~~~~~~~~~~~~~~~~~
+make[2]: *** [Makefile:626: hello.o] 오류 1
+make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/adhoc-tests' 나감
+make[1]: *** [Makefile:941: all-recursive] 오류 1
+make[1]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle' 나감
+make: *** [Makefile:807: all] 오류 2
 
 
 
