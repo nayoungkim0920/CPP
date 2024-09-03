@@ -5990,7 +5990,17 @@ config.h.in 수정
 #define _GL_ATTRIBUTE_DEALLOC_FREE /**/
 #endif
 
+(오류)
+lib/gl_list.h:651:1: warning: 'nodiscard' attribute directive ignored [-Wattributes]
+  651 | {
+      | ^
+(수정)
+configure.ac 수정
+# Check for C++ compiler
+AC_PROG_CXX
 
+# Set C++ standard to C++17
+CXXFLAGS="$CXXFLAGS -std=c++17"
 
 
 
