@@ -5764,9 +5764,11 @@ term-ostream.oo.c, term-ostream.c 수정
 #include <unistd.h>
 
 gnulib 모듈 설정(/c/gnulib/gnulib-tool --help : 옵션출력)
-fsync 모듈을 포함
+gnulib 모듈을 현재 패키지에 가져와서 필요한 파일을 추가하고, 
+관련 설정을 configure.ac와 Makefile.am에 반영
 /c/gnulib/gnulib-tool --import fsync
-fsync 모듈을 추가
+gnulib 모듈을 이미 가져온 후, 새 모듈을 추가하거나 기존 모듈을 업데이트할 때 사용
+gnulib 설정을 유지한 채로 새로운 모듈을 추가
 /c/gnulib/gnulib-tool --add-import fsync
 
 lib/fsync.c 만 존재함
@@ -5782,7 +5784,6 @@ int fsync(int fd);
 configure.ac 수정
 # Make sure to include the gnulib modules
 gl_MODULES([fsync]) /*추가*/
-echo ">>>>>>>>>>>>>>$(noinst_HEADERS)" /*makefile.am 에서 생성한 변수값출력*/
 
 Makefile.am 수정
 # Add gnulib modules to the sources
@@ -5790,6 +5791,17 @@ noinst_HEADERS = $(top_srcdir)/lib/fsync.h
 
 # Add gnulib modules to the sources
 noinst_SOURCES = fsync.c
+
+# Makefile.am에 새로운 타겟 추가
+print-noinst-headers-sources:
+@echo ">>>>>>>>>>>>>>>>>>>>>>$(noinst_HEADERS)"
+@echo ">>>>>>>>>>>>>>>>>>>>>>$(noinst_SOURCES)"
+# autoreconf -ivf && ./configure
+# make print-noinst-headers-sources
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# make print-noinst-headers-sources
+>>>>>>>>>>>>>>>>>>>>>>./lib/fsync.h
+>>>>>>>>>>>>>>>>>>>>>>./lib/fsync.c
 
 lib/unistd.h 수정
 gnulib 모듈을 사용하여 fsync를 포터블하게 처리하는 방법
@@ -5829,6 +5841,7 @@ _GL_FUNCDECL_SYS (fsync, int, (int fd));
 _GL_CXXALIAS_SYS (fsync, int, (int fd));
 _GL_CXXALIASWARN (fsync);
 #endif
+
 lib/unistd.in.h 수정
 gnulib 모듈을 사용하여 fsync를 포터블하게 처리하는 방법
 //#if @GNULIB_FSYNC@
@@ -5869,7 +5882,6 @@ _GL_WARN_ON_USE (fsync, "fsync is unportable - "
 # endif
 #endif
 
-co
 
 
 
