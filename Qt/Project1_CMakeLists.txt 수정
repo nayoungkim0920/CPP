@@ -6002,6 +6002,13 @@ AC_PROG_CXX
 # Set C++ standard to C++17
 CXXFLAGS="$CXXFLAGS -std=c++17"
 
+(오류)
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: lib/.libs/color.o:color.c:(.text+0x291): undefined reference to `ostream_write_str'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: lib/.libs/color.o:color.c:(.text+0x328): undefined reference to `ostream_write_mem'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: lib/.libs/color.o:color.c:(.text+0x3bd): undefined reference to `ostream_write_mem'
+
+(수정)
+
 
 
 
