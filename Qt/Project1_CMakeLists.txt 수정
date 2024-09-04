@@ -6587,6 +6587,7 @@ AC_DEFINE([_GL_ARG_NONNULL], [__attribute__((nonnull))], [Define for non-null at
 configure.ac 수정
 AC_DEFINE([_GL_ARG_NONNULL], [__attribute__((nonnull(__VA_ARGS__)))], [Define for non-null argument checking])
 
+AC_DEFINE_UNQUOTED([_GL_ARG_NONNULL], [__attribute__((nonnull(__VA_ARGS__)))], [Define for non-null argument checking])
 
 
 
