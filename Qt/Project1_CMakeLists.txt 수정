@@ -6294,26 +6294,40 @@ libtextstyle_la_SOURCES = \
 	lib/error.c \
 	lib/full-write.c \
 	lib/terminfo.c \
-	lib/term-style-control.h \
-	lib/fsync.h
+	lib/term-style-control.c \
+	lib/fsync.c
 
 nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
 # grep -rnE --include='*.h' "deactivate_term_style_controller" .
 ./lib/term-style-control.h:144:   deactivate_term_style_controller.
 ./lib/term-style-control.h:179:       deactivate_term_style_controller (const struct term_style_controller *controller,
 
-(오류)
+# autoreconf -ivf && ./configure && make
 lib/concat-filename.c: In function 'concatenated_filename':
 lib/concat-filename.c:69:7: error: implicit declaration of function 'stpcpy' [-Wimplicit-function-declaration]
    69 |   p = stpcpy (p, filename);
       |       ^~~~~~
 lib/concat-filename.c:69:7: warning: incompatible implicit declaration of built-in function 'stpcpy' [-Wbuiltin-declaration-mismatch]
-(수정)
+make[2]: *** [Makefile:945: lib/concat-filename.lo] 오류 1
+make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle' 나감
+make[1]: *** [Makefile:964: all-recursive] 오류 1
+make[1]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle' 나감
+make: *** [Makefile:823: all] 오류 2
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -rnE --include='*.h' "strcpy" .
+./lib/unistr.h:541:/* Similar to strcpy(), wcscpy().  */
+./lib/unistr.h:543:       u8_strcpy (uint8_t *_UC_RESTRICT dest, const uint8_t *src);
+./lib/unistr.h:545:       u16_strcpy (uint16_t *_UC_RESTRICT dest, const uint16_t *src);
+./lib/unistr.h:547:       u32_strcpy (uint32_t *_UC_RESTRICT dest, const uint32_t *src);
+./lib/unistr.in.h:540:/* Similar to strcpy(), wcscpy().  */
+./lib/unistr.in.h:542:       u8_strcpy (uint8_t *_UC_RESTRICT dest, const uint8_t *src);
+./lib/unistr.in.h:544:       u16_strcpy (uint16_t *_UC_RESTRICT dest, const uint16_t *src);
+./lib/unistr.in.h:546:       u32_strcpy (uint32_t *_UC_RESTRICT dest, const uint32_t *src);
+
 lib/concat-filename.h 수정
 #include <config.h> /*추가*/
-#include <string.h> /*추가*/
-
-
+#include "unistr.h" /*추가*/
 
 
 
