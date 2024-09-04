@@ -6003,14 +6003,302 @@ AC_PROG_CXX
 CXXFLAGS="$CXXFLAGS -std=c++17"
 
 (오류)
-C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: lib/.libs/color.o:color.c:(.text+0x291): undefined reference to `ostream_write_str'
-C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: lib/.libs/color.o:color.c:(.text+0x328): undefined reference to `ostream_write_mem'
-C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: lib/.libs/color.o:color.c:(.text+0x3bd): undefined reference to `ostream_write_mem'
+...
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+lib/.libs/color.o:color.c:(.text+0x291): undefined reference to `ostream_write_str'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+lib/.libs/color.o:color.c:(.text+0x328): undefined reference to `ostream_write_mem'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe:
+lib/.libs/color.o:color.c:(.text+0x3bd): undefined reference to `ostream_write_mem'
+...
+(수정)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -rn 'define ostream_write_str' ./
+./gnulib-local/lib/ostream.oo.h:87:#define ostream_write_str ostream_write_str_inline
+./lib/ostream.h:170:#define ostream_write_str ostream_write_str_inline
+./lib/ostream.oo.h:87:#define ostream_write_str ostream_write_str_inline
+color.o 파일에서 참조된 ostream_write_str 함수의 정의를 찾을 수 없다
+링크 중인 오브젝트 파일이나 라이브러리에 해당 함수의 정의가 없을 때 발생
+ostream_write_str가 #define 지시어로 ostream_write_str_inline로 정의되어 있는 것을 볼 수 있다.
+ostream_write_str는 실제로는 ostream_write_str_inline라는 이름의 인라인 함수로 정의되어 있을 가능성이 있다.
+컴파일러에 -fno-inline 또는 관련 옵션을 추가하여 인라인 함수의 실제 구현이 생성되도록 할 수 있다.
+configure.ac 수정
+if test "$host_os" = "mingw32"; then
+    AM_CONDITIONAL([WOE32DLL], true)
+    AM_CONDITIONAL([WOE32], true)
+    echo "WOE32DLL and WOE32 are enabled."
+    LDFLAGS="$LDFLAGS -no-undefined -export-dynamic"
+else
+    AM_CONDITIONAL([WOE32DLL], false)
+    AM_CONDITIONAL([WOE32], false)
+    echo "WOE32DLL and WOE32 are disabled."
+    LDFLAGS="$LDFLAGS -no-undefined"
+fi
+
+# 공통적으로 추가되는 LDFLAGS 설정
+LDFLAGS="$LDFLAGS -L./lib -lterm_ostream"
+AC_SUBST(LDFLAGS)
+
+# CFLAGS 설정 추가
+CFLAGS="$CFLAGS -fno-inline"
+AC_SUBST(CFLAGS)
+
+(오류)
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+cannot find -lterm_ostream: No such file or directory
 
 (수정)
+configure.ac 수정
+LDFLAGS="$LDFLAGS -L/c/libidn2/gettext-0.22.5/libtextstyle/lib -lterm_ostream"
+=> LDFLAGS="$LDFLAGS -L/c/libidn2/gettext-0.22.5/libtextstyle/lib"
 
+(오류)
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+lib/.libs/color.o:color.c:(.text+0x1cb): undefined reference to `term_ostream_create'
+(수정)
+lib/color.h
+#include "term-ostream.h" /*추가*/
 
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe:
+lib/.libs/color.o:color.c:(.text+0x1cb): undefined reference to `term_ostream_create'
 
+libterm_ostream.a 또는 libterm_ostream.so 파일이 없으면, term_ostream 라이브러리가 제대로 설치되지 않았거나, 라이브러리 파일이 빌드되지 않았다는 것을 의미
+term_ostream 라이브러리의 소스 코드가 제대로 다운로드되었는지 확인
 
+정의찾기
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -rn --include='*.h' 'define term_ostream' ./
 
+term-ostream.h 헤더 파일에서 term_ostream_create와 같은 함수가 매크로로 정의되어 있는 것을 확인
+함수정의
+./lib/term-ostream.c:2323:
+term_ostream_create (int fd, const char *filename, ttyctl_t tty_control)
+함수선언
+./lib/term-ostream.h:370:       
+term_ostream_create (int fd, const char *filename, ttyctl_t tty_control);
+확인
+lib/term-ostream.h
+extern term_ostream_t
+       term_ostream_create (int fd, const char *filename, ttyctl_t tty_control);
+
+lib/term-ostream.c
+term_ostream_t
+term_ostream_create (int fd, const char *filename, ttyctl_t tty_control)
+{
+...
+}
+빌드 시스템 점검
+Makefile.am
+libtextstyle_la_SOURCES = \
+	lib/color.c \
+	lib/gl_array_list.c \
+	lib/term-ostream.c
+
+configure.ac
+AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([lib/Makefile])
+
+(오류)
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+lib/.libs/color.o:color.c:(.text+0x291): undefined reference to `ostream_write_str'
+
+(수정)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -rn 'define ostream_write_str' .
+./gnulib-local/lib/ostream.oo.h:87:#define ostream_write_str ostream_write_str_inline
+./lib/ostream.h:170:#define ostream_write_str ostream_write_str_inline
+./lib/ostream.oo.h:87:#define ostream_write_str ostream_write_str_inline
+lib/color.h 수정
+#include "ostream.h" /*추가*/
+Makefile.am 수정
+libtextstyle_la_SOURCES = \
+	lib/color.c \
+	lib/gl_array_list.c \
+	lib/term-ostream.c \
+        lib/ostream.c
+(오류)
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+lib/.libs/color.o:color.c:(.text+0x1670): undefined reference to `xconcatenated_filename'
+(수정)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -rn 'xconcatenated_filename' .
+Binary file ./adhoc-tests/.libs/hello.exe matches
+Binary file ./hello.exe matches
+Binary file ./lib/.libs/color.o matches
+./lib/color.c:402:            xconcatenated_filename (stylesdir_after_install, file_name, NULL);
+./lib/color.c:443:            xconcatenated_filename (stylesdir, default_style_file,
+Binary file ./lib/color.o matches
+>> ./lib/concat-filename.h:41:extern char *xconcatenated_filename (const char *directory,
+./lib/concat-filename.h~:47:extern char *xconcatenated_filename (const char *directory,
+>> ./lib/xconcat-filename.c:32:xconcatenated_filename (const char *directory, const char *filename,
+Makefile.am 수정
+libtextstyle_la_SOURCES = \
+	lib/color.c \
+	lib/gl_array_list.c \
+	lib/term-ostream.c \
+	lib/ostream.c \
+	lib/concat-filename.h
+lib/color.h 수정
+#include "concat-filename.h" /*추가*/
+(오류) undefined error
+color.c xconcatenated_filename
+color.c xstrdup
+gl_array_list.c xsum
+term-ostream.c error
+term-ostream.c full_write
+term-ostream.c tparm
+term-ostream.c tputs
+term-ostream.c deactivate_term_non_default_mode
+term-ostream.c activate_term_non_default_mode
+term-ostream.c xmax
+term-ostream.c fsync
+term-ostream.c deactivate_term_style_controller
+
+(수정)
+grep -rnE --include='*.h' \
+"xsum|error|full_write|tparm|tputs|\
+deactivate_term_non_default_mode|\
+activate_term_non_default_mode|\
+xmax|fsync|deactivate_term_style_controller" .
+
+# grep -rnE --include='*.h' "xsum" .
+./lib/xsize.h:58:      size_t size = xsum (header_size, xtimes (n, element_size));
+./lib/xsize.h:68:xsum (size_t size1, size_t size2)
+./lib/xsize.h:76:xsum3 (size_t size1, size_t size2, size_t size3)
+./lib/xsize.h:78:  return xsum (xsum (size1, size2), size3);
+./lib/xsize.h:83:xsum4 (size_t size1, size_t size2, size_t size3, size_t size4)
+./lib/xsize.h:85:  return xsum (xsum (xsum (size1, size2), size3), size4);
+
+lib/gl_array_list.c 수정
+#include "xsize.h" /*추가*/
+
+Makefile.am 수정
+libtextstyle_la_SOURCES = \
+	lib/color.c \
+	lib/gl_array_list.c \
+	lib/term-ostream.c \
+	lib/ostream.c \
+	lib/concat-filename.c \
+    	lib/xsize.c
+
+lib/term-ostream.c 수정
+#include "error.h" /*추가*/
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -rnE --include='*.h' "full_write" .
+./lib/full-write.h:30:extern size_t full_write (int fd, const void *buf, size_t count);
+
+lib/term-ostream.c 수정
+#include "full-write.h" /*추가*/
+
+Makefile.am 수정
+libtextstyle_la_SOURCES = \
+	lib/color.c \
+	lib/gl_array_list.c \
+	lib/term-ostream.c \
+	lib/ostream.c \
+	lib/concat-filename.c \
+    	lib/xsize.c \
+	lib/error.c \
+	lib/full-write.c
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -rnE --include='*.h' "tparm" .
+./lib/terminfo.h:95:extern char * tparm (const char *str, ...);
+
+lib/term-ostream.c 수정
+#include "terminfo.h" /*추가*/
+
+Makefile.am 수정
+libtextstyle_la_SOURCES = \
+	lib/color.c \
+	lib/gl_array_list.c \
+	lib/term-ostream.c \
+	lib/ostream.c \
+	lib/concat-filename.c \
+    	lib/xsize.c \
+	lib/error.c \
+	lib/full-write.c \
+	lib/terminfo.c
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -rnE --include='*.h' "tputs" .
+./lib/terminfo.h:112:extern void tputs (const char *cp, int affcnt, int (*outcharfun) (int));
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -rnE --include='*.h' "deactivate_term_non_default_mode" .
+./lib/term-style-control.h:159:   deactivate_term_non_default_mode.  */
+./lib/term-style-control.h:171:       deactivate_term_non_default_mode (const struct term_style_controller *controller,
+
+lib/term-ostream.c 수정
+#include "term-style-control.h" /*추가*/
+
+Makefile.am 수정
+libtextstyle_la_SOURCES = \
+	lib/color.c \
+	lib/gl_array_list.c \
+	lib/term-ostream.c \
+	lib/ostream.c \
+	lib/concat-filename.c \
+    	lib/xsize.c \
+	lib/error.c \
+	lib/full-write.c \
+	lib/terminfo.c \
+	lib/term-style-control.h
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -rnE --include='*.h' "activate_term_non_default_mode" .
+./lib/term-style-control.h:61:  bool non_default_active;           /* True if activate_term_non_default_mode()
+./lib/term-style-control.h:159:   deactivate_term_non_default_mode.  */
+./lib/term-style-control.h:161:       activate_term_non_default_mode (const struct term_style_controller *controller,
+./lib/term-style-control.h:171:       deactivate_term_non_default_mode (const struct term_style_controller *controller,
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -rnE --include='*.h' "xmax" .
+./lib/xsize.h:90:xmax (size_t size1, size_t size2)
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -rnE --include='*.h' "fsync" .
+./config.h:18:/* Define to 1 when the gnulib module fsync should be tested. */
+./config.h:34:/* Define to 1 if you have the 'fsync' function. */
+./lib/fsync.h:1:// fsync.h
+./lib/fsync.h:5:int fsync(int fd);
+./lib/unistd.h:1606:   <https://pubs.opengroup.org/onlinepubs/9699919799/functions/fsync.html>.  */
+./lib/unistd.h:1608:_GL_FUNCDECL_SYS (fsync, int, (int fd));
+./lib/unistd.h:1610:_GL_CXXALIAS_SYS (fsync, int, (int fd));
+./lib/unistd.h:1611:_GL_CXXALIASWARN (fsync);
+./lib/unistd.h:1613:# undef fsync
+./lib/unistd.h:1615:_GL_WARN_ON_USE (fsync, "fsync is unportable - "
+./lib/unistd.h:1616:                 "use gnulib module fsync for portability");
+./lib/unistd.in.h:1072:   <https://pubs.opengroup.org/onlinepubs/9699919799/functions/fsync.html>.  */
+./lib/unistd.in.h:1074:_GL_FUNCDECL_SYS (fsync, int, (int fd));
+./lib/unistd.in.h:1076:_GL_CXXALIAS_SYS (fsync, int, (int fd));
+./lib/unistd.in.h:1077:_GL_CXXALIASWARN (fsync);
+./lib/unistd.in.h:1079:# undef fsync
+./lib/unistd.in.h:1081:_GL_WARN_ON_USE (fsync, "fsync is unportable - "
+./lib/unistd.in.h:1082:                 "use gnulib module fsync for portability");
+./동적/config.h:156:/* Define to 1 when the gnulib module fsync should be tested. */
+./동적/config.h:460:/* Define to 1 if you have the 'fsync' function. */
+
+lib/term-ostream.c 수정
+#include "fsync.h" /*추가*/
+
+Makefile.am 수정
+libtextstyle_la_SOURCES = \
+	lib/color.c \
+	lib/gl_array_list.c \
+	lib/term-ostream.c \
+	lib/ostream.c \
+	lib/concat-filename.c \
+    	lib/xsize.c \
+	lib/error.c \
+	lib/full-write.c \
+	lib/terminfo.c \
+	lib/term-style-control.h \
+	lib/fsync.h
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -rnE --include='*.h' "deactivate_term_style_controller" .
+./lib/term-style-control.h:144:   deactivate_term_style_controller.
+./lib/term-style-control.h:179:       deactivate_term_style_controller (const struct term_style_controller *controller,
 
