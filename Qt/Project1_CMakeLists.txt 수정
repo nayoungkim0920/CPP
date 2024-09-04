@@ -4662,7 +4662,7 @@ configure: loading site script /etc/config.site
 ./configure: line 4981: `GL_REQUIRE_VERSION(2.0)'
 
 configure.ac 수정
-GL_REQUIRE_VERSION"([2.0])"
+GL_REQUIRE_VERSION"([2.0])" 중요!!
 
 #make
 make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/adhoc-tests' 들어감
@@ -6326,10 +6326,266 @@ nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
 ./lib/unistr.in.h:546:       u32_strcpy (uint32_t *_UC_RESTRICT dest, const uint32_t *src);
 
 lib/concat-filename.h 수정
-#include <config.h> /*추가*/
-#include "unistr.h" /*추가*/
+#include "string.h" /*추가*/
+
+(오류)
+lib/error.c:119:1: error: expected identifier or '(' before string constant
+  119 | "this configure-time declaration test was not run"
+      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+(수정)
+lib/error.c
+# if !(GNULIB_STRERROR_R_POSIX || HAVE_DECL_STRERROR_R)
+#  ifndef HAVE_DECL_STRERROR_R
+"this configure-time declaration test was not run"
+#  endif
+=> #    error "this configure-time declaration test was not run"
+
+(오류)
+lib/error.c:218:51: error: expected declaration specifiers or '...' before numeric constant
+  218 | static void _GL_ATTRIBUTE_FORMAT_PRINTF_STANDARD (3, 0) _GL_ARG_NONNULL ((3))
+      |                                                   ^
+(수정)
+lib/error.c
+/*static void _GL_ATTRIBUTE_FORMAT_PRINTF_STANDARD (3, 0) _GL_ARG_NONNULL ((3))*/
+static void _GL_ATTRIBUTE_FORMAT_PRINTF_STANDARD_3_0 _GL_ARG_NONNULL ((3))
+
+(오류)
+lib/error.c:218:54: error: expected declaration specifiers or '...' before numeric constant
+  218 | static void _GL_ATTRIBUTE_FORMAT_PRINTF_STANDARD (3, 0) _GL_ARG_NONNULL ((3))
+      |                                                      ^
+(수정)
+/*# define _GL_ATTRIBUTE_FORMAT_PRINTF_STANDARD (a, b) 삭제*/
+static void _GL_ATTRIBUTE_FORMAT_PRINTF_STANDARD (3,0) _GL_ARG_NONNULL ((3))
+=> static void _GL_ATTRIBUTE_FORMAT_PRINTF_STANDARD_3_0 _GL_ARG_NONNULL ((3))
+
+(오류)
+lib/error.c: In function 'verror':
+lib/error.c:128:23: error: implicit declaration of function 'getprogname' [-Wimplicit-function-declaration]
+  128 | # define program_name getprogname ()
+      |                       ^~~~~~~~~~~
+(수정)
+lib/error.c
+#include <stdlib.h> 확인
+#   undef getprogname
+#   define getprogname rpl_getprogname
+getprogname 함수가 실제로 rpl_getprogname으로 대체된다는 것을 의미
+rpl_getprogname은 GNULIB의 대체 구현으로, GNULIB 모듈이 필요
+getprogname을 시스템 함수로 체크하고, 필요한 경우 GNULIB을 포함
+configure.ac 수정
+AC_CONFIG_RPATH([/c/gnulib/lib]) #추가
+# Check for the presence of getprogname function # 추가
+AC_CHECK_FUNCS([getprogname])
+# If not found, use GNULIB for getprogname
+if test "$ac_cv_func_getprogname" = no; then
+  AC_MSG_WARN([getprogname not found, using GNULIB])
+  # Add GNULIB to the project
+  # You should already have GNULIB initialization in your project
+  GNULIB_MODULES([getprogname])
+fi
+AC_DEFINE([getprogname], [1], [Define for gnulib getprogname])는 직접적인 정의를 추가할 수 있지만, 
+보통 AC_CHECK_FUNCS와 GNULIB 모듈을 사용하는 것이 더 일반적
+
+(오류)
+lib/error.c:273:32: note: in expansion of macro 'program_name'
+  273 |       fprintf (stderr, "%s: ", program_name);
+      |                                ^~~~~~~~~~~~
+(수정)
+
+(오류)
+lib/error.c:29:9: error: implicit declaration of function 'error_tail' [-Wimplicit-function-declaration]
+   29 |         error_tail (status, err, fmt, args)
+      |         ^~~~~~~~~~
+
+(수정)
+lib/error.c:277:3: note: in expansion of macro 'error_tail'
+  277 |   error_tail (status, errnum, message, args, mode_flags);
+      |   ^~~~~~~~~~
+
+(오류)
+configure.ac:25: error: possibly undefined macro: AC_CONFIG_RPATH
+      If this token and others are legitimate, please use m4_pattern_allow.
+      See the Autoconf documentation.
+autoreconf: error: /mingw64/bin/autoconf failed with exit status: 1
+(수정)
+configure.ac
+AC_CHECK_HEADERS([stdlib.h]) #추가
+
+# Configure RPATH for libraries
+AC_CONFIG_RPATH([/c/gnulib/lib]) #추가
+
+# Configure libraries (optional, if needed)
+AC_CONFIG_LIBS #추가
+
+m4_pattern_allow([AC_CONFIG_RPATH]) #추가
+m4_pattern_allow([AC_CONFIG_LIBS]) #추가
+
+(오류)
+./configure: line 5151: syntax error near unexpected token `/c/gnulib/lib'
+./configure: line 5151: `AC_CONFIG_RPATH(/c/gnulib/lib) #추가'
+
+(수정)
+AC_CONFIG_RPATH"([./lib])" # 중요!!
+
+(오류)
+./configure: line 5151: AC_CONFIG_RPATH(/c/libidn2/gettext-0.22.5/libtextstyle/lib): No such file or directory
+./configure: line 5160: (getprogname): command not found
+./configure: line 5167: syntax error near unexpected token `getprogname'
+./configure: line 5167: `  GNULIB_MODULES(getprogname)'
+
+(수정)
+configure.ac 수정
+#AC_CONFIG_RPATH"([/c/libidn2/gettext-0.22.5/libtextstyle/lib])" # 추가
+
+# 공통적으로 추가되는 LDFLAGS 설정
+LDFLAGS="$LDFLAGS -L./lib"
+# Set library path for linking and runtime
+LDFLAGS="$LDFLAGS -L/c/libidn2/gettext-0.22.5/libtextstyle/lib -Wl,-rpath,/c/libidn2/gettext-0.22.5/libtextstyle/lib"
+AC_SUBST(LDFLAGS)
+AC_SUBST([CPPFLAGS], ["-I/c/libidn2/gettext-0.22.5/libtextstyle/lib"]) #헤더파일
+
+GNULIB_MODULES"([getprogname])"
+
+(오류)
+./configure: line 5154: AC_CONFIG_LIBS: command not found
+./configure: line 5160: (getprogname): command not found
+
+(수정)
+configure.ac 수정
+두가지 방법
+첫쨰. 무조건 m4_define([gl_GETPROGNAME],[1]) #추가
+두번쨰. 선언되어있는지 확인후 처리 (이걸로함)
+# Check for the presence of getprogname function # 추가
+AC_CHECK_FUNCS"([getprogname])"
+# If not found, use GNULIB for getprogname
+if test "$ac_cv_func_getprogname" = no; then
+  AC_MSG_WARN([getprogname not found, using GNULIB])
+  GNULIB_MODULES([getprogname])
+fi
+
+m4_pattern_allow([AC_CHECK_FUNCS])
+m4_pattern_allow([GNULIB_MODULES])
+
+(오류)
+./configure: line 5160: (getprogname): command not found
+./configure: line 5165: syntax error near unexpected token `getprogname'
+./configure: line 5165: `  GNULIB_MODULES(getprogname)'
+
+(수정)
+configure.ac 수정
+AC_SUBST([CPPFLAGS], ["-I/mingw64/include"])
+AC_SUBST([LDFLAGS], ["$LDFLAGS -L./lib -L/mingw64/lib -L/usr/lib -Wl,-rpath,/mingw64/bin"])
+
+(오류)
+getprogname: command not found
+C++ preprocessor "/lib/cpp" fails sanity check
+(수정)
+configure.ac 수정
+AC_SUBST([LDFLAGS], [
+  $LDFLAGS \
+  -L/c/libidn2/gettext-0.22.5/libtextstyle/lib \
+  -L/mingw64/lib \
+  -L/usr/lib \
+  -Wl,-rpath,/mingw64/bin
+])
+AC_SUBST([CPPFLAGS], ["-I/mingw64/include"]) #헤더파일
+
+(오류)
+lib/error.c:119:6: error: #error "this configure-time declaration test was not run"
+  119 | #    error "this configure-time declaration test was not run" /*?      ^~~~~
+(수정)
+configure.ac 수정
+AC_CHECK_HEADERS([stdio.h stdlib.h])
+AC_CHECK_FUNCS"[printf malloc]"
+
+(오류)
+static void _GL_ATTRIBUTE_FORMAT_PRINTF_STANDARD_3_0 _GL_ARG_NONNULL ((3))
+lib/error.c:218:71: error: expected declaration specifiers or '...' before '(' token
+  218 | static void _GL_ATTRIBUTE_FORMAT_PRINTF_STANDARD_3_0 _GL_ARG_NONNULL ((3))
+      |                                                                       ^
+(수정)
+configure.ac수정
+AC_CHECK_FUNCS"[getprogname]"
+AC_CHECK_FUNCS"[printf malloc]"
+# If not found, use GNULIB for getprogname
+if test "$ac_cv_func_getprogname" = no; then
+  AC_MSG_WARN([getprogname not found, using GNULIB])
+  GNULIB_MODULES"[getprogname]"
+fi
+
+GNULIB_MODULES"[argp, getprogname]"
+GNULIB_MODULES"[printf malloc]"
+
+(오류)
+lib/error.c:128:23: error: implicit declaration of function 'getprogname' [-Wimplicit-function-declaration]
+  128 | # define program_name getprogname ()
+      |                       ^~~~~~~~~~~
+(수정)
+# Check for the presence of getprogname function # 추가
+AC_CHECK_FUNCS"[getprogname]"
+AC_CHECK_FUNCS"[printf malloc]"
+# If not found, use GNULIB for getprogname
+if test "$ac_cv_func_getprogname" = no; then
+  AC_MSG_WARN([getprogname not found, using GNULIB])
+  GNULIB_MODULES"[getprogname]"
+fi
+
+GNULIB_MODULES"[argp, getprogname]"
+GNULIB_MODULES"[printf malloc]"
+
+(오류)
+lib/error.c:218:71: error: expected declaration specifiers or '...' before '(' token
+  218 | static void _GL_ATTRIBUTE_FORMAT_PRINTF_STANDARD_3_0 _GL_ARG_NONNULL ((3))
+      |                                                                       ^
+
+(수정)
+lib/string.h 호출
+_GL_ARG_NONNULL ((1))
+
+lib/error.c 호출
+_GL_ARG_NONNULL ((3))
+
+configure.ac 수정
+AC_DEFINE([_GL_ARG_NONNULL], [__attribute__((nonnull))], [Define for non-null argument checking])
+
+(오류)
+./string.h:812:1: error: expected ',' or ';' before '(' token
+  812 | _GL_FUNCDECL_RPL (memchr, void *, (void const *__s, int __c, size_t __n)
+      | ^~~~~~~~~~~~~~~~
+(수정)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -rn '#define _GL_FUNCDECL_RPL' .
+...
+./lib/string.h:271:#define _GL_FUNCDECL_RPL(func,rettype,parameters,...) \
+./lib/string.h:273:#define _GL_FUNCDECL_RPL_1(rpl_func,rettype,parameters,...) \
+...
+_GL_FUNCDECL_RPL (memchr, void *, (void const *__s, int __c, size_t __n)
+                                  _GL_ATTRIBUTE_PURE
+                                  _GL_ARG_NONNULL ((1)));
+
+./string.h:812:1: error: expected ',' or ';' before '(' token
+  812 | _GL_FUNCDECL_RPL (memchr, void *, (void const *__s, int __c, size_t __n)
+      | ^~~~~~~~~~~~~~~~
+configure.ac 수정
+AC_DEFINE([_GL_EXTERN_C_FUNC], [extern "C"], [Define for C linkage])
+AC_DEFINE([_GL_ATTRIBUTE_PURE], [__attribute__((pure))], [Define for pure attribute])
+AC_DEFINE([_GL_ARG_NONNULL], [__attribute__((nonnull))], [Define for non-null attribute])
 
 
+
+
+
+./string.h:1025:1: error: expected ',' or ';' before '(' token
+ 1025 | _GL_FUNCDECL_SYS (stpcpy, char *,
+      | ^~~~~~~~~~~~~~~~
+./string.h:1186:1: error: expected ',' or ';' before '(' token
+ 1186 | _GL_FUNCDECL_SYS (strdup, char *,
+      | ^~~~~~~~~~~~~~~~
+./string.h:1285:1: error: expected ',' or ';' before '(' token
+ 1285 | _GL_FUNCDECL_SYS (strndup, char *,
+      | ^~~~~~~~~~~~~~~~
+
+configure.ac 수정
+AC_DEFINE([_GL_ARG_NONNULL], [__attribute__((nonnull(__VA_ARGS__)))], [Define for non-null argument checking])
 
 
 
