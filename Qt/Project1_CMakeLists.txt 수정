@@ -6302,3 +6302,30 @@ nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
 ./lib/term-style-control.h:144:   deactivate_term_style_controller.
 ./lib/term-style-control.h:179:       deactivate_term_style_controller (const struct term_style_controller *controller,
 
+(오류)
+lib/concat-filename.c: In function 'concatenated_filename':
+lib/concat-filename.c:69:7: error: implicit declaration of function 'stpcpy' [-Wimplicit-function-declaration]
+   69 |   p = stpcpy (p, filename);
+      |       ^~~~~~
+lib/concat-filename.c:69:7: warning: incompatible implicit declaration of built-in function 'stpcpy' [-Wbuiltin-declaration-mismatch]
+(수정)
+lib/concat-filename.h 수정
+#include <config.h> /*추가*/
+#include <string.h> /*추가*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
