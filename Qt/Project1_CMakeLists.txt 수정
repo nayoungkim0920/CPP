@@ -6567,36 +6567,44 @@ _GL_FUNCDECL_RPL (memchr, void *, (void const *__s, int __c, size_t __n)
       | ^~~~~~~~~~~~~~~~
 configure.ac 수정
 AC_DEFINE([_GL_EXTERN_C_FUNC], [extern "C"], [Define for C linkage])
-AC_DEFINE([_GL_ATTRIBUTE_PURE], [__attribute__((pure))], [Define for pure attribute])
-AC_DEFINE([_GL_ARG_NONNULL], [__attribute__((nonnull))], [Define for non-null attribute])
+AC_DEFINE_UNQUOTED([_GL_ARG_NONNULL_1], [__attribute__((nonnull(1)))], [Define _GL_ARG_NONNULL ((1))])
+AC_DEFINE_UNQUOTED([_GL_ARG_NONNULL_1_3], [__attribute__((nonnull(1,3)))], [Define _GL_ARG_NONNULL ((1, 3))])
+AC_DEFINE_UNQUOTED([_GL_ARG_NONNULL_1_2], [__attribute__((nonnull(1,2)))], [Define _GL_ARG_NONNULL ((1, 2))])
+AC_DEFINE_UNQUOTED([_GL_ATTRIBUTE_PURE], [__attribute__((pure))], [Define _GL_ATTRIBUTE_PURE macro for pure function attribute])
 
-
-
-
-
-./string.h:1025:1: error: expected ',' or ';' before '(' token
- 1025 | _GL_FUNCDECL_SYS (stpcpy, char *,
+(오류)
+./unistd.h:1613:1: error: expected identifier or '(' before string constant
+ 1613 | _GL_FUNCDECL_SYS(fsync, int, (int fd));
       | ^~~~~~~~~~~~~~~~
-./string.h:1186:1: error: expected ',' or ';' before '(' token
- 1186 | _GL_FUNCDECL_SYS (strdup, char *,
+(수정)
+lib/unistd.in.h 수정
+#define _GL_FUNCDECL_SYS(func, ret_type, args) \
+  extern ret_type func args;
+_GL_FUNCDECL_SYS(fsync, int, (int fd));
+
+(오류)
+./stdlib.h:813:1: error: expected identifier or '(' before string constant
+  813 | _GL_FUNCDECL_RPL (free, void, (void *ptr));
       | ^~~~~~~~~~~~~~~~
-./string.h:1285:1: error: expected ',' or ';' before '(' token
- 1285 | _GL_FUNCDECL_SYS (strndup, char *,
+./stdlib.h:871:1: error: expected identifier or '(' before string constant
+  871 | _GL_FUNCDECL_SYS (aligned_alloc, void *,
       | ^~~~~~~~~~~~~~~~
-
-configure.ac 수정
-AC_DEFINE([_GL_ARG_NONNULL], [__attribute__((nonnull(__VA_ARGS__)))], [Define for non-null argument checking])
-
-AC_DEFINE_UNQUOTED([_GL_ARG_NONNULL], [__attribute__((nonnull(__VA_ARGS__)))], [Define for non-null argument checking])
-
-
-
-
-
-
-
-
-
-
-
+./stdlib.h:910:1: error: expected identifier or '(' before string constant
+  910 | _GL_FUNCDECL_RPL (calloc, void *,
+      | ^~~~~~~~~~~~~~~~
+./stdlib.h:998:1: error: expected identifier or '(' before string constant
+  998 | _GL_FUNCDECL_SYS (canonicalize_file_name, char *,
+      | ^~~~~~~~~~~~~~~~
+./stdlib.h:1131:1: error: expected identifier or '(' before string constant
+ 1131 | _GL_FUNCDECL_SYS (getprogname, const char *, (void));
+      | ^~~~~~~~~~~~~~~~
+./stdlib.h:1217:1: error: expected identifier or '(' before string constant
+ 1217 | _GL_FUNCDECL_RPL (malloc, void *,
+      | ^~~~~~~~~~~~~~~~
+./stdlib.h:1980:1: error: expected identifier or '(' before string constant
+ 1980 | _GL_FUNCDECL_RPL (realloc, void *, (void *ptr, size_t size)
+      | ^~~~~~~~~~~~~~~~
+./stdlib.h:2037:1: error: expected identifier or '(' before string constant
+ 2037 | _GL_FUNCDECL_SYS (reallocarray, void *,
+      | ^~~~~~~~~~~~~~~~
 
