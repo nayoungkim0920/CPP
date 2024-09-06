@@ -6608,3 +6608,100 @@ _GL_FUNCDECL_SYS(fsync, int, (int fd));
  2037 | _GL_FUNCDECL_SYS (reallocarray, void *,
       | ^~~~~~~~~~~~~~~~
 
+(수정)
+# Define _GL_FUNCDECL_RPL and _GL_FUNCDECL_RPL_1 macros
+#AH_BOTTOM([
+##define _GL_FUNCDECL_RPL(func, rettype, parameters, ...) _GL_FUNCDECL_RPL_1(rpl_##func, rettype, parameters, __VA_ARGS__)
+##define _GL_FUNCDECL_RPL_1(rpl_func, rettype, parameters, ...) _GL_EXTERN_C_FUNC __VA_ARGS__ rettype rpl_func parameters
+#])
+
+(오류)
+static void _GL_ATTRIBUTE_FORMAT_PRINTF_STANDARD_3_0 _GL_ARG_NONNULL ((3))
+
+(수정)
+AC_DEFINE_UNQUOTED([_GL_ARG_NONNULL_3], [__attribute__((nonnull(3)))], [Define _GL_ARG_NONNULL ((3))])
+
+(오류)
+lib/error.c:128:23: error: implicit declaration of function 'getprogname' [-Wimplicit-function-declaration]
+  128 | # define program_name getprogname ()
+      |                       ^~~~~~~~~~~
+lib/error.c:273:32: note: in expansion of macro 'program_name'
+  273 |       fprintf (stderr, "%s: ", program_name);
+      |                                ^~~~~~~~~~~~
+getprogname 함수가 암시적으로 선언되어 있어서 발생
+# define program_name getprogname ()
+
+lib/error.c 수정
+/*추가 window는 지원이안돼서 생성*/
+#include <windows.h>
+// getprogname() 함수 정의
+const char* getprogname() {
+    static char program_name[MAX_PATH];
+    // const 제거하고 GetModuleFileName을 올바르게 사용
+    GetModuleFileName(NULL, program_name, MAX_PATH);
+    return program_name;
+}
+
+#if _LIBC
+      /*__fxprintf (NULL, "%s: ", program_name);*/
+	  __fxprintf (NULL, "%s: ", getprogname());
+#else
+      /*fprintf (stderr, "%s: ", program_name);*/
+	  fprintf (stderr, "%s: ", getprogname());
+#endif
+
+#if _LIBC
+      /*__fxprintf (NULL, "%s:", program_name);*/
+	  __fxprintf (NULL, "%s:", getprogname());
+#else
+      /*fprintf (stderr, "%s:", program_name);*/
+	  fprintf (stderr, "%s:", getprogname());
+#endif
+
+configure.ac 수정
+# Check for the presence of getprogname function
+AC_CHECK_FUNCS"([getprogname printf malloc])" #함수의 존재 여부를 검사
+GNULIB_MODULES"([argp, getprogname, printf, malloc])"
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# autoreconf -ivf
+autoreconf: export WARNINGS=
+autoreconf: Entering directory '.'
+autoreconf: configure.ac: not using Gettext
+autoreconf: running: aclocal --force -I m4 -I gnulib-m4
+autoreconf: configure.ac: tracing
+autoreconf: running: libtoolize --copy --force
+libtoolize: putting auxiliary files in AC_CONFIG_AUX_DIR, 'build-aux'.
+libtoolize: copying file 'build-aux/ltmain.sh'
+libtoolize: putting macros in 'm4'.
+libtoolize: copying file 'm4/libtool.m4'
+libtoolize: copying file 'm4/ltoptions.m4'
+libtoolize: copying file 'm4/ltsugar.m4'
+libtoolize: copying file 'm4/ltversion.m4'
+libtoolize: copying file 'm4/lt~obsolete.m4'
+libtoolize: Consider adding 'AC_CONFIG_MACRO_DIRS([m4])' to configure.ac,
+libtoolize: and rerunning libtoolize and aclocal.
+autoreconf: configure.ac: not using Intltool
+autoreconf: configure.ac: not using Gtkdoc
+autoreconf: running: aclocal --force -I m4 -I gnulib-m4
+autoreconf: running: /mingw64/bin/autoconf --force
+configure.ac:40: warning: AC_COMPILE_IFELSE was called before AC_USE_SYSTEM_EXTENSIONS
+=> AC_COMPILE_IFELSE가 AC_USE_SYSTEM_EXTENSIONS보다 먼저 호출
+./lib/autoconf/specific.m4:541: AC_USE_SYSTEM_EXTENSIONS is expanded from...
+configure.ac:40: the top level
+configure.ac:70: warning: AM_INIT_AUTOMAKE was called before gl_INIT_PACKAGE
+=> AM_INIT_AUTOMAKE가 gl_INIT_PACKAGE보다 먼저 호출
+m4/init-package-version.m4:92: gl_INIT_PACKAGE is expanded from...
+configure.ac:70: the top level
+autoreconf: running: /mingw64/bin/autoheader --force
+autoreconf: running: automake --add-missing --copy --force-missing
+configure.ac:26: installing 'build-aux/missing'
+Makefile.am:59: warning: variable 'noinst_SOURCES' is defined but no program or
+=> Makefile.am 파일에서 noinst_SOURCES 변수를 정의했지만, 이를 사용하는 프로그램이나 라이브러리가 없음. 수정/삭제
+Makefile.am:59: library has 'noinst' as canonical name (possible typo)
+adhoc-tests/Makefile.am: installing 'build-aux/depcomp'
+autoreconf: 'build-aux/install-sh' is updated
+autoreconf: 'build-aux/config.sub' is updated
+autoreconf: 'build-aux/config.guess' is updated
+autoreconf: Leaving directory '.'
+
