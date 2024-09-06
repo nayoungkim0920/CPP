@@ -6697,11 +6697,498 @@ autoreconf: running: /mingw64/bin/autoheader --force
 autoreconf: running: automake --add-missing --copy --force-missing
 configure.ac:26: installing 'build-aux/missing'
 Makefile.am:59: warning: variable 'noinst_SOURCES' is defined but no program or
-=> Makefile.am 파일에서 noinst_SOURCES 변수를 정의했지만, 이를 사용하는 프로그램이나 라이브러리가 없음. 수정/삭제
+=> Makefile.am 파일에서 noinst_SOURCES 변수를 정의했지만, 이를 사용하는 프로그램이나 라이브러리가 없음.
+=> Makefile.am 파일에서 noinst_SOURCES 변수수정/삭제
 Makefile.am:59: library has 'noinst' as canonical name (possible typo)
 adhoc-tests/Makefile.am: installing 'build-aux/depcomp'
 autoreconf: 'build-aux/install-sh' is updated
 autoreconf: 'build-aux/config.sub' is updated
 autoreconf: 'build-aux/config.guess' is updated
 autoreconf: Leaving directory '.'
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ./configure
+configure: loading site script /etc/config.site
+checking for a BSD-compatible install... /usr/bin/install -c
+checking whether build environment is sane... yes
+checking for a race-free mkdir -p... /usr/bin/mkdir -p
+checking for gawk... gawk
+checking whether make sets $(MAKE)... yes
+checking whether make supports nested variables... yes
+checking whether make supports the include directive... yes (GNU style)
+checking for gcc... /mingw64/bin/gcc
+checking whether the C compiler works... yes
+checking for C compiler default output file name... a.exe
+checking for suffix of executables... .exe
+checking whether we are cross compiling... no
+checking for suffix of object files... o
+checking whether the compiler supports GNU C... yes
+checking whether /mingw64/bin/gcc accepts -g... yes
+checking for /mingw64/bin/gcc option to enable C23 features... unsupported
+checking for /mingw64/bin/gcc option to enable C11 features... none needed
+checking whether the compiler is clang... no
+checking for compiler option needed when checking for declarations... none
+checking dependency style of /mingw64/bin/gcc... gcc3
+checking for stdio.h... yes
+checking for stdlib.h... yes
+checking for string.h... yes
+checking for inttypes.h... yes
+checking for stdint.h... yes
+checking for strings.h... yes
+checking for sys/stat.h... yes
+checking for sys/types.h... yes
+checking for unistd.h... yes
+checking for wchar.h... yes
+checking for minix/config.h... no
+checking whether it is safe to define __EXTENSIONS__... yes
+checking whether _XOPEN_SOURCE should be defined... no
+checking for gcc... (cached) /mingw64/bin/gcc
+checking whether the compiler supports GNU C... (cached) yes
+checking whether /mingw64/bin/gcc accepts -g... (cached) yes
+checking for /mingw64/bin/gcc option to enable C23 features... (cached) unsupported
+checking for /mingw64/bin/gcc option to enable C11 features... (cached) none needed
+checking whether the compiler is clang... (cached) no
+checking for compiler option needed when checking for declarations... (cached) none
+checking dependency style of /mingw64/bin/gcc... (cached) gcc3
+checking for stdio.h... (cached) yes
+checking for stdlib.h... (cached) yes
+checking for wchar.h... (cached) yes
+checking for attributes.h... no
+checking for getprogname... no
+checking for printf... yes
+checking for malloc... yes
+
+./configure: line 6521: GNULIB_INIT: command not found
+=> gnulib과 관련된 설정이나 초기화 과정에서 문제가 발생했음을 의미
+nayou@kimnayooung MINGW64 /c/gnulib
+# git pull
+...
+ 201 files changed, 1726 insertions(+), 373 deletions(-)
+ create mode 100644 m4/locale-en.m4
+cd /c/libidn2/gettext-0.22.5/libtextstyle
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# cat version.sh
+# Version number and release date.
+VERSION_NUMBER=0.22.5
+RELEASE_DATE=2024-02-21      # in "date +%Y-%m-%d" format
+/c/gnulib/build-aux, doc, examples, lib, m4, tests 폴더들을 
+/c/libidn2/gettext-0.22.5/libtextstyle/로 복사
+
+checking build system type... x86_64-w64-mingw32
+checking host system type... x86_64-w64-mingw32
+checking how to run the C preprocessor... /mingw64/bin/cpp
+checking for egrep -e... /usr/bin/grep -E
+checking for Minix Amsterdam compiler... no
+checking for ar... ar
+checking for ranlib... ranlib
+checking whether ctype.h defines __header_inline... no
+checking for fsync... no
+checking for _set_invalid_parameter_handler... yes
+checking whether the preprocessor supports include_next... yes
+checking whether source code line length is unlimited... yes
+checking for good max_align_t... yes
+checking whether NULL can be used in arbitrary expressions... yes
+checking for unreachable... no
+checking whether nullptr_t needs <stddef.h>... no
+checking for clean definition of __STDC_VERSION_STDDEF_H__... yes
+checking for pid_t... yes
+checking for mode_t... yes
+checking for 64-bit off_t... no
+checking for 64-bit st_size... no
+checking for off64_t... yes
+checking for C/C++ restrict keyword... __restrict__
+checking for /mingw64/bin/gcc options needed to detect all undeclared functions... none needed
+checking whether execvpe is declared... yes
+checking for C compiler option to allow warnings... -Wno-error
+checking for ssize_t... yes
+checking for wchar_t... yes
+
+./configure: line 9184: -L/c/libidn2/gettext-0.22.5/libtextstyle/lib: No such file or directory
+=> configure 스크립트가 특정 라이브러리 경로를 찾지 못한다는 문제
+LDFLAGS=
+  $LDFLAGS \
+  -L/c/libidn2/gettext-0.22.5/libtextstyle/lib \
+  -L/mingw64/lib \
+  -L/usr/lib \
+  -Wl,-rpath,/mingw64/bin
+
+nayou@kimnayooung MINGW64 ~
+# ls -l /c/libidn2/gettext-0.22.5/libtextstyle/lib
+합계 16367
+configure.ac 수정
+#export LDFLAGS="-L/c/libidn2/gettext-0.22.5/libtextstyle/lib -L/mingw64/lib -L/usr/lib -Wl,-rpath,/mingw64/bin"
+
+~/.bashrc 수정
+export LDFLAGS="-L/c/libidn2/gettext-0.22.5/libtextstyle/lib:-L/mingw64/lib:-L/usr/lib:-Wl,-rpath,/mingw64/bin"
+#source ~/.bashrc
+
+gnulib 모듈 확인: configure.ac 파일에서 GNULIB 모듈설정있는지 확인
+
+aclocal 다시 실행
+aclocal --force -I m4 -I gnulib-m4
+
+autoconf 및 automake 다시 실행
+autoconf --force
+automake --add-missing --copy --force-missing
+
+configure 스크립트에서 GNULIB_INIT 제거: 만약 GNULIB을 사용하지 않는다면, 
+configure.ac에서 GNULIB_INIT과 관련된 부분을 제거
+
+configure.ac 수정
+AC_CONFIG_MACRO_DIRS([m4])
+
+m4_pattern_allow([GNULIB_MODULES])
+m4_pattern_allow([gl_CC_GNULIB_WARNINGS])
+m4_include([m4/gnulib-common.m4]) #"C:\libidn2\gettext-0.22.5\libtextstyle\m4\gnulib-common.m4"
+m4_include([m4/gnulib-tool.m4]) #"C:\libidn2\gettext-0.22.5\libtextstyle\m4\gnulib-tool.m4"
+GNULIB_INIT
+
+autoreconf -ivf 명령을 다시 실행하여 configure 스크립트를 업데이트
+libtoolize와 aclocal 명령을 다시 실행하여 필요한 파일과 매크로를 업데이트
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# libtoolize --copy --force
+libtoolize: putting auxiliary files in AC_CONFIG_AUX_DIR, 'build-aux'.
+libtoolize: copying file 'build-aux/ltmain.sh'
+libtoolize: putting macros in AC_CONFIG_MACRO_DIRS, 'm4'.
+libtoolize: copying file 'm4/libtool.m4'
+libtoolize: copying file 'm4/ltoptions.m4'
+libtoolize: copying file 'm4/ltsugar.m4'
+libtoolize: copying file 'm4/ltversion.m4'
+libtoolize: copying file 'm4/lt~obsolete.m4'
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# aclocal --force -I m4
+autoconf 명령을 실행하여 configure 스크립트를 생성
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# autoconf
+autoheader 명령을 실행하여 config.h.in 파일을 생성
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# autoheader
+automake 명령을 실행하여 Makefile.am 파일을 기반으로 Makefile.in 파일을 생성
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# automake --add-missing
+configure.ac:31: installing 'build-aux/missing'
+adhoc-tests/Makefile.am: installing 'build-aux/depcomp'
+./configure 명령을 실행하여 프로젝트의 빌드 환경을 설정하고, Makefile을 생성
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ./configure
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ./configure
+configure: loading site script /etc/config.site
+checking for a BSD-compatible install... /usr/bin/install -c
+checking whether build environment is sane... yes
+checking for a race-free mkdir -p... /usr/bin/mkdir -p
+checking for gawk... gawk
+checking whether make sets $(MAKE)... yes
+checking whether make supports nested variables... yes
+checking whether make supports the include directive... yes (GNU style)
+checking for gcc... /mingw64/bin/gcc
+checking whether the C compiler works... yes
+checking for C compiler default output file name... a.exe
+checking for suffix of executables... .exe
+checking whether we are cross compiling... no
+checking for suffix of object files... o
+checking whether the compiler supports GNU C... yes
+checking whether /mingw64/bin/gcc accepts -g... yes
+checking for /mingw64/bin/gcc option to enable C23 features... unsupported
+checking for /mingw64/bin/gcc option to enable C11 features... none needed
+checking whether the compiler is clang... no
+checking for compiler option needed when checking for declarations... none
+checking dependency style of /mingw64/bin/gcc... gcc3
+checking for stdio.h... yes
+checking for stdlib.h... yes
+checking for string.h... yes
+checking for inttypes.h... yes
+checking for stdint.h... yes
+checking for strings.h... yes
+checking for sys/stat.h... yes
+checking for sys/types.h... yes
+checking for unistd.h... yes
+checking for wchar.h... yes
+checking for minix/config.h... no
+checking whether it is safe to define __EXTENSIONS__... yes
+checking whether _XOPEN_SOURCE should be defined... no
+checking for gcc... (cached) /mingw64/bin/gcc
+checking whether the compiler supports GNU C... (cached) yes
+checking whether /mingw64/bin/gcc accepts -g... (cached) yes
+checking for /mingw64/bin/gcc option to enable C23 features... (cached) unsupported
+checking for /mingw64/bin/gcc option to enable C11 features... (cached) none needed
+checking whether the compiler is clang... (cached) no
+checking for compiler option needed when checking for declarations... (cached) none
+checking dependency style of /mingw64/bin/gcc... (cached) gcc3
+checking for stdio.h... (cached) yes
+checking for stdlib.h... (cached) yes
+checking for wchar.h... (cached) yes
+checking for attributes.h... no
+checking for getprogname... no
+checking for printf... yes
+checking for malloc... yes
+./configure: line 6524: GNULIB_INIT: command not found
+checking build system type... x86_64-w64-mingw32
+checking host system type... x86_64-w64-mingw32
+checking how to run the C preprocessor... /mingw64/bin/cpp
+checking for egrep -e... /usr/bin/grep -E
+checking for Minix Amsterdam compiler... no
+checking for ar... ar
+checking for ranlib... ranlib
+checking whether ctype.h defines __header_inline... no
+checking for fsync... no
+checking for _set_invalid_parameter_handler... yes
+checking whether the preprocessor supports include_next... yes
+checking whether source code line length is unlimited... yes
+checking for good max_align_t... yes
+checking whether NULL can be used in arbitrary expressions... yes
+checking for unreachable... no
+checking whether nullptr_t needs <stddef.h>... no
+checking for clean definition of __STDC_VERSION_STDDEF_H__... yes
+checking for pid_t... yes
+checking for mode_t... yes
+checking for 64-bit off_t... no
+checking for 64-bit st_size... no
+checking for off64_t... yes
+checking for C/C++ restrict keyword... __restrict__
+checking for /mingw64/bin/gcc options needed to detect all undeclared functions... none needed
+checking whether execvpe is declared... yes
+checking for C compiler option to allow warnings... -Wno-error
+checking for ssize_t... yes
+checking for wchar_t... yes
+checking how to run the C preprocessor... /mingw64/bin/cpp
+configure.ac: Configured host OS: mingw32
+WOE32DLL and WOE32 are enabled.
+checking for textstyle/woe32dll.h... yes
+checking how to print strings... printf
+checking for a sed that does not truncate output... /usr/bin/sed
+checking for grep that handles long lines and -e... /usr/bin/grep
+checking for egrep... /usr/bin/grep -E
+checking for fgrep... /usr/bin/grep -F
+checking for ld used by /mingw64/bin/gcc... C:/msys64/mingw64/x86_64-w64-mingw32/bin/ld.exe
+checking if the linker (C:/msys64/mingw64/x86_64-w64-mingw32/bin/ld.exe) is GNU ld... yes
+checking for BSD- or MS-compatible name lister (nm)... /mingw64/bin/nm -B
+checking the name lister (/mingw64/bin/nm -B) interface... BSD nm
+checking whether ln -s works... no, using cp -pR
+checking the maximum length of command line arguments... 8192
+checking how to convert x86_64-w64-mingw32 file names to x86_64-w64-mingw32 format... func_convert_file_msys_to_w32
+checking how to convert x86_64-w64-mingw32 file names to toolchain format... func_convert_file_msys_to_w32
+checking for C:/msys64/mingw64/x86_64-w64-mingw32/bin/ld.exe option to reload object files... -r
+checking for file... file
+checking for objdump... objdump
+checking how to recognize dependent libraries... file_magic ^x86 archive import|^x86 DLL
+checking for dlltool... dlltool
+checking how to associate runtime and link libraries... func_cygming_dll_for_implib
+checking for archiver @FILE support... @
+checking for strip... strip
+checking for ranlib... (cached) ranlib
+checking command to parse /mingw64/bin/nm -B output from /mingw64/bin/gcc object... failed
+checking for sysroot... no
+checking for a working dd... /usr/bin/dd
+checking how to truncate binary pipes... /usr/bin/dd bs=4096 count=1
+checking for mt... no
+checking if : is a manifest tool... no
+checking for dlfcn.h... no
+checking for as... as
+checking for dlltool... (cached) dlltool
+checking for objdump... (cached) objdump
+checking for objdir... .libs
+checking if /mingw64/bin/gcc supports -fno-rtti -fno-exceptions... no
+checking for /mingw64/bin/gcc option to produce PIC... -DDLL_EXPORT -DPIC
+checking if /mingw64/bin/gcc PIC flag -DDLL_EXPORT -DPIC works... yes
+checking if /mingw64/bin/gcc static flag -static works... no
+checking if /mingw64/bin/gcc supports -c -o file.o... yes
+checking if /mingw64/bin/gcc supports -c -o file.o... (cached) yes
+checking whether the /mingw64/bin/gcc linker (C:/msys64/mingw64/x86_64-w64-mingw32/bin/ld.exe) supports shared libraries... yes
+checking whether -lc should be explicitly linked in... yes
+checking dynamic linker characteristics... Win32 ld.exe
+checking how to hardcode library paths into programs... immediate
+checking whether stripping libraries is possible... yes
+checking if libtool supports shared libraries... yes
+checking whether to build shared libraries... yes
+checking whether to build static libraries... yes
+checking for windres... windres
+checking for texi2dvi... /usr/bin/texi2dvi
+checking for dvips... /c/libidn2/gettext-0.22.5/libtextstyle/build-aux/missing dvips
+checking for perl... /usr/bin/perl
+checking for gawk... (cached) gawk
+checking that generated files are newer than configure... done
+configure: creating ./config.status
+config.status: creating Makefile
+config.status: creating doc/Makefile
+config.status: creating lib/Makefile
+config.status: creating lib/exported.sh
+config.status: creating lib/textstyle/version.h
+config.status: creating lib/textstyle/woe32dll.h
+config.status: creating tests/Makefile
+config.status: creating adhoc-tests/Makefile
+config.status: creating config.h
+config.status: config.h is unchanged
+config.status: executing depfiles commands
+config.status: executing libtool commands
+
+<<GNULIB_INIT: command not found>>
+
+nayou@kimnayooung MINGW64 /c
+# grep -rn 'GNULIB_INIT' /c/libidn2/gettext-0.22.5/libtextstyle
+/c/libidn2/gettext-0.22.5/libtextstyle/autom4te.cache/output.1:6524:GNULIB_INIT
+/c/libidn2/gettext-0.22.5/libtextstyle/autom4te.cache/output.2:6524:GNULIB_INIT
+/c/libidn2/gettext-0.22.5/libtextstyle/autom4te.cache/output.4:6524:GNULIB_INIT
+/c/libidn2/gettext-0.22.5/libtextstyle/configure:6524:GNULIB_INIT
+/c/libidn2/gettext-0.22.5/libtextstyle/configure.ac:58:GNULIB_INIT
+/c/libidn2/gettext-0.22.5/libtextstyle/configure~:6524:GNULIB_INIT
+
+GNULIB_INIT가 선언된곳이 없어서 재설치
+
+# git clone https://git.savannah.gnu.org/git/gnulib.git
+'gnulib'에 복제합니다...
+remote: Counting objects: 308943, done.
+remote: Compressing objects: 100% (35672/35672), done.
+remote: Total 308943 (delta 273897), reused 307914 (delta 273159)
+오브젝트를 받는 중: 100% (308943/308943), 80.62 MiB | 1.23 MiB/s, 완료.
+델타를 알아내는 중: 100% (273897/273897), 완료.
+Updating files: 100% (11852/11852), 완료.
+nayou@kimnayooung MINGW64 /c/gnulib
+# chmod +x /c/gnulib/gnulib-tool
+(m4, lib 폴더를 백업한 후!!!!)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# gnulib-tool --update
+checking how to run the C preprocessor... /mingw64/bin/cpp
+configure.ac: Configured host OS: mingw32
+WOE32DLL and WOE32 are enabled.
+checking for textstyle/woe32dll.h... yes
+checking how to print strings... printf
+checking for a sed that does not truncate output... /usr/bin/sed
+checking for grep that handles long lines and -e... /usr/bin/grep
+checking for egrep... /usr/bin/grep -E
+checking for fgrep... /usr/bin/grep -F
+checking for ld used by /mingw64/bin/gcc... C:/msys64/mingw64/x86_64-w64-mingw32/bin/ld.exe
+checking if the linker (C:/msys64/mingw64/x86_64-w64-mingw32/bin/ld.exe) is GNU ld... yes
+checking for BSD- or MS-compatible name lister (nm)... /mingw64/bin/nm -B
+checking the name lister (/mingw64/bin/nm -B) interface... BSD nm
+checking whether ln -s works... no, using cp -pR
+checking the maximum length of command line arguments... 8192
+checking how to convert x86_64-w64-mingw32 file names to x86_64-w64-mingw32 format... func_convert_file_msys_to_w32
+checking how to convert x86_64-w64-mingw32 file names to toolchain format... func_convert_file_msys_to_w32
+checking for C:/msys64/mingw64/x86_64-w64-mingw32/bin/ld.exe option to reload object files... -r
+checking for file... file
+checking for objdump... objdump
+checking how to recognize dependent libraries... file_magic ^x86 archive import|^x86 DLL
+checking for dlltool... dlltool
+checking how to associate runtime and link libraries... func_cygming_dll_for_implib
+checking for archiver @FILE support... @
+checking for strip... strip
+checking for ranlib... (cached) ranlib
+checking command to parse /mingw64/bin/nm -B output from /mingw64/bin/gcc object... failed
+checking for sysroot... no
+checking for a working dd... /usr/bin/dd
+checking how to truncate binary pipes... /usr/bin/dd bs=4096 count=1
+checking for mt... no
+checking if : is a manifest tool... no
+checking for dlfcn.h... no
+checking for as... as
+checking for dlltool... (cached) dlltool
+checking for objdump... (cached) objdump
+checking for objdir... .libs
+checking if /mingw64/bin/gcc supports -fno-rtti -fno-exceptions... no
+checking for /mingw64/bin/gcc option to produce PIC... -DDLL_EXPORT -DPIC
+checking if /mingw64/bin/gcc PIC flag -DDLL_EXPORT -DPIC works... yes
+checking if /mingw64/bin/gcc static flag -static works... no
+checking if /mingw64/bin/gcc supports -c -o file.o... yes
+checking if /mingw64/bin/gcc supports -c -o file.o... (cached) yes
+checking whether the /mingw64/bin/gcc linker (C:/msys64/mingw64/x86_64-w64-mingw32/bin/ld.exe) supports shared libraries... yes
+checking whether -lc should be explicitly linked in... yes
+checking dynamic linker characteristics... Win32 ld.exe
+checking how to hardcode library paths into programs... immediate
+checking whether stripping libraries is possible... yes
+checking if libtool supports shared libraries... yes
+checking whether to build shared libraries... yes
+checking whether to build static libraries... yes
+checking for windres... windres
+checking for texi2dvi... /usr/bin/texi2dvi
+checking for dvips... /c/libidn2/gettext-0.22.5/libtextstyle/build-aux/missing dvips
+checking for perl... /usr/bin/perl
+checking for gawk... (cached) gawk
+checking that generated files are newer than configure... done
+configure: creating ./config.status
+config.status: creating Makefile
+config.status: creating doc/Makefile
+config.status: creating lib/Makefile
+config.status: creating lib/exported.sh
+config.status: creating lib/textstyle/version.h
+config.status: creating lib/textstyle/woe32dll.h
+config.status: creating tests/Makefile
+config.status: creating adhoc-tests/Makefile
+config.status: creating config.h
+config.status: executing depfiles commands
+config.status: executing libtool commands
+
+#make
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# make VERBOSE=1
+make  all-recursive
+make[1]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle' 들어감
+Making all in lib
+make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/lib' 들어감
+make  all-recursive
+make[3]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/lib' 들어감
+make[4]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/lib' 들어감
+make[4]: 'all-am'을(를) 위해 할 일이 없습니다.
+make[4]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/lib' 나감
+make[3]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/lib' 나감
+make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/lib' 나감
+Making all in tests
+make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/tests' 들어감
+## ---------------------------------------------------- ##
+## ------------------- Gnulib tests ------------------- ##
+## You can ignore compiler warnings in this directory.  ##
+## ---------------------------------------------------- ##
+make  all-recursive
+make[3]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/tests' 들어감
+Making all in .
+make[4]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/tests' 들어감
+make[4]: 'all-am'을(를) 위해 할 일이 없습니다.
+make[4]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/tests' 나감
+make[3]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/tests' 나감
+make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/tests' 나감
+Making all in adhoc-tests
+make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/adhoc-tests' 들어감
+make[2]: 'all'을(를) 위해 할 일이 없습니다.
+make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/adhoc-tests' 나감
+Making all in doc
+make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/doc' 들어감
+make[2]: 'all'을(를) 위해 할 일이 없습니다.
+make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/doc' 나감
+make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle' 들어감
+
+>>> make[2]: *** 'lib/terminfo.lo'에서 필요한 'lib/terminfo.c' 타겟을 만들 규칙이 없습니다.  멈춤.
+빌드 과정에서 lib/terminfo.lo와 lib/terminfo.c 관련 오류가 발생
+소스 파일이 누락되었거나 Makefile 설정에 문제가 있을 때 발생
+lib/terminfo.c 파일이 lib 디렉토리에 존재하는지 확인 => 없음
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# cd /c/gnulib
+nayou@kimnayooung MINGW64 /c/gnulib
+# git pull
+이미 업데이트 상태입니다.
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -rn 'terminfo.c' .
+...
+./Makefile.am:38:       lib/terminfo.c \
+...
+Makefile.am 수정
+libtextstyle_la_SOURCES = \
+	lib/color.c \
+	lib/gl_array_list.c \
+	lib/term-ostream.c \
+	lib/ostream.c \
+	lib/concat-filename.c \
+	lib/xsize.c \
+	lib/error.c \
+	lib/full-write.c \
+	#lib/terminfo.c \ #존재하지않음
+	lib/term-style-control.c \
+	lib/fsync.c
+
+make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle' 나감
+
+>>> make[1]: *** [Makefile:965: all-recursive] 오류 1
+
+make[1]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle' 나감
+make: *** [Makefile:822: all] 오류 2
 
