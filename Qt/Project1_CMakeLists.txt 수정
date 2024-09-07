@@ -7192,3 +7192,111 @@ make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle' 나감
 make[1]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle' 나감
 make: *** [Makefile:822: all] 오류 2
 
+(오류)
+./lib/concat-filename.h:45:extern char *xconcatenated_filename (const char *directory,
+(수정)
+# grep -rn 'xconcatenated_filename' .
+./lib/concat-filename.h:45:extern char *xconcatenated_filename (const char *directory,
+Makefile.am 수정
+libtextstyle_la_SOURCES 에 lib/xconcat-filename.c 추가
+
+(오류)
+lib/xconcat-filename.c: In function 'xconcatenated_filename':
+lib/xconcat-filename.c:39:5: error: implicit declaration of function 'xalloc_die' [-Wimplicit-function-declaration]
+   39 |     xalloc_die ();
+      |     ^~~~~~~~~~
+(수정)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -rn 'xalloc_die' .
+./lib/xalloc.h:54:_Noreturn void xalloc_die (void);
+
+(오류)
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+lib/.libs/color.o:color.c:(.text+0x16fa): undefined reference to xstrdup'
+(수정)
+./lib/progreloc.c:63:# define xstrdup strdup
+인클루드할수없어 파일에 정의하기로 함
+lib/color.h 수정
+#ifndef xstrdup
+#define xstrdup strdup
+#endif
+
+(오류)
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+lib/.libs/color.o:color.c:(.text+0x16fa): undefined reference to `xstrdup'
+(수정)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -rn 'xstrdup' ./lib
+./lib/xstrdup.h:7:char *xstrdup(const char *s);
+Makefile.am 파일에서 xstrdup.c가 컴파일 대상에 포함되어 있는지 확인
+Makefile.am 수정
+libtextstyle_la_SOURCES=lib/xstrdup.c 추가
+폴더 권한 확인
+
+정리후빌드
+Remove configure and Makefile generated files:
+make distclean
+Clean up previous build files:
+make clean
+autoreconf -ivf && ./configure && make
+
+(오류)
+term-ostream.oo.c:1849:3: error: initialization of 'struct term_style_control_data * (*)(struct term_style_user_data *)' from incompatible pointer type 'struct term_style_control_data * (*)(struct any_ostream_representation *)' [-Wincompatible-pointer-types]
+term-ostream.oo.c:1849:3: note: (near initialization for 'controller.get_control_data')
+term-ostream.oo.c:1850:3: error: initialization of 'void (*)(struct term_style_user_data *)' from incompatible pointer type 'void (*)(struct any_ostream_representation *)' [-Wincompatible-pointer-types]
+term-ostream.oo.c:1850:3: note: (near initialization for 'controller.restore')
+term-ostream.oo.c:1851:3: error: initialization of 'void (*)(struct term_style_user_data *)' from incompatible pointer type 'void (*)(struct any_ostream_representation *)' [-Wincompatible-pointer-types]
+term-ostream.oo.c:1851:3: note: (near initialization for 'controller.async_restore')
+term-ostream.oo.c:1852:3: error: initialization of 'void (*)(struct term_style_user_data *)' from incompatible pointer type 'void (*)(struct any_ostream_representation *)' [-Wincompatible-pointer-types]
+term-ostream.oo.c:1852:3: note: (near initialization for 'controller.async_set_attributes_from_default')
+term-ostream.oo.c: In function 'activate_default_attr':
+term-ostream.oo.c:1862:50: error: passing argument 2 of 'deactivate_term_non_default_mode' from incompatible pointer type [-Wincompatible-pointer-types]
+In file included from term-ostream.oo.h:25,
+                 from term-ostream.oo.c:21:
+lib/term-style-control.h:178:71: note: expected 'struct term_style_user_data *' but argument is of type 'term_ostream_t' {aka 'struct any_ostream_representation
+'}
+  178 |                                          struct term_style_user_data *user_data);
+      |                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~
+term-ostream.oo.c: In function 'output_buffer':
+term-ostream.oo.c:1903:54: error: passing argument 2 of 'activate_term_non_default_mode' from incompatible pointer type [-Wincompatible-pointer-types]
+lib/term-style-control.h:168:69: note: expected 'struct term_style_user_data *' but argument is of type 'term_ostream_t' {aka 'struct any_ostream_representation
+'}
+  168 |                                        struct term_style_user_data *user_data);
+      |                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~
+term-ostream.oo.c:1935:50: error: passing argument 2 of 'activate_term_non_default_mode' from incompatible pointer type [-Wincompatible-pointer-types]
+lib/term-style-control.h:168:69: note: expected 'struct term_style_user_data *' but argument is of type 'term_ostream_t' {aka 'struct any_ostream_representation
+'}
+  168 |                                        struct term_style_user_data *user_data);
+      |                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~
+term-ostream.oo.c:1941:52: error: passing argument 2 of 'deactivate_term_non_default_mode' from incompatible pointer type [-Wincompatible-pointer-types]
+lib/term-style-control.h:178:71: note: expected 'struct term_style_user_data *' but argument is of type 'term_ostream_t' {aka 'struct any_ostream_representation
+'}
+  178 |                                          struct term_style_user_data *user_data);
+      |                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~
+term-ostream.oo.c: In function 'term_ostream__free':
+term-ostream.oo.c:2081:50: error: passing argument 2 of 'deactivate_term_style_controller' from incompatible pointer type [-Wincompatible-pointer-types]
+lib/term-style-control.h:186:71: note: expected 'struct term_style_user_data *' but argument is of type 'term_ostream_t' {aka 'struct any_ostream_representation
+'}
+  186 |                                          struct term_style_user_data *user_data);
+      |                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~
+term-ostream.oo.c: In function 'term_ostream_create':
+term-ostream.oo.c:2766:48: error: passing argument 2 of 'activate_term_style_controller' from incompatible pointer type [-Wincompatible-pointer-types]
+lib/term-style-control.h:155:69: note: expected 'struct term_style_user_data *' but argument is of type 'term_ostream_t' {aka 'struct any_ostream_representation
+'}
+  155 |                                        struct term_style_user_data *user_data,
+      |                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~
+make[2]: *** [Makefile:937: lib/term-ostream.lo] 오류 1
+make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle' 나감
+make[1]: *** [Makefile:956: all-recursive] 오류 1
+make[1]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle' 나감
+make: *** [Makefile:812: all] 오류 2
+
+(수정)
+struct term_style_user_data *를 인수로 받는 함수 포인터에
+struct any_ostream_representation *를 인수로 받는 함수를 대입하려고 하면서 발생하는 유형 불일치 문제
+함수 정의를 수정하여 함수가 struct term_style_user_data *를 인수로 받도록 변경
+
+
+
+
+
