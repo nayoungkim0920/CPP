@@ -7241,6 +7241,234 @@ make clean
 autoreconf -ivf && ./configure && make
 
 (오류)
+term-ostream.oo.c:1849:3: error: initialization of 'struct term_style_control_data * (*)(struct term_style_user_data *)' 
+from incompatible pointer type 'struct term_style_control_data * (*)(struct any_ostream_representation *)' 
+[-Wincompatible-pointer-types]
+
+
+(수정)
+struct term_style_user_data *를 인수로 받는 함수 포인터에
+struct any_ostream_representation *를 인수로 받는 함수를 대입하려고 하면서 발생하는 유형 불일치 문제
+함수 정의를 수정하여 함수가 struct term_style_user_data *를 인수로 받도록 변경
+# grep -rn 'get_control_data' .
+./lib/term-ostream.c:1052:get_control_data (term_ostream_t stream)
+static struct term_style_control_data *
+get_control_data (term_ostream_t stream)
+{
+  return &stream->control_data;
+}
+./lib/term-ostream.oo.c:1114:get_control_data (term_ostream_t stream)
+static struct term_style_control_data *
+get_control_data (term_ostream_t stream)
+{
+  return &stream->control_data;
+}
+./lib/term-style-control.h:81:  struct term_style_control_data * (*get_control_data) (struct term_style_user_data *);
+struct term_style_control_data * (*get_control_data) (struct term_style_user_data *);
+term-style-control.h에 선언된 함수 포인터가 struct term_style_user_data *를 인수로 받는다는 점에서 발생
+#include "textstyle.h" /*추가*/
+static struct term_style_control_data *
+/*./lib/term-ostream.oo.c:1114:get_control_data (term_ostream_t stream)*/
+struct term_style_control_data * (*get_control_data) (term_ostream_t);
+
+(오류)
+lib/term-style-control.h:45:3: error: redeclaration of enumerator 'TTYCTL_AUTO'
+   45 |   TTYCTL_AUTO = 0,  /* Automatic best-possible choice.  */
+      |   ^~~~~~~~~~~
+(수정)
+include한 textstyle.h에 정의되어있어 주석처리
+
+(오류) #include "textstyle.h" 후 재선언 오류발생 모두 주석처리
+term-ostream.oo.h:48:3: error: redeclaration of enumerator 'WEIGHT_NORMAL'
+In file included from lib/term-style-control.h:19,
+                 from term-ostream.oo.h:25:
+lib/textstyle.h:236:3: note: previous definition of 'WEIGHT_NORMAL' with type 'enum <anonymous>'
+  236 |   WEIGHT_NORMAL = 0,
+      |   ^~~~~~~~~~~~~
+term-ostream.oo.h:49:3: error: redeclaration of enumerator 'WEIGHT_BOLD'
+lib/textstyle.h:237:3: note: previous definition of 'WEIGHT_BOLD' with type 'enum <anonymous>'
+  237 |   WEIGHT_BOLD,
+      |   ^~~~~~~~~~~
+term-ostream.oo.h:50:3: error: redeclaration of enumerator 'WEIGHT_DEFAULT'
+lib/textstyle.h:238:3: note: previous definition of 'WEIGHT_DEFAULT' with type 'enum <anonymous>'
+  238 |   WEIGHT_DEFAULT = WEIGHT_NORMAL
+      |   ^~~~~~~~~~~~~~
+term-ostream.oo.h:51:3: error: conflicting types for 'term_weight_t'; have 'enum <anonymous>'
+lib/textstyle.h:239:3: note: previous declaration of 'term_weight_t' with type 'term_weight_t'
+  239 | } term_weight_t;
+      |   ^~~~~~~~~~~~~
+term-ostream.oo.h:55:3: error: redeclaration of enumerator 'POSTURE_NORMAL'
+lib/textstyle.h:243:3: note: previous definition of 'POSTURE_NORMAL' with type 'enum <anonymous>'
+  243 |   POSTURE_NORMAL = 0,
+      |   ^~~~~~~~~~~~~~
+term-ostream.oo.h:56:3: error: redeclaration of enumerator 'POSTURE_ITALIC'
+lib/textstyle.h:244:3: note: previous definition of 'POSTURE_ITALIC' with type 'enum <anonymous>'
+  244 |   POSTURE_ITALIC, /* same as oblique */
+      |   ^~~~~~~~~~~~~~
+term-ostream.oo.h:57:3: error: redeclaration of enumerator 'POSTURE_DEFAULT'
+lib/textstyle.h:245:3: note: previous definition of 'POSTURE_DEFAULT' with type 'enum <anonymous>'
+  245 |   POSTURE_DEFAULT = POSTURE_NORMAL
+      |   ^~~~~~~~~~~~~~~
+term-ostream.oo.h:58:3: error: conflicting types for 'term_posture_t'; have 'enum <anonymous>'
+lib/textstyle.h:246:3: note: previous declaration of 'term_posture_t' with type 'term_posture_t'
+  246 | } term_posture_t;
+      |   ^~~~~~~~~~~~~~
+term-ostream.oo.h:62:3: error: redeclaration of enumerator 'UNDERLINE_OFF'
+lib/textstyle.h:250:3: note: previous definition of 'UNDERLINE_OFF' with type 'enum <anonymous>'
+  250 |   UNDERLINE_OFF = 0,
+      |   ^~~~~~~~~~~~~
+term-ostream.oo.h:63:3: error: redeclaration of enumerator 'UNDERLINE_ON'
+lib/textstyle.h:251:3: note: previous definition of 'UNDERLINE_ON' with type 'enum <anonymous>'
+  251 |   UNDERLINE_ON,
+      |   ^~~~~~~~~~~~
+term-ostream.oo.h:64:3: error: redeclaration of enumerator 'UNDERLINE_DEFAULT'
+lib/textstyle.h:252:3: note: previous definition of 'UNDERLINE_DEFAULT' with type 'enum <anonymous>'
+  252 |   UNDERLINE_DEFAULT = UNDERLINE_OFF
+      |   ^~~~~~~~~~~~~~~~~
+term-ostream.oo.h:65:3: error: conflicting types for 'term_underline_t'; have 'enum <anonymous>'
+lib/textstyle.h:253:3: note: previous declaration of 'term_underline_t' with type 'term_underline_t'
+  253 | } term_underline_t;
+      |   ^~~~~~~~~~~~~~~~
+
+(수정)
+lib/term-ostream.h, lib/term-ostream.oo.h 수정
+// redeclaration by lib/textstyle.h
+//enum
+//{
+//  COLOR_DEFAULT = -1  /* unknown */
+//};
+
+
+/* redeclaration by lib/textstyle.h
+typedef enum
+{
+  WEIGHT_NORMAL = 0,
+  WEIGHT_BOLD,
+  WEIGHT_DEFAULT = WEIGHT_NORMAL
+} term_weight_t;
+*/
+
+// redeclaration by lib/textstyle.h
+//typedef enum
+//{
+//  POSTURE_NORMAL = 0,
+//  POSTURE_ITALIC, /* same as oblique */
+//  POSTURE_DEFAULT = POSTURE_NORMAL
+//} term_posture_t;
+
+/* redeclaration by lib/textstyle.h
+typedef enum
+{
+  UNDERLINE_OFF = 0,
+  UNDERLINE_ON,
+  UNDERLINE_DEFAULT = UNDERLINE_OFF
+} term_underline_t;
+*/
+
+(오류)
+term-ostream.oo.c:1850:3: error: initialization of 'void (*)(struct term_style_user_data *)' 
+from incompatible pointer type 'void (*)(struct any_ostream_representation *)' [-Wincompatible-pointer-types]
+term-ostream.oo.c:1850:3: note: (near initialization for 'controller.restore')
+term-ostream.oo.c:1851:3: error: initialization of 'void (*)(struct term_style_user_data *)' from incompatible pointer type 'void (*)(struct any_ostream_representation *)' [-Wincompatible-pointer-types]
+term-ostream.oo.c:1851:3: note: (near initialization for 'controller.async_restore')
+term-ostream.oo.c:1852:3: error: initialization of 'void (*)(struct term_style_user_data *)' from incompatible pointer type 'void (*)(struct any_ostream_representation *)' [-Wincompatible-pointer-types]
+term-ostream.oo.c:1852:3: note: (near initialization for 'controller.async_set_attributes_from_default')
+
+(수정)
+void (*)(struct term_style_user_data *) 타입의 포인터를 
+void (*)(struct any_ostream_representation *) 타입의 함수로 초기화하려고 하고 있어서 오류가 발생
+static const struct term_style_controller controller =
+{
+  get_control_data,
+  restore,
+  async_restore,
+  async_set_attributes_from_default
+};
+
+term_style_controller 정의 찾아 포함하기
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# find . -name "*.h" | xargs grep 'struct term_style_controller'
+./lib/term-style-control.h:struct term_style_controller
+./lib/term-style-control.h:   1. You fill a 'struct term_style_controller' with function pointers.
+./lib/term-style-control.h:       activate_term_style_controller (const struct term_style_controller *controller,
+./lib/term-style-control.h:       activate_term_non_default_mode (const struct term_style_controller *controller,
+./lib/term-style-control.h:       deactivate_term_non_default_mode (const struct term_style_controller *controller,
+./lib/term-style-control.h:       deactivate_term_style_controller (const struct term_style_controller *controller,
+
+lib/term-ostream.oo.h, lib/term-ostream.h
+#include "term-style-control.h" 없다면 추가
+있을경우
+lib/term-style-control.h
+struct term_style_controller
+{
+  /* This function returns a pointer to the embedded
+     'struct term_style_control_data' contained in a
+     'struct term_style_user_data'.  */
+  /*struct term_style_control_data * (*get_control_data) (struct term_style_user_data *);*/
+  /*./lib/term-ostream.oo.c:1114:get_control_data (term_ostream_t stream) 매개변수형식맞춰야함*/
+  struct term_style_control_data * (*get_control_data) (term_ostream_t);
+
+  /* This function brings the terminal's state back to the default state
+     (no styling attributes set).  It is invoked when the process terminates
+     through exit().  */
+  void (*restore) (struct term_style_user_data *);
+
+  /* This function brings the terminal's state back to the default state
+     (no styling attributes set).  It is async-safe (see gnulib-common.m4 for
+     the precise definition).  It is invoked when the process receives a fatal
+     or stopping signal.  */
+  _GL_ASYNC_SAFE void (*async_restore) (struct term_style_user_data *);
+
+  /* This function brings the terminal's state, from the default state, back
+     to the state where it has the desired attributes set.  It is async-safe
+     (see gnulib-common.m4 for the precise definition).  It is invoked when
+     the process receives a SIGCONT signal.  */
+  _GL_ASYNC_SAFE void (*async_set_attributes_from_default) (struct term_style_user_data *);
+};
+=>get_control_data 함수 포인터가 term_ostream_t 타입을 받고, 
+다른 함수들은 term_style_user_data *를 받는 데서 발생하는 시그니처 불일치
+
+lib/term-ostream.oo.c
+static const struct term_style_controller controller =
+{
+  get_control_data,
+  restore,
+  async_restore,
+  async_set_attributes_from_default
+};
+
+static struct term_style_control_data *
+get_control_data (term_ostream_t stream)
+
+static void
+restore (term_ostream_t stream)
+
+static _GL_ASYNC_SAFE void
+async_restore (term_ostream_t stream)
+
+static _GL_ASYNC_SAFE void
+async_set_attributes_from_default (term_ostream_t stream)
+
+=> 전부 term_ostream_t 이걸로 받는데 정의가 struct term_style_user_data * 이것으로되있음
+=> struct term_style_user_data * => term_ostream_t
+=> term-style-control.h에 맞추기로함(매개변수 전부 struct term_style_user_data * 로 맞춤)
+
+lib/term-style-control.h 수정
+struct term_style_control_data * (*get_control_data) (struct term_style_user_data *);
+
+lib/term-ostream.oo.c, lib/term-ostream.c 수정
+static struct term_style_control_data *
+get_control_data (struct term_style_user_data * stream)
+
+static void
+restore (struct term_style_user_data * stream)
+
+static _GL_ASYNC_SAFE void
+async_restore (struct term_style_user_data * stream)
+
+static _GL_ASYNC_SAFE void
+async_set_attributes_from_default (struct term_style_user_data * stream)
+(오류)
 term-ostream.oo.c:1849:3: error: initialization of 'struct term_style_control_data * (*)(struct term_style_user_data *)' from incompatible pointer type 'struct term_style_control_data * (*)(struct any_ostream_representation *)' [-Wincompatible-pointer-types]
 term-ostream.oo.c:1849:3: note: (near initialization for 'controller.get_control_data')
 term-ostream.oo.c:1850:3: error: initialization of 'void (*)(struct term_style_user_data *)' from incompatible pointer type 'void (*)(struct any_ostream_representation *)' [-Wincompatible-pointer-types]
@@ -7249,54 +7477,35 @@ term-ostream.oo.c:1851:3: error: initialization of 'void (*)(struct term_style_u
 term-ostream.oo.c:1851:3: note: (near initialization for 'controller.async_restore')
 term-ostream.oo.c:1852:3: error: initialization of 'void (*)(struct term_style_user_data *)' from incompatible pointer type 'void (*)(struct any_ostream_representation *)' [-Wincompatible-pointer-types]
 term-ostream.oo.c:1852:3: note: (near initialization for 'controller.async_set_attributes_from_default')
-term-ostream.oo.c: In function 'activate_default_attr':
-term-ostream.oo.c:1862:50: error: passing argument 2 of 'deactivate_term_non_default_mode' from incompatible pointer type [-Wincompatible-pointer-types]
-In file included from term-ostream.oo.h:25,
-                 from term-ostream.oo.c:21:
-lib/term-style-control.h:178:71: note: expected 'struct term_style_user_data *' but argument is of type 'term_ostream_t' {aka 'struct any_ostream_representation
-'}
-  178 |                                          struct term_style_user_data *user_data);
-      |                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~
-term-ostream.oo.c: In function 'output_buffer':
-term-ostream.oo.c:1903:54: error: passing argument 2 of 'activate_term_non_default_mode' from incompatible pointer type [-Wincompatible-pointer-types]
-lib/term-style-control.h:168:69: note: expected 'struct term_style_user_data *' but argument is of type 'term_ostream_t' {aka 'struct any_ostream_representation
-'}
-  168 |                                        struct term_style_user_data *user_data);
-      |                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~
-term-ostream.oo.c:1935:50: error: passing argument 2 of 'activate_term_non_default_mode' from incompatible pointer type [-Wincompatible-pointer-types]
-lib/term-style-control.h:168:69: note: expected 'struct term_style_user_data *' but argument is of type 'term_ostream_t' {aka 'struct any_ostream_representation
-'}
-  168 |                                        struct term_style_user_data *user_data);
-      |                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~
-term-ostream.oo.c:1941:52: error: passing argument 2 of 'deactivate_term_non_default_mode' from incompatible pointer type [-Wincompatible-pointer-types]
-lib/term-style-control.h:178:71: note: expected 'struct term_style_user_data *' but argument is of type 'term_ostream_t' {aka 'struct any_ostream_representation
-'}
-  178 |                                          struct term_style_user_data *user_data);
-      |                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~
-term-ostream.oo.c: In function 'term_ostream__free':
-term-ostream.oo.c:2081:50: error: passing argument 2 of 'deactivate_term_style_controller' from incompatible pointer type [-Wincompatible-pointer-types]
-lib/term-style-control.h:186:71: note: expected 'struct term_style_user_data *' but argument is of type 'term_ostream_t' {aka 'struct any_ostream_representation
-'}
-  186 |                                          struct term_style_user_data *user_data);
-      |                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~
-term-ostream.oo.c: In function 'term_ostream_create':
-term-ostream.oo.c:2766:48: error: passing argument 2 of 'activate_term_style_controller' from incompatible pointer type [-Wincompatible-pointer-types]
-lib/term-style-control.h:155:69: note: expected 'struct term_style_user_data *' but argument is of type 'term_ostream_t' {aka 'struct any_ostream_representation
-'}
-  155 |                                        struct term_style_user_data *user_data,
-      |                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~
-make[2]: *** [Makefile:937: lib/term-ostream.lo] 오류 1
-make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle' 나감
-make[1]: *** [Makefile:956: all-recursive] 오류 1
-make[1]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle' 나감
-make: *** [Makefile:812: all] 오류 2
 
 (수정)
-struct term_style_user_data *를 인수로 받는 함수 포인터에
-struct any_ostream_representation *를 인수로 받는 함수를 대입하려고 하면서 발생하는 유형 불일치 문제
-함수 정의를 수정하여 함수가 struct term_style_user_data *를 인수로 받도록 변경
+타입을 맞춰줬는데도 에러가남
+lib/term-ostream.c
+#if !IS_CPLUSPLUS
+#define term_ostream_representation any_ostream_representation
+#endif
+ C++가 아닌 경우에 term_ostream_representation을 any_ostream_representation으로 정의
+이로 인해 term-style-control.h와 term-ostream.oo.c에서의 매개변수 타입 불일치 문제가 발생
+lib/term-styl-control.h 수정(term_style_user_data =>any_ostream_representation)
+  struct term_style_control_data * (*get_control_data) (struct any_ostream_representation *);
+  void (*restore) (struct any_ostream_representation *);
+  _GL_ASYNC_SAFE void (*async_restore) (struct any_ostream_representation *);
+  _GL_ASYNC_SAFE void (*async_set_attributes_from_default) (struct any_ostream_representation *);
 
+lib/term-ostream.oo.c, lib/term-ostream.c 수정 (term_style_user_data => term_ostream_representation)
+static struct term_style_control_data *
+get_control_data (struct term_ostream_representation * stream)
 
+static void
+restore (struct term_ostream_representation * stream)
 
+static _GL_ASYNC_SAFE void
+async_restore (struct term_ostream_representation * stream)
 
+static _GL_ASYNC_SAFE void
+async_set_attributes_from_default (struct term_ostream_representation * stream)
 
+(오류)
+term-ostream.oo.c: In function 'activate_default_attr':
+term-ostream.oo.c:1862:50: error: passing argument 2 of 'deactivate_term_non_default_mode' from incompatible pointer type [-Wincompatible-pointer-types]
+(수정)
