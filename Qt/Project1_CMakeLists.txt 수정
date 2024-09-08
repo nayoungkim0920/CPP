@@ -7507,5 +7507,90 @@ async_set_attributes_from_default (struct term_ostream_representation * stream)
 
 (오류)
 term-ostream.oo.c: In function 'activate_default_attr':
-term-ostream.oo.c:1862:50: error: passing argument 2 of 'deactivate_term_non_default_mode' from incompatible pointer type [-Wincompatible-pointer-types]
+term-ostream.oo.c:1862:50: error: passing argument 2 of 'deactivate_term_non_default_mode' 
+from incompatible pointer type [-Wincompatible-pointer-types]
 (수정)
+error (EXIT_FAILURE, error_code, _("error writing to %s"), stream->filename);
+deactivate_term_non_default_mode 함수 호출 중 두 번째 인수가 예상된 타입과 호환되지 않는 포인터 타입이라는 경고가 발생
+-Wincompatible-pointer-types 옵션에 의해 발생했으며, 이는 서로 다른 포인터 타입 간의 호환성 문제를 감지
+
+static void
+activate_default_attr (term_ostream_t stream)
+{
+  /* Switch back to the default attributes.  */
+  out_attr_change (stream, stream->default_attr);
+
+  >>> deactivate_term_non_default_mode (&controller, stream);
+}
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# find . -name "*.h" | xargs grep 'deactivate_term_non_default_mode'
+./lib/term-style-control.h:       deactivate_term_non_default_mode (const struct term_style_controller *controller,
+
+lib/term-style-control.h
+extern void
+       deactivate_term_non_default_mode (const struct term_style_controller *controller,
+                                         struct term_style_user_data *user_data);
+
+=> struct term_style_user_data *user_data로 선언되어있으나 term_ostream_t stream을 대입하였음
+deactivate_term_non_default_mode (&controller, (struct term_style_user_data *)stream); 수정
+
+make clean (가끔씩 갱신이안되는경우가있을때 사용)
+autoreconf -ivf && ./configure && make
+
+(오류)
+lib/textstyle.h:625:6: error: redeclaration of 'enum color_option'
+  625 | enum color_option { color_no, color_tty, color_yes, color_html };
+      |      ^~~~~~~~~~~~
+In file included from lib/color.c:24:
+lib/color.h:39:6: note: originally defined here
+   39 | enum color_option { color_no, color_tty, color_yes, color_html };
+      |      ^~~~~~~~~~~~
+(수정)
+lib/color.h
+//enum color_option { color_no, color_tty, color_yes, color_html };
+
+(오류)
+term-ostream.oo.c: In function 'activate_default_attr':
+term-ostream.oo.c:1862:50: error: passing argument 2 of 'deactivate_term_non_default_mode' 
+from incompatible pointer type [-Wincompatible-pointer-types]
+(수정)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# find . -name '*.h' | xargs grep 'deactivate_term_non_default_mode'
+./lib/term-style-control.h:       deactivate_term_non_default_mode (const struct term_style_controller *controller,
+
+lib/term-style-control.h
+extern void deactivate_term_non_default_mode (const struct term_style_controller *controller,
+                                              struct term_style_user_data *user_data);
+
+lib/term-ostream.oo.c
+deactivate_term_non_default_mode (&controller, stream);
+
+stream은 term_ostream_t 타입인데, term_ostream_t가 struct term_style_user_data와 호환되지 않아서 에러가 발생
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -r "struct term_ostream_t" .
+./lib/term-ostream.h:struct term_ostream_t
+lib/term-ostream.h
+#define term_style_user_data term_ostream_representation
+#if IS_CPLUSPLUS
+struct term_ostream_t
+{
+private:
+  struct term_ostream_representation *_pointer;
+public:
+  term_ostream_t () : _pointer (NULL) {}
+  term_ostream_t (struct term_ostream_representation *pointer) : _pointer (pointer) {}
+  struct term_ostream_representation * operator -> () { return _pointer; }
+  operator struct term_ostream_representation * () { return _pointer; }
+  operator struct any_ostream_representation * () { return (struct any_ostream_representation *) _pointer; }
+  operator void * () { return _pointer; }
+  bool operator == (const void *p) { return _pointer == p; }
+  bool operator != (const void *p) { return _pointer != p; }
+  operator ostream_t () { return (ostream_t) (struct any_ostream_representation *) _pointer; }
+  explicit term_ostream_t (ostream_t x) : _pointer ((struct term_ostream_representation *) (void *) x) {}
+};
+#else
+typedef ostream_t term_ostream_t;
+#endif
+
+
