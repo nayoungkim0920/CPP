@@ -7690,12 +7690,150 @@ term-ostream.oo.c: In function 'output_buffer':
 term-ostream.oo.c:1903:54: error: passing argument 2 of 'activate_term_non_default_mode' 
 from incompatible pointer type [-Wincompatible-pointer-types]
 (수정)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -rn 'activate_term_non_default_mode' .
+
+extern void
+activate_term_non_default_mode (const struct term_style_controller *controller,
+                                struct term_style_user_data *user_data);
+
 lib/term-ostream.oo.c, lib/term-ostream.c 수정
 activate_term_non_default_mode의 두 번째 인수로 전달되는 stream 포인터의 타입이 호환되지 않음
-//deactivate_term_non_default_mode (&controller, (term_style_user_data *) stream);
-deactivate_term_non_default_mode (&controller, (term_style_user_data *) stream->_pointer);
 
+if (!equal_attributes (*ap, stream->default_attr)){
+	//activate_term_non_default_mode (&controller, stream);
+	#if IS_CPLUSPLUS
+		activate_term_non_default_mode(&controller, (term_style_user_data *) stream->_pointer);
+	#else
+		activate_term_non_default_mode(&controller, (term_style_user_data *) stream);
+	#endif
+}
 
+(오류)
+term-ostream.h:76:37: error: unknown type name 'any_ostream_representation'; did you mean 'term_ostream_representation'?
+(수정)
+lib/term-ostream.h, lib/term-ostream.oo.h 수정
+#define term_ostream_representation any_ostream_representation
 
+// C++의 스마트 포인터 클래스 정의
+struct term_ostream_t
+{
+private:
+  struct any_ostream_representation *_pointer;
+public:
+  term_ostream_t() : _pointer(NULL) {}
+  term_ostream_t(struct any_ostream_representation *pointer) : _pointer(pointer) {}
+  
+  // 형변환 연산자
+  struct any_ostream_representation * operator -> () { return _pointer; }
+  operator struct any_ostream_representation * () { return _pointer; }
+  operator void * () { return _pointer; }
+  bool operator == (const void *p) { return _pointer == p; }
+  bool operator != (const void *p) { return _pointer != p; }
 
+  // 다른 형변환 연산자
+  operator ostream_t () { return (ostream_t) _pointer; }
+  explicit term_ostream_t(ostream_t x) : _pointer((struct any_ostream_representation *) x) {}
+};
 
+(오류)
+term-ostream.h:76:37: error: unknown type name 'any_ostream_representation'; did you mean 'term_ostream_representation'?
+term-ostream.oo.c:1872:55: note: in expansion of macro 'term_ostream_representation'
+term-ostream.h 파일에서 any_ostream_representation이라는 타입 이름이 정의되지 않았다
+term_ostream_representation이 올바른 타입 이름으로 보인다
+(수정)
+term-ostream.h 파일 수정
+
+any_ostream_representation정의 및 구현을 꼭 찾아야함
+findstr /s /i /n /c:"any_ostream_representation" c:\gnulib\*.* c:\libidn2\*.*
+
+(오류)
+term-ostream.oo.c:1863:81: error: 'struct any_ostream_representation' has no member named '_pointer'
+(수정)
+#if IS_CPLUSPLUS
+  deactivate_term_non_default_mode(&controller, (term_style_user_data *) stream->_pointer);
+#else
+  deactivate_term_non_default_mode(&controller, (term_style_user_data *) stream);
+#endif
+
+(오류)
+term-ostream.oo.c: In function 'output_buffer':
+term-ostream.oo.c:1913:51: error: passing argument 2 of 'activate_term_non_default_mode' from incompatible pointer type [-Wincompatible-pointer-types]
+In file included from term-ostream.oo.h:25,
+                 from term-ostream.oo.c:21:
+(수정)
+#if IS_CPLUSPLUS
+  activate_term_non_default_mode(&controller, (term_style_user_data *) stream->_pointer);
+#else
+  activate_term_non_default_mode(&controller, (term_style_user_data *) stream);
+#endif
+(오류)
+term-ostream.oo.c:1913:51: error: passing argument 2 of 'activate_term_non_default_mode' from incompatible pointer type [-Wincompatible-pointer-types]
+In file included from term-ostream.oo.h:25,
+                 from term-ostream.oo.c:21:
+(수정)
+#if IS_CPLUSPLUS
+  activate_term_non_default_mode(&controller, (term_style_user_data *) (void *) stream->_pointer);
+#else
+  activate_term_non_default_mode(&controller, (term_style_user_data *) (void *) stream);
+#endif
+(오류)
+In file included from term-ostream.oo.h:25,
+                 from term-ostream.oo.c:21:
+(수정)
+#include "ostream.h" // any_ostream_representation 선언
+
+#define term_ostream_representation any_ostream_representation
+
+// C++의 스마트 포인터 클래스 정의
+struct term_ostream_t
+{
+private:
+  struct any_ostream_representation *_pointer;
+public:
+  term_ostream_t() : _pointer(NULL) {}
+  term_ostream_t(struct any_ostream_representation *pointer) : _pointer(pointer) {}
+  
+  // 형변환 연산자
+  struct any_ostream_representation * operator -> () { return _pointer; }
+  operator struct any_ostream_representation * () { return _pointer; }
+  operator void * () { return _pointer; }
+  bool operator == (const void *p) { return _pointer == p; }
+  bool operator != (const void *p) { return _pointer != p; }
+
+  // 다른 형변환 연산자
+  operator ostream_t () { return (ostream_t) _pointer; }
+  explicit term_ostream_t(ostream_t x) : _pointer((struct any_ostream_representation *) x) {}
+};
+
+(오류)
+In file included from lib/color.c:32:
+term-ostream.h:104:1: error: expected specifier-qualifier-list before 'private'
+(수정)
+#ifdef __cplusplus
+// C++ 전용 코드
+struct term_ostream_t
+{
+private:
+  struct any_ostream_representation *_pointer;
+public:
+  term_ostream_t() : _pointer(NULL) {}
+  term_ostream_t(struct any_ostream_representation *pointer) : _pointer(pointer) {}
+  
+  struct any_ostream_representation * operator -> () { return _pointer; }
+  operator struct any_ostream_representation * () { return _pointer; }
+  operator void * () { return _pointer; }
+  bool operator == (const void *p) { return _pointer == p; }
+  bool operator != (const void *p) { return _pointer != p; }
+  
+  operator ostream_t () { return (ostream_t) _pointer; }
+  explicit term_ostream_t(ostream_t x) : _pointer((struct any_ostream_representation *) x) {}
+};
+#else
+// C 전용 코드
+typedef struct any_ostream_representation * term_ostream_t;
+#endif
+
+(오류)
+any_ostream_representation 정의 와 구현을 찾을 수 없어 생성
+(수정)
