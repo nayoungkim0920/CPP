@@ -7837,3 +7837,409 @@ typedef struct any_ostream_representation * term_ostream_t;
 (오류)
 any_ostream_representation 정의 와 구현을 찾을 수 없어 생성
 (수정)
+lib/ostream.h수정
+struct any_ostream_representation {
+    // 기본 멤버
+    struct ostream_representation_header *vtable;  // 가상 테이블 포인터
+    void *_pointer;  // 스트림 데이터 또는 관련 구조체에 대한 포인터
+    int fd;          // 파일 디스크립터
+    FILE *file;      // FILE 포인터
+    char *buffer;    // 메모리 스트림 버퍼
+    size_t size;     // 버퍼 크기
+    size_t position; // 스트림 내 현재 위치
+
+    // 속성 관련 멤버
+    int no_color_video;
+    int supports_weight;
+    int supports_posture;
+    int supports_underline;
+    int supports_hyperlink;
+    unsigned long hostname_hash;
+    unsigned long start_time;
+    unsigned long id_serial;
+    char *filename;
+    int colormodel; // 컬러 모델
+    int is_windows_console; // Windows 콘솔 여부
+    //void* current_console_attributes; // 현재 콘솔 속성
+
+    // 색상 관련 멤버
+    bool supports_foreground; // 전경색 지원 여부
+    bool supports_background; // 배경색 지원 여부
+    int curr_attr;            // 현재 속성
+    int orig_pair;            // 원래 색상 쌍
+
+    // 텍스트 속성 관련 멤버
+    void (*set_a_foreground)(int color); // 전경색 설정 함수
+    void (*set_foreground)(int color);   // 전경색 설정 함수
+    void (*set_a_background)(int color); // 배경색 설정 함수
+    void (*set_background)(int color);   // 배경색 설정 함수
+    void (*enter_bold_mode)(void);       // 굵은 글씨 모드 진입 함수
+    void (*enter_italics_mode)(void);    // 이탤릭 모드 진입 함수
+    void (*exit_italics_mode)(void);     // 이탤릭 모드 종료 함수
+    void (*enter_underline_mode)(void);  // 밑줄 모드 진입 함수
+    void (*exit_underline_mode)(void);   // 밑줄 모드 종료 함수
+    void (*exit_attribute_mode)(void);   // 속성 모드 종료 함수
+
+    // 하이퍼링크 관련 멤버
+    char **hyperlinks_array; // 하이퍼링크 배열
+    int hyperlinks_count;    // 하이퍼링크 수
+
+    // 복원 관련 멤버
+    void (*restore_colors)(void); // 색상 복원 함수
+    void (*restore_weight)(void); // 굵기 복원 함수
+    void (*restore_posture)(void); // 기울기 복원 함수
+    void (*restore_underline)(void); // 밑줄 복원 함수
+    void (*restore_hyperlink)(void); // 하이퍼링크 복원 함수
+
+    // 누락된 멤버들 추가
+    char *attrbuffer;       // 속성 버퍼
+    int buflen;            // 버퍼 길이
+    int allocated;         // 할당된 메모리 크기
+    int default_attr;      // 기본 속성
+    int active_attr;       // 활성 속성
+    int max_colors;        // 최대 색상 수
+    int hyperlinks_allocated; // 하이퍼링크 배열의 할당된 크기
+    int simp_attr;         // 단순화된 속성
+    void *tty_control;     // TTY 제어 데이터
+    void *control_data;    // 제어 데이터
+
+	HANDLE handle; //or FILE* handle;
+	int bgcolor;                       // 배경 색상
+    int weight;                        // 글자 두께
+    int posture;                       // 글자의 기울기
+    int underline;                     // 밑줄 스타일
+    hyperlink_t *hyperlink;            // 하이퍼링크 정보
+    attributes_t default_console_attributes;  // 기본 콘솔 속성
+    attributes_t current_console_attributes;  // 현재 콘솔 속성
+    ttyctl_t ttyctl;                   // TTY 제어
+};
+(오류)
+term-ostream.oo.c: In function 'out_color_change':
+term-ostream.oo.c:1247:5: error: aggregate value used where an integer was expected
+tparm 함수 또는 그와 관련된 호출에서 반환되는 값이 구조체와 같은 복합 자료형인데, 정수형 값이 기대되었다는 의미
+tputs (tparm (stream->set_foreground, new_color),
+                   1, async_safe ? out_char_unchecked : out_char);
+
+(수정)
+lib/term-ostream.c, lib/term-ostream.oo.c 수정
+
+/*if (stream->set_a_foreground != NULL)
+            tputs (tparm (stream->set_a_foreground, color_bgr (new_color)),
+                   1, async_safe ? out_char_unchecked : out_char);
+          else
+            tputs (tparm (stream->set_foreground, new_color),
+                   1, async_safe ? out_char_unchecked : out_char);*/
+
+const char* color_change_cmd = NULL;
+
+if (stream->set_a_foreground != NULL) {
+    color_change_cmd = tparm(stream->set_a_foreground, (long)color_bgr(new_color));
+} else if (stream->set_foreground != NULL) {
+    color_change_cmd = tparm(stream->set_foreground, (long)new_color);
+}
+
+if (color_change_cmd != NULL) {
+    tputs(color_change_cmd, 1, async_safe ? out_char_unchecked : out_char);
+}
+
+
+(오류)
+term-ostream.oo.c: In function 'generate_hyperlink_id':
+term-ostream.oo.c:1163:38: warning: right shift count >= width of type [-Wshift-count-overflow]
+(수정)
+lib/term-ostream.c, lib/term-ostream.oo.c 수정
+/* Generate an id for a hyperlink.  */
+/*static char *
+generate_hyperlink_id (term_ostream_t stream)
+{
+  // A UUID would be optimal, but is overkill here.  An id of 128 bits
+  //  (32 hexadecimal digits) should be sufficient. 
+  static const char hexdigits[16] =
+    {
+      '0', '1', '2', '3', '4', '5', '6', '7',
+      '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
+    };
+  //char *id = (char *) xmalloc (128 / 4 + 1);
+  char *id = (char *) malloc (128 / 4 + 1);
+  uint32_t words[4] =
+    {
+      stream->hostname_hash,
+      (uint32_t) (stream->start_time >> 32),
+      (uint32_t) stream->start_time,
+      stream->id_serial
+    };
+  char *p = id;
+  unsigned int i;
+  for (i = 0; i < 4; i++)
+    {
+      uint32_t word = words[i];
+      unsigned int j;
+      for (j = 0; j < 32 / 4; j++)
+        *p++ = hexdigits[(word >> (32 - 4 * (j + 1))) & 0x0f];
+    }
+  *p = '\0';
+  stream->id_serial++;
+  return id;
+}*/
+
+
+/* Define constants */
+#define HEX_DIGITS_PER_WORD 8  // Since each 32-bit word produces 8 hexadecimal digits
+
+static char *
+generate_hyperlink_id (term_ostream_t stream)
+{
+  static const char hexdigits[16] =
+    {
+      '0', '1', '2', '3', '4', '5', '6', '7',
+      '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
+    };
+  char *id = (char *) malloc (HEX_DIGITS_PER_WORD * 4 + 1);  // Allocate memory for 32 hex digits + null terminator
+  uint32_t words[4] =
+    {
+      stream->hostname_hash,
+      (uint32_t) (stream->start_time >> 32),
+      (uint32_t) stream->start_time,
+      stream->id_serial
+    };
+  char *p = id;
+  unsigned int i;
+  for (i = 0; i < 4; i++)
+    {
+      uint32_t word = words[i];
+      unsigned int j;
+      for (j = 0; j < HEX_DIGITS_PER_WORD; j++)
+        *p++ = hexdigits[(word >> (4 * (HEX_DIGITS_PER_WORD - 1 - j))) & 0x0f];
+    }
+  *p = '\0';
+  stream->id_serial++;
+  return id;
+}
+
+(오류)
+term-ostream.oo.c: In function 'generate_hyperlink_id':
+term-ostream.oo.c:1197:38: warning: right shift count >= width of type [-Wshift-count-overflow]
+term-ostream.oo.c: In function 'out_color_change':
+term-ostream.oo.c:1281:5: error: aggregate value used where an integer was expected
+term-ostream.oo.c:1304:7: error: 'color_change_cmd' undeclared (first use in this function)
+term-ostream.oo.c:1304:7: note: each undeclared identifier is reported only once for each function it appears in
+term-ostream.oo.c:1304:38: error: passing argument 1 of 'tparm' from incompatible pointer type [-Wincompatible-pointer-types]
+
+(수정)
+lib/term-ostream.c, lib/term-ostream.oo.c 수정
+
+char buffer[1024]; // 충분히 큰 버퍼를 선언합니다
+const char *color_change_cmd = NULL; // 변수 선언
+
+if (stream->set_a_foreground != NULL)
+{
+color_change_cmd = tparm((const char *)stream->set_a_foreground, color_bgr(new_color));
+if (color_change_cmd != NULL)
+{
+    snprintf(buffer, sizeof(buffer), "%s", color_change_cmd);
+    tputs(buffer, 1, async_safe ? out_char_unchecked : out_char);
+}
+}
+else if (stream->set_foreground != NULL)
+{
+color_change_cmd = tparm((const char *)stream->set_foreground, new_color);
+if (color_change_cmd != NULL)
+{
+    snprintf(buffer, sizeof(buffer), "%s", color_change_cmd);
+    tputs(buffer, 1, async_safe ? out_char_unchecked : out_char);
+}
+}
+
+(오류)
+term-ostream.oo.c: In function 'generate_hyperlink_id':
+term-ostream.oo.c:1196:4: error: 'return' with no value, in function
+
+(수정)
+/* Define constants */
+#define HEX_DIGITS_PER_WORD 8  // Since each 32-bit word produces 8 hexadecimal digits
+
+static char *
+generate_hyperlink_id (term_ostream_t stream)
+{
+  static const char hexdigits[16] =
+    {
+      '0', '1', '2', '3', '4', '5', '6', '7',
+      '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
+    };
+  char *id = (char *) malloc (HEX_DIGITS_PER_WORD * 4 + 1);  // Allocate memory for 32 hex digits + null terminator
+	if (id == NULL) {
+			// Handle memory allocation failure
+			return NULL; <-- return 에서 return NULL로 수정
+	}
+
+	uint32_t words[4] = {
+			stream->hostname_hash,
+			(uint32_t) (stream->start_time >> 32),
+			(uint32_t) stream->start_time,
+			stream->id_serial
+	};
+
+	char *p = id;
+	unsigned int i;
+	for (i = 0; i < 4; i++) {
+			uint32_t word = words[i];
+			unsigned int j;
+			for (j = 0; j < HEX_DIGITS_PER_WORD; j++) {
+					*p++ = hexdigits[(word >> (4 * (HEX_DIGITS_PER_WORD - 1 - j))) & 0x0f];
+			}
+	}
+  *p = '\0';
+  stream->id_serial++;
+  return id;
+}
+
+(오류)
+term-ostream.oo.c: In function 'generate_hyperlink_id':
+term-ostream.oo.c:1197:38: warning: right shift count >= width of type [-Wshift-count-overflow]
+비트 시프트 연산의 오른쪽 수치가 타입의 비트 너비를 초과할 때 발생
+(수정)
+lib/term-ostream.c, lib/term-ostream.oo.c 수정
+/*uint32_t words[4] = {
+		stream->hostname_hash,
+		(uint32_t) (stream->start_time >> 32),
+		(uint32_t) stream->start_time,
+		stream->id_serial
+};*/
+
+// start_time이 64비트임을 가정
+uint64_t start_time = stream->start_time;
+
+uint32_t words[4] = {
+		stream->hostname_hash,
+		(uint32_t)(start_time >> 32),  // 상위 32비트를 가져옴
+		(uint32_t)start_time,          // 하위 32비트를 가져옴
+		stream->id_serial
+};
+
+(오류)
+term-ostream.oo.c: In function 'out_color_change':
+term-ostream.oo.c:1288:13: error: aggregate value used where an integer was expected
+주로 구조체나 복합 데이터 타입이 예상되는 곳에 정수가 아닌 다른 값이 전달될 때 발생
+(수정)
+lib/term-ostream.oo.h
+typedef int term_color_t;
+case cm_common8:
+stream->current_console_attributes =
+            (stream->current_console_attributes & ~(7 << 4))
+            | (new_bgcolor << 4);
+current_console_attributes나 new_bgcolor가 정수형 값이 아닌 복합 데이터형(예: 구조체)이라는 것을 의미할 수 있다.
+비트 연산에서 두 값이 모두 정수형이어야 하는데, 하나 또는 두 값이 정수형이 아닐 경우 문제가 발생
+new_bgcolor와 stream->current_console_attributes가 정수형(예: int, unsigned int, WORD)인지 확인
+
+typedef int term_color_t;
+term_color_t new_bgcolor
+이고
+#if IS_CPLUSPLUS
+struct term_ostream_t
+{
+private:
+  struct term_ostream_representation *_pointer;
+public:
+  term_ostream_t () : _pointer (NULL) {}
+  term_ostream_t (struct term_ostream_representation *pointer) : _pointer (pointer) {}
+  struct term_ostream_representation * operator -> () { return _pointer; }
+  operator struct term_ostream_representation * () { return _pointer; }
+  operator struct any_ostream_representation * () { return (struct any_ostream_representation *) _pointer; }
+  operator void * () { return _pointer; }
+  bool operator == (const void *p) { return _pointer == p; }
+  bool operator != (const void *p) { return _pointer != p; }
+  operator ostream_t () { return (ostream_t) (struct any_ostream_representation *) _pointer; }
+  explicit term_ostream_t (ostream_t x) : _pointer ((struct term_ostream_representation *) (void *) x) {}
+};
+#else
+typedef ostream_t term_ostream_t;
+#endif
+term_ostream_t stream
+stream->current_console_attributes
+정의에 current_console_attributes 없어서 추가
+lib/term-ostream.h, lib/term-ostream.oo.h 수정
+struct term_ostream_t에 	
+int current_console_attributes; //term-ostream.c stream->current_console_attributes; 추가
+
+(오류)
+term-ostream.oo.c: In function 'out_color_change':
+term-ostream.oo.c:1284:15: error: 'new_bgcolor' undeclared (first use in this function); did you mean 'new_color'?
+(수정)
+lib/term-ostream.oo.c, lib/term-ostream.c 수정
+static _GL_ASYNC_SAFE void
+out_color_change(term_ostream_t stream, term_color_t new_color, bool async_safe)
+{
+	term_color_t new_bgcolor = new_color; //선언추가
+}
+
+(오류)
+C:/msys64/mingw64/include/wincon.h:252:80: note: expected 'WORD' {aka 'short unsigned int'} but argument is of type 'attributes_t'
+  252 |   WINBASEAPI WINBOOL WINAPI SetConsoleTextAttribute(HANDLE hConsoleOutput,WORD wAttributes);
+      |
+               ~~~~~^~~~~~~~~~~
+(수정)
+lib/term-ostream.oo.c, lib/term-ostream.c 수정
+SetConsoleTextAttribute 함수가 두 번째 인자로 WORD 타입(16비트 부호 없는 정수)을 기대하는데, 
+현재 stream->current_console_attributes가 int 타입이기 때문에 발생
+//SetConsoleTextAttribute (stream->handle, stream->current_console_attributes);
+SetConsoleTextAttribute(stream->handle, (WORD)stream->current_console_attributes);
+
+(오류)
+term-ostream.oo.c: In function 'out_color_change':
+term-ostream.oo.c:1296:49: error: invalid operands to binary & (have 'attributes_t' and 'int')
+(수정)
+lib/term-ostream.oo.c, lib/term-ostream.c 수정
+WORD current_attributes = (WORD)stream->current_console_attributes;
+current_attributes = (current_attributes & ~(7 << 4)) | (new_bgcolor << 4);
+stream->current_console_attributes = (int)current_attributes;
+SetConsoleTextAttribute(stream->handle, current_attributes);
+
+(오류)
+term-ostream.oo.c: In function 'out_color_change':
+term-ostream.oo.c:1290:38: error: incompatible types when initializing type 'int' using type 'attributes_t'
+term-ostream.oo.c:1301:50: error: incompatible types when assigning to type 'attributes_t' from type 'int'
+(수정)
+lib/ostream.h 수정
+struct any_ostream_representation {
+WORD current_console_attributes;  // 현재 콘솔 속성
+}
+lib/term-ostream.oo.c, lib/term-ostream.c 수정
+case cm_common8:
+assert (new_bgcolor >= 0 && new_bgcolor < 8);
+#if HAVE_WINDOWS_CONSOLES
+if (stream->is_windows_console)
+{
+  /* SetConsoleTextAttribute
+     <https://docs.microsoft.com/en-us/windows/console/setconsoletextattribute>
+     <https://docs.microsoft.com/en-us/windows/console/console-screen-buffers>  */
+  /* Assign to stream->current_console_attributes *before* calling
+     SetConsoleTextAttribute, otherwise async_set_attributes_from_default
+     will not do its job correctly.  */
+
+				// 현재 콘솔 속성을 WORD 타입으로 가져옵니다.
+    WORD current_attributes = stream->current_console_attributes;
+    // 색상 비트를 제거하기 위한 마스크를 정의합니다.
+    WORD mask = ~(7 << 4);  // 4비트 색상 마스크
+    // 새 색상 값을 4비트 왼쪽으로 이동합니다.
+    WORD new_color_value = new_color << 4;
+
+    // 비트 연산을 통해 업데이트된 속성 계산
+    WORD updated_attributes = (current_attributes & mask) | new_color_value;
+
+    // SetConsoleTextAttribute 호출
+    SetConsoleTextAttribute(stream->handle, updated_attributes);
+
+    // 업데이트된 속성을 stream에 저장
+    stream->current_console_attributes = updated_attributes;
+
+
+  //stream->current_console_attributes =
+  //  (stream->current_console_attributes & ~(7 << 4))
+  //  | (new_bgcolor << 4);
+  //SetConsoleTextAttribute (stream->handle, stream->current_console_attributes);
+}
+
+(오류)
+term-ostream.oo.c: In function 'out_color_change':
+term-ostream.oo.c:1322:33: error: passing argument 1 of 'tparm' from incompatible pointer type [-Wincompatible-pointer-types]
+(수정)
