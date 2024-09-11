@@ -8861,6 +8861,184 @@ uint32_t와 uint64_t는 <stdint.h> 헤더 파일에서 정의된 타입
 lib/term_ostream.priv 수정
 #include <stdint.h>
 
+(오류)
+lib/gl_list.h:651:1: warning: 'nodiscard' attribute directive ignored [-Wattributes]
+  651 | {
+      | ^
+(수정)
+configure.ac 수정
+# Set C++ standard to C++17
+CXXFLAGS="$CXXFLAGS -std=c++17"
+AC_SUBST(CXXFLAGS)
+
+AC_MSG_CHECKING([whether the compiler supports __attribute__((nodiscard))])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[__attribute__((nodiscard)) int x;]])],
+  [AC_DEFINE_UNQUOTED([_GL_ATTRIBUTE_NODISCARD], [__attribute__((nodiscard))], [Define for attribute nodiscard])],
+  [AC_DEFINE_UNQUOTED([_GL_ATTRIBUTE_NODISCARD], [], [Define for attribute nodiscard])]
+)
+AC_MSG_RESULT([done])
+
+(오류)
+lib/ostream.priv.h:5:8: error: redefinition of 'struct ostream_representation'
+    5 | struct ostream_representation
+      |        ^~~~~~~~~~~~~~~~~~~~~~
+(수정)
+lib/ostream.priv.h 수정
+#ifndef OSTREAM_PRIV_H
+#define OSTREAM_PRIV_H
+...
+#endif // OSTREAM_PRIV_H
+
+(오류)
+lib/term_ostream.priv.h:13:4: error: redeclaration of enumerator 'cm_monochrome'
+   13 |    cm_monochrome,        /* No colors.  */
+      |    ^~~~~~~~~~~~~
+(수정)
+/gnulib-local/lib/term-ostream.oo.c 수정
+/* The color model used by the terminal.  */
+//typedef enum
+//{
+//  cm_monochrome,        /* No colors.  */
+//  cm_common8,           /* Usual terminal with at least 8 colors.  */
+//  cm_xterm8,            /* TERM=xterm, with 8 colors.  */
+//  cm_xterm16,           /* TERM=xterm-16color, with 16 colors.  */
+//  cm_xterm88,           /* TERM=xterm-88color, with 88 colors.  */
+//  cm_xterm256,          /* TERM=xterm-256color, with 256 colors.  */
+//  cm_xtermrgb           /* TERM=xterm-direct, with 256*256*256 colors.  */
+//} colormodel_t;
+
+(오류)
+In file included from term-ostream.c:1039:
+lib/term_ostream.priv.h:13:4: error: redeclaration of enumerator 'cm_monochrome'
+   13 |    cm_monochrome,        /* No colors.  */
+      |    ^~~~~~~~~~~~~
+In file included from term-ostream.oo.h:29,
+                 from term-ostream.oo.c:21:
+lib/term_ostream.priv.h:13:4: note: previous definition of 'cm_monochrome' with type 'enum <anonymous>'
+   13 |    cm_monochrome,        /* No colors.  */
+      |    ^~~~~~~~~~~~~
+lib/term_ostream.priv.h:14:4: error: redeclaration of enumerator 'cm_common8'
+   14 |    cm_common8,           /* Usual terminal with at least 8 colors.  */
+      |    ^~~~~~~~~~
+lib/term_ostream.priv.h:14:4: note: previous definition of 'cm_common8' with type 'enum <anonymous>'
+   14 |    cm_common8,           /* Usual terminal with at least 8 colors.  */
+      |    ^~~~~~~~~~
+lib/term_ostream.priv.h:15:4: error: redeclaration of enumerator 'cm_xterm8'
+   15 |    cm_xterm8,            /* TERM=xterm, with 8 colors.  */
+      |    ^~~~~~~~~
+lib/term_ostream.priv.h:15:4: note: previous definition of 'cm_xterm8' with type 'enum <anonymous>'
+   15 |    cm_xterm8,            /* TERM=xterm, with 8 colors.  */
+      |    ^~~~~~~~~
+lib/term_ostream.priv.h:16:4: error: redeclaration of enumerator 'cm_xterm16'
+   16 |    cm_xterm16,           /* TERM=xterm-16color, with 16 colors.  */
+      |    ^~~~~~~~~~
+lib/term_ostream.priv.h:16:4: note: previous definition of 'cm_xterm16' with type 'enum <anonymous>'
+   16 |    cm_xterm16,           /* TERM=xterm-16color, with 16 colors.  */
+      |    ^~~~~~~~~~
+lib/term_ostream.priv.h:17:4: error: redeclaration of enumerator 'cm_xterm88'
+   17 |    cm_xterm88,           /* TERM=xterm-88color, with 88 colors.  */
+      |    ^~~~~~~~~~
+lib/term_ostream.priv.h:17:4: note: previous definition of 'cm_xterm88' with type 'enum <anonymous>'
+   17 |    cm_xterm88,           /* TERM=xterm-88color, with 88 colors.  */
+      |    ^~~~~~~~~~
+lib/term_ostream.priv.h:18:4: error: redeclaration of enumerator 'cm_xterm256'
+   18 |    cm_xterm256,          /* TERM=xterm-256color, with 256 colors.  */
+      |    ^~~~~~~~~~~
+lib/term_ostream.priv.h:18:4: note: previous definition of 'cm_xterm256' with type 'enum <anonymous>'
+   18 |    cm_xterm256,          /* TERM=xterm-256color, with 256 colors.  */
+      |    ^~~~~~~~~~~
+lib/term_ostream.priv.h:19:4: error: redeclaration of enumerator 'cm_xtermrgb'
+   19 |    cm_xtermrgb           /* TERM=xterm-direct, with 256*256*256 colors.  */
+      |    ^~~~~~~~~~~
+lib/term_ostream.priv.h:19:4: note: previous definition of 'cm_xtermrgb' with type 'enum <anonymous>'
+   19 |    cm_xtermrgb           /* TERM=xterm-direct, with 256*256*256 colors.  */
+      |    ^~~~~~~~~~~
+lib/term_ostream.priv.h:20:4: error: conflicting types for 'colormodel_t'; have 'enum <anonymous>'
+   20 |  } colormodel_t;
+      |    ^~~~~~~~~~~~
+lib/term_ostream.priv.h:20:4: note: previous declaration of 'colormodel_t' with type 'colormodel_t'
+   20 |  } colormodel_t;
+      |    ^~~~~~~~~~~~
+lib/term_ostream.priv.h:92:37: error: unknown type name 'any_ostream_representation'; did you mean 'term_ostream_representation'?
+   92 | #define term_ostream_representation any_ostream_representation
+      |                                     ^~~~~~~~~~~~~~~~~~~~~~~~~~
+(수정)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -rn 'cm_monochrome,' .
+./lib/term_ostream.priv.h:13:   cm_monochrome,        /* No colors.  */
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -rn 'colormodel_t;' .
+./lib/term_ostream.priv.h:20: } colormodel_t;
+
+# aclocal && autoconf && autoheader && automake --add-missing && libtoolize && autoreconf -ivf && ./configure && make clean && make
+aclocal: aclocal.m4 파일을 생성하거나 업데이트하여, configure.ac에서 사용하는 매크로를 준비합니다.
+autoconf: configure 스크립트를 생성합니다. configure.ac 파일에 기반하여 configure 스크립트를 자동으로 생성합니다.
+autoheader: config.h.in 파일을 생성합니다. 이 파일은 configure 스크립트가 config.h를 생성하는 데 사용됩니다.
+automake --add-missing: Makefile.am에 정의된 파일을 기반으로 Makefile.in을 생성하고, 필요한 missing 파일을 추가합니다.
+libtoolize: libtool 관련 파일을 추가하거나 업데이트합니다. libtool을 사용하는 프로젝트에 필요합니다.
+autoreconf -ivf: 위의 모든 도구를 호출하여 configure 스크립트와 관련된 파일들을 업데이트합니다. 
+-i는 누락된 파일을 설치하고, -v는 상세 출력을 제공하며, -f는 강제로 재생성합니다.
+./configure: configure 스크립트를 실행하여 프로젝트의 빌드 환경을 설정합니다. 이 단계에서 사용자 시스템에 맞는 설정을 검사하고, Makefile을 생성합니다.
+make clean: 이전 빌드의 결과물들을 제거합니다. Makefile에 정의된 클린 작업을 수행하여 깨끗한 상태에서 빌드를 시작합니다.
+make: 소스 코드를 컴파일하고, 지정된 빌드 작업을 수행합니다. 이 명령어는 Makefile을 기반으로 빌드를 진행합니다.
+
+중복선언확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -rn '#include "term_ostream.priv.h"' .
+./lib/term-ostream.c:1016:#include "term_ostream.priv.h" => 주석처리
+./lib/term-ostream.h:33:#include "term_ostream.priv.h"
+
+lib/term-ostream.h 수정
+#include <windows.h> /*추가 HANDLE*/
+#include <stdbool.h>
+#include "term_ostream.priv.h" //위치이동
+#include "error.h" /*추가*/
+#include "full-write.h" /*추가*/
+#include "terminfo.h" /*추가*/
+#include "term-style-control.h" /*추가*/
+#include "fsync.h" /*추가*/
+#include "ostream.h"  
+
+(오류)
+In file included from term-ostream.oo.h:23,
+                 from lib/color.c:32:
+lib/term_ostream.priv.h:33:3: error: unknown type name 'ttyctl_t'
+   33 |   ttyctl_t tty_control;
+      |   ^~~~~~~~
+lib/term_ostream.priv.h:64:34: error: field 'control_data' has incomplete type
+   64 |   struct term_style_control_data control_data;
+      |                                  ^~~~~~~~~~~~
+lib/term_ostream.priv.h:70:3: error: unknown type name 'hyperlink_t'
+   70 |   hyperlink_t **hyperlinks_array;
+      |   ^~~~~~~~~~~
+lib/term_ostream.priv.h:78:3: error: unknown type name 'attributes_t'; did you mean '__attribute__'?
+   78 |   attributes_t default_attr;
+      |   ^~~~~~~~~~~~
+      |   __attribute__
+lib/term_ostream.priv.h:79:3: error: expected specifier-qualifier-list before 'attributes_t'
+   79 |   attributes_t volatile active_attr;
+      |   ^~~~~~~~~~~~
+(수정)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -rn 'ttyctl_t;' .                                                                 
+./lib/term-style-control.h:79://} ttyctl_t;
+./lib/textstyle.h:284:} ttyctl_t;
+./lib/textstyle.in.h:354:} ttyctl_t;
+
+lib/term_ostream.priv.h 수정
+#include "textstyle.h" //ttyctl_t
+#include "ostream.h" //attributes_t, hyperlink_t,  term_style_control_data
+
+
+
+
+
+
+
+
+
+
 
 
 
