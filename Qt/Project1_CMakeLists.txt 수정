@@ -8243,3 +8243,626 @@ if (stream->is_windows_console)
 term-ostream.oo.c: In function 'out_color_change':
 term-ostream.oo.c:1322:33: error: passing argument 1 of 'tparm' from incompatible pointer type [-Wincompatible-pointer-types]
 (수정)
+tparm 함수에 전달되어 터미널에서 배경색을 설정
+lib/ostream.h 수정
+struct any_ostream_representation {
+//void (*set_a_background)(int color); // 배경색 설정 함수
+//void (*set_background)(int color);   // 배경색 설정 함수
+char *set_a_background;
+char *set_background;
+}
+
+(오류)
+term-ostream.oo.c: In function 'out_weight_change':
+term-ostream.oo.c:1600:16: error: passing argument 1 of 'tputs' from incompatible pointer type [-Wincompatible-pointer-types]
+In file included from term-ostream.oo.h:25,
+                 from term-ostream.oo.c:21:
+lib/terminfo.h:112:32: note: expected 'const char *' but argument is of type 'void (*)(void)'
+  112 | extern void tputs (const char *cp, int affcnt, int (*outcharfun) (int));
+      |                    ~~~~~~~~~~~~^~
+
+(수정)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -rn 'void tputs' .
+./lib/termcap.h:113:extern void tputs (const char *cp, int affcnt, int (*outcharfun) (int));
+./lib/terminfo.h:112:extern void tputs (const char *cp, int affcnt, int (*outcharfun) (int));
+./lib/tputs.c:25:void tputs (const char *cp, int affcnt, int (*outcharfun) (int));
+
+lib/ostream.h
+struct any_ostream_representation {
+//void (*enter_bold_mode)(void);       // 굵은 글씨 모드 진입 함수
+const char *enter_bold_mode;
+}
+
+lib/term_ostream.oo.c, lib/term_ostream.c
+tputs (stream->enter_bold_mode,
+         1, async_safe ? out_char_unchecked : out_char);
+
+(오류)
+term-ostream.oo.c: In function 'out_posture_change':
+term-ostream.oo.c:1613:16: error: passing argument 1 of 'tputs' from incompatible pointer type [-Wincompatible-pointer-types]
+(수정)
+lib/ostream.h
+struct any_ostream_representation {
+     // 텍스트 속성 관련 멤버
+    //void (*set_a_foreground)(int color); // 전경색 설정 함수
+    //void (*set_foreground)(int color);   // 전경색 설정 함수
+    //void (*set_a_background)(int color); // 배경색 설정 함수
+    //void (*set_background)(int color);   // 배경색 설정 함수
+    //void (*enter_bold_mode)(void);       // 굵은 글씨 모드 진입 함수
+    //void (*enter_italics_mode)(void);    // 이탤릭 모드 진입 함수
+    //void (*exit_italics_mode)(void);     // 이탤릭 모드 종료 함수
+    //void (*enter_underline_mode)(void);  // 밑줄 모드 진입 함수
+    //void (*exit_underline_mode)(void);   // 밑줄 모드 종료 함수
+    //void (*exit_attribute_mode)(void);   // 속성 모드 종료 함수
+
+    const char *set_a_foreground; // 전경색 설정 함수
+    const char *set_foreground;   // 전경색 설정 함수
+    const char *set_a_background; // 배경색 설정 함수
+    const char *set_background;   // 배경색 설정 함수
+    const char *enter_bold_mode;       // 굵은 글씨 모드 진입 함수
+    const char *enter_italics_mode;    // 이탤릭 모드 진입 함수
+    const char *exit_italics_mode;     // 이탤릭 모드 종료 함수
+    const char *enter_underline_mode;  // 밑줄 모드 진입 함수
+    const char *exit_underline_mode;   // 밑줄 모드 종료 함수
+    const char *exit_attribute_mode;   // 속성 모드 종료 함수
+}
+
+(오류)
+term-ostream.oo.c: In function 'out_attr_change':
+term-ostream.oo.c:1672:27: error: invalid initializer
+term-ostream.oo.c:1677:25: error: incompatible types when assigning to type 'int' from type 'attributes_t'
+term-ostream.oo.c:1678:11: error: 'struct any_ostream_representation' has no member named 'active_attr_color'; did you mean 'active_attr'?
+term-ostream.oo.c:1679:9: error: 'struct any_ostream_representation' has no member named 'active_attr_bgcolor'
+term-ostream.oo.c:1680:9: error: 'struct any_ostream_representation' has no member named 'active_attr_hyperlink'
+term-ostream.oo.c:1718:24: error: passing argument 1 of 'tputs' makes pointer from integer without a cast [-Wint-conversion]
+term-ostream.oo.c:1695:49: error: invalid operands to binary & (have 'attributes_t' and 'int')
+term-ostream.oo.c:1698:49: error: invalid operands to binary & (have 'attributes_t' and 'int')
+(수정)
+struct any_ostream_representation {
+const char * orig_pair;            // 원래 색상 쌍
+int active_attr;       // 활성 속성
+int active_attr_color;
+int active_attr_bgcolor;
+hyperlink_t active_att_hyperlink;
+WORD default_console_attributes;  // 기본 콘솔 속성
+}
+
+(오류)
+term-ostream.oo.c: In function 'restore':
+term-ostream.oo.c:1829:18: error: assignment to 'term_ostream_t' from incompatible pointer type 'struct term_ostream_representation *' [-Wincompatible-pointer-types]
+(수정)
+lib/ostream.h 수정
+struct any_ostream_representation {
+// 복원 관련 멤버
+//void (*restore_colors)(void); // 색상 복원 함수
+//void (*restore_weight)(void); // 굵기 복원 함수
+//void (*restore_posture)(void); // 기울기 복원 함수
+//void (*restore_underline)(void); // 밑줄 복원 함수
+//void (*restore_hyperlink)(void); // 하이퍼링크 복원 함수
+int restore_colors;
+int restore_weight;
+int restore_posture;
+int restore_underline;
+int restore_hyperlink;
+}
+
+(오류)
+term-ostream.oo.c: In function 'restore':
+term-ostream.oo.c:1829:18: error: assignment to 'term_ostream_t' from 
+incompatible pointer type 'struct term_ostream_representation *' [-Wincompatible-pointer-types]
+(수정)
+lib/term-style-control.h
+typedef struct term_style_user_data {
+    term_style_control_data *control_data;
+    // 다른 필요한 멤버들 정의
+} term_style_user_data;
+./gnulib-local/lib/term-ostream.oo.h:65:#define term_style_user_data term_ostream_representation
+lib/term-ostream.h
+#if IS_CPLUSPLUS
+struct term_ostream_t
+{
+private:
+  struct term_ostream_representation *_pointer;
+public:
+  term_ostream_t () : _pointer (NULL) {}
+  term_ostream_t (struct term_ostream_representation *pointer) : _pointer (pointer) {}
+  struct term_ostream_representation * operator -> () { return _pointer; }
+  operator struct term_ostream_representation * () { return _pointer; }
+  operator struct any_ostream_representation * () { return (struct any_ostream_representation *) _pointer; }
+  operator void * () { return _pointer; }
+  bool operator == (const void *p) { return _pointer == p; }
+  bool operator != (const void *p) { return _pointer != p; }
+  operator ostream_t () { return (ostream_t) (struct any_ostream_representation *) _pointer; }
+  explicit term_ostream_t (ostream_t x) : _pointer ((struct term_ostream_representation *) (void *) x) {}
+  int current_console_attributes; //term-ostream.c stream->current_console_attributes;
+};
+#else
+typedef ostream_t term_ostream_t;
+#endif
+static term_ostream_t volatile out_stream;
+struct any_ostream_representation { }
+
+static void
+restore (struct term_ostream_representation * stream)
+{
+   out_stream = stream; //term_style_user_data = any_ostream_representation
+}
+
+lib/term-ostream.oo.h, lib/term-ostream.h 수정
+#if IS_CPLUSPLUS
+struct term_ostream_t
+{};
+#else
+//typedef ostream_t term_ostream_t;
+typedef struct any_ostream_representation * term_ostream_t;
+#endif
+
+lib/term-ostream.c, lib/term-ostream.oo.c 수정
+//out_stream = stream;
+out_stream = (term_ostream_t)stream;
+
+(오류)
+term-ostream.oo.c: In function 'async_restore':
+term-ostream.oo.c:1861:18: error: assignment to 'term_ostream_t' from incompatible pointer type 'struct term_ostream_representation *' [-Wincompatible-pointer-types]
+term-ostream.oo.c: In function 'async_set_attributes_from_default':
+term-ostream.oo.c:1900:18: error: assignment to 'term_ostream_t' from incompatible pointer type 'struct term_ostream_representation *' [-Wincompatible-pointer-types]
+
+(수정)
+lib/term-ostream.oo.h, lib/term-ostream.h 수정
+static _GL_ASYNC_SAFE void
+async_restore (struct term_ostream_representation * stream)
+{
+  //out_stream = stream;
+  out_stream = (term_ostream_t)stream;
+}
+
+static _GL_ASYNC_SAFE void
+async_set_attributes_from_default (struct term_ostream_representation * stream)
+{
+  //out_stream = stream;
+  out_stream = (term_ostream_t)stream;
+}
+
+static void
+out_attr_change (term_ostream_t stream, attributes_t new_attr)
+{
+  //out_stream = stream;
+  out_stream = (term_ostream_t)stream;
+}
+
+(오류)
+term-ostream.oo.c: In function 'async_set_attributes_from_default':
+term-ostream.oo.c:1907:27: error: passing argument 1 of 'out_color_change' from incompatible pointer type [-Wincompatible-pointer-types]
+(수정)
+typedef int term_color_t;
+
+static _GL_ASYNC_SAFE void
+out_color_change(term_ostream_t stream, term_color_t new_color, bool async_safe)
+{
+  attributes_t new_attr = stream->active_attr; //attributes_t active_attr;
+}
+
+if (new_attr.color != COLOR_DEFAULT)
+        out_color_change (stream, new_attr.color, true);
+
+lib/otream.h 추가
+struct any_ostream_representation {
+  term_color_t color;
+}
+
+(오류)
+term-ostream.oo.c: In function 'async_set_attributes_from_default':
+term-ostream.oo.c:1907:27: error: passing argument 1 of 'out_color_change' from incompatible pointer type [-Wincompatible-pointer-types]
+(수정)
+lib/term-style-control.h
+typedef struct term_style_user_data {
+    term_style_control_data *control_data;
+    // 다른 필요한 멤버들 정의
+} term_style_user_data;
+
+lib/term-ostream.h
+#define term_style_user_data term_ostream_representation
+
+lib/ostream.h
+struct any_ostream_representation {
+  attributes_t active_attr;
+  int active_attr_color;
+}
+
+typedef struct {
+    BITFIELD_TYPE(term_color_t, signed int) color : 25;
+    BITFIELD_TYPE(term_color_t, signed int) bgcolor : 25;
+    BITFIELD_TYPE(term_weight_t, unsigned int) weight : 1;
+    BITFIELD_TYPE(term_posture_t, unsigned int) posture : 1;
+    BITFIELD_TYPE(term_underline_t, unsigned int) underline : 1;
+    // 기타 필요한 멤버
+    hyperlink_t *hyperlink;
+} attributes_t;
+
+lib/term-ostream.c
+static _GL_ASYNC_SAFE void
+out_color_change(term_ostream_t stream, term_color_t new_color, bool async_safe)
+
+lib/term-ostream.c, lib/term-ostream.oo.c 수정
+static _GL_ASYNC_SAFE void
+async_set_attributes_from_default (struct term_ostream_representation * stream)
+{
+  attributes_t new_attr = stream->active_attr; //attributes_t = attributes_t
+  new_attr.color = stream->active_attr_color; //signed int = int
+
+  //수정
+  if (new_attr.color != COLOR_DEFAULT)
+    //out_color_change (stream, new_attr.color, true); //term_ostream_t(any_ostream_representation) , term_color_t(signed int), bool(bool)
+    out_color_change ((term_ostream_t)stream, (term_color_t)new_attr.color, true);
+}
+
+(오류)
+term-ostream.oo.c: In function 'async_set_attributes_from_default':
+term-ostream.oo.c:1911:29: error: passing argument 1 of 'out_bgcolor_change' from incompatible pointer type [-Wincompatible-pointer-types]
+term-ostream.oo.c:1442:36: note: expected 'term_ostream_t' but argument is of type
+struct term_ostream_representation *'
+term-ostream.oo.c:1913:28: error: passing argument 1 of 'out_weight_change' from incompatible pointer type [-Wincompatible-pointer-types]
+term-ostream.oo.c:1593:35: note: expected 'term_ostream_t' but argument is of type
+struct term_ostream_representation *'
+term-ostream.oo.c:1915:29: error: passing argument 1 of 'out_posture_change' from incompatible pointer type [-Wincompatible-pointer-types]
+term-ostream.oo.c:1606:36: note: expected 'term_ostream_t' but argument is of type
+struct term_ostream_representation *'
+term-ostream.oo.c:1917:31: error: passing argument 1 of 'out_underline_change' from incompatible pointer type [-Wincompatible-pointer-types]
+term-ostream.oo.c:1619:38: note: expected 'term_ostream_t' but argument is of type
+struct term_ostream_representation *'
+term-ostream.oo.c:1919:31: error: passing argument 1 of 'out_hyperlink_change' from incompatible pointer type [-Wincompatible-pointer-types]
+term-ostream.oo.c:1649:38: note: expected 'term_ostream_t' but argument is of type
+struct term_ostream_representation *'
+(수정)
+lib/term-ostream.c, lib/term-ostream.oo.c 수정
+if (new_attr.color != COLOR_DEFAULT){
+//out_color_change (stream, new_attr.color, true);
+    out_color_change ((term_ostream_t)stream, (term_color_t)new_attr.color, true);
+  }
+if (new_attr.bgcolor != COLOR_DEFAULT){
+//out_bgcolor_change (stream, new_attr.bgcolor, true);
+    out_color_change ((term_ostream_t)stream, (term_color_t)new_attr.bgcolor, true);
+  }
+  if (new_attr.weight != WEIGHT_DEFAULT){
+//out_weight_change (stream, new_attr.weight, true);
+    out_color_change ((term_ostream_t)stream, (term_color_t)new_attr.weight, true);
+  }
+  if (new_attr.posture != POSTURE_DEFAULT){
+//out_posture_change (stream, new_attr.posture, true);
+    out_color_change ((term_ostream_t)stream, (term_color_t)new_attr.posture, true);
+  }
+  if (new_attr.underline != UNDERLINE_DEFAULT){
+//out_underline_change (stream, new_attr.underline, true);
+    out_color_change ((term_ostream_t)stream, (term_color_t)new_attr.underline, true);
+  }
+  if (new_attr.hyperlink != NULL){
+//out_hyperlink_change (stream, new_attr.hyperlink, true);
+    out_color_change ((term_ostream_t)stream, (term_color_t)new_attr.hyperlink, true);
+  }
+
+(오류)
+term-ostream.oo.c:1935:3: error: initialization of 'struct term_style_control_data * (*)(struct any_ostream_representation *)' 
+from incompatible pointer type 'struct term_style_control_data * (*)(struct term_ostream_representation *)' 
+[-Wincompatible-pointer-types]
+term-ostream.oo.c:1935:3: note: (near initialization for 'controller.get_control_data')
+
+(수정)
+lib/term-style-control.h
+typedef struct {
+    int volatile fd;
+    ttyctl_t volatile tty_control;
+    #if HAVE_TCGETATTR
+    bool volatile same_as_stderr;
+    #endif
+    bool non_default_active;
+} term_style_control_data;
+
+/*추가*/
+typedef struct term_style_user_data {
+    term_style_control_data *control_data;
+    // 다른 필요한 멤버들 정의
+} term_style_user_data;
+
+=> lib/otream.h로 이동
+/*추가*/
+typedef struct {
+    int volatile fd;
+    ttyctl_t volatile tty_control;
+    #if HAVE_TCGETATTR
+    bool volatile same_as_stderr;
+    #endif
+    bool non_default_active;
+} term_style_control_data;
+
+/*추가*/
+typedef struct term_style_user_data {
+    term_style_control_data *control_data;
+    // 다른 필요한 멤버들 정의
+} term_style_user_data;
+
+lib/ostream.h 수정
+struct any_ostream_representation {
+  //void *control_data;    // 제어 데이터
+  term_style_control_data control_data;
+}
+
+lib/term-ostream.c, lib/term-ostream.oo.c
+static struct term_style_control_data *
+get_control_data (struct term_ostream_representation * stream)
+{
+  return &stream->control_data; //term_style_control_data control_data;
+}
+
+(오류)
+term-ostream.oo.c: In function 'get_control_data':
+term-ostream.oo.c:1113:3: error: cannot convert to a pointer type
+term-ostream.oo.c: In function 'async_set_attributes_from_default':
+term-ostream.oo.c:1929:48: warning: cast from pointer to integer of different size
+-Wpointer-to-int-cast]
+term-ostream.oo.c: At top level:
+term-ostream.oo.c:1936:3: error: initialization of 'struct term_style_control_data * (*)(struct any_ostream_representation *)' from incompatible pointer type 'struct term_style_control_data * (*)(struct term_ostream_representation *)' [-Wincompatible-pointer-types]
+term-ostream.oo.c:1936:3: note: (near initialization for 'controller.get_control_data')
+
+(수정)
+lib/term-ostream.c, lib/term-ostream.oo.c 수정
+static struct term_style_control_data *
+get_control_data (struct term_ostream_representation * stream)
+{
+  //return stream->control_data;
+  return &stream->control_data;
+}
+
+(오류)
+term-ostream.oo.c: In function 'async_set_attributes_from_default':
+term-ostream.oo.c:1929:48: warning: cast from pointer to integer of different size
+-Wpointer-to-int-cast]
+term-ostream.oo.c: At top level:
+(수정)
+static _GL_ASYNC_SAFE void
+async_set_attributes_from_default (struct term_ostream_representation * stream)
+{
+  #if HAVE_WINDOWS_CONSOLES
+  if (stream->is_windows_console)
+    {
+      /* SetConsoleTextAttribute
+         <https://docs.microsoft.com/en-us/windows/console/setconsoletextattribute>
+         <https://docs.microsoft.com/en-us/windows/console/console-screen-buffers>  */
+      SetConsoleTextAttribute (stream->handle, stream->current_console_attributes);
+    }
+  else
+  #endif
+    {
+      attributes_t new_attr = stream->active_attr;
+      /* Since stream->active_attr is not guaranteed to be loaded atomically,
+         new_attr.color and new_attr.bgcolor may have invalid values.
+         Use the atomically loadable values instead.  */
+      new_attr.color = stream->active_attr_color;
+      new_attr.bgcolor = stream->active_attr_bgcolor;
+      new_attr.hyperlink = stream->active_attr_hyperlink;
+
+      /* For out_char_unchecked to work.  */
+      //out_stream = stream;
+	  out_stream = (term_ostream_t)stream;
+      out_fd = stream->fd;
+
+      if (new_attr.color != COLOR_DEFAULT){
+        //out_color_change (stream, new_attr.color, true);
+	    out_color_change ((term_ostream_t)stream, (term_color_t)new_attr.color, true);
+	  }
+      if (new_attr.bgcolor != COLOR_DEFAULT){
+        //out_bgcolor_change (stream, new_attr.bgcolor, true);
+	    out_color_change ((term_ostream_t)stream, (term_color_t)new_attr.bgcolor, true);
+	  }
+	  if (new_attr.weight != WEIGHT_DEFAULT){
+        //out_weight_change (stream, new_attr.weight, true);
+	    out_color_change ((term_ostream_t)stream, (term_weight_t)new_attr.weight, true);
+	  }
+	  if (new_attr.posture != POSTURE_DEFAULT){
+        //out_posture_change (stream, new_attr.posture, true);
+	    out_color_change ((term_ostream_t)stream, (term_posture_t)new_attr.posture, true);
+	  }
+	  if (new_attr.underline != UNDERLINE_DEFAULT){
+        //out_underline_change (stream, new_attr.underline, true);
+	    out_color_change ((term_ostream_t)stream, (term_underline_t)new_attr.underline, true);
+	  }
+	  if (new_attr.hyperlink != NULL){
+        //out_hyperlink_change (stream, new_attr.hyperlink, true);
+	    out_color_change ((term_ostream_t)stream, (term_hyperlink_t)new_attr.hyperlink, true);
+	  }
+    }
+}
+
+lib/ostream.h 수정
+typedef struct {
+    BITFIELD_TYPE(term_color_t, signed int) color : 25;
+    BITFIELD_TYPE(term_color_t, signed int) bgcolor : 25;
+    BITFIELD_TYPE(term_weight_t, unsigned int) weight : 1;
+    BITFIELD_TYPE(term_posture_t, unsigned int) posture : 1;
+    BITFIELD_TYPE(term_underlink_t, unsigned int) underlink : 1;
+    // 기타 필요한 멤버
+    hyperlink_t *hyperlink;
+} attributes_t;
+
+(오류)
+term-ostream.oo.c: In function 'equal_attributes':
+term-ostream.oo.c:982:20: error: 'attributes_t' has no member named 'underline'; did you mean 'underlink'?
+term-ostream.oo.c:982:39: error: 'attributes_t' has no member named 'underline'; did you mean 'underlink'?
+term-ostream.oo.c: In function 'simplify_attributes':
+term-ostream.oo.c:1128:14: error: 'attributes_t' has no member named 'underline'; did you mean 'underlink'?
+term-ostream.oo.c:1142:10: error: 'attributes_t' has no member named 'underline'; did you mean 'underlink'?
+term-ostream.oo.c: In function 'out_attr_change':
+term-ostream.oo.c:1701:21: error: 'attributes_t' has no member named 'underline'; did you mean 'underlink'?
+term-ostream.oo.c:1755:20: error: 'attributes_t' has no member named 'underline'; did you mean 'underlink'?
+term-ostream.oo.c:1756:23: error: 'attributes_t' has no member named 'underline'; did you mean 'underlink'?
+term-ostream.oo.c:1760:20: error: 'attributes_t' has no member named 'underline'; did you mean 'underlink'?
+term-ostream.oo.c:1768:24: error: 'attributes_t' has no member named 'underline'; did you mean 'underlink'?
+term-ostream.oo.c:1769:27: error: 'attributes_t' has no member named 'underline'; did you mean 'underlink'?
+term-ostream.oo.c:1779:22: error: 'attributes_t' has no member named 'underline'; did you mean 'underlink'?
+term-ostream.oo.c:1804:20: error: 'attributes_t' has no member named 'underline'; did you mean 'underlink'?
+term-ostream.oo.c:1804:42: error: 'attributes_t' has no member named 'underline'; did you mean 'underlink'?
+term-ostream.oo.c:1805:46: error: 'attributes_t' has no member named 'underline'; did you mean 'underlink'?
+term-ostream.oo.c:1807:50: error: 'attributes_t' has no member named 'underline'; did you mean 'underlink'?
+term-ostream.oo.c: In function 'async_set_attributes_from_default':
+term-ostream.oo.c:1923:17: error: 'attributes_t' has no member named 'underline'; did you mean 'underlink'?
+term-ostream.oo.c:1925:75: error: 'attributes_t' has no member named 'underline'; did you mean 'underlink'?
+term-ostream.oo.c:1929:49: error: 'term_hyperlink_t' undeclared (first use in this function); did you mean 'term_underline_t'?
+(수정)
+lib/ostream.h 수정
+typedef struct {
+    BITFIELD_TYPE(term_color_t, signed int) color : 25;
+    BITFIELD_TYPE(term_color_t, signed int) bgcolor : 25;
+    BITFIELD_TYPE(term_weight_t, unsigned int) weight : 1;
+    BITFIELD_TYPE(term_posture_t, unsigned int) posture : 1;
+    BITFIELD_TYPE(term_underlink_t, unsigned int) underlink : 1;
+    BITFIELD_TYPE(term_underline_t, unsigned int) underline : 1; //추가
+	// 기타 필요한 멤버
+    hyperlink_t *hyperlink;
+} attributes_t;
+
+(오류)
+term-ostream.oo.c: In function 'async_set_attributes_from_default':
+term-ostream.oo.c:1929:49: error: 'term_hyperlink_t' undeclared (first use in this function); 
+did you mean 'term_underline_t'?
+
+(수정)
+lib/term-ostream.oo.c
+static _GL_ASYNC_SAFE void
+out_hyperlink_change (term_ostream_t stream, hyperlink_t *new_hyperlink,
+                      bool async_safe)
+
+static _GL_ASYNC_SAFE void
+async_set_attributes_from_default (struct term_ostream_representation * stream)
+{
+if (new_attr.color != COLOR_DEFAULT){
+//out_color_change (stream, new_attr.color, true);
+    out_color_change ((term_ostream_t)stream, (term_color_t)new_attr.color, true);
+  }
+if (new_attr.bgcolor != COLOR_DEFAULT){
+//out_bgcolor_change (stream, new_attr.bgcolor, true);
+    out_bgcolor_change ((term_ostream_t)stream, (term_color_t)new_attr.bgcolor, true);
+  }
+  if (new_attr.weight != WEIGHT_DEFAULT){
+//out_weight_change (stream, new_attr.weight, true);
+    out_weight_change ((term_ostream_t)stream, (term_weight_t)new_attr.weight, true);
+  }
+  if (new_attr.posture != POSTURE_DEFAULT){
+//out_posture_change (stream, new_attr.posture, true);
+    out_posture_change ((term_ostream_t)stream, (term_posture_t)new_attr.posture, true);
+  }
+  if (new_attr.underline != UNDERLINE_DEFAULT){
+//out_underline_change (stream, new_attr.underline, true);
+    out_underline_change ((term_ostream_t)stream, (term_underline_t)new_attr.underline, true);
+  }
+  if (new_attr.hyperlink != NULL){
+//out_hyperlink_change (stream, new_attr.hyperlink, true);
+    out_hyperlink_change ((term_ostream_t)stream, (hyperlink_t *)new_attr.hyperlink, true); //수정
+  }
+}
+
+lib/ostream.h 수정
+/* Attributes that can be set on a character.  */
+typedef struct {
+    BITFIELD_TYPE(term_color_t, signed int) color : 25;
+    BITFIELD_TYPE(term_color_t, signed int) bgcolor : 25;
+    BITFIELD_TYPE(term_weight_t, unsigned int) weight : 1;
+    BITFIELD_TYPE(term_posture_t, unsigned int) posture : 1;
+    //BITFIELD_TYPE(term_underlink_t, unsigned int) underlink : 1; //주석처리
+    BITFIELD_TYPE(term_underline_t, unsigned int) underline : 1;
+	// 기타 필요한 멤버
+    hyperlink_t *hyperlink; 
+} attributes_t;
+
+(오류)
+term-ostream.oo.c:1936:3: error: initialization of 'struct term_style_control_data * (*)(struct any_ostream_representation *)' from incompatible pointer type 'struct term_style_control_data * (*)(struct term_ostream_representation *)' [-Wincompatible-pointer-types]
+term-ostream.oo.c:1936:3: note: (near initialization for 'controller.get_control_data')
+
+(수정)
+헤더 파일에서의 정의
+lib/term-ostream.h 수정
+#define term_style_user_data term_ostream_representation
+함수 포인터 선언
+lib/term-style-control.h 수정
+typedef struct term_style_control_data * (*get_control_data_func)(struct term_style_user_data *);
+함수 정의
+lib/term-ostream.c, lib/term-ostream.oo.c
+struct term_style_control_data * get_control_data(struct term_ostream_representation *stream)
+포인터 사용
+lib/term-ostream.c, lib/term-ostream.oo.c
+struct term_ostream_representation{} 존재해서 ostream.h에 추가했던 struct any_ostream_representation{} 제거 후
+lib/term-ostream.h 에 #include "term_ostream.priv.h" 추가
+#define term_ostream_representation any_ostream_representation 주석 제거
+
+(오류)
+lib/term_ostream.priv.h:37:3: error: expected specifier-qualifier-list before 'colormodel_t'
+   37 |   colormodel_t volatile colormodel;
+      |   ^~~~~~~~~~~~
+(수정)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -rn 'colormodel_t' .
+./gnulib-local/lib/term-ostream.oo.c:267:} colormodel_t;
+./gnulib-local/lib/term-ostream.oo.c:1065:  colormodel_t volatile colormodel;
+./lib/term-ostream.c:271:} colormodel_t;
+./lib/term-ostream.oo.c:282:} colormodel_t;
+./lib/term-ostream.oo.c:1056:  colormodel_t volatile colormodel;
+./lib/term-ostream.oo.c-백업:282:} colormodel_t;
+./lib/term-ostream.oo.c-백업:1056:  colormodel_t volatile colormodel;
+./lib/term_ostream.priv.h:37:  colormodel_t volatile colormodel;
+
+lib/term-ostream.oo.c, lib/term-ostream.c
+/* ============================= Color models ============================= */
+// lib/term_ostream.priv.h 로 이동
+/* The color model used by the terminal.  */
+// typedef enum
+// {
+//   cm_monochrome,        /* No colors.  */
+//   cm_common8,           /* Usual terminal with at least 8 colors.  */
+//   cm_xterm8,            /* TERM=xterm, with 8 colors.  */
+//   cm_xterm16,           /* TERM=xterm-16color, with 16 colors.  */
+//   cm_xterm88,           /* TERM=xterm-88color, with 88 colors.  */
+//   cm_xterm256,          /* TERM=xterm-256color, with 256 colors.  */
+//   cm_xtermrgb           /* TERM=xterm-direct, with 256*256*256 colors.  */
+// } colormodel_t;
+
+lib/term_ostream.priv.h 수정
+/* ============================= Color models ============================= */
+// lib/term-ostream.oo.c, lib/term-ostream.c 가져옴
+/* The color model used by the terminal.  */
+typedef enum
+ {
+   cm_monochrome,        /* No colors.  */
+   cm_common8,           /* Usual terminal with at least 8 colors.  */
+   cm_xterm8,            /* TERM=xterm, with 8 colors.  */
+   cm_xterm16,           /* TERM=xterm-16color, with 16 colors.  */
+   cm_xterm88,           /* TERM=xterm-88color, with 88 colors.  */
+   cm_xterm256,          /* TERM=xterm-256color, with 256 colors.  */
+   cm_xtermrgb           /* TERM=xterm-direct, with 256*256*256 colors.  */
+ } colormodel_t;
+
+(오류)
+lib/term_ostream.priv.h:65:3: error: unknown type name 'uint32_t'
+   65 |   uint32_t hostname_hash;
+      |   ^~~~~~~~
+lib/term_ostream.priv.h:6:1: note: 'uint32_t' is defined in header '<stdint.h>'; this is probably fixable by adding '#include <stdint.h>'
+    5 | #include "ostream.priv.h"
+  +++ |+#include <stdint.h>
+    6 |
+lib/term_ostream.priv.h:66:3: error: unknown type name 'uint64_t'
+   66 |   uint64_t start_time;
+      |   ^~~~~~~~
+lib/term_ostream.priv.h:66:3: note: 'uint64_t' is defined in header '<stdint.h>'; this is probably fixable by adding '#include <stdint.h>'
+lib/term_ostream.priv.h:67:3: error: unknown type name 'uint32_t'
+   67 |   uint32_t id_serial;
+      |   ^~~~~~~~
+lib/term_ostream.priv.h:67:3: note: 'uint32_t' is defined in header '<stdint.h>'; this is probably fixable by adding '#include <stdint.h>'
+
+(수정)
+uint32_t와 uint64_t는 <stdint.h> 헤더 파일에서 정의된 타입
+lib/term_ostream.priv 수정
+#include <stdint.h>
+
+
+
+
+
+
