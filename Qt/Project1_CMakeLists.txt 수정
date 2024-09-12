@@ -9028,12 +9028,604 @@ nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
 
 lib/term_ostream.priv.h 수정
 #include "textstyle.h" //ttyctl_t
-#include "ostream.h" //attributes_t, hyperlink_t,  term_style_control_data
+#include "ostream.h" //attributes_t, hyperlink_t,  term_style_control_data => 제거 후 가져옴
+
+(오류)
+lib/term_ostream.priv.h:58:5: error: expected specifier-qualifier-list before 'colormodel_t'
+   58 |     colormodel_t volatile colormodel;
+      |     ^~~~~~~~~~~~
+
+(수정)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -rn 'colormodel_t;' .
+
+./gnulib-local/lib/term-ostream.oo.c:267://} colormodel_t;
+./lib/term-ostream.c:271:// } colormodel_t;
+./lib/term-ostream.oo.c:282:// } colormodel_t;
+./lib/term-ostream.oo.c-백업:282:} colormodel_t;
+
+lib/term_ostream.priv.h 수정
+/* ============================= Color models ============================= */
+/* The color model used by the terminal.  */
+/* term-ostream.oo.c 에서 가져옴*/
+ typedef enum
+ {
+   cm_monochrome,        /* No colors.  */
+   cm_common8,           /* Usual terminal with at least 8 colors.  */
+   cm_xterm8,            /* TERM=xterm, with 8 colors.  */
+   cm_xterm16,           /* TERM=xterm-16color, with 16 colors.  */
+   cm_xterm88,           /* TERM=xterm-88color, with 88 colors.  */
+   cm_xterm256,          /* TERM=xterm-256color, with 256 colors.  */
+   cm_xtermrgb           /* TERM=xterm-direct, with 256*256*256 colors.  */
+ } colormodel_t;
+
+
+(오류)
+In file included from lib/color.c:32:
+term-ostream.h:79:44: error: conflicting types for 'term_ostream_t'; have 'struct any_ostream_representation'
+In file included from lib/term_ostream.priv.h:6,
+                 from term-ostream.oo.h:23:
+lib/textstyle.h:287:19: note: previous declaration of 'term_ostream_t' with type 'term_ostream_t' {aka 'struct any_ostream_representation *'}
+  287 | typedef ostream_t term_ostream_t;
+      |                   ^~~~~~~~~~~~~~
+
+(수정)
+lib/term_ostream.priv.h
+#define term_ostream_representation any_ostream_representation
+
+term_ostream_t는 struct any_ostream_representation *로 정의되어야 함
+term_ostream_representation은 any_ostream_representation으로 매크로 정의되어 있기 때문에, 두 구조체는 동일하다는 의미
+term_ostream_t가 struct any_ostream_representation *로 정의되도록 코드를 조정
+
+lib/term-ostream.oo.h, lib/term-ostream.h 수정
+typedef struct term_ostream_representation term_ostream_t;
+#if IS_CPLUSPLUS
+// C++에서의 term_ostream_t 정의
+struct term_ostream_t
+{
+private:
+    struct term_ostream_representation *_pointer;
+public:
+    term_ostream_t () : _pointer (NULL) {}
+    term_ostream_t (struct term_ostream_representation *pointer) : _pointer (pointer) {}
+    struct term_ostream_representation * operator -> () { return _pointer; }
+    operator struct term_ostream_representation * () { return _pointer; }
+    operator struct any_ostream_representation * () { return (struct any_ostream_representation *) _pointer; }
+    operator void * () { return _pointer; }
+    bool operator == (const void *p) { return _pointer == p; }
+    bool operator != (const void *p) { return _pointer != p; }
+    operator ostream_t () { return (ostream_t) (struct any_ostream_representation *) _pointer; }
+    explicit term_ostream_t (ostream_t x) : _pointer ((struct term_ostream_representation *) (void *) x) {}
+    int current_console_attributes;
+};
+#else
+// C에서의 term_ostream_t 정의
+typedef struct any_ostream_representation * term_ostream_t;  // C에서는 포인터 타입으로 정의
+#endif
+
+(오류)
+error: invalid use of undefined type 'struct any_ostream_resentation'
+(수정)
+lib/term_ostream.priv.h
+struct term_ostream_representation { ]
+#define term_ostream_representation any_ostream_representation
+term_ostream_representation을 any_ostream_representation으로 정의하고, 
+term_ostream_representation이라는 별칭으로 사용
+=> any_ostream_representation에 대한 정의가 없어서 문제
+최상단,최하단의 
+#ifndef TERM_OSTREAM_PRIV_H
+#define TERM_OSTREAM_PRIV_H
+#endif // TERM_OSTREAM_PRIV_H 제거
+
+(오류)
+lib/term_ostream.priv.h:14:5: error: redeclaration of enumerator 'cm_monochrome'
+   14 |     cm_monochrome,        /* No colors.  */
+      |     ^~~~~~~~~~~~~
+In file included from term-ostream.oo.h:23:
+lib/term_ostream.priv.h:14:5: note: previous definition of 'cm_monochrome' with type 'enum <anonymous>'
+   14 |     cm_monochrome,        /* No colors.  */
+      |     ^~~~~~~~~~~~~
+lib/term_ostream.priv.h:15:5: error: redeclaration of enumerator 'cm_common8'
+   15 |     cm_common8,           /* Usual terminal with at least 8 colors.  */
+      |     ^~~~~~~~~~
+lib/term_ostream.priv.h:15:5: note: previous definition of 'cm_common8' with type 'enum <anonymous>'
+   15 |     cm_common8,           /* Usual terminal with at least 8 colors.  */
+      |     ^~~~~~~~~~
+lib/term_ostream.priv.h:16:5: error: redeclaration of enumerator 'cm_xterm8'
+   16 |     cm_xterm8,            /* TERM=xterm, with 8 colors.  */
+      |     ^~~~~~~~~
+lib/term_ostream.priv.h:16:5: note: previous definition of 'cm_xterm8' with type 'enum <anonymous>'
+   16 |     cm_xterm8,            /* TERM=xterm, with 8 colors.  */
+      |     ^~~~~~~~~
+lib/term_ostream.priv.h:17:5: error: redeclaration of enumerator 'cm_xterm16'
+   17 |     cm_xterm16,           /* TERM=xterm-16color, with 16 colors.  */
+      |     ^~~~~~~~~~
+lib/term_ostream.priv.h:17:5: note: previous definition of 'cm_xterm16' with type 'enum <anonymous>'
+   17 |     cm_xterm16,           /* TERM=xterm-16color, with 16 colors.  */
+      |     ^~~~~~~~~~
+lib/term_ostream.priv.h:18:5: error: redeclaration of enumerator 'cm_xterm88'
+   18 |     cm_xterm88,           /* TERM=xterm-88color, with 88 colors.  */
+      |     ^~~~~~~~~~
+lib/term_ostream.priv.h:18:5: note: previous definition of 'cm_xterm88' with type 'enum <anonymous>'
+   18 |     cm_xterm88,           /* TERM=xterm-88color, with 88 colors.  */
+      |     ^~~~~~~~~~
+lib/term_ostream.priv.h:19:5: error: redeclaration of enumerator 'cm_xterm256'
+   19 |     cm_xterm256,          /* TERM=xterm-256color, with 256 colors.  */
+      |     ^~~~~~~~~~~
+lib/term_ostream.priv.h:19:5: note: previous definition of 'cm_xterm256' with type
+enum <anonymous>'
+   19 |     cm_xterm256,          /* TERM=xterm-256color, with 256 colors.  */
+      |     ^~~~~~~~~~~
+lib/term_ostream.priv.h:20:5: error: redeclaration of enumerator 'cm_xtermrgb'
+   20 |     cm_xtermrgb           /* TERM=xterm-direct, with 256*256*256 colors.  */
+      |     ^~~~~~~~~~~
+lib/term_ostream.priv.h:20:5: note: previous definition of 'cm_xtermrgb' with type
+enum <anonymous>'
+   20 |     cm_xtermrgb           /* TERM=xterm-direct, with 256*256*256 colors.  */
+      |     ^~~~~~~~~~~
+lib/term_ostream.priv.h:21:3: error: conflicting types for 'colormodel_t'; have 'enum <anonymous>'
+   21 | } colormodel_t;
+      |   ^~~~~~~~~~~~
+lib/term_ostream.priv.h:21:3: note: previous declaration of 'colormodel_t' with type 'colormodel_t'
+   21 | } colormodel_t;
+      |   ^~~~~~~~~~~~
+lib/term_ostream.priv.h:30:3: error: conflicting types for 'term_style_control_data'; have 'struct <anonymous>'
+   30 | } term_style_control_data;
+      |   ^~~~~~~~~~~~~~~~~~~~~~~
+lib/term_ostream.priv.h:30:3: note: previous declaration of 'term_style_control_dat
+' with type 'term_style_control_data'
+   30 | } term_style_control_data;
+      |   ^~~~~~~~~~~~~~~~~~~~~~~
+lib/term_ostream.priv.h:32:44: error: conflicting types for 'any_ostream_representation'; have 'struct any_ostream_representation'
+   32 | typedef struct term_ostream_representation any_ostream_representation;
+      |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+lib/term_ostream.priv.h:32:44: note: previous declaration of 'any_ostream_representation' with type 'any_ostream_representation' {aka 'struct term_ostream_representation'}
+   32 | typedef struct term_ostream_representation any_ostream_representation;
+      |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+lib/term_ostream.priv.h:40:3: error: conflicting types for 'hyperlink_t'; have 'struct <anonymous>'
+   40 | } hyperlink_t;
+      |   ^~~~~~~~~~~
+lib/term_ostream.priv.h:40:3: note: previous declaration of 'hyperlink_t' with type 'hyperlink_t'
+   40 | } hyperlink_t;
+      |   ^~~~~~~~~~~
+lib/term_ostream.priv.h:49:3: error: conflicting types for 'attributes_t'; have 'struct <anonymous>'
+   49 | } attributes_t;
+      |   ^~~~~~~~~~~~
+lib/term_ostream.priv.h:49:3: note: previous declaration of 'attributes_t' with type 'attributes_t'
+   49 | } attributes_t;
+      |   ^~~~~~~~~~~~
+
+(수정)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -rn 'cm_monochrome,' .                                                       
+./gnulib-local/lib/term-ostream.oo.c:260://  cm_monochrome,        /* No colors.  */
+./lib/term-ostream.c:264://   cm_monochrome,        /* No colors.  */
+./lib/term-ostream.oo.c:275://   cm_monochrome,        /* No colors.  */
+./lib/term-ostream.oo.c-백업:275:  cm_monochrome,        /* No colors.  */
+./lib/term_ostream.priv.h:14:    cm_monochrome,        /* No colors.  */
+./백업/lib/term-ostream.c:266:  cm_monochrome,        /* No colors.  */
+./백업/lib/term-ostream.oo.c:262:  cm_monochrome,        /* No colors.  */
+lib/ostream.priv.h 수정
+#ifndef OSTREAM_PRIV_H
+#define OSTREAM_PRIV_H
+#include "config.h"
+/* DO NOT EDIT! GENERATED AUTOMATICALLY! */
+
+/* Define the ostream_representation structure */
+struct ostream_representation
+{
+  const void *vtable;
+};
+
+/* Define any_ostream_representation as an alias for ostream_representation */
+typedef struct ostream_representation any_ostream_representation;
+
+#endif // OSTREAM_PRIV_H
+
+lib/term_ostream.priv.h 수정
+#ifndef TERM_OSTREAM_PRIV_H
+#define TERM_OSTREAM_PRIV_H
+
+#include "ostream.priv.h"  // Include the header where any_ostream_representation is defined
+#include <pthread.h>       // Mutex
+#include "textstyle.h"    // ttyctl_t 정의가 포함된 헤더
+
+#ifndef COLORMODEL_H
+#define COLORMODEL_H
+
+/* ============================= Color models ============================= */
+/* The color model used by the terminal.  */
+typedef enum
+{
+    cm_monochrome,        /* No colors.  */
+    cm_common8,           /* Usual terminal with at least 8 colors.  */
+    cm_xterm8,            /* TERM=xterm, with 8 colors.  */
+    cm_xterm16,           /* TERM=xterm-16color, with 16 colors.  */
+    cm_xterm88,           /* TERM=xterm-88color, with 88 colors.  */
+    cm_xterm256,          /* TERM=xterm-256color, with 256 colors.  */
+    cm_xtermrgb           /* TERM=xterm-direct, with 256*256*256 colors.  */
+} colormodel_t;
+
+#endif // COLORMODEL_H
+
+#ifndef TERM_STYLE_CONTROL_DATA_H
+#define TERM_STYLE_CONTROL_DATA_H
+
+typedef struct {
+    int volatile fd;
+    ttyctl_t volatile tty_control;
+    #if HAVE_TCGETATTR
+    bool volatile same_as_stderr;
+    #endif
+    bool non_default_active;
+} term_style_control_data;
+
+#endif // TERM_STYLE_CONTROL_DATA_H
+
+#ifndef HYPERLINK_T_H
+#define HYPERLINK_T_H
+
+typedef struct {
+    char *url;
+    char *ref;
+    char *id;
+    char *real_id;
+} hyperlink_t;
+
+#endif // HYPERLINK_T_H
+
+#ifndef ATTRIBUTES_T_H
+#define ATTRIBUTES_T_H
+
+typedef struct {
+    BITFIELD_TYPE(term_color_t, signed int) color : 25;
+    BITFIELD_TYPE(term_color_t, signed int) bgcolor : 25;
+    BITFIELD_TYPE(term_weight_t, unsigned int) weight : 1;
+    BITFIELD_TYPE(term_posture_t, unsigned int) posture : 1;
+    BITFIELD_TYPE(term_underline_t, unsigned int) underline : 1;
+    hyperlink_t *hyperlink;
+} attributes_t;
+
+#endif // ATTRIBUTES_T_H
+
+/* Define the term_ostream_representation structure */
+struct term_ostream_representation {
+    any_ostream_representation base; // Use the alias here
+    int fd;
+    #if HAVE_WINDOWS_CONSOLES
+    HANDLE handle;
+    bool is_windows_console;
+    #endif
+    char *filename;
+    ttyctl_t tty_control;
+    int max_colors;
+    int no_color_video;
+    char *set_a_foreground;
+    char *set_foreground;
+    char *set_a_background;
+    char *set_background;
+    char *orig_pair;
+    char *enter_bold_mode;
+    char *enter_italics_mode;
+    char *exit_italics_mode;
+    char *enter_underline_mode;
+    char *exit_underline_mode;
+    char *exit_attribute_mode;
+    bool supports_foreground;
+    bool supports_background;
+    colormodel_t colormodel;
+    bool supports_weight;
+    bool supports_posture;
+    bool supports_underline;
+    bool supports_hyperlink;
+    const char *restore_colors;
+    const char *restore_weight;
+    const char *restore_posture;
+    const char *restore_underline;
+    const char *restore_hyperlink;
+    term_style_control_data control_data;
+    uint32_t hostname_hash;
+    uint64_t start_time;
+    uint32_t id_serial;
+    hyperlink_t **hyperlinks_array;
+    size_t hyperlinks_count;
+    size_t hyperlinks_allocated;
+    #if HAVE_WINDOWS_CONSOLES
+    WORD default_console_attributes;
+    WORD current_console_attributes;
+    #endif
+    attributes_t default_attr;
+    attributes_t active_attr;
+    term_color_t active_attr_color;
+    term_color_t active_attr_bgcolor;
+    hyperlink_t *active_attr_hyperlink;
+    char *buffer;
+    attributes_t *attrbuffer;
+    size_t buflen;
+    size_t allocated;
+    attributes_t curr_attr;
+    attributes_t simp_attr;
+    pthread_mutex_t mutex; // Mutex for thread safety
+};
+
+#endif // TERM_OSTREAM_PRIV_H
+
+
+(오류)
+lib/term_ostream.priv.h:102:5: error: unknown type name 'uint32_t'
+  102 |     uint32_t hostname_hash;
+      |     ^~~~~~~~
+(수정)
+lib/term_ostream.priv.h수정
+#include <stdint.h>		   // uint32_t, uint64_t 
+
+(오류)
+ error: invalid use of undefined type 'struct any_ostream_representation'
+(수정)
+lib/ostream.priv.h 수정
+#ifndef OSTREAM_PRIV_H
+#define OSTREAM_PRIV_H
+struct ostream_representation
+{
+  const void *vtable;
+};
+#endif // OSTREAM_PRIV_H
+lib/term_ostream.priv.h 수정
+#include <pthread.h>       // Mutex
+#include <stdint.h>        // uint32_t, uint64_t
+#include "textstyle.h"    // ttyctl_t 정의가 포함된 헤더
+#include "ostream.priv.h"  // Include the header where any_ostream_representation is defined
+
+
+#ifndef COLORMODEL_H
+#define COLORMODEL_H
+
+/* ============================= Color models ============================= */
+/* The color model used by the terminal.  */
+typedef enum
+{
+    cm_monochrome,        /* No colors.  */
+    cm_common8,           /* Usual terminal with at least 8 colors.  */
+    cm_xterm8,            /* TERM=xterm, with 8 colors.  */
+    cm_xterm16,           /* TERM=xterm-16color, with 16 colors.  */
+    cm_xterm88,           /* TERM=xterm-88color, with 88 colors.  */
+    cm_xterm256,          /* TERM=xterm-256color, with 256 colors.  */
+    cm_xtermrgb           /* TERM=xterm-direct, with 256*256*256 colors.  */
+} colormodel_t;
+
+#endif // COLORMODEL_H
+
+#ifndef TERM_STYLE_CONTROL_DATA_H
+#define TERM_STYLE_CONTROL_DATA_H
+
+typedef struct {
+    int volatile fd;
+    ttyctl_t volatile tty_control;
+    #if HAVE_TCGETATTR
+    bool volatile same_as_stderr;
+    #endif
+    bool non_default_active;
+} term_style_control_data;
+
+#endif // TERM_STYLE_CONTROL_DATA_H
+
+#ifndef HYPERLINK_T_H
+#define HYPERLINK_T_H
+
+typedef struct {
+    char *url;
+    char *ref;
+    char *id;
+    char *real_id;
+} hyperlink_t;
+
+#endif // HYPERLINK_T_H
+
+#ifndef ATTRIBUTES_T_H
+#define ATTRIBUTES_T_H
+
+typedef struct {
+    BITFIELD_TYPE(term_color_t, signed int) color : 25;
+    BITFIELD_TYPE(term_color_t, signed int) bgcolor : 25;
+    BITFIELD_TYPE(term_weight_t, unsigned int) weight : 1;
+    BITFIELD_TYPE(term_posture_t, unsigned int) posture : 1;
+    BITFIELD_TYPE(term_underline_t, unsigned int) underline : 1;
+    hyperlink_t *hyperlink;
+} attributes_t;
+
+#endif // ATTRIBUTES_T_H
+
+#ifndef TERM_OSTREAM_PRIV_H
+#define TERM_OSTREAM_PRIV_H
+
+/* Define the term_ostream_representation structure */
+//struct term_ostream_representation {
+struct any_ostream_representation { 
+    struct ostream_representation base;
+    int fd;
+    #if HAVE_WINDOWS_CONSOLES
+    HANDLE handle;
+    bool is_windows_console;
+    #endif
+    char *filename;
+    ttyctl_t tty_control;
+    int max_colors;
+    int no_color_video;
+    char *set_a_foreground;
+    char *set_foreground;
+    char *set_a_background;
+    char *set_background;
+    char *orig_pair;
+    char *enter_bold_mode;
+    char *enter_italics_mode;
+    char *exit_italics_mode;
+    char *enter_underline_mode;
+    char *exit_underline_mode;
+    char *exit_attribute_mode;
+    bool supports_foreground;
+    bool supports_background;
+    colormodel_t colormodel;
+    bool supports_weight;
+    bool supports_posture;
+    bool supports_underline;
+    bool supports_hyperlink;
+    const char *restore_colors;
+    const char *restore_weight;
+    const char *restore_posture;
+    const char *restore_underline;
+    const char *restore_hyperlink;
+    term_style_control_data control_data;
+    uint32_t hostname_hash;
+    uint64_t start_time;
+    uint32_t id_serial;
+    hyperlink_t **hyperlinks_array;
+    size_t hyperlinks_count;
+    size_t hyperlinks_allocated;
+    #if HAVE_WINDOWS_CONSOLES
+    WORD default_console_attributes;
+    WORD current_console_attributes;
+    #endif
+    attributes_t default_attr;
+    attributes_t active_attr;
+    term_color_t active_attr_color;
+    term_color_t active_attr_bgcolor;
+    hyperlink_t *active_attr_hyperlink;
+    char *buffer;
+    attributes_t *attrbuffer;
+    size_t buflen;
+    size_t allocated;
+    attributes_t curr_attr;
+    attributes_t simp_attr;
+    pthread_mutex_t mutex; // Mutex for thread safety
+};
+
+// Define any_ostream_representation as term_ostream_representation
+//#define term_ostream_representation any_ostream_representation
+
+#endif /* TERM_OSTREAM_PRIV_H */
+
+(오류)
+'is_windows_console'
+term-ostream.oo.c:1298:45: error: 'struct any_ostream_representation' has no member named 'current_console_attributes'
+term-ostream.oo.c:1308:43: error: 'struct any_ostream_representation' has no member named 'handle'
+term-ostream.oo.c:1696:20: error: 'struct any_ostream_representation' has no member named 'default_console_attributes'
+term-ostream.oo.c:1308:43: error: 'struct any_ostream_representation' has no member named 'handle'
+
+(수정)
+lib/term-ostream.priv.h 수정
+struct any_ostream_representation {
+    int is_windows_console;               // 윈도우 콘솔 여부를 나타내는 플래그
+    int current_console_attributes;       // 현재 콘솔 속성 (색상, 스타일 등)
+    int default_console_attributes;       // 기본 콘솔 속성
+    HANDLE handle;                        // 콘솔 핸들 (윈도우에서 사용)
+}
+
+(오류)
+term-ostream.oo.c: In function 'get_control_data':
+term-ostream.oo.c:1113:10: error: returning 'term_style_control_data *' from a function with incompatible return type 'struct term_style_control_data *' [-Wincompatible-pointer-types]
+term-ostream.oo.c: At top level:
+term-ostream.oo.c:72:37: error: unknown type name 'any_ostream_representation'; did you mean 'term_ostream_representation'?
+term-ostream.oo.c:1959:55: note: in expansion of macro 'term_ostream_representation'
+term-ostream.oo.c: In function 'output_buffer':
+term-ostream.oo.c:2006:50: error: implicit declaration of function 'convert_to_term_style_user_data' [-Wimplicit-function-declaration]
+term-ostream.oo.c:2006:50: error: passing argument 2 of 'activate_term_non_default_mode' makes pointer from integer without a cast [-Wint-conversion]
+(수정)
+
+
+(오류)
+lib/term-style-control.h:37:74: warning: 'struct term_style_user_data' declared inside parameter list will not be visible outside of this definition or declaration
+   37 | typedef struct term_style_control_data * (*get_control_data_func)(struct term_style_user_data *user_data);
+      |                                                                          ^~~~~~~~~~~~~~~~~~~~
+ostream.oo.h:33:16: error: redefinition of 'struct term_style_user_data'
+lib/term-style-control.h:99:16: note: originally defined here
+   99 | typedef struct term_style_user_data {
+      |                ^~~~~~~~~~~~~~~~~~~~
+ostream.oo.h:36:3: error: conflicting types for 'term_style_user_data'; have 'struct term_style_user_data'
+lib/term-style-control.h:101:3: note: previous declaration of 'term_style_user_data' with type 'term_style_user_data'
+  101 | } term_style_user_data;
+      |   ^~~~~~~~~~~~~~~~~~~~
+(수정)
+lib/ostream.h, lib/ostream.oo.h 수정
+//typedef struct term_style_user_data {
+//    term_style_control_data *control_data;
+//    // 다른 필요한 멤버들 정의
+//} term_style_user_data;
+
+(오류)
+lib/term-style-control.h:36:74: warning: 'struct term_style_user_data' declared inside parameter list will not be visible outside of this definition or declaration
+   36 | typedef struct term_style_control_data * (*get_control_data_func)(struct term_style_user_data *);
+      |                                                                          ^~~~~~~~~~~~~~~~~~~~
+
+(수정)
+struct term_style_user_data를 사용하는 함수 포인터 선언에서 경고가 발생
+lib/term-style-control.h 수정
+typedef struct term_style_control_data {
+    int volatile fd;
+    ttyctl_t volatile tty_control;     /* 신호 처리 및 tty 제어 */
+    #if HAVE_TCGETATTR
+    bool volatile same_as_stderr;
+    #endif
+    bool non_default_active;           /* activate_term_non_default_mode() 가 활성화된 경우 */
+} term_style_control_data;
+
+typedef struct term_style_user_data {
+    // 터미널 스타일 제어에 필요한 데이터
+    term_style_control_data *control_data;
+
+    // 추가적인 터미널 설정 정보
+    int some_terminal_setting;
+
+    // 스타일 설정을 위한 함수 포인터
+    void (*custom_style_function)(void);
+
+    // 상태 플래그
+    bool is_active;
+
+    // 기타 필요한 데이터
+    // ...
+} term_style_user_data;
+
+/*수정*/
+typedef struct term_style_control_data * (*get_control_data_func)(struct term_style_user_data *);
+
+(오류)
+term-ostream.oo.c:72:37: error: unknown type name 'any_ostream_representation'; did you mean 'term_ostream_representation'?
+term-ostream.oo.c:1960:55: note: in expansion of macro 'term_ostream_representation'
+(수정)
+lib/term-ostream.oo.c, lib/term-ostream.c 수정
+//#define term_ostream_representation any_ostream_representation
+
+(오류)
+term-ostream.oo.c:1818:17: warning: 'struct term_ostream_representation' declared inside parameter list will not be visible outside of this definition or declaration
+term-ostream.oo.c: In function 'restore':
+term-ostream.oo.c:1821:13: error: invalid use of undefined type 'struct term_ostream_representation'
+(수정)
+lib/term-ostream.oo.c, lib/term-ostream.c 수정
+static void
+//restore (struct term_ostream_representation * stream)
+restore (struct any_ostream_representation * stream)
 
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+(오류)
+lib/term-style-control.h:63:5: error: unknown type name 'term_style_control_data'
+   63 |     term_style_control_data *control_data;
+      |     ^~~~~~~~~~~~~~~~~~~~~~~
+
+(수정)
 
 
 
