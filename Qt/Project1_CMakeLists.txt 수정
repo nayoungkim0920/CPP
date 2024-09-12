@@ -9620,13 +9620,6 @@ restore (struct any_ostream_representation * stream)
 
 
 
-(오류)
-lib/term-style-control.h:63:5: error: unknown type name 'term_style_control_data'
-   63 |     term_style_control_data *control_data;
-      |     ^~~~~~~~~~~~~~~~~~~~~~~
-
-(수정)
-
 
 
 
