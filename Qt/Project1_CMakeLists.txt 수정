@@ -9596,30 +9596,204 @@ lib/term-ostream.oo.c, lib/term-ostream.c 수정
 //#define term_ostream_representation any_ostream_representation
 
 (오류)
-term-ostream.oo.c:1818:17: warning: 'struct term_ostream_representation' declared inside parameter list will not be visible outside of this definition or declaration
-term-ostream.oo.c: In function 'restore':
-term-ostream.oo.c:1821:13: error: invalid use of undefined type 'struct term_ostream_representation'
+term-ostream.oo.c:62:36: warning: 'struct term_ostream_representatio
+' declared inside parameter list will not be visible outside of this definition or declaration
 (수정)
-lib/term-ostream.oo.c, lib/term-ostream.c 수정
-static void
-//restore (struct term_ostream_representation * stream)
-restore (struct any_ostream_representation * stream)
+
+(오류)
+lib/color.c:147:22: error: passing argument 1 of 'ostream_write_str' from incompatible pointer type [-Wincompatible-pointer-types]
+  147 |   ostream_write_str (stream, "\n");
+      |                      ^~~~~~
+      |                      |
+      |                      term_ostream_t
+(수정)
+lib/color.c
+#include "ostream.h"
+term_ostream_t stream;
+ostream_write_str (stream, "Colors (foreground/background):\n");
+
+lib/ostream.h, lib/ostream.oo.h
+//extern void ostream_write_str(ostream_t stream, const char *string);
+extern void ostream_write_str(term_ostream_t stream, const char *string);
+
+static inline void
+//ostream_write_str(ostream_t stream, const char *string)
+ostream_write_str(term_ostream_t stream, const char *string)
+{
+  ostream_write_mem(stream, string, strlen(string));
+}
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+//extern void ostream_write_mem(ostream_t first_arg, const void *data, size_t len);
+//extern void ostream_flush(ostream_t first_arg, ostream_flush_scope_t scope);
+//extern void ostream_free(ostream_t first_arg);
+extern void ostream_write_mem(term_ostream_t first_arg, const void *data, size_t len);
+extern void ostream_flush(term_ostream_t first_arg, ostream_flush_scope_t scope);
+extern void ostream_free(term_ostream_t first_arg);
+#ifdef __cplusplus
+}
+#endif
+
+static inline void
+//ostream_write_mem(ostream_t first_arg, const void *data, size_t len)
+ostream_write_mem(term_ostream_t first_arg, const void *data, size_t len)
+{
+  const struct ostream_implementation *vtable =
+    ((struct ostream_representation_header *) (struct term_ostream_representation *) first_arg)->vtable;
+  vtable->write_mem(first_arg, data, len);
+}
+
+(오류)
+lib/ostream.h:18:3: error: redeclaration of enumerator 'FLUSH_THIS_STREAM'
+   18 |   FLUSH_THIS_STREAM = 0,   /* Flushes buffers in this ostream_t. */
+      |   ^~~~~~~~~~~~~~~~~
+
+(수정)
+/* Describes the scope of a flush operation.  */
+// textstyle.h에 있음
+// typedef enum
+// {
+//   FLUSH_THIS_STREAM = 0,   /* Flushes buffers in this ostream_t. */
+//   FLUSH_THIS_PROCESS = 1,  /* Flushes all buffers in the current process. */
+//   FLUSH_ALL = 2            /* Flushes buffers in the current process and attempts to flush the buffers in the kernel. */
+// } ostream_flush_scope_t;
+
+(오류)
+lib/ostream.h:50:45: error: conflicting types for 'ostream_t'; have
+struct term_ostream_representation *'
+   50 | typedef struct term_ostream_representation *ostream_t;
+      |                                             ^~~~~~~~~
+In file included from lib/term_ostream.priv.h:6:
+lib/textstyle.h:66:45: note: previous declaration of 'ostream_t' with type 'ostream_t' {aka 'struct any_ostream_representation *'}
+   66 | typedef struct any_ostream_representation * ostream_t;
+      |                                             ^~~~~~~~~
+(수정)
+lib/textstyle.h 수정
+#include "ostream.h"
+typedef ostream_t ostream_t;
+
+
+(오류)
+In file included from ../lib/term-style-control.h:4,
+                 from ../lib/term_ostream.priv.h:105,
+                 from ../lib/textstyle.h:32,
+                 from hello.c:21:
+../lib/ostream.h:129:31: error: unknown type name 'term_ostream_t'; d
+  129 | extern void ostream_write_str(term_ostream_t stream, const ch
+      |                               ^~~~~~~~~~~~~~
+      |                               ostream_t
+In file included from ../lib/error.h:41,
+                 from term-ostream.oo.h:24,
+                 from ../lib/term_ostream.priv.h:108:
+../lib/unreachable.h:17:9: warning: "unreachable" redefined
+   17 | #define unreachable() abort()  // Define the unreachable macr
+      |         ^~~~~~~~~~~
+In file included from ../lib/textstyle.h:24:
+../lib/stddef.h:208:11: note: this is the location of the previous de
+  208 | #  define unreachable() __builtin_unreachable ()
+      |           ^~~~~~~~~~~
+(수정)
+lib/textstyle.h 수정
+#include "term_ostream.priv.h" //ttlctl_t, BITFIELD_TYPE
+
+lib/term_ostream.priv.h 수정
+#include "term-ostream.h" //term_ostream_t
+
+lib/stddef.h 수정
+/* ISO C 23 § 7.21.1 The unreachable macro  */
+/* Check if unreachable() is already defined to avoid redefinition */
+#ifndef unreachable
+# if _GL_HAS_BUILTIN_UNREACHABLE
+#  define unreachable() __builtin_unreachable()
+# elif 1200 <= _MSC_VER
+#  define unreachable() __assume (0)
+# else
+extern
+#  if defined __cplusplus
+"C"
+#  endif
+_Noreturn
+void abort (void)
+#  if defined __cplusplus && (__GLIBC__ >= 2)
+_GL_ATTRIBUTE_NOTHROW
+#  endif
+;
+#  define unreachable() abort()
+# endif
+#endif /* unreachable */
+
+lib/unrechable.h 수정
+#ifndef UNREACHABLE_H
+#define UNREACHABLE_H
+
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
+#include <stdlib.h>  // For abort()
+
+_Noreturn void abort(void);  // Ensure abort() is declared
+
+#if defined(__cplusplus)
+}
+#endif
+
+// Check if unreachable() is already defined to avoid redefinition
+#ifndef unreachable
+#define unreachable() abort()  // Define the unreachable macro to call abort()
+#endif
+
+#endif /* UNREACHABLE_H */
 
 
 
+(오류)
+In file included from ../lib/term-style-control.h:4,
+                 from ../lib/term_ostream.priv.h:105,
+                 from ../lib/textstyle.h:32,
+                 from hello.c:21:
+../lib/ostream.h: In function 'is_instance_of_term_ostream':
+../lib/ostream.h:48:45: error: storage class specified for parameter 'ostream_t'
+   48 | typedef struct term_ostream_representation *ostream_t;  // term_ostream_representation?
+  ^~~~~~~~~
+../lib/ostream.h:62:31: error: expected declaration specifiers or '...' before 'ostream_t'
+   62 | extern void ostream_write_mem(ostream_t first_arg, const void *data, size_t len);
+      |                               ^~~~~~~~~
+../lib/ostream.h:63:27: error: expected declaration specifiers or '...' before 'ostream_t'
+   63 | extern void ostream_flush(ostream_t first_arg, ostream_flush_scope_t scope);
+      |                           ^~~~~~~~~
+../lib/ostream.h:64:26: error: expected declaration specifiers or '...' before 'ostream_t'
+   64 | extern void ostream_free(ostream_t first_arg);
+      |                          ^~~~~~~~~
+../lib/ostream.h:75:18: error: expected declaration specifiers or '...' before 'ostream_t'
+   75 | #define THIS_ARG ostream_t first_arg
+      |                  ^~~~~~~~~
+../lib/ostream.vt.h:5:27: note: in expansion of macro 'THIS_ARG'
+    5 |        void (*write_mem) (THIS_ARG, const void *data, size_t len);
+      |                           ^~~~~~~~
+../lib/ostream.h:75:18: error: expected declaration specifiers or '...' before 'ostream_t'
+   75 | #define THIS_ARG ostream_t first_arg
+      |                  ^~~~~~~~~
 
+(수정)
+typedef는 파일의 시작 부분에서 정의되어야 하며, 함수 정의나 코드 블록 내에 정의되어서는 안 됩니다
+typedef 선언을 통해 새로운 타입 이름을 정의할 수 있지만, 
+함수 내부나 파라미터 위치에서 typedef를 사용하게 되면 오류가 발생
+typedef 선언이 함수나 매크로 내에서가 아닌, 전역 스코프에서 올바르게 정의되어야 함
+typedef struct term_ostream_representation *ostream_t;가 함수의 매개변수 목록에 잘못 위치해 있다는 점
+lib/textstyle.h, lib/textstyle.in.h 수정
+#define any_ostream_representation term_ostream_representation
+typedef struct term_ostream_representation * ostream_t;
 
+(오류)
+lib/idx.h: In function 'is_instance_of_term_ostream':
+lib/idx.h:126:19: error: storage class specified for parameter 'idx_t'
+  126 | typedef ptrdiff_t idx_t;
+      |                   ^~~~~
 
-
-
-
-
-
-
-
-
-
-
+(수정)
 
 
 
