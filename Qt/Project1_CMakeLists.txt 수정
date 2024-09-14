@@ -9788,18 +9788,178 @@ lib/textstyle.h, lib/textstyle.in.h 수정
 typedef struct term_ostream_representation * ostream_t;
 
 (오류)
+../lib/ostream.h:47:31: error: unknown type name 'ostream_t'; did you mean 'IStream'?
+   47 | extern void ostream_write_mem(ostream_t first_arg, const void *data, size_t len);
+      |                               ^~~~~~~~~
+      |                               IStream
+
+(수정)
+lib/ostream.h, lib/ostream.oo.h 수정
+typedef struct term_ostream_representation* ostream_t;
+#if IS_CPLUSPLUS
+#else
+typedef struct term_ostream_representation* ostream_t;
+#endif
+
+(오류)
+../lib/term_ostream.priv.h: In function 'is_instance_of_term_ostream':
+../lib/term_ostream.priv.h:161:1: warning: empty declaration
+  161 | struct term_ostream_representation {
+      | ^~~~~~
+../lib/term_ostream.priv.h:220:44: error: storage class specified for parameter 'any_ostream_representation'
+  220 | typedef struct term_ostream_representation any_ostream_representation;
+      |                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+../lib/textstyle.h:41:16: error: storage class specified for parameter 'ostream_t'
+   41 | typedef FILE * ostream_t;
+      |                ^~~~~~~~~
+../lib/textstyle.h:46:45: error: storage class specified for parameter 'term_ostream_t'
+   46 | typedef struct any_ostream_representation * term_ostream_t;
+      |                                             ^~~~~~~~~~~~~~
+(수정)
+lib/term_ostream.priv.h 수정
+//#include "term-style-control.h" // term_style_control_data
+//#include "term-ostream.h" //term_ostream_t
+typedef struct term_ostream_representation any_ostream_representation;
+// typedef struct term_ostream_representation* ostream_t;
+// #if IS_CPLUSPLUS
+// typedef ostream_t term_ostream_t;
+// #else
+// typedef struct any_ostream_representation * term_ostream_t;
+// #endif 
+// typedef term_ostream_t styled_ostream_t;
+// typedef styled_ostream_t html_styled_ostream_t;
+// typedef styled_ostream_t noop_styled_ostream_t;
+lib/textstyle.h, lib/textstyle.in.h 수정
+//#include "term-ostream.h" //#include "term-ostream.priv.h"
+//#include "term-ostream.h" //term_weight_t
+#include "term_ostream.priv.h" //ttlctl_t, BITFIELD_TYPE
+typedef FILE * ostream_t;
+//typedef struct term_ostream_representation* ostream_t;
+#if IS_CPLUSPLUS
+typedef ostream_t term_ostream_t;
+#else
+typedef struct any_ostream_representation * term_ostream_t;
+#endif 
+typedef term_ostream_t styled_ostream_t;
+typedef styled_ostream_t html_styled_ostream_t;
+typedef styled_ostream_t noop_styled_ostream_t;
+
+#define term_ostream_write_mem ostream_write_mem
+#define term_ostream_flush ostream_flush
+#define term_ostream_free ostream_free
+
+(오류)
+../lib/textstyle.h:52:32: error: conflicting types for 'ostream_write_mem';
+have 'void(struct any_ostream_representation *, const void *, size_t)'
+{aka 'void(struct any_ostream_representation *, const void *, long long unsigned int)'}
+   52 | #define term_ostream_write_mem ostream_write_mem
+      |                                ^~~~~~~~~~~~~~~~~
+(수정)
+#define term_ostream_write_mem ostream_write_mem
+extern void term_ostream_write_mem (term_ostream_t first_arg, const void *data, size_t len);
+extern void ostream_write_mem (ostream_t first_arg, const void *data, size_t len);
+
+lib/textstyle.h (두번정의되어있었음) 수정, lib/textstyle.in.h(한번정의되어있었음)
+/* styled_ostream_t is a subtype of ostream_t.  */
+typedef ostream_t styled_ostream_t;
+#define styled_ostream_write_mem ostream_write_mem
+#define styled_ostream_flush ostream_flush
+#define styled_ostream_free ostream_free
+
+(오류)
+../lib/textstyle.h:132:19: error: conflicting types for 'styled_ostream_t';
+have 'ostream_t' {aka 'struct _iobuf *'}
+  132 | typedef ostream_t styled_ostream_t;
+      |                   ^~~~~~~~~~~~~~~~
+(수정)
+lib/textstyle.h, lib/textstyle.in.h 수정
+typedef FILE * ostream_t;
+//typedef struct term_ostream_representation* ostream_t;
+#if IS_CPLUSPLUS
+typedef ostream_t term_ostream_t;
+#else
+typedef struct any_ostream_representation * term_ostream_t;
+#endif 
+//typedef term_ostream_t styled_ostream_t;
+typedef styled_ostream_t html_styled_ostream_t;
+typedef styled_ostream_t noop_styled_ostream_t;
+
+/* styled_ostream_t is a subtype of ostream_t.  */
+typedef ostream_t styled_ostream_t;
+
+(오류)
+../lib/textstyle.h:49:9: error: unknown type name 'styled_ostream_t'; did you mean 'term_ostream_t'?
+   49 | typedef styled_ostream_t html_styled_ostream_t;
+      |         ^~~~~~~~~~~~~~~~
+      |         term_ostream_t
+(수정)
+lib/textstyle.h, lib/textstyle.in.h 수정
+typedef FILE * ostream_t;
+//typedef struct term_ostream_representation* ostream_t;
+#if IS_CPLUSPLUS
+typedef ostream_t term_ostream_t;
+#else
+typedef struct any_ostream_representation * term_ostream_t;
+#endif 
+//typedef term_ostream_t styled_ostream_t;
+//typedef styled_ostream_t html_styled_ostream_t;
+//typedef styled_ostream_t noop_styled_ostream_t;
+
+/* html_styled_ostream_t is a subtype of styled_ostream_t.  */
+typedef styled_ostream_t html_styled_ostream_t;
+
+/* noop_styled_ostream_t is a subtype of styled_ostream_t.  */
+typedef styled_ostream_t noop_styled_ostream_t;
+
+(오류)
+lib/ostream.h:33:45: error: conflicting types for 'ostream_t'; 
+have 'struct term_ostream_representation *'
+   33 | typedef struct term_ostream_representation* ostream_t;
+      |                                             ^~~~~~~~~
+(수정)
+lib/ostream.h, lib/ostream.oo.h 수정
+//#include "textstyle.h"         // ostream_flush_scope_t
+//#include "term-ostream.h"      // term_ostream_t
+
+(오류)
+In file included from lib/xalloc.h:33,
+                 from lib/color.c:33:
 lib/idx.h: In function 'is_instance_of_term_ostream':
 lib/idx.h:126:19: error: storage class specified for parameter 'idx_t'
   126 | typedef ptrdiff_t idx_t;
       |                   ^~~~~
+(수정)
+typedef는 새로운 타입을 정의하는 것이지, 변수나 함수의 저장 클래스 지정자가 아니라는 것을 의미
+저장 클래스 지정자가 포함되지 않도록 수정
+함수 매개변수에 저장 클래스(storage class)를 지정하려고 했기 때문에 발생
+typedef가 함수의 매개변수로 잘못 사용된 경우
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -rn 'typedef .* idx_t' .
+./lib/fnmatch.c:110:typedef ptrdiff_t idx_t;
+./lib/idx.h:126:typedef ptrdiff_t idx_t;
+
+lib/fnmatch.c 수정
+/*idx.h 중복정의*/
+// #ifdef _LIBC
+// typedef ptrdiff_t idx_t;
+// #else
+// # include "idx.h"
+// #endif
+ # include "idx.h"
+
+(오류)
+In file included from lib/color.c:1:
+./config.h:480:21: error: expected declaration specifiers before '__attribute__'
+  480 | #  define _Noreturn __attribute__ ((__noreturn__))
+      |                     ^~~~~~~~~~~~~
 
 (수정)
-
-
-
-
-
-
-
-
-
+configure.ac 수정
+# Check for __attribute__((noreturn)) support
+AC_MSG_CHECKING([whether the compiler supports __attribute__((noreturn))])
+AC_COMPILE_IFELSE(
+  [AC_LANG_PROGRAM([[]], [[__attribute__((noreturn)) void x();]])],
+  [AC_DEFINE_UNQUOTED([_GL_ATTRIBUTE_NORETURN], [__attribute__((noreturn))], [Define for attribute noreturn])],
+  [AC_DEFINE_UNQUOTED([_GL_ATTRIBUTE_NORETURN], [], [Define for attribute noreturn])]
+)
+AC_MSG_RESULT([done])
