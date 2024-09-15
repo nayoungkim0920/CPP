@@ -10043,10 +10043,137 @@ config.h 자동생성부분 확인
 lib/xalloc.h:70:3: warning: 'malloc' attribute ignored; valid only for functions [-Wattributes]
    70 |   _GL_ATTRIBUTE_RETURNS_NONNULL;
       |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-lib/xalloc.h:70:3: warning: 'malloc' attribute ignored; valid only for functions [-Wattributes]
 (수정)
+_GL_ATTRIBUTE_RETURNS_NONNULL 속성이 함수 외부에서 잘못 사용되었기 때문
+이 속성은 함수에 적용되어야 하는데, 현재 매크로로 정의
+lib/xalloc.h 수정
+//void *ximalloc (idx_t s)
+//  _GL_ATTRIBUTE_MALLOC _GL_ATTRIBUTE_DEALLOC_FREE
+//  _GL_ATTRIBUTE_ALLOC_SIZE ((1)) _GL_ATTRIBUTE_RETURNS_NONNULL;
+void *ximalloc (idx_t s)
+  __attribute__ ((malloc, alloc_size(1), returns_nonnull, dealloc(free)));
 
+configure.ac 수정
+#AC_DEFINE([_GL_ATTRIBUTE_RETURNS_NONNULL], [], [Define to enable returns nonnull attributes])
+# _GL_ATTRIBUTE_RETURNS_NONNULL
+# Check if the compiler supports the __attribute__((returns_nonnull)) attribute
+AC_MSG_CHECKING([whether the compiler supports __attribute__((returns_nonnull))])
+AC_COMPILE_IFELSE(
+  [AC_LANG_PROGRAM([[]], [[
+    void* test_returns_nonnull(void) __attribute__((returns_nonnull));
+  ]])],
+  [AC_DEFINE([_GL_HAS_ATTRIBUTE_RETURNS_NONNULL], [1], [Define if compiler supports __attribute__((returns_nonnull))])],
+  [AC_DEFINE([_GL_HAS_ATTRIBUTE_RETURNS_NONNULL], [0], [Define if compiler does not support __attribute__((returns_nonnull))])]
+)
+AC_MSG_RESULT([done])
 
+config.h 생성확인
+/* _GL_ATTRIBUTE_RETURNS_NONNULL declares that the function's return value is
+   a non-NULL pointer.  */
+/* Applies to: functions.  */
+#ifndef _GL_ATTRIBUTE_RETURNS_NONNULL
+# if _GL_HAS_ATTRIBUTE (returns_nonnull)
+#  define _GL_ATTRIBUTE_RETURNS_NONNULL __attribute__ ((__returns_nonnull__))
+# else
+#  define _GL_ATTRIBUTE_RETURNS_NONNULL
+# endif
+#endif
+
+(오류)
+lib/xalloc.h:68:3: warning: 'malloc' attribute ignored; valid only for functions [-Wattributes]
+   68 |   _GL_ATTRIBUTE_ALLOC_SIZE ((1)) _GL_ATTRIBUTE_RETURNS_NONNULL;
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~
+lib/xalloc.h:68:3: warning: 'malloc' attribute ignored; valid only for functions [-Wattributes]
+(수정)
+lib/xalloc.h 수정
+//void *xmalloc (size_t s)
+//  _GL_ATTRIBUTE_MALLOC _GL_ATTRIBUTE_DEALLOC_FREE
+//  _GL_ATTRIBUTE_ALLOC_SIZE ((1)) _GL_ATTRIBUTE_RETURNS_NONNULL;
+void *xmalloc(size_t s)
+  _GL_ATTRIBUTE_MALLOC _GL_ATTRIBUTE_DEALLOC_FREE _GL_ATTRIBUTE_ALLOC_SIZE((1))
+
+(오류)
+lib/xalloc.h:71:1: warning: 'malloc' attribute ignored; valid only for functions [-Wattributes]
+   71 | void *ximalloc (idx_t s)
+      | ^~~~
+lib/xalloc.h:71:1: warning: 'malloc' attribute ignored; valid only for functions [-Wattributes]
+(수정)
+lib/xalloc.h 수정
+void *xmalloc (size_t s)
+  _GL_ATTRIBUTE_MALLOC _GL_ATTRIBUTE_DEALLOC_FREE
+  _GL_ATTRIBUTE_ALLOC_SIZE ((1)) _GL_ATTRIBUTE_RETURNS_NONNULL;
+=> void *xmalloc (size_t s);
+
+void *xmalloc (size_t s);
+void *ximalloc (idx_t s);
+void *xinmalloc (idx_t n, idx_t s);
+void *xzalloc (size_t s);
+void *xizalloc (idx_t s);
+void *xcalloc (size_t n, size_t s);
+void *xicalloc (idx_t n, idx_t s);
+void *xrealloc (void *p, size_t s);
+void *xirealloc (void *p, idx_t s);
+void *xreallocarray (void *p, size_t n, size_t s);
+void *xireallocarray (void *p, idx_t n, idx_t s);
+void *x2realloc (void *p, size_t *ps); /* superseded by xpalloc */
+void *x2nrealloc (void *p, size_t *pn, size_t s); /* superseded by xpalloc */
+void *xpalloc (void *pa, idx_t *pn, idx_t n_incr_min, ptrdiff_t n_max, idx_t s);
+void *xmemdup (void const *p, size_t s);
+void *ximemdup (void const *p, idx_t s);
+char *ximemdup0 (void const *p, idx_t s);
+char *xstrdup (char const *str);
+
+/* Function definitions with attributes */
+void *xmalloc (size_t s)
+  _GL_ATTRIBUTE_MALLOC _GL_ATTRIBUTE_DEALLOC_FREE
+  _GL_ATTRIBUTE_ALLOC_SIZE ((1)) _GL_ATTRIBUTE_RETURNS_NONNULL;
+void *ximalloc (idx_t s)
+  _GL_ATTRIBUTE_MALLOC _GL_ATTRIBUTE_DEALLOC_FREE
+  _GL_ATTRIBUTE_ALLOC_SIZE ((1)) _GL_ATTRIBUTE_RETURNS_NONNULL;
+void *xinmalloc (idx_t n, idx_t s)
+  _GL_ATTRIBUTE_MALLOC _GL_ATTRIBUTE_DEALLOC_FREE
+  _GL_ATTRIBUTE_ALLOC_SIZE ((1, 2)) _GL_ATTRIBUTE_RETURNS_NONNULL;
+void *xzalloc (size_t s)
+  _GL_ATTRIBUTE_MALLOC _GL_ATTRIBUTE_DEALLOC_FREE
+  _GL_ATTRIBUTE_ALLOC_SIZE ((1)) _GL_ATTRIBUTE_RETURNS_NONNULL;
+void *xizalloc (idx_t s)
+  _GL_ATTRIBUTE_MALLOC _GL_ATTRIBUTE_DEALLOC_FREE
+  _GL_ATTRIBUTE_ALLOC_SIZE ((1)) _GL_ATTRIBUTE_RETURNS_NONNULL;
+void *xcalloc (size_t n, size_t s)
+  _GL_ATTRIBUTE_MALLOC _GL_ATTRIBUTE_DEALLOC_FREE
+  _GL_ATTRIBUTE_ALLOC_SIZE ((1, 2)) _GL_ATTRIBUTE_RETURNS_NONNULL;
+void *xicalloc (idx_t n, idx_t s)
+  _GL_ATTRIBUTE_MALLOC _GL_ATTRIBUTE_DEALLOC_FREE
+  _GL_ATTRIBUTE_ALLOC_SIZE ((1, 2)) _GL_ATTRIBUTE_RETURNS_NONNULL;
+void *xrealloc (void *p, size_t s)
+  _GL_ATTRIBUTE_ALLOC_SIZE ((2));
+void *xirealloc (void *p, idx_t s)
+  _GL_ATTRIBUTE_ALLOC_SIZE ((2)) _GL_ATTRIBUTE_RETURNS_NONNULL;
+void *xreallocarray (void *p, size_t n, size_t s)
+  _GL_ATTRIBUTE_ALLOC_SIZE ((2, 3));
+void *xireallocarray (void *p, idx_t n, idx_t s)
+  _GL_ATTRIBUTE_ALLOC_SIZE ((2, 3)) _GL_ATTRIBUTE_RETURNS_NONNULL;
+void *x2realloc (void *p, size_t *ps) /* superseded by xpalloc */
+  _GL_ATTRIBUTE_RETURNS_NONNULL;
+void *x2nrealloc (void *p, size_t *pn, size_t s) /* superseded by xpalloc */
+  _GL_ATTRIBUTE_RETURNS_NONNULL;
+void *xpalloc (void *pa, idx_t *pn, idx_t n_incr_min, ptrdiff_t n_max, idx_t s)
+  _GL_ATTRIBUTE_RETURNS_NONNULL;
+void *xmemdup (void const *p, size_t s)
+  _GL_ATTRIBUTE_MALLOC _GL_ATTRIBUTE_DEALLOC_FREE
+  _GL_ATTRIBUTE_ALLOC_SIZE ((2)) _GL_ATTRIBUTE_RETURNS_NONNULL;
+void *ximemdup (void const *p, idx_t s)
+  _GL_ATTRIBUTE_MALLOC _GL_ATTRIBUTE_DEALLOC_FREE
+  _GL_ATTRIBUTE_ALLOC_SIZE ((2)) _GL_ATTRIBUTE_RETURNS_NONNULL;
+char *ximemdup0 (void const *p, idx_t s)
+  _GL_ATTRIBUTE_MALLOC _GL_ATTRIBUTE_DEALLOC_FREE
+  _GL_ATTRIBUTE_RETURNS_NONNULL;
+char *xstrdup (char const *str)
+  _GL_ATTRIBUTE_MALLOC _GL_ATTRIBUTE_DEALLOC_FREE
+  _GL_ATTRIBUTE_RETURNS_NONNULL;
+
+//XALLOC_INLINE void *xnrealloc (void *p, size_t n, size_t s)
+//  _GL_ATTRIBUTE_ALLOC_SIZE ((2, 3));
 
 
 
