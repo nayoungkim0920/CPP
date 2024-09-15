@@ -9955,7 +9955,26 @@ In file included from lib/color.c:1:
 
 (수정)
 configure.ac 수정
-# Check for __attribute__((noreturn)) support
+
+# Set C++ standard to C++17
+CXXFLAGS="$CXXFLAGS -std=c++17"
+AC_SUBST(CXXFLAGS)
+
+# C99->C11
+AC_PROG_CC
+AC_LANG([C])
+AC_COMPILE_IFELSE(
+  [AC_LANG_PROGRAM([], [[#if __STDC_VERSION__ >= 201112L
+                         #else
+                         # error "C11 not supported"
+                         #endif]])],
+  [
+    AC_DEFINE([HAVE_C11], [1], [Define if the C compiler supports C11.])
+    CFLAGS="$CFLAGS -std=c11 -fno-inline -UNDEFINED_MACRO"
+  ],
+  [AC_MSG_ERROR([C11 support is required but not available.])]
+)
+
 AC_MSG_CHECKING([whether the compiler supports __attribute__((noreturn))])
 AC_COMPILE_IFELSE(
   [AC_LANG_PROGRAM([[]], [[__attribute__((noreturn)) void x();]])],
@@ -9963,3 +9982,93 @@ AC_COMPILE_IFELSE(
   [AC_DEFINE_UNQUOTED([_GL_ATTRIBUTE_NORETURN], [], [Define for attribute noreturn])]
 )
 AC_MSG_RESULT([done])
+
+(오류)
+lib/xalloc.h:54:16: warning: parameter 'xalloc_die' declared '_Noreturn'
+   54 | _Noreturn void xalloc_die (void);
+      |                ^~~~~~~~~~
+
+(수정)
+lib/xalloc.h 수정
+_Noreturn void xalloc_die (void);
+_Noreturn은 함수의 반환되지 않음을 나타내는 속성이며, 매개변수에 적용될 수 없음
+void xalloc_die (void) __attribute__((noreturn));
+
+(오류)
+lib/xalloc.h:65:3: warning: 'malloc' attribute ignored; valid only for functions [-Wattributes]
+   65 |   _GL_ATTRIBUTE_ALLOC_SIZE ((1)) _GL_ATTRIBUTE_RETURNS_NONNULL;
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~
+(수정)
+#if GNULIB_XALLOC
+void *xmalloc (size_t s)
+  _GL_ATTRIBUTE_MALLOC _GL_ATTRIBUTE_DEALLOC_FREE
+  _GL_ATTRIBUTE_ALLOC_SIZE ((1)) _GL_ATTRIBUTE_RETURNS_NONNULL;
+#endif /* GNULIB_XALLOC */
+
+_GL_ATTRIBUTE_ALLOC_SIZE와 _GL_ATTRIBUTE_RETURNS_NONNULL가 함수 선언에 올바르게 적용되지 않았기 때문
+이 속성들은 함수의 매개변수 및 반환 값과 관련된 속성들로, 함수 선언에만 적용되어야 함.
+lib/xalloc.h 수정
+#if GNULIB_XALLOC
+void *xmalloc(size_t s)
+  _GL_ATTRIBUTE_MALLOC
+  _GL_ATTRIBUTE_DEALLOC_FREE
+  _GL_ATTRIBUTE_ALLOC_SIZE(1) //수정
+  _GL_ATTRIBUTE_RETURNS_NONNULL;
+#endif /* GNULIB_XALLOC */
+
+configure.ac 수정
+# _GL_ATTRIBUTE_ALLOC_SIZE
+# Check if the compiler supports the __attribute__((__alloc_size__)) attribute
+AC_MSG_CHECKING([whether the compiler supports __attribute__((__alloc_size__))])
+AC_COMPILE_IFELSE(
+  [AC_LANG_PROGRAM([[]], [[
+    void* xmalloc(size_t) __attribute__((__alloc_size__(1)));
+  ]])],
+  [AC_DEFINE([_GL_HAS_ATTRIBUTE_ALLOC_SIZE], [1], [Define if compiler supports __attribute__((__alloc_size__))])],
+  [AC_DEFINE([_GL_HAS_ATTRIBUTE_ALLOC_SIZE], [0], [Define if compiler does not support __attribute__((__alloc_size__))])]
+)
+AC_MSG_RESULT([done])
+
+config.h 자동생성부분 확인
+/* Applies to: functions, pointer to functions, function types.  */
+#ifndef _GL_ATTRIBUTE_ALLOC_SIZE
+# if _GL_HAS_ATTRIBUTE (alloc_size)
+#  define _GL_ATTRIBUTE_ALLOC_SIZE(args) __attribute__ ((__alloc_size__ args))
+# else
+#  define _GL_ATTRIBUTE_ALLOC_SIZE(args)
+# endif
+#endif
+
+(오류)
+lib/xalloc.h:70:3: warning: 'malloc' attribute ignored; valid only for functions [-Wattributes]
+   70 |   _GL_ATTRIBUTE_RETURNS_NONNULL;
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+lib/xalloc.h:70:3: warning: 'malloc' attribute ignored; valid only for functions [-Wattributes]
+(수정)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
