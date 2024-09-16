@@ -10331,6 +10331,140 @@ extern char *xconcatenated_filename (const char *directory,
   //_GL_ATTRIBUTE_RETURNS_NONNULL
   //;
 
+(오류)
+lib/string.h:700:19: error: storage class specified for parameter 'rpl_free'
+  700 | _GL_EXTERN_C void rpl_free (void *);
+      |                   ^~~~~~~~
+
+(수정)
+extern 또는 _GL_EXTERN_C와 같은 스토리지 클래스 지정자가 잘못된 위치에 사용되었을 때 발생
+rpl_free 함수의 선언에서 스토리지 클래스 지정자가 매개변수에 적용된 것처럼 해석되기 때문에 발생
+_GL_EXTERN_C가 정확하게 함수 선언의 앞부분에 위치해야 함
+
+lib/string.h
+_GL_EXTERN_C void rpl_free (void *);
+
+configure.ac
+#AC_MSG_CHECKING([whether the compiler supports extern "C"])
+#AC_COMPILE_IFELSE(
+#  [AC_LANG_PROGRAM([[#ifdef __cplusplus]])],
+#  [AC_DEFINE([_GL_EXTERN_C], [extern "C"], [Define if compiler supports extern "C"])],
+#  [AC_DEFINE([_GL_EXTERN_C], [extern], [Define if compiler does not support extern])]
+#)
+#AC_MSG_RESULT([done])
+
+#/* Define to extern for C only */
+#define _GL_EXTERN_C extern "C"
+#
+#AC_MSG_CHECKING([whether the compiler supports extern "C"])
+#AC_COMPILE_IFELSE([
+#AC_LANG_PROGRAM([[
+#            #ifdef __cplusplus
+#            #define _GL_EXTERN_C extern "C"
+#            #else
+#            #define _GL_EXTERN_C extern
+#            #endif
+#        ]], [])
+#    ], [
+#        AC_DEFINE([_GL_EXTERN_C], [extern "C"], [Define to extern "C" for C++ and extern for C])
+#    ], [
+#        AC_DEFINE([_GL_EXTERN_C], [extern], [Define to extern for C only])
+#    ]
+#)	
+#AC_MSG_RESULT([done])
+
+#/* Define to extern for C only */
+#define _GL_EXTERN_C extern "C"
+#
+# Check if we are compiling with C++
+AC_MSG_CHECKING([whether the compiler supports extern "C"])
+AC_COMPILE_IFELSE(
+  [AC_LANG_PROGRAM([[
+    #ifdef __cplusplus
+    extern "C"
+    #else
+    extern
+    #endif
+  ]], [])],
+  [AC_DEFINE([_GL_EXTERN_C], [extern "C"], [Define to extern "C" for C++ and extern for C])],
+  [AC_DEFINE([_GL_EXTERN_C], [extern], [Define to extern for C only])]
+)
+AC_MSG_RESULT([done])
+
+config.h
+/* Define to extern for C */
+#define _GL_EXTERN_C extern
+
+=> 
+
+/* Define to extern for C only */
+#define _GL_EXTERN_C extern "C"
+
+lib/string.h
+/* Define to extern for C */
+//#define _GL_EXTERN_C extern
+
+=>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void rpl_free (void *);  // 함수 선언에는 스토리지 클래스가 필요하지 않음
+
+#ifdef __cplusplus
+}
+#endif
+
+(오류)
+./unistd.h:855:1: error: expected identifier or '(' before string constant
+  855 | _GL_CXXALIAS_MDA (access, int, (const char *file, int mode));
+      | ^~~~~~~~~~~~~~~~
+
+(수정)
+_GL_CXXALIAS_MDA (access, int, (const char *file, int mode));
+
+AC_MSG_CHECKING([whether the compiler supports extern "C"])
+AC_COMPILE_IFELSE(
+  [AC_LANG_PROGRAM([[
+    #ifdef __cplusplus
+    extern "C"
+    #else
+    extern
+    #endif
+  ]], [])],
+  [AC_DEFINE([_GL_EXTERN_C], [extern "C"], [Define to extern "C" for C++ and extern for C])],
+  [AC_DEFINE([_GL_EXTERN_C], [extern], [Define to extern for C only])]
+)
+AC_MSG_RESULT([done])
+
+이게 
+
+/* Define to extern for C only */
+#define _GL_EXTERN_C extern "C"
+
+이렇게 생성되
+
+/* Define to extern "C" for C++, and extern for C */
+#ifdef __cplusplus
+# define _GL_EXTERN_C extern "C"
+#else
+# define _GL_EXTERN_C extern
+#endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
