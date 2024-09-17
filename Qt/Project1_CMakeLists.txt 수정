@@ -10416,12 +10416,43 @@ _GL_FUNCDECL_SYS (strdup, char *,
       |                           ^~~~~~~~~~~~~
 
 (수정)
+# Define a macro to check for attribute support
+AC_DEFUN([_GL_HAS_ATTRIBUTE],
+  [AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
+    [[#ifndef __has_attribute
+      # define __has_attribute(x) 0
+    #endif]],  # <-- 첫 번째 코드 블록의 끝
+    [[int foo __attribute__ (($1));]])],  # <-- 두 번째 코드 블록의 끝
+    [AC_DEFINE([_GL_HAS_ATTRIBUTE_$1], [1],
+      [Define if the compiler supports __attribute__((($1)))])],  # <-- 성공 시
+    [AC_DEFINE([_GL_HAS_ATTRIBUTE_$1], [0],
+      [Define if the compiler does not support __attribute__((($1)))])])  # <-- 실패 시
+  ])
 
+# Check for 'pure' attribute support
+_GL_HAS_ATTRIBUTE([pure])
 
+(오류)
 
+./config.h:346:29: error: expected declaration specifiers before '__attribute__'
+  346 | #define _GL_ARG_NONNULL_1_2 __attribute__((nonnull(1,2)))
+      |                             ^~~~~~~~~~~~~
+./config.h:343:27: error: expected declaration specifiers before '__attribute__'
+  343 | #define _GL_ARG_NONNULL_1 __attribute__((nonnull(1)))
+      |                           ^~~~~~~~~~~~~
+./config.h:343:27: error: expected declaration specifiers before '__attribute__'
+  343 | #define _GL_ARG_NONNULL_1 __attribute__((nonnull(1)))
+      |                           ^~~~~~~~~~~~~
+./config.h:1164:30: error: expected declaration specifiers before '__attribute__'
+ 1164 | #  define _GL_ATTRIBUTE_PURE __attribute__ ((__pure__))
+      |                              ^~~~~~~~~~~~~
 
-
-
+(수정)
+__attribute__가 적용되기 전에 함수나 변수의 선언이 필요하다는 의미
+해당 속성을 적용할 대상(함수나 변수)이 먼저 선언되어야 함
+__attribute__를 정의할 때 AC_DEFINE_UNQUOTED를 사용하면 
+매크로가 정의될 때 자동으로 문자열로 감싸지지 않고 직접 적용
+#define _GL_ARG_NONNULL_1_2 __attribute__((nonnull(1,2)))
 
 
 
