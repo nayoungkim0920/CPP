@@ -10341,124 +10341,81 @@ extern 또는 _GL_EXTERN_C와 같은 스토리지 클래스 지정자가 잘못�
 rpl_free 함수의 선언에서 스토리지 클래스 지정자가 매개변수에 적용된 것처럼 해석되기 때문에 발생
 _GL_EXTERN_C가 정확하게 함수 선언의 앞부분에 위치해야 함
 
-lib/string.h
-_GL_EXTERN_C void rpl_free (void *);
-
 configure.ac
-#AC_MSG_CHECKING([whether the compiler supports extern "C"])
-#AC_COMPILE_IFELSE(
-#  [AC_LANG_PROGRAM([[#ifdef __cplusplus]])],
-#  [AC_DEFINE([_GL_EXTERN_C], [extern "C"], [Define if compiler supports extern "C"])],
-#  [AC_DEFINE([_GL_EXTERN_C], [extern], [Define if compiler does not support extern])]
-#)
-#AC_MSG_RESULT([done])
-
-#/* Define to extern for C only */
-#define _GL_EXTERN_C extern "C"
-#
-#AC_MSG_CHECKING([whether the compiler supports extern "C"])
-#AC_COMPILE_IFELSE([
-#AC_LANG_PROGRAM([[
-#            #ifdef __cplusplus
-#            #define _GL_EXTERN_C extern "C"
-#            #else
-#            #define _GL_EXTERN_C extern
-#            #endif
-#        ]], [])
-#    ], [
-#        AC_DEFINE([_GL_EXTERN_C], [extern "C"], [Define to extern "C" for C++ and extern for C])
-#    ], [
-#        AC_DEFINE([_GL_EXTERN_C], [extern], [Define to extern for C only])
-#    ]
-#)	
-#AC_MSG_RESULT([done])
-
-#/* Define to extern for C only */
-#define _GL_EXTERN_C extern "C"
-#
-# Check if we are compiling with C++
-AC_MSG_CHECKING([whether the compiler supports extern "C"])
-AC_COMPILE_IFELSE(
-  [AC_LANG_PROGRAM([[
-    #ifdef __cplusplus
-    extern "C"
-    #else
-    extern
-    #endif
-  ]], [])],
-  [AC_DEFINE([_GL_EXTERN_C], [extern "C"], [Define to extern "C" for C++ and extern for C])],
-  [AC_DEFINE([_GL_EXTERN_C], [extern], [Define to extern for C only])]
-)
-AC_MSG_RESULT([done])
+AC_CONFIG_COMMANDS([post-config-h], [
+  echo "/* Define extern linkage */" >> config.h
+  echo "#ifdef __cplusplus" >> config.h
+  echo "# define _GL_EXTERN_C extern \"C\"" >> config.h
+  echo "#else" >> config.h
+  echo "# define _GL_EXTERN_C extern" >> config.h
+  echo "#endif" >> config.h
+])
 
 config.h
-/* Define to extern for C */
-#define _GL_EXTERN_C extern
-
-=> 
-
-/* Define to extern for C only */
-#define _GL_EXTERN_C extern "C"
-
-lib/string.h
-/* Define to extern for C */
-//#define _GL_EXTERN_C extern
-
-=>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-void rpl_free (void *);  // 함수 선언에는 스토리지 클래스가 필요하지 않음
-
-#ifdef __cplusplus
-}
-#endif
-
-(오류)
-./unistd.h:855:1: error: expected identifier or '(' before string constant
-  855 | _GL_CXXALIAS_MDA (access, int, (const char *file, int mode));
-      | ^~~~~~~~~~~~~~~~
-
-(수정)
-_GL_CXXALIAS_MDA (access, int, (const char *file, int mode));
-
-AC_MSG_CHECKING([whether the compiler supports extern "C"])
-AC_COMPILE_IFELSE(
-  [AC_LANG_PROGRAM([[
-    #ifdef __cplusplus
-    extern "C"
-    #else
-    extern
-    #endif
-  ]], [])],
-  [AC_DEFINE([_GL_EXTERN_C], [extern "C"], [Define to extern "C" for C++ and extern for C])],
-  [AC_DEFINE([_GL_EXTERN_C], [extern], [Define to extern for C only])]
-)
-AC_MSG_RESULT([done])
-
-이게 
-
-/* Define to extern for C only */
-#define _GL_EXTERN_C extern "C"
-
-이렇게 생성되
-
-/* Define to extern "C" for C++, and extern for C */
+/* Define as a signed type of the same size as size_t. */
+/* #undef ssize_t */
+/* Define extern linkage */
 #ifdef __cplusplus
 # define _GL_EXTERN_C extern "C"
 #else
 # define _GL_EXTERN_C extern
 #endif
 
+lib/string.h, lib/string.in.h 수정
+/* Define to extern for C */
+//#define _GL_EXTERN_C extern
+#ifdef __cplusplus
+extern "C" {
+#endif
+void rpl_free(void *);
+#ifdef __cplusplus
+}
+#endif
 
+(오류)
+lib/string.h:1040:19: error: expected declaration specifiers before '__attribute__'
+ 1040 |                   _GL_ARG_NONNULL ((1, 2)));
+      |                   ^~~~~~~~~~~~~~~
+lib/string.h:1203:19: error: expected declaration specifiers before '__attribute__'
+ 1203 |                   _GL_ARG_NONNULL ((1))
+      |                   ^~~~~~~~~~~~~~~
+lib/string.h:1302:19: error: expected declaration specifiers before '__attribute__'
+ 1302 |                   _GL_ARG_NONNULL ((1))
+      |                   ^~~~~~~~~~~~~~~
+(수정)
+_GL_FUNCDECL_SYS (stpcpy, char *,
+  (char *restrict __dst, char const *restrict __src),
+  //_GL_ARG_NONNULL ((1, 2))
+		  _GL_ARG_NONNULL_1_2
+		  );
 
+_GL_FUNCDECL_SYS (strdup, char *,
+                  (char const *__s)
+                  //_GL_ARG_NONNULL ((1))
+				  _GL__ARG_NONNULL_1
+                  _GL_ATTRIBUTE_MALLOC _GL_ATTRIBUTE_DEALLOC_FREE);
 
+_GL_FUNCDECL_SYS (strdup, char *,
+                  (char const *__s)
+                  //_GL_ARG_NONNULL ((1))
+				  _GL_ARG_NONNULL_1
+                  _GL_ATTRIBUTE_MALLOC _GL_ATTRIBUTE_DEALLOC_FREE);
 
+(오류)
+./config.h:394:28: error: expected declaration specifiers before '__attribute__'
+  394 | #define _GL_ATTRIBUTE_PURE __attribute__((pure))
+      |                            ^~~~~~~~~~~~~
+./config.h:346:29: error: expected declaration specifiers before '__attribute__'
+  346 | #define _GL_ARG_NONNULL_1_2 __attribute__((nonnull(1,2)))
+      |                             ^~~~~~~~~~~~~
+./config.h:343:27: error: expected declaration specifiers before '__attribute__'
+  343 | #define _GL_ARG_NONNULL_1 __attribute__((nonnull(1)))
+      |                           ^~~~~~~~~~~~~
+./config.h:343:27: error: expected declaration specifiers before '__attribute__'
+  343 | #define _GL_ARG_NONNULL_1 __attribute__((nonnull(1)))
+      |                           ^~~~~~~~~~~~~
 
-
-
+(수정)
 
 
 
