@@ -10649,54 +10649,76 @@ lib/color.h 수정
 
 
 (오류)
-lib/color.h:42:39: error: storage class specified for parameter 'color_test_mode'
-   42 | extern LIBTEXTSTYLE_DLL_VARIABLE bool color_test_mode;
+lib/color.h:54:39: error: storage class specified for parameter 'color_test_mode'
+   54 | extern LIBTEXTSTYLE_DLL_VARIABLE bool color_test_mode;
       |                                       ^~~~~~~~~~~~~~~
-lib/color.h:43:52: error: storage class specified for parameter 'color_mode'
-   43 | extern LIBTEXTSTYLE_DLL_VARIABLE enum color_option color_mode;
+lib/color.h:54:1: warning: 'dllimport' attribute ignored [-Wattributes]
+   54 | extern LIBTEXTSTYLE_DLL_VARIABLE bool color_test_mode;
+      | ^~~~~~
+lib/color.h:55:52: error: storage class specified for parameter 'color_mode'
+   55 | extern LIBTEXTSTYLE_DLL_VARIABLE enum color_option color_mode;
       |                                                    ^~~~~~~~~~
-lib/color.h:44:46: error: storage class specified for parameter 'style_file_name'
-   44 | extern LIBTEXTSTYLE_DLL_VARIABLE const char *style_file_name;
+lib/color.h:55:39: warning: 'dllimport' attribute ignored [-Wattributes]
+   55 | extern LIBTEXTSTYLE_DLL_VARIABLE enum color_option color_mode;
+      |                                       ^~~~~~~~~~~~
+lib/color.h:56:46: error: storage class specified for parameter 'style_file_name'
+   56 | extern LIBTEXTSTYLE_DLL_VARIABLE const char *style_file_name;
       |                                              ^~~~~~~~~~~~~~~
-lib/color.h:47:1: warning: empty declaration
-   47 | enum color_option { color_no, color_tty, color_yes, color_html };
+lib/color.h:56:1: warning: 'dllimport' attribute ignored [-Wattributes]
+   56 | extern LIBTEXTSTYLE_DLL_VARIABLE const char *style_file_name;
+      | ^~~~~~
+lib/color.h:59:1: warning: empty declaration
+   59 | enum color_option { color_no, color_tty, color_yes, color_html };
       | ^~~~
-lib/color.h:50:13: error: storage class specified for parameter 'handle_color_option'
-   50 | extern bool handle_color_option(const char *option);
+lib/color.h:62:13: error: storage class specified for parameter 'handle_color_option'
+   62 | extern bool handle_color_option(const char *option);
       |             ^~~~~~~~~~~~~~~~~~~
-lib/color.h:53:13: error: storage class specified for parameter 'handle_style_option'
-   53 | extern void handle_style_option(const char *option);
+lib/color.h:65:13: error: storage class specified for parameter 'handle_style_option'
+   65 | extern void handle_style_option(const char *option);
       |             ^~~~~~~~~~~~~~~~~~~
-lib/color.h:56:13: error: storage class specified for parameter 'print_color_test'
-   56 | extern void print_color_test(void);
+lib/color.h:68:13: error: storage class specified for parameter 'print_color_test'
+   68 | extern void print_color_test(void);
       |             ^~~~~~~~~~~~~~~~
-lib/color.h:69:13: error: storage class specified for parameter 'style_file_prepar
-'
-   69 | extern void style_file_prepare(const char *style_file_envvar,
+lib/color.h:81:13: error: storage class specified for parameter 'style_file_prepare'
+   81 | extern void style_file_prepare(const char *style_file_envvar,
       |             ^~~~~~~~~~~~~~~~~~
-lib/color.c:39:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '
-' token
-   39 | {
-      | ^
-lib/color.c:67:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '
-' token
-   67 | {
-      | ^
-lib/color.c:74:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '
-' token
-   74 | {
-      | ^
-lib/color.c:383:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before
-{' token
-  383 | {
-      | ^
-lib/color.c:415:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before
-{' token
-  415 | {
-      | ^
-lib/color.c:443: error: expected '{' at end of input
-
 (수정)
+함수 매개변수로 color_test_mode에 대해 저장 클래스(storage class)를 지정했다
+extern 키워드는 일반적으로 전역 변수를 선언할 때 사용되며, 함수 매개변수에 사용할 수 없다
+color_test_mode가 함수 매개변수가 아니라 전역 변수로 선언되었어야 하지만, 현재 잘못된 방식으로 선언
+extern은 전역 변수를 다른 파일에서 사용할 수 있게 선언할 때 사용하는데, 
+만약 이 선언이 함수 매개변수에서 사용되면 에러가 발생
+extern LIBTEXTSTYLE_DLL_VARIABLE bool color_test_mode;는 함수 바깥에서 전역 변수로 선언되어야 
+LIBTEXTSTYLE_DLL_VARIABLE 매크로가 dllimport를 포함하고 있는데, 이 속성이 무시되고 있다는 것
+잘못된 위치에서 dllimport 속성이 사용될 때 발생
+dllimport는 주로 윈도우 환경에서 다른 DLL에서 변수를 가져올 때 사용되며, 함수 매개변수에는 적용될 수 없음
+extern 키워드를 명시적으로 추가하면 이 변수가 전역 변수로 인식
+
+extern __declspec(dllexport) bool color_test_mode;
+lib/color.h:55:35: error: storage class specified for parameter 'color_test_mode'
+   55 | extern __declspec(dllexport) bool color_test_mode;
+      |                                   ^~~~~~~~~~~~~~~
+lib/color.h:55:1: warning: 'dllexport' attribute ignored [-Wattributes]
+   55 | extern __declspec(dllexport) bool color_test_mode;
+      | ^~~~~~
+
+extern __declspec(dllimport) enum color_option color_mode;
+lib/color.h:56:48: error: storage class specified for parameter 'color_mode'
+   56 | extern __declspec(dllimport) enum color_option color_mode;
+      |                                                ^~~~~~~~~~
+lib/color.h:56:35: warning: 'dllimport' attribute ignored [-Wattributes]
+   56 | extern __declspec(dllimport) enum color_option color_mode;
+      |                                   ^~~~~~~~~~~~
+
+extern const char *style_file_name;
+lib/color.h:57:20: error: storage class specified for parameter 'style_file_name'
+   57 | extern const char *style_file_name;
+      |                    ^~~~~~~~~~~~~~~
+
+
+
+
+
 
 
 
