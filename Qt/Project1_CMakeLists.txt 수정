@@ -10766,8 +10766,21 @@ AM_INIT_AUTOMAKE([-Wall -Werror foreign])  # Automake 초기화
 AC_PROG_CC
 
 (오류)
-color.c
-error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+lib/color.c:41:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+   41 | {
+      | ^
+lib/color.c:69:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+   69 | {
+      | ^
+lib/color.c:76:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+   76 | {
+      | ^
+lib/color.c:382:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  382 | {
+      | ^
+lib/color.c:414:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  414 | {
+      | ^
 (수정)
 lib/color.h 파일에서  #include "term-ostream.h" 를 넣으면 위와같은 에러가 계속 발생
 lib/term-osteram.h 수정
