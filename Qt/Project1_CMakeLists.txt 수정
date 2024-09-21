@@ -10783,15 +10783,55 @@ lib/color.c:414:1: error: expected '=', ',', ';', 'asm' or '__attribute__' befor
       | ^
 (수정)
 lib/color.h 파일에서  #include "term-ostream.h" 를 넣으면 위와같은 에러가 계속 발생
+lib/term_ostream.priv.h 
+typedef struct term_ostream_representation any_ostream_representation;
+
 lib/term-osteram.h 수정
-#include "term_ostream.priv.h" //term_ostream_t
-//typedef FILE * ostream_t;
+#include "term_ostream.priv.h"
+//typedef FILE * ostream_t;  //textstyle.h
 typedef struct term_ostream_representation* ostream_t;
 #if IS_CPLUSPLUS
 typedef ostream_t term_ostream_t;
 #else
 // typedef struct any_ostream_representation * term_ostream_t; //lib/term_ostream.priv.h와 중복정의되고있었음
 #endif 
+
+(오류)
+term-ostream.h:80:45: error: conflicting types for 'ostream_t'; have 'struct any_ostream_representation *'
+In file included from term-ostream.oo.h:30:
+lib/ostream.h:45:45: note: previous declaration of 'ostream_t' with type
+ostream_t' {aka 'struct term_ostream_representation *'}
+   45 | typedef struct term_ostream_representation* ostream_t;
+      |                                             ^~~~~~~~~
+term-ostream.h:85:2: error: expected specifier-qualifier-list before 'private'
+term-ostream.h:160:44: error: unknown type name 'term_ostream_t'; did you mean 'term_posture_t'?
+(수정)
+lib/ostream.h, lib/ostream.oo.h
+typedef struct term_ostream_representation* ostream_t;
+
+lib/term-ostream.h, lib/term-ostream.oo.h
+typedef struct term_ostream_representation *term_ostream_t;
+typedef struct any_ostream_representation *ostream_t;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
