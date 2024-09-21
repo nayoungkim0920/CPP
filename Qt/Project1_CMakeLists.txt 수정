@@ -10765,8 +10765,20 @@ AC_INIT([Your Program], [1.0], [bug@example.com])  # 프로그램 이름, 버전
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])  # Automake 초기화
 AC_PROG_CC
 
-
-
+(오류)
+color.c
+error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+(수정)
+lib/color.h 파일에서  #include "term-ostream.h" 를 넣으면 위와같은 에러가 계속 발생
+lib/term-osteram.h 수정
+#include "term_ostream.priv.h" //term_ostream_t
+//typedef FILE * ostream_t;
+typedef struct term_ostream_representation* ostream_t;
+#if IS_CPLUSPLUS
+typedef ostream_t term_ostream_t;
+#else
+// typedef struct any_ostream_representation * term_ostream_t;
+#endif 
 
 
 
