@@ -10777,7 +10777,7 @@ typedef struct term_ostream_representation* ostream_t;
 #if IS_CPLUSPLUS
 typedef ostream_t term_ostream_t;
 #else
-// typedef struct any_ostream_representation * term_ostream_t;
+// typedef struct any_ostream_representation * term_ostream_t; //lib/term_ostream.priv.h와 중복정의되고있었음
 #endif 
 
 
