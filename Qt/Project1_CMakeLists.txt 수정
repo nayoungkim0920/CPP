@@ -10783,41 +10783,52 @@ lib/color.c:414:1: error: expected '=', ',', ';', 'asm' or '__attribute__' befor
       | ^
 (수정)
 lib/color.h 파일에서  #include "term-ostream.h" 를 넣으면 위와같은 에러가 계속 발생
-lib/term_ostream.priv.h 
-typedef struct term_ostream_representation any_ostream_representation;
-
-lib/term-osteram.h 수정
-#include "term_ostream.priv.h"
-//typedef FILE * ostream_t;  //textstyle.h
-typedef struct term_ostream_representation* ostream_t;
-#if IS_CPLUSPLUS
-typedef ostream_t term_ostream_t;
-#else
-// typedef struct any_ostream_representation * term_ostream_t; //lib/term_ostream.priv.h와 중복정의되고있었음
-#endif 
+lib/term-ostream.h, lib/term-ostream.oo.h 수정
+385 line  extern bool is_instance_of_term_ostream (term_ostream_t stream); <-세미콜론누락
 
 (오류)
-term-ostream.h:80:45: error: conflicting types for 'ostream_t'; have 'struct any_ostream_representation *'
-In file included from term-ostream.oo.h:30:
-lib/ostream.h:45:45: note: previous declaration of 'ostream_t' with type
-ostream_t' {aka 'struct term_ostream_representation *'}
-   45 | typedef struct term_ostream_representation* ostream_t;
-      |                                             ^~~~~~~~~
-term-ostream.h:85:2: error: expected specifier-qualifier-list before 'private'
-term-ostream.h:160:44: error: unknown type name 'term_ostream_t'; did you mean 'term_posture_t'?
+lib/color.c: In function 'print_color_test':
+lib/color.c:84:18: error: storage size of 'stream' isn't known
+   84 |   term_ostream_t stream;
+      |                  ^~~~~~
+
 (수정)
-lib/ostream.h, lib/ostream.oo.h
-typedef struct term_ostream_representation* ostream_t;
+lib/term_ostream.priv.h 수정
+typedef struct => struct term_ostream_representation 로 수정
 
-lib/term-ostream.h, lib/term-ostream.oo.h
-typedef struct term_ostream_representation *term_ostream_t;
-typedef struct any_ostream_representation *ostream_t;
+(오류)
+lib/color.c: In function 'print_color_test':
+lib/color.c:91:22: error: incompatible type for argument 1 of 'ostream_write_str'
+   91 |   ostream_write_str (stream, "Colors (foreground/background):\n");
+      |                      ^~~~~~
+      |                      |
+      |                      term_ostream_t {aka struct term_ostream_representation}
+In file included from term-ostream.oo.h:30,
+                 from lib/color.h:30,
+                 from lib/color.c:18:
+lib/ostream.h:128:41: note: expected 'ostream_t' {aka 'struct term_ostream_representation *'} but argument is of type 'term_ostream_t' {aka 'struct term_ostream_representation'}
+  128 | extern void ostream_write_str(ostream_t stream, const char *string);
+      |                               ~~~~~~~~~~^~~~~~
+(수정)
+lib/term-ostream.h 수정
+//typedef struct term_ostream_representation term_ostream_t;
+typedef struct term_ostream_representation * term_ostream_t;
 
+(오류)
+lib/color.c: In function 'style_file_lookup':
+lib/color.c:374:8: error: implicit declaration of function 'IS_FILE_NAME_WITH_DIR' [-Wimplicit-function-declaration]
+  374 |   if (!IS_FILE_NAME_WITH_DIR (file_name))
+      |        ^~~~~~~~~~~~~~~~~~~~~
+lib/color.c:384:13: error: implicit declaration of function 'xconcatenated_filename' [-Wimplicit-function-declaration]
+  384 |             xconcatenated_filename (stylesdir_after_install, file_name, NULL);
+      |             ^~~~~~~~~~~~~~~~~~~~~~
+lib/color.c:384:13: error: initialization of 'char *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
+lib/color.c: In function 'style_file_prepare':
+lib/color.c:424:27: error: assignment to 'const char *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
+  424 |           style_file_name =
+      |                           ^
 
-
-
-
-
+(수정)
 
 
 
