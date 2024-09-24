@@ -10829,6 +10829,127 @@ lib/color.c:424:27: error: assignment to 'const char *' from 'int' makes pointer
       |                           ^
 
 (수정)
+lib/color.h 수정
+#include "filename.h"
+
+(오류)
+lib/color.c: In function 'style_file_lookup':
+lib/color.c:384:13: error: implicit declaration of function 'xconcatenated_filename' [-Wimplicit-function-declaration]
+  384 |             xconcatenated_filename (stylesdir_after_install, file_name, NULL);
+      |             ^~~~~~~~~~~~~~~~~~~~~~
+lib/color.c:384:13: error: initialization of 'char *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
+lib/color.c: In function 'style_file_prepare':
+lib/color.c:424:27: error: assignment to 'const char *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
+  424 |           style_file_name =
+      |                           ^
+
+(수정)
+lib/color.h 수정
+#include "concat-filename.h" 
+
+(오류)
+term-ostream.oo.c:1113:26: warning: 'struct any_ostream_representation' declared inside parameter list will not be visible outside of this definition or declaration
+term-ostream.oo.c: In function 'get_control_data':
+term-ostream.oo.c:1114:17: error: invalid use of undefined type 'struct any_ostream_representation'
+term-ostream.oo.c: In function 'out_color_change':
+term-ostream.oo.c:1289:17: error: 'struct term_ostream_representation' has no member named 'is_windows_console'
+term-ostream.oo.c:1299:45: error: 'struct term_ostream_representation' has no member named 'current_console_attributes'
+term-ostream.oo.c:1309:43: error: 'struct term_ostream_representation' has no member named 'handle'
+term-ostream.oo.c:1312:19: error: 'struct term_ostream_representation' has no member named 'current_console_attributes'
+(수정)
+HAVE_WINDOWS_CONSOLES가 config.h에 없어서 문제가 발생
+configure.ac 수정
+# 윈도우 콘솔 관련 라이브러리 또는 헤더 파일 체크
+AC_CHECK_HEADERS([windows.h], 
+    [AC_DEFINE([HAVE_WINDOWS_CONSOLES], [1], [Define to 1 if Windows consoles are available.])],
+    [AC_DEFINE([HAVE_WINDOWS_CONSOLES], [0], [Define to 0 if Windows consoles are not available.])]
+)
+
+config.h 생성
+/* Define to 0 if Windows consoles are not available. */
+#define HAVE_WINDOWS_CONSOLES 1
+
+(오류)
+In file included from ../lib/textstyle.h:36,
+                 from hello.c:21:
+../lib/term_ostream.priv.h:163:5: error: unknown type name 'HANDLE'
+  163 |     HANDLE handle;
+      |     ^~~~~~
+../lib/term_ostream.priv.h:201:5: error: unknown type name 'WORD'
+  201 |     WORD default_console_attributes;
+      |     ^~~~
+../lib/term_ostream.priv.h:202:5: error: unknown type name 'WORD'
+  202 |     WORD current_console_attributes;
+      |     ^~~~
+(수정)
+lib/term_ostream.priv.h 수정
+#include "config.h"
+#ifdef HAVE_WINDOWS_CONSOLES  // _WIN32
+#include <windows.h>	      // HANDLE, WORD
+#endif
+
+(오류)
+
+(수정)
+configure.ac 수정
+# 플랫폼별 시스템 헤더 설정
+AC_DEFUN([CHECK_WINDOWS_CONSOLES], [
+  AC_MSG_CHECKING([for Windows consoles])
+  if test -f /mingw64/include/windows.h; then
+    AC_DEFINE([HAVE_WINDOWS_CONSOLES], [1], [Define to 1 if you have Windows consoles.])
+    AC_MSG_RESULT([yes])
+  else
+    AC_MSG_RESULT([no])
+  fi
+])
+
+# 호출
+CHECK_WINDOWS_CONSOLES
+
+config.h 생성됨
+/* Define to 1 if you have Windows consoles. */
+#define HAVE_WINDOWS_CONSOLES 1
+
+lib/term-ostream.c, lib/term-ostream.oo.c 수정
+#include "config.h"
+#ifdef HAVE_WINDOWS_CONSOLES  
+#include <windows.h>	      // HANDLE, WORD
+#endif
+
+(오류)
+term-ostream.oo.c:1939:3: error: initialization of 'term_style_control_data * (*)(term_style_user_data *)' from incompatible pointer type 'struct term_style_control_data * (*)(struct term_ostream_representation *)' [-Wincompatible-pointer-types]
+term-ostream.oo.c:1939:3: note: (near initialization for 'controller.get_control_data')
+term-ostream.oo.c:1940:3: error: initialization of 'void (*)(term_style_user_data *)' from incompatible pointer type 'void (*)(struct term_ostream_representation *)' [-Wincompatible-pointer-types]
+(수정)
+lib/term-style-control.h
+struct term_style_controller {
+(정의) term_style_control_data *(*get_control_data)(term_style_user_data *);  /* Function to get control data */
+    void (*restore)(term_style_user_data *);  /* Restore terminal to default state */
+    _GL_ASYNC_SAFE void (*async_restore)(term_style_user_data *);  /* Async-safe restore function */
+    _GL_ASYNC_SAFE void (*async_set_attributes_from_default)(term_style_user_data *);  /* Set attributes from default */
+};
+lib/term-ostream.c, lib/term-ostream.oo.c 수정
+매개변수타입일치시킴
+//get_control_data (struct term_ostream_representation  * stream)
+//get_control_data (struct any_ostream_representation * stream)
+struct term_style_control_data *
+get_control_data (struct term_style_user_data  * stream)
+{
+  return  &stream->control_data; //term_style_control_data control_data;
+}
+
+(오류)
+term-ostream.oo.c: In function 'get_control_data':
+term-ostream.oo.c:1115:11: error: returning 'term_style_control_data **' from a function with incompatible return type 'struct term_style_control_data *' [-Wincompatible-pointer-types]
+
+(수정)
+&stream->control_data는 term_style_control_data ** 타입을 반환
+term_style_control_data * 타입을 반환하도록 수정
+struct term_style_control_data *
+get_control_data (struct term_ostream_representation *stream)
+{
+  return stream->control_data; // control_data 자체를 반환
+}
 
 
 
@@ -10839,6 +10960,22 @@ lib/color.c:424:27: error: assignment to 'const char *' from 'int' makes pointer
 
 
 
+
+
+
+
+(출력)
+#define VERSION 1.0
+
+#ifdef SOME_MACRO
+// 정상적인 경우
+#else
+#error "Please include config.h first. Current version: " STRINGIFY(VERSION)
+#endif
+
+#define STRINGIFY(x) #x
+
+=> error: Please include config.h first. Current version: "1.0"
 
 
 
