@@ -10951,12 +10951,106 @@ get_control_data (struct term_ostream_representation *stream)
   return stream->control_data; // control_data 자체를 반환
 }
 
+(오류)
+term-ostream.oo.c:1940:3: error: initialization of 'void (*)(term_style_user_data *)' from incompatible pointer type 'void (*)(struct term_ostream_representation *
+' [-Wincompatible-pointer-types]
+term-ostream.oo.c:1940:3: note: (near initialization for 'controller.restore')
+term-ostream.oo.c:1941:3: error: initialization of 'void (*)(term_style_user_data *)' from incompatible pointer type 'void (*)(struct term_ostream_representation *
+' [-Wincompatible-pointer-types]
+term-ostream.oo.c:1941:3: note: (near initialization for 'controller.async_restor
+')
+(수정)
+lib/term-style-control.h 정의확인
+struct term_style_controller {
+    term_style_control_data *(*get_control_data)(term_style_user_data *);  /* Function to get control data */
+    void (*restore)(term_style_user_data *);  /* Restore terminal to default state */
+    _GL_ASYNC_SAFE void (*async_restore)(term_style_user_data *);  /* Async-safe restore function */
+    _GL_ASYNC_SAFE void (*async_set_attributes_from_default)(term_style_user_data *);  /* Set attributes from default */
+};
+lib/term-ostream.c, lib/term-ostream.oo.c 수정
+// term_style_user_data로부터 control_data를 가져오는 함수
+//term_style_control_data *(*get_control_data)(term_style_user_data *);  /* Function to get control data */
+struct term_style_control_data *
+get_control_data (term_style_user_data * user_data)
+{
+    //struct term_ostream_representation *stream = (struct term_ostream_representation *)user_data; // 변환
+    return &user_data->control_data; // control_data는 term_style_control_data 타입이어야 합니다.
+}
 
+// 터미널을 기본 상태로 복원하는 함수
+//void (*restore)(term_style_user_data *);  /* Restore terminal to default state */
+static void
+restore(term_style_user_data * stream)
+//restore (struct term_ostream_representation * stream)
+//restore (struct any_ostream_representation * stream)
 
+// 비동기적으로 터미널을 기본 상태로 복원하는 함수
+// _GL_ASYNC_SAFE void (*async_restore)(term_style_user_data *);  /* Async-safe restore function */
+static _GL_ASYNC_SAFE void
+//async_restore (struct term_ostream_representation * stream)
+async_restore (term_style_user_data * stream)
 
+// 기본값으로부터 속성을 설정하는 비동기 함수
+//_GL_ASYNC_SAFE void (*async_set_attributes_from_default)(term_style_user_data *);  /* Set attributes from default */
+static _GL_ASYNC_SAFE void
+//async_set_attributes_from_default (struct term_ostream_representation * stream)
+async_set_attributes_from_default (term_style_user_data * stream)
 
+// term_style_controller 구조체 초기화
+static const struct term_style_controller controller =
+{
+  get_control_data,
+  restore,
+  async_restore,
+  async_set_attributes_from_default
+};
 
+(오류)
+term-ostream.oo.c: In function 'restore':
+term-ostream.oo.c:1827:13: error: 'term_style_user_data' has no member named 'is_windows_console'
+term-ostream.oo.c:1832:38: error: 'term_style_user_data' has no member named 'handle'
+term-ostream.oo.c:1832:54: error: 'term_style_user_data' has no member named 'default_console_attributes'
+term-ostream.oo.c:1840:22: error: 'term_style_user_data' has no member named 'fd'
+term-ostream.oo.c:1842:17: error: 'term_style_user_data' has no member named 'restore_colors'
+term-ostream.oo.c:1843:22: error: 'term_style_user_data' has no member named 'restore_colors'
+term-ostream.oo.c:1844:17: error: 'term_style_user_data' has no member named 'restore_weight'
+term-ostream.oo.c:1845:22: error: 'term_style_user_data' has no member named 'restore_weight'
+term-ostream.oo.c:1846:17: error: 'term_style_user_data' has no member named 'restore_posture'
+term-ostream.oo.c:1847:22: error: 'term_style_user_data' has no member named 'restore_posture'
+term-ostream.oo.c:1848:17: error: 'term_style_user_data' has no member named 'restore_underline'
+term-ostream.oo.c:1849:22: error: 'term_style_user_data' has no member named 'restore_underline'
+term-ostream.oo.c:1850:17: error: 'term_style_user_data' has no member named 'restore_hyperlink'
+term-ostream.oo.c:1851:22: error: 'term_style_user_data' has no member named 'restore_hyperlink'
 
+(수정)
+lib/term_ostream.priv.h
+struct term_ostream_representation의 멤버들임
+
+lib/term-ostream.h, lib/term-ostream.oo.h 수정
+term_style_control_data *(*get_control_data)(term_style_user_data *);  /* Function to get control data */
+
+lib/term-ostream.c, lib/term-ostream.oo.c 수정
+get_control_data (term_style_user_data * stream)
+{
+    return  stream->control_data; // control_data는 term_style_control_data 타입이어야 합니다.
+}
+
+static void restore (struct term_ostream_representation * stream) {}
+static _GL_ASYNC_SAFE void async_restore (struct term_ostream_representation * stream) {}
+static _GL_ASYNC_SAFE void async_set_attributes_from_default (struct term_ostream_representation * stream) {}
+
+(오류)
+term-ostream.oo.c:1973:55: error: unknown type name 'term_ostream_representation'; did you mean 'any_ostream_representation'?
+(수정)
+lib/term-ostream.c, lib/term-ostream.oo.c 수정
+term_style_user_data *convert_to_term_style_user_data(struct term_ostream_representation *rep) {
+    // 필요한 변환 로직 작성
+    return (term_style_user_data *) rep; // 가정: 직접 변환 가능할 때
+}
+
+(오류)
+
+(수정)
 
 
 
