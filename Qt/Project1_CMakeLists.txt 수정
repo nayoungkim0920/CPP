@@ -11043,14 +11043,184 @@ static _GL_ASYNC_SAFE void async_set_attributes_from_default (struct term_ostrea
 term-ostream.oo.c:1973:55: error: unknown type name 'term_ostream_representation'; did you mean 'any_ostream_representation'?
 (수정)
 lib/term-ostream.c, lib/term-ostream.oo.c 수정
+term_style_user_data *convert_to_term_style_user_data(struct term_ostream_representation *rep) { //struct 추가
+    // 필요한 변환 로직 작성
+    return (term_style_user_data *) rep; // 가정: 직접 변환 가능할 때
+}
+
+(오류)
+term-ostream.oo.c: In function 'output_buffer':
+term-ostream.oo.c:2020:82: error: passing argument 1 of 'convert_to_term_style_user_data' from incompatible pointer type [-Wincompatible-pointer-types]
+term-ostream.oo.c:1973:91: note: expected 'struct term_ostream_representation *' but argument is of type 'term_style_user_data *'
+term-ostream.oo.c: In function 'output_buffer':
+term-ostream.oo.c:2062:52: error: passing argument 2 of 'deactivate_term_non_default_mode' from incompatible pointer type [-Wincompatible-pointer-types]
+(수정)
+lib/term-ostream.c, lib/term-ostream.oo.c 수정
+//activate_term_non_default_mode(&controller, convert_to_term_style_user_data((term_style_user_data *) stream));
+activate_term_non_default_mode(&controller, convert_to_term_style_user_data((struct term_ostream_representation *) stream));
+
+//deactivate_term_non_default_mode(&controller, (term_style_user_data *) stream);
+deactivate_term_non_default_mode(&controller, convert_to_term_style_user_data((struct term_ostream_representation *) stream));
+
+(오류)
+In file included from term-ostream.oo.h:29,
+                 from lib/term-ostream.c:40:
+lib/term-style-control.h:58:68: note: expected 'term_style_user_data *' but argument is of type 'int'
+   58 |                                              term_style_user_data *user_data);
+      |                                              ~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~
+term-ostream.oo.c: At top level:
+term-ostream.oo.c:1974:23: error: conflicting types for 'convert_to_term_style_user_data'; have 'term_style_user_data *(struct term_ostream_representation *)'
+term-ostream.oo.c:1969:49: note: previous implicit declaration of 'convert_to_term_style_user_data' with type 'int()'
+term-ostream.oo.c: In function 'output_buffer':
+term-ostream.oo.c:2064:49: error: expected expression before ',' token
+term-ostream.oo.c:2064:2: error: too many arguments to function 'deactivate_term_non_default_mode'
+lib/term-style-control.h:57:13: note: declared here
+   57 | extern void deactivate_term_non_default_mode(const struct term_style_controller *controller,
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+(수정)
+오타 ,
+
+(오류)
+term-ostream.oo.c: In function 'activate_default_attr':
+term-ostream.oo.c:1969:49: error: implicit declaration of function 'convert_to_term_style_user_data' [-Wimplicit-function-declaration]
+term-ostream.oo.c:1969:49: error: passing argument 2 of 'deactivate_term_non_default_mode' makes pointer from integer without a cast [-Wint-conversion]
+
+(수정)
+lib/term-ostream.oo.c, lib/term-ostream.c 수정
+호출전에선언(위치변경)
 term_style_user_data *convert_to_term_style_user_data(struct term_ostream_representation *rep) {
     // 필요한 변환 로직 작성
     return (term_style_user_data *) rep; // 가정: 직접 변환 가능할 때
 }
 
 (오류)
+term-ostream.oo.c: In function 'term_ostream__free':
+term-ostream.oo.c:2204:50: error: passing argument 2 of 'deactivate_term_style_controller' from incompatible pointer type [-Wincompatible-pointer-types]
+(수정)
+lib/term-ostream.c 수정
+static void
+term_ostream__free (term_ostream_t stream)
+{
+//deactivate_term_style_controller (&controller, stream);
+deactivate_term_style_controller (&controller, convert_to_term_style_user_data((struct term_ostream_representation *) stream));
+}
+lib/term-ostream.oo.c 수정
+static void
+term_ostream::free (term_ostream_t stream)
+{
+  //deactivate_term_style_controller (&controller, stream);
+  deactivate_term_style_controller (&controller, convert_to_term_style_user_data((struct term_ostream_representation *) stream));
+}
+
+(오류)
+term-ostream.oo.c: In function 'term_ostream__set_hyperlink':
+term-ostream.oo.c:2333:32: error: implicit declaration of function 'XMALLOC' [-Wimplicit-function-declaration]
+term-ostream.oo.c:2333:41: error: expected expression before 'hyperlink_t'
+term-ostream.oo.c: In function 'term_ostream_create':
+term-ostream.oo.c:2865:20: error: implicit declaration of function 'XNMALLOC'; did you mean 'XMALLOC'? [-Wimplicit-function-declaration]
+(수정)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -rn 'XMALLOC' ./lib
+XMALLOC 정의가없음
+lib/xmalloca.h 수정
+#include <stdlib.h> // xmalloc 함수 선언이 포함된 경우
+#ifdef __cplusplus
+extern "C" {
+#endif
+#define XMALLOC(type) ((type *) xmalloc(sizeof(type)))
+#ifdef __cplusplus
+}
+#endif
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -rn 'XNMALLOC' ./lib
+XNMALLOC 정의가없음
+lib/xmalloca.h 수정
+#define XNMALLOC(count, type) ((type *) xmalloc ((count) * sizeof(type))) //XNMALLOC정의 추가
+
+(오류)
+term-ostream.oo.c: In function 'term_ostream_create':
+term-ostream.oo.c:2890:48: error: passing argument 2 of 'activate_term_style_controller' from incompatible pointer type [-Wincompatible-pointer-types]
+In file included from term-ostream.oo.h:29,
+                 from lib/term-ostream.c:40:
+lib/term-style-control.h:51:66: note: expected 'term_style_user_data *' but argument is of type 'term_ostream_t' {aka 'struct term_ostream_representation *'}
+   51 |                                            term_style_user_data *user_data,
+      |                                            ~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~
+(수정)
+lib/term-ostream.c, lib/term-ostream.oo.c 수정
+term_ostream_t
+term_ostream_create (int fd, const char *filename, ttyctl_t tty_control)
+{
+  /* Prepare tty control.  */
+  //activate_term_style_controller (&controller, stream, fd, tty_control);
+  activate_term_style_controller (&controller, convert_to_term_style_user_data((struct term_ostream_representation *) stream), fd, tty_control);
+}
+
+(오류)
+In file included from lib/ostream.h:9,
+                 from ostream.oo.c:21:
+lib/term_ostream.priv.h:148:5: error: unknown type name 'bool'
+  148 |     bool non_default_active;           /* Non-default mode status */
+      |     ^~~~
+(수정)
+lib/term_ostream.priv.h
+#include <stdbool.h> // bool
+
+(오류)
+In file included from lib/ostream.h:9,
+                 from ostream.oo.c:21:
+lib/term_ostream.priv.h:148:5: error: unknown type name 'bool'
+  148 |     bool non_default_active;           /* Non-default mode status */
+      |     ^~~~
+lib/term_ostream.priv.h:1:1: note: 'bool' is defined in header '<stdbool.h>'; this is probably fixable by adding '#include <stdbool.h>'
+  +++ |+#include <stdbool.h>
+    1 | #ifndef TTYCTL_T_H
+(수정)
+lib/term_ostream.priv.h 수정
+전역으로 이동
+#include "config.h"
+
+#ifdef HAVE_WINDOWS_CONSOLES  
+#include <windows.h>	      // HANDLE, WORD
+#endif
+
+#include <stdbool.h>		  // bool
+#include <pthread.h>          // Mutex
+#include <stdint.h>           // uint32_t, uint64_t
+#include "ostream.priv.h"     // Include the header where any_ostream_representation is defined
+
+(오류)
+lib/concat-filename.c: In function 'concatenated_filename':
+lib/concat-filename.c:69:7: error: implicit declaration of function 'stpcpy'; did you mean 'strcpy'? [-Wimplicit-function-declaration]
+   69 |   p = stpcpy (p, filename);
+      |       ^~~~~~
+      |       strcpy
+lib/concat-filename.c:69:5: error: assignment to 'char *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
+   69 |   p = stpcpy (p, filename);
+      |     ^
 
 (수정)
+lib/string.h
+#if 1
+//# if 0
+# if 1
+#  if !(defined __cplusplus && defined GNULIB_NAMESPACE)
+#   undef stpcpy
+#   define stpcpy rpl_stpcpy
+#  endif
+
+//#endif /* _GL_LTS_STRING_H */
+#endif /* _GL_LTS_STRING_H */
+
+lib/concat-filename.h, lib/concat-filename.h~ 수정
+#include "string.h" //stpcpy
+
+
+
+
+
+
+
+
 
 
 
