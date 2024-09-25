@@ -11214,6 +11214,229 @@ lib/string.h
 lib/concat-filename.h, lib/concat-filename.h~ 수정
 #include "string.h" //stpcpy
 
+(오류)
+lib/term-style-control.c:34:62: error: unknown type name 'term_ostream_t'; did you mean 'term_posture_
+'?
+   34 | struct term_style_user_data *convert_to_term_style_user_data(term_ostream_t *term_ostream) {
+      |                                                              ^~~~~~~~~~~~~~
+      |                                                              term_posture_t
+
+(수정)
+lib/term-style-control.h 수정
+#include "term-ostream.h"
+
+(오류)
+In file included from lib/term-style-control.c:57:
+lib/fatal-signal.h:95:14: error: unknown type name 'sigset_t'; did you mean '_sigset_t'?
+   95 | extern const sigset_t * get_fatal_signal_set (void);
+      |              ^~~~~~~~
+      |              _sigset_t
+
+(수정)
+lib/term-style-control.h 수정
+#ifdef _WIN32
+typedef _sigset_t sigset_t;
+#endif
+
+(오류)
+In file included from lib/term-style-control.c:58:
+lib/sig-handler.h:41:21: warning: 'struct sigaction' declared inside parameter list will not be visible outside of this definition or declaration
+   41 | get_handler (struct sigaction const *a)
+      |                     ^~~~~~~~~
+
+(수정)
+비POSIX환경에서는 제공되지 않아 구현해야함
+lib/sig-handler.h 수정
+#include <signal.h>
+
+_GL_INLINE_HEADER_BEGIN
+#ifndef SIG_HANDLER_INLINE
+# define SIG_HANDLER_INLINE _GL_INLINE
+#endif
+
+/* Convenience type when working with signal handlers.  */
+typedef void (*sa_handler_t) (int);
+
+#ifdef _WIN32  // Windows
+struct sigaction {
+    sa_handler_t sa_handler;  // 핸들러 함수 포인터 
+    sigset_t sa_mask;         // 신호 마스크
+    int sa_flags;             // 플래그
+    void (*sa_restorer)(void); // 복구 함수 포인터 (선택적)
+};
+#endif /* _WIN32 */
+
+(오류)
+lib/term-style-control.c: In function 'atexit_handler':
+lib/term-style-control.c:443:35: error: passing argument 1 of '((const struct term_style_controller *)active_controller)->restore' from incompatible pointer type [-Wincompatible-pointer-types]
+  443 |       active_controller->restore (active_user_data);
+      |                                   ^~~~~~~~~~~~~~~~
+      |                                   |
+      |                                   struct term_style_user_data *
+lib/term-style-control.c:443:35: note: expected 'struct term_ostream_representation *' but argument is of type 'struct term_style_user_data *'
+(수정)
+lib/term-style-control.h 확인
+void (*restore)(struct term_ostream_representation *); 
+
+lib/term-style-control.c 수정
+struct term_ostream_representation의 멤버를 사용하므로 
+//static struct term_style_user_data * volatile active_user_data; //struct term_ostream_representation *로 바꿔야함
+static struct term_ostream_representation * volatile active_user_data;
+
+(오류)
+lib/term-style-control.c: In function 'atexit_handler':
+lib/term-style-control.c:446:60: error: passing argument 2 of 'deactivate_term_non_default_mode' from incompatible pointer type [-Wincompatible-pointer-types]
+  446 |       deactivate_term_non_default_mode (active_controller, active_user_data);
+      |                                                            ^~~~~~~~~~~~~~~~
+      |                                                            |
+      |                                                            struct term_ostream_representation
+(수정)
+lib/term-style-control.h 수정
+extern void deactivate_term_non_default_mode(const struct term_style_controller *controller,
+struct term_ostream_representation *user_data);
+//term_style_user_data *user_data);
+
+extern void deactivate_term_style_controller(const struct term_style_controller *controller,
+struct term_ostream_representation *user_data);
+//term_style_user_data *user_data);
+
+lib/term-style-control.c 수정
+//deactivate_term_non_default_mode(&controller, (term_style_user_data *) stream);
+deactivate_term_non_default_mode(&controller, (struct term_ostream_representation *) stream);
+
+//deactivate_term_style_controller (&controller, stream);
+//deactivate_term_style_controller (&controller, convert_to_term_style_user_data((struct term_ostream_representation *) stream));
+deactivate_term_style_controller (&controller, (struct term_ostream_representation *) stream);
+
+(오류)
+term-ostream.oo.c: In function 'output_buffer':
+term-ostream.oo.c:2065:49: error: passing argument 2 of 'deactivate_term_non_default_mode' from incompatible pointer type [-Wincompatible-pointer-types]
+In file included from term-ostream.oo.h:29,
+                 from lib/term-ostream.c:40:
+lib/term-style-control.h:64:126: note: expected 'struct term_ostream_representation *' but argument is of type 'term_style_user_data *'
+   64 |                                                                                          struct term_ostream_representation *user_data);
+      |                                                                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~
+term-ostream.oo.c: In function 'term_ostream__free':
+term-ostream.oo.c:2206:50: error: passing argument 2 of 'deactivate_term_style_controller' from incompatible pointer type [-Wincompatible-pointer-types]
+lib/term-style-control.h:68:82: note: expected 'struct term_ostream_representation *' but argument is of type 'term_style_user_data *'
+   68 |                                              struct term_ostream_representation *user_data);
+      |                                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~
+
+(수정)
+lib/term-ostream.c, lib/term-ostream.oo.c 수정
+static void
+output_buffer (term_ostream_t stream, attributes_t goal_attr){
+if (equal_attributes (goal_attr, stream->default_attr))
+//deactivate_term_non_default_mode (&controller, stream);
+//deactivate_term_non_default_mode (&controller, convert_to_term_style_user_data((struct term_ostream_representation *) stream));
+deactivate_term_non_default_mode (&controller, (struct term_ostream_representation *) stream);
+}
+
+static void
+term_ostream__free (term_ostream_t stream)
+{
+//deactivate_term_style_controller (&controller, stream);
+//deactivate_term_style_controller (&controller, convert_to_term_style_user_data((struct term_ostream_representation *) stream));
+deactivate_term_style_controller (&controller, (struct term_ostream_representation *) stream);
+}
+
+(오류)
+lib/term-style-control.c: In function 'init_relevant_signal_set':
+lib/term-style-control.c:584:7: error: implicit declaration of function 'sigemptyset' [-Wimplicit-function-declaration]
+  584 |       sigemptyset (&relevant_signal_set);
+      |       ^~~~~~~~~~~
+lib/term-style-control.c:586:9: error: implicit declaration of function 'sigaddset' [-Wimplicit-function-declaration]
+  586 |         sigaddset (&relevant_signal_set, fatal_signals[i]);
+      |         ^~~~~~~~~
+lib/term-style-control.c: In function 'block_relevant_signals':
+lib/term-style-control.c:605:3: error: implicit declaration of function 'sigprocmask' [-Wimplicit-function-declaration]
+  605 |   sigprocmask (SIG_BLOCK, &relevant_signal_set, NULL);
+      |   ^~~~~~~~~~~
+
+(수정)
+lib/term-style-control.h 수정
+#ifdef _WIN32
+typedef unsigned int sigset_t;
+
+int sigemptyset(sigset_t *set) {
+    if (set) {
+        *set = 0;
+        return 0;
+    }
+    return -1;
+}
+
+int sigaddset(sigset_t *set, int signal) {
+    if (set && signal > 0 && signal < 32) {
+        *set |= (1U << signal);
+        return 0;
+    }
+    return -1;
+}
+
+int sigprocmask(int how, const sigset_t *set, sigset_t *oldset) {
+    return 0;
+}
+#endif /* _WIN32 */
+
+(오류)
+lib/term-style-control.c: In function 'activate_term_non_default_mode':
+lib/term-style-control.c:921:24: error: assignment to 'struct term_ostream_representation *' from incompatible pointer type 'struct term_style_user_data *' [-Wincompatible-pointer-types]
+  921 |       active_user_data = user_data;
+      |                        ^
+lib/term-style-control.c: In function 'deactivate_term_non_default_mode':
+lib/term-style-control.c:943:35: error: passing argument 1 of 'controller->get_control_data' from incompatible pointer type [-Wincompatible-pointer-types]
+  943 |     controller->get_control_data (user_data);
+      |                                   ^~~~~~~~~
+      |                                   |
+      |                                   struct term_ostream_representation *
+lib/term-style-control.c:943:35: note: expected 'term_style_user_data *' but argument is of type 'struct term_ostream_representation *'
+lib/term-style-control.c: In function 'deactivate_term_style_controller':
+lib/term-style-control.c:1035:35: error: passing argument 1 of 'controller->get_control_data' from incompatible pointer type [-Wincompatible-pointer-types]
+ 1035 |     controller->get_control_data (user_data);
+      |                                   ^~~~~~~~~
+      |                                   |
+      |                                   struct term_ostream_representation *
+lib/term-style-control.c:1035:35: note: expected 'term_style_user_data *' but argument is of type 'struct term_ostream_representation *'
+
+(수정)
+lib/term-style-control.h 수정
+extern void activate_term_non_default_mode(const struct term_style_controller *controller,
+struct term_ostream_representation *user_data);
+//term_style_user_data *user_data);
+
+lib/term-style-control.c 수정
+void
+activate_term_non_default_mode (const struct term_style_controller *controller,
+struct term_ostream_representation *user_data)
+//struct term_style_user_data *user_data)
+
+void
+deactivate_term_non_default_mode (const struct term_style_controller *controller,
+                                  struct term_ostream_representation *user_data)
+				  //struct term_style_user_data *user_data)
+{
+struct term_style_control_data *control_data =
+controller->get_control_data ((term_style_user_data * )user_data);
+//controller->get_control_data (user_data);
+}
+
+void
+deactivate_term_style_controller (const struct term_style_controller *controller,
+								  struct term_ostream_representation *user_data)
+                                  //struct term_style_user_data *user_data)
+{
+struct term_style_control_data *control_data =
+controller->get_control_data ((term_style_user_data * )user_data);
+//controller->get_control_data (user_data);
+}
+
+
+
+
+
+
+
 
 
 
