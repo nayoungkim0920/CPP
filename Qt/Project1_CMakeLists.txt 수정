@@ -11431,15 +11431,321 @@ controller->get_control_data ((term_style_user_data * )user_data);
 //controller->get_control_data (user_data);
 }
 
+(오류)
+term-ostream.oo.c: In function 'output_buffer':
+term-ostream.oo.c:2023:50: error: passing argument 2 of 'activate_term_non_default_mode' from incompatible pointer type [-Wincompatible-pointer-types]
+In file included from term-ostream.oo.h:29,
+                 from lib/term-ostream.c:40:
+lib/term-style-control.h:81:125: note: expected 'struct term_ostream_representation
+' but argument is of type 'term_style_user_data *'
+   81 |
+           struct term_ostream_representation *user_data);
+      |
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~
+term-ostream.oo.c:2058:46: error: passing argument 2 of 'activate_term_non_default_mode' from incompatible pointer type [-Wincompatible-pointer-types]
+lib/term-style-control.h:81:125: note: expected 'struct term_ostream_representation
+' but argument is of type 'term_style_user_data *'
+   81 |
+           struct term_ostream_representation *user_data);
+      |
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~
+(수정)
+lib/term-ostream.c, lib/term-ostream.oo.c 수정
+static void
+output_buffer (term_ostream_t stream, attributes_t goal_attr)
+{
+//activate_term_non_default_mode(&controller, convert_to_term_style_user_data((term_style_user_data *) stream));
+//activate_term_non_default_mode(&controller, convert_to_term_style_user_data((struct term_ostream_representation *) stream));
+activate_term_non_default_mode(&controller, (struct term_ostream_representation *) stream);
 
+if (!equal_attributes (goal_attr, stream->default_attr))
+//activate_term_non_default_mode (&controller, stream);
+//activate_term_non_default_mode(&controller, convert_to_term_style_user_data((struct term_ostream_representation *) stream));
+activate_term_non_default_mode(&controller, (struct term_ostream_representation *) stream);
+}
 
+(오류)
+lib/term-style-control.c: In function 'activate_term_non_default_mode':
+lib/term-style-control.c:894:35: error: passing argument 1 of 'controller->get_control_data' from incompatible pointer type [-Wincompatible-pointer-types]
+  894 |     controller->get_control_data (user_data);
+      |                                   ^~~~~~~~~
+      |                                   |
+      |                                   struct term_ostream_representation *
+lib/term-style-control.c:894:35: note: expected 'term_style_user_data *' but argument is of type 'struct term_ostream_representation *'
 
+(수정)
+lib/term-style-control.c 수정
+void
+activate_term_non_default_mode (const struct term_style_controller *controller,
+                                struct term_ostream_representation *user_data)
+				//struct term_style_user_data *user_data)
+{
+  struct term_style_control_data *control_data =
+    controller->get_control_data ((struct term_style_user_data * ) user_data);
+    //controller->get_control_data (user_data);
+}
 
+(오류)
+더이상오류경고메시지가 출력되지않는데 마지막메시지가 
+make[2]: *** [Makefile:922: libtextstyle.la] 오류 1
+make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle' 나감
+make[1]: *** [Makefile:958: all-recursive] 오류 1
+make[1]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle' 나감
+make: *** [Makefile:814: all] 오류 2
+이렇게 나와 상세한 오류를 봐야할것같아 명령어에 옵션들을 추가하기로함
+(수정)
+명령어수정
+aclocal 2>&1 && autoconf 2>&1 && autoheader 2>&1 && automake --add-missing 2>&1 && libtoolize 2>&1 && autoreconf -ivf 2>&1 && ./configure 2>&1 && make clean 2>&1 && make 2>&1 || echo "An error occurred in the build process."
 
+(오류)
+rmdir: failed to remove 'sys': Directory not empty
+(수정)
+lib/sys 백업 후 lib/sys 비우고 다시 make 명령어를 실행
 
+(오류)
+multiple definition of `sigaddset'; lib/.libs/color.o:color.c:(.text+0xf0): first defined here
+multiple definition of `sigprocmask'; lib/.libs/color.o:color.c:(.text+0x120): first defined here
+multiple definition of `sigemptyset'; lib/.libs/color.o:color.c:(.text+0xd0): first defined here
 
+(수정)
+sigemptyset, sigaddset, sigprocmask와 같은 함수들이 여러 파일에서 중복 정의
+grep -rnw './lib' -e 'sigaddset' 명령어를 실행한 후, 해당 경로의 모든 파일에서 sigaddset이라는 심볼을 검색
+./lib/term-style-control.h:26:int sigaddset(sigset_t *set, int signal) //사용자 정의
+./lib/signal.h:806:_GL_FUNCDECL_SYS (sigaddset, int, (sigset_t *set, int sig) //시스템에서 제공
+./lib/signal.in.h:272:_GL_FUNCDECL_SYS (sigaddset, int, (sigset_t *set, int sig) //시스템에서 제공
+./lib/signal.in.h:275:_GL_CXXALIAS_SYS (sigaddset, int, (sigset_t *set, int sig)); //시스템에서 제공
+term-style-control.h 수정
+// 재정의 오류 signal.h
+// int sigemptyset(sigset_t *set) {
+//     if (set) {
+//         *set = 0;
+//         return 0;
+//     }
+//     return -1;
+// }
 
+// 재정의 오류 signal.h
+// int sigaddset(sigset_t *set, int signal) {
+//     if (set && signal > 0 && signal < 32) {
+//         *set |= (1U << signal);
+//         return 0;
+//     }
+//     return -1;
+// }
 
+// 재정의 오류 signal.h
+// int sigprocmask(int how, const sigset_t *set, sigset_t *oldset) {
+//     return 0;
+// }
+
+(오류)
+undefined reference to `tparm'; lib/.libs/color.o:color.c: line 50
+undefined reference to `tputs'; lib/.libs/color.o:color.c: line 55
+undefined reference to `xmalloc'; lib/.libs/color.o:color.c: line 60
+undefined reference to `xrealloc'; lib/.libs/color.o:color.c: line 65
+undefined reference to `_gl_nothrow_get_osfhandle'; lib/.libs/color.o:color.c: line 70
+undefined reference to `xgethostname'; lib/.libs/color.o:color.c: line 75
+
+(수정)
+configure.ac 수정
+
+# GNULIB 모듈 정의
+GNULIB_MODULES="
+    ncurses
+    terminfo
+    xmalloc
+    xrealloc
+    xgethostname
+    _gl_nothrow_get_osfhandle
+"
+
+m4_pattern_allow([GNULIB_MODULES]) # 허용 패턴 설정
+
+AC_CHECK_LIB([ncurses], [tputs]) # ncurses 라이브러리 링크 추가
+
+Makefile.am 수정
+lib_LTLIBRARIES = libtextstyle.la 
+libtextstyle_la_SOURCES = \
+	lib/color.c \
+	lib/gl_array_list.c \
+	lib/term-ostream.c \
+	lib/ostream.c \
+	lib/concat-filename.c \
+	lib/xconcat-filename.c \
+    lib/xsize.c \
+	lib/error.c \
+	lib/full-write.c \
+	lib/term-style-control.c \
+	lib/fsync.c \
+	lib/xstrdup.c
+libyourlib_la_LIBS = -lncurses $(GNULIB_LIBS)
+
+(오류)
+lib/term-style-control.c: In function 'init_relevant_signal_set':
+lib/term-style-control.c:584:7: error: implicit declaration of function 'sigemptyset' [-Wimplicit-function-declaration]
+  584 |       sigemptyset (&relevant_signal_set);
+      |       ^~~~~~~~~~~
+lib/term-style-control.c:586:9: error: implicit declaration of function 'sigaddset'
+-Wimplicit-function-declaration]
+  586 |         sigaddset (&relevant_signal_set, fatal_signals[i]);
+      |         ^~~~~~~~~
+lib/term-style-control.c: In function 'block_relevant_signals':
+lib/term-style-control.c:605:3: error: implicit declaration of function 'sigprocmask' [-Wimplicit-function-declaration]
+  605 |   sigprocmask (SIG_BLOCK, &relevant_signal_set, NULL);
+      |   ^~~~~~~~~~~
+(수정)
+color.c에서 term-style-control.h에서 posix 함수들 중복정의로 주석처리한 부분을 같이 사용할 수 없어서
+term-style-control.c 전용함수로 주석제거후 함수명 바꿔서 사용하기로 함
+lib/term-style-control.h 수정
+#ifdef _WIN32 // POSIX 미제공
+typedef unsigned int sigset_t;
+
+#ifndef sigemptyset
+extern int sigemptyset(sigset_t *set) {
+    if (set) {
+        *set = 0;
+        return 0;
+    }
+    return -1;
+}
+#endif
+
+#ifndef sigaddset
+extern int sigaddset(sigset_t *set, int signal) {
+    if (set && signal > 0 && signal < 32) {
+        *set |= (1U << signal);
+        return 0;
+    }
+    return -1;
+}
+#endif
+
+#ifndef sigprocmask
+extern int sigprocmask(int how, const sigset_t *set, sigset_t *oldset) {
+    return 0;
+}
+#endif
+
+#endif /* _WIN32 */
+
+(오류)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# aclocal 2>&1 && autoconf 2>&1 && autoheader 2>&1 && automake --add-missing 2>&1 && libtoolize 2>&1 && autoreconf -ivf 2>&1 && ./configure 2>&1 && make clean 2>&1 && make 2>&1 || echo "An error occurred in the build process."
+
+(수정)
+aclocal --verbose 2>&1 && \
+autoconf --verbose 2>&1 && \
+autoheader --verbose 2>&1 && \
+automake --add-missing --verbose 2>&1 && \
+libtoolize --verbose 2>&1 && \
+autoreconf -ivf 2>&1 && \
+./configure --verbose 2>&1 && \
+make clean 2>&1 && \
+make 2>&1 || echo "An error occurred in the build process."
+
+(오류)
+모든오류출력설정하기
+(수정)
+Makefile.am 수정
+CFLAGS = -Wall -Wextra -Wpedantic -fdiagnostics-show-option #모든 경고와 추가적인 경고를 활성화
+(직접실행옵션으로 : make CFLAGS="-Wall -Wextra -Wpedantic -fdiagnostics-show-option" )
+-Werror : 모든 경고를 오류로 처리하고 
+-fverbose-asm : 등을 사용하여 어셈블리 코드 출력 시 더 많은 정보를 받을 수 있습니다.
+make VERBOSE=1 : 컴파일러 명령어가 화면에 표시됩니다.
+-fdiagnostics-show-option : 경고가 발생한 위치를 명확히 보여줍니다.
+-Wfatal-errors : 경고가 발생하더라도 컴파일을 계속하게 하려면 이 플래그를 사용해도 좋습니다.
+모든 경고를 활성화 : GNU GCC 컴파일러의 경우 -Wall 플래그는 기본적으로 모든 경고를 활성화합니다. 
+그러나 추가적인 경고를 추가하고 싶다면 -Wextra와 -pedantic을 고려할 수 있습니다.
+
+- 빌드명령어
+aclocal --verbose 2>&1 && \
+autoconf --verbose 2>&1 && \
+autoheader --verbose 2>&1 && \
+automake --add-missing --verbose 2>&1 && \
+libtoolize --verbose 2>&1 && \
+autoreconf -ivf 2>&1 && \
+./configure --verbose 2>&1 && \
+make clean 2>&1 && \
+make 2>&1 || \
+echo "An error occurred in the build process."
+
+aclocal: aclocal.m4 파일을 생성하여 사용자 정의 매크로를 포함합니다.
+autoconf: configure 스크립트를 생성합니다.
+autoheader: config.h.in 파일을 생성하여 헤더 파일의 매크로를 설정합니다.
+automake: Makefile.in 파일을 생성하고 필요한 파일을 추가합니다.
+libtoolize: Libtool을 초기화합니다.
+autoreconf: 위의 모든 도구를 호출하여 설정을 업데이트합니다.
+./configure: 구성 스크립트를 실행하여 Makefile을 생성합니다.
+make clean: 이전 빌드를 청소합니다.
+make: 프로그램을 빌드합니다
+
+(오류)
+lib/term-style-control.h:39:28: warning: unused parameter 'how' [-Wunused-parameter]
+extern int sigprocmask(int how, const sigset_t *set, sigset_t *oldset) {
+                         ~~~~^~~
+lib/term-style-control.h: In function 'sigprocmask':
+lib/term-style-control.h:39:49: warning: unused parameter 'set' [-Wunused-parameter]
+   39 | extern int sigprocmask(int how, const sigset_t *set, sigset_t *oldset) {
+      |                                 ~~~~~~~~~~~~~~~~^~~
+lib/term-style-control.h:39:64: warning: unused parameter 'oldset' [-Wunused-parameter]
+   39 | extern int sigprocmask(int how, const sigset_t *set, sigset_t *oldset) {
+      |                                                      ~~~~~~~~~~^~~~~~
+(수정)
+매개변수를 사용하는 코드를 추가하거나, 
+사용하지 않기로 결정했다면 매개변수 이름 앞에 (void)를 추가하여 사용되지 않음을 명시할 수 있다.
+#ifndef sigprocmask
+extern int sigprocmask(int how, const sigset_t *set, sigset_t *oldset) {
+	(void)how;  // 사용하지 않음을 명시
+	(void)set; // 사용하지 않음을 명시
+	(void)oldset; // 사용하지 않음을 명시
+    return 0;
+}
+#endif
+
+(오류)
+lib/color.h:47:39: warning: ISO C forbids forward references to 'enum' types [-Wpedantic]
+   47 | extern LIBTEXTSTYLE_DLL_VARIABLE enum color_option color_mode;
+      |                                       ^~~~~~~~~~~~
+(수정)
+lib/color.c 수정
+/* Color option enumeration */
+enum color_option { color_no, color_tty, color_yes, color_html };
+
+/* External variables with DLL export macro */
+extern LIBTEXTSTYLE_DLL_VARIABLE bool color_test_mode;
+extern LIBTEXTSTYLE_DLL_VARIABLE enum color_option color_mode;
+extern LIBTEXTSTYLE_DLL_VARIABLE const char *style_file_name;
+
+(오류)
+term-ostream.oo.c: In function 'out_color_change':
+term-ostream.oo.c:1379:51: warning: comparison of integer expressions of different signedness:
+'size_t' {aka 'long long unsigned int'} and 'long long int' [-Wsign-compar
+]
+term-ostream.oo.c:1399:51: warning: comparison of integer expressions of different signedness: 
+'size_t' {aka 'long long unsigned int'} and 'long long int' [-Wsign-compar
+]
+term-ostream.oo.c:1434:51: warning: comparison of integer expressions of different signedness: 
+'size_t' {aka 'long long unsigned int'} and 'long long int' [-Wsign-compar
+]
+(수정)
+lib/term-ostream.c, lib/term-ostream.oo.c 수정
+static _GL_ASYNC_SAFE void
+out_color_change(term_ostream_t stream, term_color_t new_color, bool async_safe)
+{
+내부적으로 size_t를 사용하는 경우가 많음
+//if (full_write (out_fd, bytes, p - bytes) < p - bytes)
+if (full_write(out_fd, bytes, (size_t)(p - bytes)) < (size_t)(p - bytes))
+  if (!async_safe)
+    out_error ();
+//if (full_write (out_fd, bytes, p - bytes) < p - bytes)
+if (full_write(out_fd, bytes, (size_t)(p - bytes)) < (size_t)(p - bytes))
+  if (!async_safe)
+    out_error ();
+//if (full_write (out_fd, bytes, p - bytes) < p - bytes)
+if (full_write(out_fd, bytes, (size_t)(p - bytes)) < (size_t)(p - bytes))
+  if (!async_safe)
+    out_error ();
+}
 
 
 
