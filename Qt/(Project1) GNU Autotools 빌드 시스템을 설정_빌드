@@ -11747,6 +11747,311 @@ if (full_write(out_fd, bytes, (size_t)(p - bytes)) < (size_t)(p - bytes))
     out_error ();
 }
 
+(오류)
+term-ostream.oo.c:1284:17: warning: unused variable 'color_change_cmd' [-Wunused-variable]
+(수정)
+lib/term-ostream.c, lib/term-ostream.oo.c 수정
+static _GL_ASYNC_SAFE void
+out_color_change(term_ostream_t stream, term_color_t new_color, bool async_safe)
+{
+(void)color_change_cmd; // 사용하지 않음을 명시
+(void)buffer; // 사용하지 않음을 명시
+}
+
+(오류)
+term-ostream.oo.c: In function 'term_ostream__write_mem':
+term-ostream.oo.c:2136:37: warning: operand of '?:' changes signedness from 'long long int' 
+to 'size_t' {aka 'long long unsigned int'} due to unsignedness of other operand [-Wsign-compare]
+
+(수정)
+lib/term-ostream.c 수정
+static void
+term_ostream__write_mem (term_ostream_t stream, const void *data, size_t len)
+{
+//if (full_write (stream->fd, "\n", 1) < 1)
+if (full_write(stream->fd, "\n", 1) < (ssize_t)1)
+  error (EXIT_FAILURE, errno, _("error writing to %s"),
+  stream->filename);
+}
+
+lib/term-ostream.oo.c 수정
+static void
+term_ostream::write_mem (term_ostream_t stream, const void *data, size_t len)
+{
+//if (full_write (stream->fd, "\n", 1) < 1)
+if (full_write(stream->fd, "\n", 1) < (ssize_t)1)
+  error (EXIT_FAILURE, errno, _("error writing to %s"),
+  stream->filename);
+}
+
+(오류)
+ostream.c: In function 'ostream__write_mem':
+ostream.c:87:31: warning: unused parameter 'first_arg' [-Wunused-parameter]
+ostream.c:87:54: warning: unused parameter 'data' [-Wunused-parameter]
+ostream.c:87:67: warning: unused parameter 'len' [-Wunused-parameter]
+ostream.c: In function 'ostream__flush':
+ostream.c:98:27: warning: unused parameter 'first_arg' [-Wunused-parameter]
+ostream.c:98:60: warning: unused parameter 'scope' [-Wunused-parameter]
+ostream.c: In function 'ostream__free':
+ostream.c:109:26: warning: unused parameter 'first_arg' [-Wunused-parameter]
+
+(수정)
+lib/ostream.c 수정
+void
+ostream__write_mem (ostream_t first_arg, const void *data, size_t len)
+{
+(void)first_arg;
+(void)data;
+(void)len;
+}
+
+void
+ostream__flush (ostream_t first_arg, ostream_flush_scope_t scope)
+{
+(void)first_arg; //사용되지않음 정의
+(void)scope; //사용되지않음 정의
+}
+
+void
+ostream__free (ostream_t first_arg)
+{
+(void)first_arg; //사용되지않음을 정의
+}
+
+(오류)
+term-ostream.oo.c: In function 'out_bgcolor_change':
+term-ostream.oo.c:1535:51: warning: comparison of integer expressions of different signedness: 'size_t' {aka 'long long unsigned int'} and 'long long int' [-Wsign-compar
+]
+term-ostream.oo.c:1555:51: warning: comparison of integer expressions of different signedness: 'size_t' {aka 'long long unsigned int'} and 'long long int' [-Wsign-compar
+]
+term-ostream.oo.c:1590:51: warning: comparison of integer expressions of different signedness: 'size_t' {aka 'long long unsigned int'} and 'long long int' [-Wsign-compar
+]
+(수정)
+lib/term-ostream.oo.c, lib/term-ostream.c 수정
+case cm_xterm8:
+		assert(new_bgcolor >= 0 && new_bgcolor < 8);
+		{
+			char bytes[5];
+			bytes[0] = 0x1B; bytes[1] = '[';
+			bytes[2] = '4'; bytes[3] = '0' + new_bgcolor;
+			bytes[4] = 'm';
+			ssize_t written = full_write(out_fd, bytes, 5);
+			if (written < 0 || (size_t)written < 5) {
+			if (!async_safe)
+				out_error();
+			}
+		}
+		break;
+
+	case cm_xterm16:
+		assert(new_bgcolor >= 0 && new_bgcolor < 16);
+		{
+			char bytes[6];
+			bytes[0] = 0x1B; bytes[1] = '[';
+			if (new_bgcolor < 8) {
+			bytes[2] = '4'; bytes[3] = '0' + new_bgcolor;
+			bytes[4] = 'm';
+			ssize_t written = full_write(out_fd, bytes, 5);
+			if (written < 0 || (size_t)written < 5) {
+				if (!async_safe)
+				out_error();
+			}
+			} else {
+			bytes[2] = '1'; bytes[3] = '0';
+			bytes[4] = '0' + (new_bgcolor - 8); bytes[5] = 'm';
+			ssize_t written = full_write(out_fd, bytes, 6);
+			if (written < 0 || (size_t)written < 6) {
+				if (!async_safe)
+				out_error();
+			}
+			}
+		}
+	break;
+    case cm_xterm88:
+	assert(new_bgcolor >= 0 && new_bgcolor < 88);
+	{
+		char bytes[10];
+		char *p;
+		bytes[0] = 0x1B; bytes[1] = '[';
+		bytes[2] = '4'; bytes[3] = '8'; bytes[4] = ';';
+		bytes[5] = '5'; bytes[6] = ';';
+		p = bytes + 7;
+        if (new_color >= 10)
+        *p++ = '0' + (new_color / 10);
+        *p++ = '0' + (new_color % 10);
+        *p++ = 'm';
+        //if (full_write (out_fd, bytes, p - bytes) < p - bytes)
+        if (full_write(out_fd, bytes, (size_t)(p - bytes)) < (size_t)(p - bytes))
+          if (!async_safe)
+            out_error ();
+      }
+      break;
+(오류)
+term-ostream.oo.c: In function 'term_ostream__write_mem':
+term-ostream.oo.c:2141:37: warning: operand of '?:' 
+changes signedness from 'long long int' to 'size_t' {aka 'long long unsigned int'} 
+due to unsignedness of other operand [-Wsign-compare]
+(수정)
+lib/term-ostream.oo.c, lib/term-ostream.c 수정
+static void
+term_ostream__write_mem(term_ostream_t stream, const void *data, size_t len)
+{
+    const char *cp = (const char *)data;
+    while (len > 0)
+    {
+        /* Look for the next newline.  */
+        const char *newline = (const char *)memchr(cp, '\n', len);
+        size_t n = (newline != NULL ? newline - cp : len);
+
+        /* Copy n bytes into the buffer.  */
+        if (n > stream->allocated - stream->buflen)
+        {
+            size_t new_allocated =
+                xmax(xsum(stream->buflen, n),
+                     xsum(stream->allocated, stream->allocated));
+            if (size_overflow_p(new_allocated))
+                error(EXIT_FAILURE, 0,
+                      _("%s: too much output, buffer size overflow"),
+                      "term_ostream");
+
+            // Reallocate buffers safely
+            char *new_buffer = (char *)realloc(stream->buffer, new_allocated);
+            if (new_buffer == NULL) // Check for realloc failure
+                error(EXIT_FAILURE, errno, _("memory allocation failure"));
+            stream->buffer = new_buffer;
+
+            attributes_t *new_attrbuffer = (attributes_t *)
+                realloc(stream->attrbuffer, new_allocated * sizeof(attributes_t));
+            if (new_attrbuffer == NULL) // Check for realloc failure
+                error(EXIT_FAILURE, errno, _("memory allocation failure"));
+            stream->attrbuffer = new_attrbuffer;
+
+            stream->allocated = new_allocated;
+        }
+
+        memcpy(stream->buffer + stream->buflen, cp, n);
+        {
+            attributes_t attr = stream->simp_attr;
+            attributes_t *ap = stream->attrbuffer + stream->buflen;
+            attributes_t *ap_end = ap + n;
+            for (; ap < ap_end; ap++)
+                *ap = attr;
+        }
+        stream->buflen += n;
+
+        if (newline != NULL)
+        {
+            output_buffer(stream, stream->default_attr);
+            if (full_write(stream->fd, "\n", 1) < (ssize_t)1)
+                error(EXIT_FAILURE, errno, _("error writing to %s"),
+                      stream->filename);
+            cp += n + 1; /* cp = newline + 1; */
+            len -= n + 1;
+        }
+        else
+            break;
+    }
+}
+
+(오류)
+In file included from lib/term-style-control.c:60:
+lib/same-inode.h: In function 'psame_inode':
+lib/same-inode.h:79:33: warning: unused parameter 'a' [-Wunused-parameter]
+   79 | psame_inode (struct stat const *a, struct stat const *b)
+      |              ~~~~~~~~~~~~~~~~~~~^
+lib/same-inode.h:79:55: warning: unused parameter 'b' [-Wunused-parameter]
+   79 | psame_inode (struct stat const *a, struct stat const *b)
+      |                                    ~~~~~~~~~~~~~~~~~~~^
+lib/term-style-control.c: In function 'fatal_or_stopping_signal_handler':
+lib/term-style-control.c:680:39: warning: unused parameter 'sig' [-Wunused-parameter]
+  680 | fatal_or_stopping_signal_handler (int sig)
+      |                                   ~~~~^~~
+(수정)
+lib/same-inode.h 수정
+SAME_INODE_INLINE bool
+psame_inode (struct stat const *a, struct stat const *b)
+{
+  (void)a; //비사용정의
+  (void)b; //비사용정의
+  return PSAME_INODE (a, b);
+}
+
+lib/term-style-control.c 수정
+static _GL_ASYNC_SAFE void
+fatal_or_stopping_signal_handler (int sig)
+{
+  (void)sig; //비사용정의
+}
+
+(오류)
+term-ostream.oo.c: In function 'term_ostream__write_mem':
+term-ostream.oo.c:2152:39: warning: operand of '?:' changes signedness from 
+'long long int' to 'size_t' {aka 'long long unsigned int'} 
+due to unsignedness of other operand [-Wsign-compare]
+(수정)
+lib/term-ostream.c 수정
+static void
+term_ostream__write_mem(term_ostream_t stream, const void *data, size_t len)
+{
+    const char *cp = (const char *)data;
+    while (len > 0)
+    {
+        /* Look for the next newline.  */
+        const char *newline = (const char *)memchr(cp, '\n', len);
+        size_t n = (newline != NULL ? (size_t)(newline - cp) : len); //n을 계산할 때 (size_t)(newline - cp)로 형 변환하여 size_t 타입으로 비교
+
+        /* Copy n bytes into the buffer.  */
+        if (n > stream->allocated - stream->buflen)
+        {
+            size_t new_allocated =
+                xmax(xsum(stream->buflen, n),
+                     xsum(stream->allocated, stream->allocated));
+            if (size_overflow_p(new_allocated))
+                error(EXIT_FAILURE, 0,
+                      _("%s: too much output, buffer size overflow"),
+                      "term_ostream");
+
+            // Reallocate buffers safely
+            char *new_buffer = (char *)realloc(stream->buffer, new_allocated);
+            if (new_buffer == NULL) // Check for realloc failure
+                error(EXIT_FAILURE, errno, _("memory allocation failure"));
+            stream->buffer = new_buffer;
+
+            attributes_t *new_attrbuffer = (attributes_t *)
+                realloc(stream->attrbuffer, new_allocated * sizeof(attributes_t));
+            if (new_attrbuffer == NULL) // Check for realloc failure
+                error(EXIT_FAILURE, errno, _("memory allocation failure"));
+            stream->attrbuffer = new_attrbuffer;
+
+            stream->allocated = new_allocated;
+        }
+
+        memcpy(stream->buffer + stream->buflen, cp, n);
+        {
+            attributes_t attr = stream->simp_attr;
+            attributes_t *ap = stream->attrbuffer + stream->buflen;
+            attributes_t *ap_end = ap + n;
+            for (; ap < ap_end; ap++)
+                *ap = attr;
+        }
+        stream->buflen += n;
+
+        if (newline != NULL)
+        {
+            output_buffer(stream, stream->default_attr);
+            if (full_write(stream->fd, "\n", 1) < (ssize_t)1)
+                error(EXIT_FAILURE, errno, _("error writing to %s"),
+                      stream->filename);
+            cp += n + 1; /* cp = newline + 1; */
+            len -= n + 1;
+        }
+        else
+            break;
+    }
+}
+
+
+
 
 
 
