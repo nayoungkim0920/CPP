@@ -12050,18 +12050,6 @@ term_ostream__write_mem(term_ostream_t stream, const void *data, size_t len)
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
 (출력)
 #define VERSION 1.0
 
@@ -12075,11 +12063,32 @@ term_ostream__write_mem(term_ostream_t stream, const void *data, size_t len)
 
 => error: Please include config.h first. Current version: "1.0"
 
+(빌드명령어)
+- 빌드명령어
+aclocal --verbose 2>&1 && \
+autoconf --verbose 2>&1 && \
+autoheader --verbose 2>&1 && \
+automake --add-missing --verbose 2>&1 && \
+libtoolize --verbose 2>&1 && \
+autoreconf -ivf 2>&1 && \
+./configure --verbose 2>&1 && \
+make clean 2>&1 && \
+make 2>&1 || \
+echo "An error occurred in the build process."
 
-
-
-
-
-
-
+aclocal: aclocal.m4 파일을 생성하여 사용자 정의 매크로를 포함합니다.
+autoconf: configure 스크립트를 생성합니다.
+autoheader: config.h.in 파일을 생성하여 헤더 파일의 매크로를 설정합니다.
+automake: Makefile.in 파일을 생성하고 필요한 파일을 추가합니다.
+libtoolize: Libtool을 초기화합니다.
+autoreconf: 위의 모든 도구를 호출하여 설정을 업데이트합니다.
+./configure: 구성 스크립트를 실행하여 Makefile을 생성합니다.
+make clean: 이전 빌드를 청소합니다.
+make: 프로그램을 빌드합니다
+(남은과정)
+make install: 빌드된 바이너리 및 기타 파일을 시스템에 설치
+make check: 설치된 패키지의 테스트를 실행하여 올바르게 작동하는지 확인
+make distclean: 빌드 과정에서 생성된 모든 파일을 정리하고 원래의 소스 파일 상태로 되돌림
+make docs : 패키지의 문서 생성: 만약 문서화가 포함되어 있다면, 다음과 같은 명령어로 문서를 생성할 수 있음
+make dist : 패키지의 릴리즈 생성: 자동으로 배포 패키지를 만드는 명령어
 
