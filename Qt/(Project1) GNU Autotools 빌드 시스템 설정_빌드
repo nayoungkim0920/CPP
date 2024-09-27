@@ -12994,7 +12994,200 @@ AC_COMPILE_IFELSE([    # C++ 컴파일러가 해당 플래그를 지원하는지
   CXXFLAGS="$CXXFLAGS -fno-rtti -fno-exceptions"
 ])
 
+(오류)
+aclocal-1.16: found macro AC_LIBTOOL_PROG_CC_C_O in /usr/share/aclocal/lt~obsolete.m4: 52
+aclocal-1.16: found macro AC_LIBTOOL_SYS_HARD_LINK_LOCKS in /usr/share/aclocal/lt~obsolete.m4: 53
+aclocal-1.16: found macro AC_LIBTOOL_OBJDIR in /usr/share/aclocal/lt~obsolete.m4: 54
+(수정)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -rn 'AC_LIBTOOL_PROG_CC_C_O' ./lib
 
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -rn 'AC_LIBTOOL_SYS_HARD_LINK_LOCKS' ./lib
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -rn 'AC_LIBTOOL_OBJDIR' ./lib
+
+configure.ac 수정
+# 매크로를 정의하고 구현 내용을 포함
+AC_DEFUN([AC_LIBTOOL_PROG_CC_C_O], [dnl
+  # 매크로의 구현 내용
+])
+AC_DEFUN([AC_LIBTOOL_SYS_HARD_LINK_LOCKS], [dnl
+  # 매크로의 구현 내용
+])
+AC_DEFUN([AC_LIBTOOL_OBJDIR], [dnl
+  # 매크로의 구현 내용
+])
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# echo $ACLOCAL_PATH
+/usr/share/aclocal:/mingw64/share/aclocal:/c/libidn2/m4
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# echo $AUTOCONF_PATH
+/c/libidn2/m4:/usr/share/aclocal:/mingw64/share/aclocal
+
+(오류)
+aclocal-1.16: ignoring macro gl_MODULE_INDICATOR_FOR_TESTS in m4/gnulib-common.m4: 1056
+aclocal-1.16: saw macro PKG_CHECK_MODULES
+...
+(수정)
+configure.ac 수정
+define([DEFINE_MACRO], [m4_ifndef([$1], [AC_DEFINE([$1], [1], [$2])])])
+AC_DEFINE([gl_XSIZE], [], [Description of gl_XSIZE])
+...
+
+(오류)
+aclocal-1.16: ignoring macro gl_XSIZE in /mingw64/share/aclocal/xsize.m4: 7
+(수정)
+configure.ac 수정
+# ignoring macro define start
+define([DEFINE_MACRO], [m4_ifndef([$1], [AC_DEFINE([$1], [1], [$2])])])
+DEFINE_MACRO([gl_XSIZE], [Description of gl_XSIZE])
+#aclocal-1.16: ignoring macro gl_XSIZE in /mingw64/share/aclocal/xsize.m4: 7
+# ignoring macro define end
+
+config.h 생성확인
+/* Description of gl_XSIZE */
+#define gl_XSIZE 1
+
+build 후 (같은에러발생)
+aclocal-1.16: ignoring macro gl_XSIZE in /mingw64/share/aclocal/xsize.m4: 7
+
+파일확인
+"C:\msys64\mingw64\share\aclocal\xsize.m4" 존재함
+# xsize.m4 serial 5
+dnl Copyright (C) 2003-2004, 2008-2016 Free Software Foundation, Inc.
+dnl This file is free software; the Free Software Foundation
+dnl gives unlimited permission to copy and/or distribute it,
+dnl with or without modifications, as long as this notice is preserved.
+
+AC_DEFUN([gl_XSIZE],
+[
+  dnl Prerequisites of lib/xsize.h.
+  AC_REQUIRE([gl_SIZE_MAX])
+  AC_CHECK_HEADERS([stdint.h])
+])
+=> gl_XSIZE 매크로가 gl_SIZE_MAX를 요구하고 있는데, 
+gl_SIZE_MAX가 정의되지 않으면 gl_XSIZE 매크로가 무시됨.
+gl_SIZE_MAX가 정의되어 있어야 함.
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# echo $ACLOCAL_PATH
+/usr/share/aclocal:/mingw64/share/aclocal:/c/libidn2/m4
+=> C:\msys64\mingw64\share\aclocal 위치 확인
+=> 안들어있다면 
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# notepad ~/.bashrc
+수정 후
+# source ~/.bashrc 
+
+일단 무시해도된다고하여 다음단계로 진행
+
+(make install)
+# make install
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# make install
+Making install in lib
+make[1]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/lib' 들어감
+make  install-recursive
+make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/lib' 들어감
+make[3]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/lib' 들어감
+make[4]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/lib' 들어감
+make[4]: 'install-exec-am'을(를) 위해 할 일이 없습니다.
+make[4]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/lib' 나감
+make[3]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/lib' 나감
+make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/lib' 나감
+make[1]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/lib' 나감
+Making install in tests
+make[1]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/tests' 들어감
+make  install-recursive
+make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/tests' 들어감
+Making install in .
+make[3]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/tests' 들어감
+make[4]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/tests' 들어감
+make[4]: 'install-exec-am'을(를) 위해 할 일이 없습니다.
+make[4]: 'install-data-am'을(를) 위해 할 일이 없습니다.
+make[4]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/tests' 나감
+make[3]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/tests' 나감
+make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/tests' 나감
+make[1]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/tests' 나감
+Making install in adhoc-tests
+make[1]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/adhoc-tests' 들어감
+make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/adhoc-tests' 들어감
+make[2]: 'install-exec-am'을(를) 위해 할 일이 없습니다.
+make[2]: 'install-data-am'을(를) 위해 할 일이 없습니다.
+make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/adhoc-tests' 나감
+make[1]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/adhoc-tests' 나감
+Making install in doc
+make[1]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/doc' 들어감
+make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/doc' 들어감
+make[2]: 'install-exec-am'을(를) 위해 할 일이 없습니다.
+/usr/bin/mkdir -p /mingw64/share/doc/libtextstyle
+for file in `if test -f libtextstyle_toc.html; then echo .; else echo .; fi`/libtextstyle_*.html; do \
+  /usr/bin/install -c -m 644 $file /mingw64/share/doc/libtextstyle/`basename $file`; \
+done
+ /usr/bin/mkdir -p '/mingw64/share/info'
+ /usr/bin/install -c -m 644 ./libtextstyle.info '/mingw64/share/info'
+ install-info --info-dir='/mingw64/share/info' '/mingw64/share/info/libtextstyle.info'
+make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/doc' 나감
+make[1]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/doc' 나감
+make[1]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle' 들어감
+make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle' 들어감
+ /usr/bin/mkdir -p '/mingw64/lib'
+ /bin/sh ./libtool   --mode=install /usr/bin/install -c   libtextstyle.la '/mingw64/lib'
+libtool: install: /usr/bin/install -c .libs/libtextstyle.lai /mingw64/lib/libtextstyle.la
+libtool: install: /usr/bin/install -c .libs/libtextstyle.a /mingw64/lib/libtextstyle.a
+libtool: install: chmod 644 /mingw64/lib/libtextstyle.a
+libtool: install: ranlib /mingw64/lib/libtextstyle.a
+make[2]: 'install-data-am'을(를) 위해 할 일이 없습니다.
+make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle' 나감
+make[1]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle' 나감
+
+(make check)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# make check
+Making check in lib
+make[1]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/lib' 들어감
+make  check-recursive
+make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/lib' 들어감
+make[3]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/lib' 들어감
+make[3]: 'check-am'을(를) 위해 할 일이 없습니다.
+make[3]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/lib' 나감
+make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/lib' 나감
+make[1]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/lib' 나감
+Making check in tests
+make[1]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/tests' 들어감
+make  check-recursive
+make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/tests' 들어감
+Making check in .
+make[3]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/tests' 들어감
+## ---------------------------------------------------------------------- ##
+## ---------------------------- Gnulib tests ---------------------------- ##
+## Please report test failures in this directory to <bug-gnulib@gnu.org>. ##
+## ---------------------------------------------------------------------- ##
+make  test-memory-ostream.exe test-term-ostream.exe test-instanceof.exe test-accessors.exe libtests.a
+make[4]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/tests' 들어감
+depbase=`echo test-memory-ostream.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+/mingw64/bin/gcc -DHAVE_CONFIG_H -I. -I. -I../lib -I..  -D@ltstests_WITNESS@=1 -I. -I. -I.. -I./.. -I../lib -I./../lib -DSRCDIR=\"./\" -I/mingw64/include  -Wno-error -Wno-cast-qual -Wno-conversion -Wno-float-equal -Wno-sign-compare -Wno-undef -Wno-unused-function -Wno-unused-parameter -Wno-float-conversion -Wimplicit-fallthrough -Wno-pedantic -Wno-sign-conversion -Wno-type-limits -Wno-unsuffixed-float-constants -I/mingw64/include -O2 -std=c11 -fno-inline -UNDEFINED_MACRO -MT test-memory-ostream.o -MD -MP -MF $depbase.Tpo -c -o test-memory-ostream.o test-memory-ostream.c &&\
+mv -f $depbase.Tpo $depbase.Po
+<command-line>: error: macro names must be identifiers
+make[4]: *** [Makefile:1053: test-memory-ostream.o] 오류 1
+make[4]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/tests' 나감
+make[3]: *** [Makefile:1423: check-am] 오류 2
+make[3]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/tests' 나감
+make[2]: *** [Makefile:1089: check-recursive] 오류 1
+make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/tests' 나감
+make[1]: *** [Makefile:1426: check] 오류 2
+make[1]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/tests' 나감
+make: *** [Makefile:926: check-recursive] 오류 1
+
+(오류)
+<command-line>: error: macro names must be identifiers
+(수정)
+매크로 이름이 잘못되었다는 것을 의미
+일반적으로 매크로 이름은 알파벳, 숫자, 그리고 언더스코어(_)로 구성되어야 하며, 숫자로 시작할 수 없음
 
 
 
