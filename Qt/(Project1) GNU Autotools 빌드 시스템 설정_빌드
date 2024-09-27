@@ -11829,63 +11829,63 @@ term-ostream.oo.c:1590:51: warning: comparison of integer expressions of differe
 (수정)
 lib/term-ostream.oo.c, lib/term-ostream.c 수정
 case cm_xterm8:
-		assert(new_bgcolor >= 0 && new_bgcolor < 8);
-		{
-			char bytes[5];
-			bytes[0] = 0x1B; bytes[1] = '[';
-			bytes[2] = '4'; bytes[3] = '0' + new_bgcolor;
-			bytes[4] = 'm';
-			ssize_t written = full_write(out_fd, bytes, 5);
-			if (written < 0 || (size_t)written < 5) {
-			if (!async_safe)
-				out_error();
-			}
-		}
-		break;
+assert(new_bgcolor >= 0 && new_bgcolor < 8);
+{
+	char bytes[5];
+	bytes[0] = 0x1B; bytes[1] = '[';
+	bytes[2] = '4'; bytes[3] = '0' + new_bgcolor;
+	bytes[4] = 'm';
+	ssize_t written = full_write(out_fd, bytes, 5);
+	if (written < 0 || (size_t)written < 5) {
+	if (!async_safe)
+		out_error();
+	}
+}
+break;
 
-	case cm_xterm16:
-		assert(new_bgcolor >= 0 && new_bgcolor < 16);
-		{
-			char bytes[6];
-			bytes[0] = 0x1B; bytes[1] = '[';
-			if (new_bgcolor < 8) {
-			bytes[2] = '4'; bytes[3] = '0' + new_bgcolor;
-			bytes[4] = 'm';
-			ssize_t written = full_write(out_fd, bytes, 5);
-			if (written < 0 || (size_t)written < 5) {
-				if (!async_safe)
-				out_error();
-			}
-			} else {
-			bytes[2] = '1'; bytes[3] = '0';
-			bytes[4] = '0' + (new_bgcolor - 8); bytes[5] = 'm';
-			ssize_t written = full_write(out_fd, bytes, 6);
-			if (written < 0 || (size_t)written < 6) {
-				if (!async_safe)
-				out_error();
-			}
-			}
-		}
-	break;
-    case cm_xterm88:
-	assert(new_bgcolor >= 0 && new_bgcolor < 88);
-	{
-		char bytes[10];
-		char *p;
-		bytes[0] = 0x1B; bytes[1] = '[';
-		bytes[2] = '4'; bytes[3] = '8'; bytes[4] = ';';
-		bytes[5] = '5'; bytes[6] = ';';
-		p = bytes + 7;
-        if (new_color >= 10)
-        *p++ = '0' + (new_color / 10);
-        *p++ = '0' + (new_color % 10);
-        *p++ = 'm';
-        //if (full_write (out_fd, bytes, p - bytes) < p - bytes)
-        if (full_write(out_fd, bytes, (size_t)(p - bytes)) < (size_t)(p - bytes))
-          if (!async_safe)
-            out_error ();
-      }
-      break;
+case cm_xterm16:
+assert(new_bgcolor >= 0 && new_bgcolor < 16);
+{
+	char bytes[6];
+	bytes[0] = 0x1B; bytes[1] = '[';
+	if (new_bgcolor < 8) {
+	bytes[2] = '4'; bytes[3] = '0' + new_bgcolor;
+	bytes[4] = 'm';
+	ssize_t written = full_write(out_fd, bytes, 5);
+	if (written < 0 || (size_t)written < 5) {
+		if (!async_safe)
+		out_error();
+	}
+	} else {
+	bytes[2] = '1'; bytes[3] = '0';
+	bytes[4] = '0' + (new_bgcolor - 8); bytes[5] = 'm';
+	ssize_t written = full_write(out_fd, bytes, 6);
+	if (written < 0 || (size_t)written < 6) {
+		if (!async_safe)
+		out_error();
+	}
+	}
+}
+break;
+case cm_xterm88:
+assert(new_bgcolor >= 0 && new_bgcolor < 88);
+{
+	char bytes[10];
+	char *p;
+	bytes[0] = 0x1B; bytes[1] = '[';
+	bytes[2] = '4'; bytes[3] = '8'; bytes[4] = ';';
+	bytes[5] = '5'; bytes[6] = ';';
+	p = bytes + 7;
+if (new_color >= 10)
+*p++ = '0' + (new_color / 10);
+*p++ = '0' + (new_color % 10);
+*p++ = 'm';
+//if (full_write (out_fd, bytes, p - bytes) < p - bytes)
+if (full_write(out_fd, bytes, (size_t)(p - bytes)) < (size_t)(p - bytes))
+  if (!async_safe)
+    out_error ();
+}
+break;
 (오류)
 term-ostream.oo.c: In function 'term_ostream__write_mem':
 term-ostream.oo.c:2141:37: warning: operand of '?:' 
@@ -12091,4 +12091,911 @@ make check: 설치된 패키지의 테스트를 실행하여 올바르게 작동
 make distclean: 빌드 과정에서 생성된 모든 파일을 정리하고 원래의 소스 파일 상태로 되돌림
 make docs : 패키지의 문서 생성: 만약 문서화가 포함되어 있다면, 다음과 같은 명령어로 문서를 생성할 수 있음
 make dist : 패키지의 릴리즈 생성: 자동으로 배포 패키지를 만드는 명령어
+
+(오류)
+*** Warning: linker path does not have real file for library -lncurses.
+*** I have the capability to make that library automatically link in when
+*** you link to this library.  But I can only do this if you have a
+*** shared version of the library, which you do not appear to have
+*** because I did check the linker path looking for a file starting
+*** with libncurses and none of the candidates passed a file format test
+*** using a file magic. Last file checked: C:/msys64/mingw64/lib/libncurses.a
+*** Since this library must not contain undefined symbols,
+*** because either the platform does not support them or
+*** it was explicitly requested with -no-undefined,
+*** libtool will only create a static version of it.
+(수정)
+libncurses의 공유 라이브러리를 찾지 못해, 정적 라이브러리만 링크하고 있다는 내용
+C:/msys64/mingw64/lib/libncurses.a 파일이 있지만, 그것은 공유 라이브러리가 아니기 때문에 경고가 발생
+# 패키지 검색(설치됨)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -Ss ncurses
+clangarm64/mingw-w64-clang-aarch64-ncurses 6.4.20231217-1
+    System V Release 4.0 curses emulation library (mingw-w64)
+mingw32/mingw-w64-i686-ncurses 6.4.20231217-1
+    System V Release 4.0 curses emulation library (mingw-w64)
+mingw64/mingw-w64-x86_64-ncurses 6.4.20231217-1 [설치함]
+    System V Release 4.0 curses emulation library (mingw-w64)
+ucrt64/mingw-w64-ucrt-x86_64-ncurses 6.4.20231217-1
+    System V Release 4.0 curses emulation library (mingw-w64)
+clang32/mingw-w64-clang-i686-ncurses 6.4.20231217-1
+    System V Release 4.0 curses emulation library (mingw-w64)
+clang64/mingw-w64-clang-x86_64-ncurses 6.4.20231217-1
+    System V Release 4.0 curses emulation library (mingw-w64)
+msys/hexcurse 1.60.0-2
+    Versatile ncurses-based hex editor.
+msys/ncdu 1.20-1
+    Disk usage analyzer with an ncurses interface.
+msys/ncurses 6.5-1 [설치함]
+    System V Release 4.0 curses emulation library
+msys/ncurses-devel 6.5-1 (development)
+    NCURSES headers and libraries
+msys/vifm 0.13-1
+    Ncurses based file manager with vi like keybindings
+
+pkg-config 확인, ncurses가 올바르게 설치되고 인식되는지 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pkg-config --libs ncurses
+Package ncurses was not found in the pkg-config search path.
+Perhaps you should add the directory containing `ncurses.pc'
+to the PKG_CONFIG_PATH environment variable
+Package 'ncurses' not found
+
+# 재설치
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -S mingw-w64-x86_64-ncurses
+재설치 해도 
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l /mingw64/lib/pkgconfig/ncurses.pc
+ls: cannot access '/mingw64/lib/pkgconfig/ncurses.pc': No such file or directory
+
+#두파일이 없음
+ls /mingw64/include/curses.h
+ls /mingw64/include/term.h
+
+#검색
+# find /mingw64 -name "*ncurses*"
+/mingw64/bin/libncurses++w6.dll
+/mingw64/bin/libncursesw6.dll
+/mingw64/bin/ncursesw6-config
+/mingw64/include/ncurses
+/mingw64/include/ncurses/ncurses.h
+/mingw64/include/ncurses/ncurses_dll.h
+/mingw64/include/ncurses/ncurses_mingw.h
+/mingw64/include/ncursesw
+/mingw64/include/ncursesw/ncurses.h
+/mingw64/include/ncursesw/ncurses_dll.h
+/mingw64/include/ncursesw/ncurses_mingw.h
+/mingw64/lib/libncurses++w.a
+/mingw64/lib/libncurses++w.dll.a
+/mingw64/lib/libncurses++w_g.a
+/mingw64/lib/libncurses.a
+/mingw64/lib/libncursesw.a
+/mingw64/lib/libncursesw.dll.a
+/mingw64/lib/libncursesw_g.a
+/mingw64/lib/pkgconfig/ncurses++w.pc
+/mingw64/lib/pkgconfig/ncursesw.pc
+/mingw64/share/man/man1/x86_64-w64-mingw32-ncursesw6-config.1.gz
+/mingw64/share/man/man3/ncurses.3x.gz
+=>curses.h: /mingw64/include/ncurses/ncurses.h 또는 /mingw64/include/ncursesw/ncurses.h
+
+configure.ac 수정
+# GNULIB 모듈 정의
+//GNULIB_MODULES="ncurses terminfo xmalloc xrealloc xgethostname _gl_nothrow_get_osfhandle"
+GNULIB_MODULES="ncursesw terminfo xmalloc xrealloc xgethostname _gl_nothrow_get_osfhandle"
+
+m4_pattern_allow([GNULIB_MODULES]) # 허용 패턴 설정
+
+//AC_CHECK_LIB([ncurses], [tputs]) # ncurses 라이브러리 링크 추가
+AC_CHECK_LIB([ncursesw], [tputs]) # ncurses 라이브러리 링크 추가
+
+AC_CHECK_HEADERS([ncursesw/ term.h])
+
+export PKG_CONFIG_PATH="/mingw64/lib/pkgconfig:$PKG_CONFIG_PATH"
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pkg-config --libs --cflags ncurses
+Package ncurses was not found in the pkg-config search path.
+Perhaps you should add the directory containing `ncurses.pc'
+to the PKG_CONFIG_PATH environment variable
+Package 'ncurses' not found
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pkg-config --libs --cflags ncursesw
+-DNCURSES_WIDECHAR -IC:/msys64/mingw64/include/ncursesw -lncursesw -lsystre -ltre -lintl -liconv
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -rn 'ncurses.h' ./lib
+./lib/termcap.h:89:     - GNU ncurses in <term.h>, <curses.h>, <ncurses.h>,
+./lib/terminfo.h:88:     - GNU ncurses in <term.h>, <curses.h>, <ncurses.h>,
+
+실패
+/c/msys64/mingw64/lib/pkgconfig/ncurses.pc 파일을 수동으로 생성
+prefix=/c/msys64/mingw64
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: ncurses
+Description: ncurses library
+Version: 6.4
+Libs: -L${libdir} -lncurses
+Cflags: -I${includedir}
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# export PKG_CONFIG_PATH="/c/msys64/mingw64/lib/pkgconfig:$PKG_CONFIG_PATH"
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# aclocal --verbose 2>&1 && autoconf --verbose 2>&1 && autoheader --verbose 2>&1 && automake --add-missing --verbose 2>&1 && libtoolize --verbose 2>&1 && autoreconf -ivf 2>&1 && ./configure --verbose 2>&1 && make clean 2>&1 && make 2>&1 || echo "An error occurred in the build process."
+
+(오류)
+*** Warning: linker path does not have real file for library -lncurses. 
+경고 메시지는 링커가 ncurses 라이브러리를 찾지 못하고 있다는 의미
+(수정)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls /mingw64/lib/libncurses.*
+/mingw64/lib/libncurses.a
+ncurses 라이브러리가 올바르게 설치되었음을 의미
+configure.ac 수정
+# ncurses 라이브러리 확인
+PKG_CHECK_MODULES([NCURSES], [ncurses])
+
+# Makefile에 전달할 변수 정의
+AC_SUBST([NCURSES_CFLAGS])
+AC_SUBST([NCURSES_LIBS])
+
+Makefile.am 수정
+bin_PROGRAMS = libtextstyle_la
+libtextstyle_la_LDADD = $(NCURSES_LIBS) #ncurses 라이브러리를 링크하기 위해 $(NCURSES_LIBS)를 사용
+# 설치할 라이브러리의 위치
+#libtextstyle_la_LDFLAGS = $(LDFLAGS)
+libtextstyle_la_LDFLAGS = -shared -Wl,--out-implib=libtextstyle.dll.a #DLL을 생성하기 위한 필수 플래그를 추가
+# -shared는 공유 라이브러리를 생성하는 옵션이며, 
+# -Wl, --out-implib=libtextstyle.dll.a는 DLL의 import 라이브러리를 생성
+
+(오류)
+Makefile.am:45: error: use 'libtextstyle_la_LIBADD', not 'libtextstyle_la_LDADD'
+(수정)
+Makefile.am 수정
+//libtextstyle_la_LDADD = $(NCURSES_LIBS) #ncurses 라이브러리를 링크하기 위해 $(NCURSES_LIBS)를 사용
+libtextstyle_la_LIBADD = $(NCURSES_LIBS) #ncurses 라이브러리를 링크하기 위해 $(NCURSES_LIBS)를 사용
+
+(오류)
+Makefile.am:45: warning: variable 'libtextstyle_la_LDADD' is defined but no program or library has 'libtextstyle_la' as canonical name (possible typo)
+(수정)
+libtextstyle_la라는 이름을 가진 프로그램이나 라이브러리가 없다
+
+pkg-config가 설치되어 있는지 확인하고, ncurses 라이브러리에 대한 정보가 올바르게 반환되는지 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pkg-config --modversion ncurses
+6.4
+
+configure.ac 수정
+# ncurses 라이브러리 확인
+#PKG_CHECK_MODULES([NCURSES], [ncurses])
+PKG_CHECK_MODULES([NCURSES], [ncurses], [have_ncurses=yes], [have_ncurses=no])
+
+# Makefile에 전달할 변수 정의
+#AC_SUBST([NCURSES_CFLAGS])
+#AC_SUBST([NCURSES_LIBS])
+AC_SUBST([NCURSES_CFLAGS], [$NCURSES_CFLAGS])
+AC_SUBST([NCURSES_LIBS], [$NCURSES_LIBS])
+
+(오류)
+aclocal-1.16: ignoring macro gl_MODULE_INDICATOR_FOR_TESTS in m4/gnulib-common.m4: 1056
+aclocal-1.16: ignoring macro AC_PROG_CC in m4/std-gnu11.m4: 44
+aclocal-1.16: ignoring macro AC_C_PROTOTYPES in m4/std-gnu11.m4: 494
+aclocal-1.16: ignoring macro AC_DISABLE_FAST_INSTALL in m4/ltoptions.m4: 312
+aclocal-1.16: ignoring macro AC_LIBTOOL_LINKER_OPTION in m4/libtool.m4: 1675
+aclocal-1.16: ignoring macro LT_AC_PROG_SED in m4/libtool.m4: 8303
+aclocal-1.16: ignoring macro gl_XSIZE in /usr/share/aclocal/xsize.m4: 7
+aclocal-1.16: ignoring macro gt_TYPE_WINT_T in /usr/share/aclocal/wint_t.m4: 11
+aclocal-1.16: ignoring macro gl_VISIBILITY in /usr/share/aclocal/visibility.m4: 23
+aclocal-1.16: ignoring macro gl_THREADLIB_EARLY in /usr/share/aclocal/threadlib.m4: 29
+aclocal-1.16: ignoring macro gl_THREADLIB_EARLY_BODY in /usr/share/aclocal/threadlib.m4: 36
+aclocal-1.16: ignoring macro gl_THREADLIB_BODY in /usr/share/aclocal/threadlib.m4: 107
+aclocal-1.16: ignoring macro gl_THREADLIB in /usr/share/aclocal/threadlib.m4: 318
+aclocal-1.16: ignoring macro gl_DISABLE_THREADS in /usr/share/aclocal/threadlib.m4: 331
+aclocal-1.16: ignoring macro gl_AC_HEADER_STDINT_H in /usr/share/aclocal/stdint_h.m4: 12
+aclocal-1.16: ignoring macro gl_SIZE_MAX in /usr/share/aclocal/size_max.m4: 9
+aclocal-1.16: ignoring macro AM_PATH_PROG_WITH_TEST in /usr/share/aclocal/progtest.m4: 25
+aclocal-1.16: ignoring macro AM_PO_SUBDIRS in /usr/share/aclocal/po.m4: 23
+aclocal-1.16: ignoring macro AM_POSTPROCESS_PO_MAKEFILE in /usr/share/aclocal/po.m4: 221
+aclocal-1.16: ignoring macro AM_XGETTEXT_OPTION_INIT in /usr/share/aclocal/po.m4: 444
+aclocal-1.16: ignoring macro AM_XGETTEXT_OPTION in /usr/share/aclocal/po.m4: 450
+aclocal-1.16: ignoring macro AM_NLS in /usr/share/aclocal/nls.m4: 23
+aclocal-1.16: ignoring macro LTOBSOLETE_VERSION in /usr/share/aclocal/lt~obsolete.m4: 37
+aclocal-1.16: ignoring macro AC_LIBTOOL_LINKER_OPTION in /usr/share/aclocal/lt~obsolete.m4: 39
+aclocal-1.16: ignoring macro AC_PROG_EGREP in /usr/share/aclocal/lt~obsolete.m4: 40
+aclocal-1.16: ignoring macro _LT_AC_PROG_ECHO_BACKSLASH in /usr/share/aclocal/lt~obsolete.m4: 41
+aclocal-1.16: ignoring macro _LT_AC_SHELL_INIT in /usr/share/aclocal/lt~obsolete.m4: 42
+aclocal-1.16: ignoring macro _LT_AC_SYS_LIBPATH_AIX in /usr/share/aclocal/lt~obsolete.m4: 43
+aclocal-1.16: ignoring macro _LT_PROG_LTMAIN in /usr/share/aclocal/lt~obsolete.m4: 44
+aclocal-1.16: ignoring macro _LT_AC_TAGVAR in /usr/share/aclocal/lt~obsolete.m4: 45
+aclocal-1.16: ignoring macro AC_LTDL_ENABLE_INSTALL in /usr/share/aclocal/lt~obsolete.m4: 46
+aclocal-1.16: ignoring macro AC_LTDL_PREOPEN in /usr/share/aclocal/lt~obsolete.m4: 47
+aclocal-1.16: ignoring macro _LT_AC_SYS_COMPILER in /usr/share/aclocal/lt~obsolete.m4: 48
+aclocal-1.16: ignoring macro _LT_AC_LOCK in /usr/share/aclocal/lt~obsolete.m4: 49
+aclocal-1.16: ignoring macro AC_LIBTOOL_SYS_OLD_ARCHIVE in /usr/share/aclocal/lt~obsolete.m4: 50
+aclocal-1.16: ignoring macro _LT_AC_TRY_DLOPEN_SELF in /usr/share/aclocal/lt~obsolete.m4: 51
+aclocal-1.16: ignoring macro AC_LIBTOOL_PROG_CC_C_O in /usr/share/aclocal/lt~obsolete.m4: 52
+aclocal-1.16: ignoring macro AC_LIBTOOL_SYS_HARD_LINK_LOCKS in /usr/share/aclocal/lt~obsolete.m4: 53
+aclocal-1.16: ignoring macro AC_LIBTOOL_OBJDIR in /usr/share/aclocal/lt~obsolete.m4: 54
+aclocal-1.16: ignoring macro AC_LTDL_OBJDIR in /usr/share/aclocal/lt~obsolete.m4: 55
+aclocal-1.16: ignoring macro AC_LIBTOOL_PROG_LD_HARDCODE_LIBPATH in /usr/share/aclocal/lt~obsolete.m4: 56
+aclocal-1.16: ignoring macro AC_LIBTOOL_SYS_LIB_STRIP in /usr/share/aclocal/lt~obsolete.m4: 57
+aclocal-1.16: ignoring macro AC_PATH_MAGIC in /usr/share/aclocal/lt~obsolete.m4: 58
+aclocal-1.16: ignoring macro AC_PROG_LD_GNU in /usr/share/aclocal/lt~obsolete.m4: 59
+aclocal-1.16: ignoring macro AC_PROG_LD_RELOAD_FLAG in /usr/share/aclocal/lt~obsolete.m4: 60
+aclocal-1.16: ignoring macro AC_DEPLIBS_CHECK_METHOD in /usr/share/aclocal/lt~obsolete.m4: 61
+aclocal-1.16: ignoring macro AC_LIBTOOL_PROG_COMPILER_NO_RTTI in /usr/share/aclocal/lt~obsolete.m4: 62
+aclocal-1.16: ignoring macro AC_LIBTOOL_SYS_GLOBAL_SYMBOL_PIPE in /usr/share/aclocal/lt~obsolete.m4: 63
+aclocal-1.16: ignoring macro AC_LIBTOOL_PROG_COMPILER_PIC in /usr/share/aclocal/lt~obsolete.m4: 64
+aclocal-1.16: ignoring macro AC_LIBTOOL_PROG_LD_SHLIBS in /usr/share/aclocal/lt~obsolete.m4: 65
+aclocal-1.16: ignoring macro AC_LIBTOOL_POSTDEP_PREDEP in /usr/share/aclocal/lt~obsolete.m4: 66
+aclocal-1.16: ignoring macro LT_AC_PROG_EGREP in /usr/share/aclocal/lt~obsolete.m4: 67
+aclocal-1.16: ignoring macro LT_AC_PROG_SED in /usr/share/aclocal/lt~obsolete.m4: 68
+aclocal-1.16: ignoring macro _LT_CC_BASENAME in /usr/share/aclocal/lt~obsolete.m4: 69
+aclocal-1.16: ignoring macro _LT_COMPILER_BOILERPLATE in /usr/share/aclocal/lt~obsolete.m4: 70
+aclocal-1.16: ignoring macro _LT_LINKER_BOILERPLATE in /usr/share/aclocal/lt~obsolete.m4: 71
+aclocal-1.16: ignoring macro _AC_PROG_LIBTOOL in /usr/share/aclocal/lt~obsolete.m4: 72
+aclocal-1.16: ignoring macro AC_LIBTOOL_SETUP in /usr/share/aclocal/lt~obsolete.m4: 73
+aclocal-1.16: ignoring macro _LT_AC_CHECK_DLFCN in /usr/share/aclocal/lt~obsolete.m4: 74
+aclocal-1.16: ignoring macro AC_LIBTOOL_SYS_DYNAMIC_LINKER in /usr/share/aclocal/lt~obsolete.m4: 75
+aclocal-1.16: ignoring macro _LT_AC_TAGCONFIG in /usr/share/aclocal/lt~obsolete.m4: 76
+aclocal-1.16: ignoring macro AC_DISABLE_FAST_INSTALL in /usr/share/aclocal/lt~obsolete.m4: 77
+aclocal-1.16: ignoring macro _LT_AC_LANG_CXX in /usr/share/aclocal/lt~obsolete.m4: 78
+aclocal-1.16: ignoring macro _LT_AC_LANG_F77 in /usr/share/aclocal/lt~obsolete.m4: 79
+aclocal-1.16: ignoring macro _LT_AC_LANG_GCJ in /usr/share/aclocal/lt~obsolete.m4: 80
+aclocal-1.16: ignoring macro AC_LIBTOOL_LANG_C_CONFIG in /usr/share/aclocal/lt~obsolete.m4: 81
+aclocal-1.16: ignoring macro _LT_AC_LANG_C_CONFIG in /usr/share/aclocal/lt~obsolete.m4: 82
+aclocal-1.16: ignoring macro AC_LIBTOOL_LANG_CXX_CONFIG in /usr/share/aclocal/lt~obsolete.m4: 83
+aclocal-1.16: ignoring macro _LT_AC_LANG_CXX_CONFIG in /usr/share/aclocal/lt~obsolete.m4: 84
+aclocal-1.16: ignoring macro AC_LIBTOOL_LANG_F77_CONFIG in /usr/share/aclocal/lt~obsolete.m4: 85
+aclocal-1.16: ignoring macro _LT_AC_LANG_F77_CONFIG in /usr/share/aclocal/lt~obsolete.m4: 86
+aclocal-1.16: ignoring macro AC_LIBTOOL_LANG_GCJ_CONFIG in /usr/share/aclocal/lt~obsolete.m4: 87
+aclocal-1.16: ignoring macro _LT_AC_LANG_GCJ_CONFIG in /usr/share/aclocal/lt~obsolete.m4: 88
+aclocal-1.16: ignoring macro AC_LIBTOOL_LANG_RC_CONFIG in /usr/share/aclocal/lt~obsolete.m4: 89
+aclocal-1.16: ignoring macro _LT_AC_LANG_RC_CONFIG in /usr/share/aclocal/lt~obsolete.m4: 90
+aclocal-1.16: ignoring macro AC_LIBTOOL_CONFIG in /usr/share/aclocal/lt~obsolete.m4: 91
+aclocal-1.16: ignoring macro _LT_AC_FILE_LTDLL_C in /usr/share/aclocal/lt~obsolete.m4: 92
+aclocal-1.16: ignoring macro _LT_REQUIRED_DARWIN_CHECKS in /usr/share/aclocal/lt~obsolete.m4: 93
+aclocal-1.16: ignoring macro _LT_AC_PROG_CXXCPP in /usr/share/aclocal/lt~obsolete.m4: 94
+aclocal-1.16: ignoring macro _LT_PREPARE_SED_QUOTE_VARS in /usr/share/aclocal/lt~obsolete.m4: 95
+aclocal-1.16: ignoring macro _LT_PROG_ECHO_BACKSLASH in /usr/share/aclocal/lt~obsolete.m4: 96
+aclocal-1.16: ignoring macro _LT_PROG_F77 in /usr/share/aclocal/lt~obsolete.m4: 97
+aclocal-1.16: ignoring macro _LT_PROG_FC in /usr/share/aclocal/lt~obsolete.m4: 98
+aclocal-1.16: ignoring macro _LT_PROG_CXX in /usr/share/aclocal/lt~obsolete.m4: 99
+aclocal-1.16: ignoring macro LTVERSION_VERSION in /usr/share/aclocal/ltversion.m4: 19
+aclocal-1.16: ignoring macro LTSUGAR_VERSION in /usr/share/aclocal/ltsugar.m4: 14
+aclocal-1.16: ignoring macro LTOPTIONS_VERSION in /usr/share/aclocal/ltoptions.m4: 14
+aclocal-1.16: ignoring macro AC_LIBTOOL_DLOPEN in /usr/share/aclocal/ltoptions.m4: 113
+aclocal-1.16: ignoring macro AC_LIBTOOL_WIN32_DLL in /usr/share/aclocal/ltoptions.m4: 148
+aclocal-1.16: ignoring macro AC_ENABLE_SHARED in /usr/share/aclocal/ltoptions.m4: 197
+aclocal-1.16: ignoring macro AC_DISABLE_SHARED in /usr/share/aclocal/ltoptions.m4: 201
+aclocal-1.16: ignoring macro AM_ENABLE_SHARED in /usr/share/aclocal/ltoptions.m4: 205
+aclocal-1.16: ignoring macro AM_DISABLE_SHARED in /usr/share/aclocal/ltoptions.m4: 206
+aclocal-1.16: ignoring macro AC_ENABLE_STATIC in /usr/share/aclocal/ltoptions.m4: 251
+aclocal-1.16: ignoring macro AC_DISABLE_STATIC in /usr/share/aclocal/ltoptions.m4: 255
+aclocal-1.16: ignoring macro AM_ENABLE_STATIC in /usr/share/aclocal/ltoptions.m4: 259
+aclocal-1.16: ignoring macro AM_DISABLE_STATIC in /usr/share/aclocal/ltoptions.m4: 260
+aclocal-1.16: ignoring macro AC_ENABLE_FAST_INSTALL in /usr/share/aclocal/ltoptions.m4: 305
+aclocal-1.16: ignoring macro AC_DISABLE_FAST_INSTALL in /usr/share/aclocal/ltoptions.m4: 312
+aclocal-1.16: ignoring macro AC_LIBTOOL_PICMODE in /usr/share/aclocal/ltoptions.m4: 411
+aclocal-1.16: ignoring macro AC_TYPE_LONG_LONG_INT in /usr/share/aclocal/longlong.m4: 17
+aclocal-1.16: ignoring macro AC_TYPE_UNSIGNED_LONG_LONG_INT in /usr/share/aclocal/longlong.m4: 67
+aclocal-1.16: ignoring macro _AC_TYPE_LONG_LONG_SNIPPET in /usr/share/aclocal/longlong.m4: 89
+aclocal-1.16: ignoring macro gl_LOCK in /usr/share/aclocal/lock.m4: 9
+aclocal-1.16: ignoring macro gl_PREREQ_LOCK in /usr/share/aclocal/lock.m4: 42
+aclocal-1.16: ignoring macro LT_INIT in /usr/share/aclocal/libtool.m4: 62
+aclocal-1.16: ignoring macro AC_PROG_LIBTOOL in /usr/share/aclocal/libtool.m4: 100
+aclocal-1.16: ignoring macro AM_PROG_LIBTOOL in /usr/share/aclocal/libtool.m4: 101
+aclocal-1.16: ignoring macro LT_OUTPUT in /usr/share/aclocal/libtool.m4: 621
+aclocal-1.16: ignoring macro LT_SUPPORTED_TAG in /usr/share/aclocal/libtool.m4: 814
+aclocal-1.16: ignoring macro LT_LANG in /usr/share/aclocal/libtool.m4: 825
+aclocal-1.16: ignoring macro AC_LIBTOOL_CXX in /usr/share/aclocal/libtool.m4: 917
+aclocal-1.16: ignoring macro AC_LIBTOOL_F77 in /usr/share/aclocal/libtool.m4: 918
+aclocal-1.16: ignoring macro AC_LIBTOOL_FC in /usr/share/aclocal/libtool.m4: 919
+aclocal-1.16: ignoring macro AC_LIBTOOL_GCJ in /usr/share/aclocal/libtool.m4: 920
+aclocal-1.16: ignoring macro AC_LIBTOOL_RC in /usr/share/aclocal/libtool.m4: 921
+aclocal-1.16: ignoring macro _LT_WITH_SYSROOT in /usr/share/aclocal/libtool.m4: 1244
+aclocal-1.16: ignoring macro _LT_COMPILER_OPTION in /usr/share/aclocal/libtool.m4: 1589
+aclocal-1.16: ignoring macro AC_LIBTOOL_COMPILER_OPTION in /usr/share/aclocal/libtool.m4: 1631
+aclocal-1.16: ignoring macro _LT_LINKER_OPTION in /usr/share/aclocal/libtool.m4: 1640
+aclocal-1.16: ignoring macro AC_LIBTOOL_LINKER_OPTION in /usr/share/aclocal/libtool.m4: 1675
+aclocal-1.16: ignoring macro LT_CMD_MAX_LEN in /usr/share/aclocal/libtool.m4: 1682
+aclocal-1.16: ignoring macro AC_LIBTOOL_SYS_MAX_CMD_LEN in /usr/share/aclocal/libtool.m4: 1821
+aclocal-1.16: ignoring macro LT_SYS_DLOPEN_SELF in /usr/share/aclocal/libtool.m4: 1932
+aclocal-1.16: ignoring macro AC_LIBTOOL_DLOPEN_SELF in /usr/share/aclocal/libtool.m4: 2057
+aclocal-1.16: ignoring macro _LT_PATH_TOOL_PREFIX in /usr/share/aclocal/libtool.m4: 3175
+aclocal-1.16: ignoring macro AC_PATH_TOOL_PREFIX in /usr/share/aclocal/libtool.m4: 3237
+aclocal-1.16: ignoring macro LT_PATH_LD in /usr/share/aclocal/libtool.m4: 3260
+aclocal-1.16: ignoring macro AM_PROG_LD in /usr/share/aclocal/libtool.m4: 3349
+aclocal-1.16: ignoring macro AC_PROG_LD in /usr/share/aclocal/libtool.m4: 3350
+aclocal-1.16: ignoring macro LT_PATH_NM in /usr/share/aclocal/libtool.m4: 3679
+aclocal-1.16: ignoring macro AM_PROG_NM in /usr/share/aclocal/libtool.m4: 3774
+aclocal-1.16: ignoring macro AC_PROG_NM in /usr/share/aclocal/libtool.m4: 3775
+aclocal-1.16: ignoring macro _LT_DLL_DEF_P in /usr/share/aclocal/libtool.m4: 3846
+aclocal-1.16: ignoring macro LT_LIB_M in /usr/share/aclocal/libtool.m4: 3860
+aclocal-1.16: ignoring macro AC_CHECK_LIBM in /usr/share/aclocal/libtool.m4: 3879
+aclocal-1.16: ignoring macro LT_PROG_GCJ in /usr/share/aclocal/libtool.m4: 8147
+aclocal-1.16: ignoring macro LT_AC_PROG_GCJ in /usr/share/aclocal/libtool.m4: 8156
+aclocal-1.16: ignoring macro LT_PROG_GO in /usr/share/aclocal/libtool.m4: 8163
+aclocal-1.16: ignoring macro LT_PROG_RC in /usr/share/aclocal/libtool.m4: 8170
+aclocal-1.16: ignoring macro LT_AC_PROG_RC in /usr/share/aclocal/libtool.m4: 8175
+aclocal-1.16: ignoring macro LT_AC_PROG_SED in /usr/share/aclocal/libtool.m4: 8303
+aclocal-1.16: ignoring macro AC_LIB_PREFIX in /usr/share/aclocal/lib-prefix.m4: 15
+aclocal-1.16: ignoring macro AC_LIB_PREPARE_PREFIX in /usr/share/aclocal/lib-prefix.m4: 115
+aclocal-1.16: ignoring macro AC_LIB_WITH_FINAL_PREFIX in /usr/share/aclocal/lib-prefix.m4: 138
+aclocal-1.16: ignoring macro AC_LIB_PREPARE_MULTILIB in /usr/share/aclocal/lib-prefix.m4: 155
+aclocal-1.16: ignoring macro AC_LIB_LINKFLAGS in /usr/share/aclocal/lib-link.m4: 17
+aclocal-1.16: ignoring macro AC_LIB_HAVE_LINKFLAGS in /usr/share/aclocal/lib-link.m4: 57
+aclocal-1.16: ignoring macro AC_LIB_RPATH in /usr/share/aclocal/lib-link.m4: 125
+aclocal-1.16: ignoring macro AC_LIB_FROMPACKAGE in /usr/share/aclocal/lib-link.m4: 161
+aclocal-1.16: ignoring macro AC_LIB_LINKFLAGS_BODY in /usr/share/aclocal/lib-link.m4: 181
+aclocal-1.16: ignoring macro AC_LIB_APPENDTOVAR in /usr/share/aclocal/lib-link.m4: 718
+aclocal-1.16: ignoring macro AC_LIB_LINKFLAGS_FROM_LIBS in /usr/share/aclocal/lib-link.m4: 742
+aclocal-1.16: ignoring macro AC_LIB_PROG_LD_GNU in /usr/share/aclocal/lib-ld.m4: 12
+aclocal-1.16: ignoring macro AC_LIB_PROG_LD in /usr/share/aclocal/lib-ld.m4: 27
+aclocal-1.16: ignoring macro gt_LC_MESSAGES in /usr/share/aclocal/lcmessage.m4: 22
+aclocal-1.16: ignoring macro _AM_PATH_GPGRT_CONFIG in /usr/share/aclocal/ksba.m4: 19
+aclocal-1.16: ignoring macro gl_AC_HEADER_INTTYPES_H in /usr/share/aclocal/inttypes_h.m4: 12
+aclocal-1.16: ignoring macro gt_INTL_MACOSX in /usr/share/aclocal/intlmacosx.m4: 18
+aclocal-1.16: ignoring macro AM_ICONV_LINKFLAGS_BODY in /usr/share/aclocal/iconv.m4: 16
+aclocal-1.16: ignoring macro AM_ICONV_LINK in /usr/share/aclocal/iconv.m4: 27
+aclocal-1.16: ignoring macro AM_ICONV in /usr/share/aclocal/iconv.m4: 237
+aclocal-1.16: ignoring macro gl_HOST_CPU_C_ABI in /usr/share/aclocal/host-cpu-c-abi.m4: 50
+aclocal-1.16: ignoring macro gl_HOST_CPU_C_ABI_32BIT in /usr/share/aclocal/host-cpu-c-abi.m4: 466
+aclocal-1.16: ignoring macro AM_GNU_GETTEXT in /usr/share/aclocal/gettext.m4: 57
+aclocal-1.16: ignoring macro AM_GNU_GETTEXT_NEED in /usr/share/aclocal/gettext.m4: 394
+aclocal-1.16: ignoring macro AM_GNU_GETTEXT_VERSION in /usr/share/aclocal/gettext.m4: 401
+aclocal-1.16: ignoring macro AM_GNU_GETTEXT_REQUIRE_VERSION in /usr/share/aclocal/gettext.m4: 405
+aclocal-1.16: ignoring macro gl_FCNTL_O_FLAGS in /usr/share/aclocal/fcntl-o.m4: 12
+aclocal-1.16: ignoring macro gl_EXTERN_INLINE in /usr/share/aclocal/extern-inline.m4: 8
+aclocal-1.16: ignoring macro AM_LANGINFO_CODESET in /usr/share/aclocal/codeset.m4: 10
+aclocal-1.16: ignoring macro gl_BUILD_TO_HOST in /usr/share/aclocal/build-to-host.m4: 32
+aclocal-1.16: ignoring macro gl_BUILD_TO_HOST_INIT in /usr/share/aclocal/build-to-host.m4: 65
+aclocal-1.16: ignoring macro BISON_I18N in /usr/share/aclocal/bison-i18n.m4: 18
+aclocal-1.16: ignoring macro gl_XSIZE in /mingw64/share/aclocal/xsize.m4: 7
+aclocal-1.16: ignoring macro gt_TYPE_WINT_T in /mingw64/share/aclocal/wint_t.m4: 11
+aclocal-1.16: ignoring macro gt_TYPE_WCHAR_T in /mingw64/share/aclocal/wchar_t.m4: 11
+aclocal-1.16: ignoring macro gl_VISIBILITY in /mingw64/share/aclocal/visibility.m4: 23
+aclocal-1.16: ignoring macro gl_AC_TYPE_UINTMAX_T in /mingw64/share/aclocal/uintmax_t.m4: 14
+aclocal-1.16: ignoring macro gl_THREADLIB_EARLY in /mingw64/share/aclocal/threadlib.m4: 29
+aclocal-1.16: ignoring macro gl_THREADLIB_EARLY_BODY in /mingw64/share/aclocal/threadlib.m4: 36
+aclocal-1.16: ignoring macro gl_THREADLIB_BODY in /mingw64/share/aclocal/threadlib.m4: 107
+aclocal-1.16: ignoring macro gl_THREADLIB in /mingw64/share/aclocal/threadlib.m4: 318
+aclocal-1.16: ignoring macro gl_DISABLE_THREADS in /mingw64/share/aclocal/threadlib.m4: 331
+aclocal-1.16: ignoring macro gl_AC_HEADER_STDINT_H in /mingw64/share/aclocal/stdint_h.m4: 12
+aclocal-1.16: ignoring macro gl_SIZE_MAX in /mingw64/share/aclocal/size_max.m4: 9
+aclocal-1.16: ignoring macro AC_COMPUTE_INT in /mingw64/share/aclocal/size_max.m4: 78
+aclocal-1.16: ignoring macro AM_PATH_PROG_WITH_TEST in /mingw64/share/aclocal/progtest.m4: 25
+aclocal-1.16: ignoring macro gt_PRINTF_POSIX in /mingw64/share/aclocal/printf-posix.m4: 11
+aclocal-1.16: ignoring macro AM_PO_SUBDIRS in /mingw64/share/aclocal/po.m4: 24
+aclocal-1.16: ignoring macro AM_POSTPROCESS_PO_MAKEFILE in /mingw64/share/aclocal/po.m4: 222
+aclocal-1.16: ignoring macro AM_XGETTEXT_OPTION_INIT in /mingw64/share/aclocal/po.m4: 445
+aclocal-1.16: ignoring macro AM_XGETTEXT_OPTION in /mingw64/share/aclocal/po.m4: 451
+aclocal-1.16: ignoring macro PKG_PROG_PKG_CONFIG in /mingw64/share/aclocal/pkg.m4: 64
+aclocal-1.16: ignoring macro PKG_CHECK_EXISTS in /mingw64/share/aclocal/pkg.m4: 101
+aclocal-1.16: ignoring macro _PKG_SHORT_ERRORS_SUPPORTED in /mingw64/share/aclocal/pkg.m4: 130
+aclocal-1.16: ignoring macro PKG_CHECK_MODULES in /mingw64/share/aclocal/pkg.m4: 148
+aclocal-1.16: ignoring macro PKG_CHECK_MODULES_STATIC in /mingw64/share/aclocal/pkg.m4: 217
+aclocal-1.16: ignoring macro PKG_INSTALLDIR in /mingw64/share/aclocal/pkg.m4: 235
+aclocal-1.16: ignoring macro PKG_NOARCH_INSTALLDIR in /mingw64/share/aclocal/pkg.m4: 257
+aclocal-1.16: ignoring macro PKG_CHECK_VAR in /mingw64/share/aclocal/pkg.m4: 276
+aclocal-1.16: ignoring macro PKG_WITH_MODULES in /mingw64/share/aclocal/pkg.m4: 294
+aclocal-1.16: ignoring macro PKG_HAVE_WITH_MODULES in /mingw64/share/aclocal/pkg.m4: 331
+aclocal-1.16: ignoring macro PKG_HAVE_DEFINE_WITH_MODULES in /mingw64/share/aclocal/pkg.m4: 346
+aclocal-1.16: ignoring macro AM_NLS in /mingw64/share/aclocal/nls.m4: 23
+aclocal-1.16: ignoring macro LTOBSOLETE_VERSION in /mingw64/share/aclocal/lt~obsolete.m4: 37
+aclocal-1.16: ignoring macro AC_LIBTOOL_LINKER_OPTION in /mingw64/share/aclocal/lt~obsolete.m4: 39
+aclocal-1.16: ignoring macro AC_PROG_EGREP in /mingw64/share/aclocal/lt~obsolete.m4: 40
+aclocal-1.16: ignoring macro _LT_AC_PROG_ECHO_BACKSLASH in /mingw64/share/aclocal/lt~obsolete.m4: 41
+aclocal-1.16: ignoring macro _LT_AC_SHELL_INIT in /mingw64/share/aclocal/lt~obsolete.m4: 42
+aclocal-1.16: ignoring macro _LT_AC_SYS_LIBPATH_AIX in /mingw64/share/aclocal/lt~obsolete.m4: 43
+aclocal-1.16: ignoring macro _LT_PROG_LTMAIN in /mingw64/share/aclocal/lt~obsolete.m4: 44
+aclocal-1.16: ignoring macro _LT_AC_TAGVAR in /mingw64/share/aclocal/lt~obsolete.m4: 45
+aclocal-1.16: ignoring macro AC_LTDL_ENABLE_INSTALL in /mingw64/share/aclocal/lt~obsolete.m4: 46
+aclocal-1.16: ignoring macro AC_LTDL_PREOPEN in /mingw64/share/aclocal/lt~obsolete.m4: 47
+aclocal-1.16: ignoring macro _LT_AC_SYS_COMPILER in /mingw64/share/aclocal/lt~obsolete.m4: 48
+aclocal-1.16: ignoring macro _LT_AC_LOCK in /mingw64/share/aclocal/lt~obsolete.m4: 49
+aclocal-1.16: ignoring macro AC_LIBTOOL_SYS_OLD_ARCHIVE in /mingw64/share/aclocal/lt~obsolete.m4: 50
+aclocal-1.16: ignoring macro _LT_AC_TRY_DLOPEN_SELF in /mingw64/share/aclocal/lt~obsolete.m4: 51
+aclocal-1.16: ignoring macro AC_LIBTOOL_PROG_CC_C_O in /mingw64/share/aclocal/lt~obsolete.m4: 52
+aclocal-1.16: ignoring macro AC_LIBTOOL_SYS_HARD_LINK_LOCKS in /mingw64/share/aclocal/lt~obsolete.m4: 53
+aclocal-1.16: ignoring macro AC_LIBTOOL_OBJDIR in /mingw64/share/aclocal/lt~obsolete.m4: 54
+aclocal-1.16: ignoring macro AC_LTDL_OBJDIR in /mingw64/share/aclocal/lt~obsolete.m4: 55
+aclocal-1.16: ignoring macro AC_LIBTOOL_PROG_LD_HARDCODE_LIBPATH in /mingw64/share/aclocal/lt~obsolete.m4: 56
+aclocal-1.16: ignoring macro AC_LIBTOOL_SYS_LIB_STRIP in /mingw64/share/aclocal/lt~obsolete.m4: 57
+aclocal-1.16: ignoring macro AC_PATH_MAGIC in /mingw64/share/aclocal/lt~obsolete.m4: 58
+aclocal-1.16: ignoring macro AC_PROG_LD_GNU in /mingw64/share/aclocal/lt~obsolete.m4: 59
+aclocal-1.16: ignoring macro AC_PROG_LD_RELOAD_FLAG in /mingw64/share/aclocal/lt~obsolete.m4: 60
+aclocal-1.16: ignoring macro AC_DEPLIBS_CHECK_METHOD in /mingw64/share/aclocal/lt~obsolete.m4: 61
+aclocal-1.16: ignoring macro AC_LIBTOOL_PROG_COMPILER_NO_RTTI in /mingw64/share/aclocal/lt~obsolete.m4: 62
+aclocal-1.16: ignoring macro AC_LIBTOOL_SYS_GLOBAL_SYMBOL_PIPE in /mingw64/share/aclocal/lt~obsolete.m4: 63
+aclocal-1.16: ignoring macro AC_LIBTOOL_PROG_COMPILER_PIC in /mingw64/share/aclocal/lt~obsolete.m4: 64
+aclocal-1.16: ignoring macro AC_LIBTOOL_PROG_LD_SHLIBS in /mingw64/share/aclocal/lt~obsolete.m4: 65
+aclocal-1.16: ignoring macro AC_LIBTOOL_POSTDEP_PREDEP in /mingw64/share/aclocal/lt~obsolete.m4: 66
+aclocal-1.16: ignoring macro LT_AC_PROG_EGREP in /mingw64/share/aclocal/lt~obsolete.m4: 67
+aclocal-1.16: ignoring macro LT_AC_PROG_SED in /mingw64/share/aclocal/lt~obsolete.m4: 68
+aclocal-1.16: ignoring macro _LT_CC_BASENAME in /mingw64/share/aclocal/lt~obsolete.m4: 69
+aclocal-1.16: ignoring macro _LT_COMPILER_BOILERPLATE in /mingw64/share/aclocal/lt~obsolete.m4: 70
+aclocal-1.16: ignoring macro _LT_LINKER_BOILERPLATE in /mingw64/share/aclocal/lt~obsolete.m4: 71
+aclocal-1.16: ignoring macro _AC_PROG_LIBTOOL in /mingw64/share/aclocal/lt~obsolete.m4: 72
+aclocal-1.16: ignoring macro AC_LIBTOOL_SETUP in /mingw64/share/aclocal/lt~obsolete.m4: 73
+aclocal-1.16: ignoring macro _LT_AC_CHECK_DLFCN in /mingw64/share/aclocal/lt~obsolete.m4: 74
+aclocal-1.16: ignoring macro AC_LIBTOOL_SYS_DYNAMIC_LINKER in /mingw64/share/aclocal/lt~obsolete.m4: 75
+aclocal-1.16: ignoring macro _LT_AC_TAGCONFIG in /mingw64/share/aclocal/lt~obsolete.m4: 76
+aclocal-1.16: ignoring macro AC_DISABLE_FAST_INSTALL in /mingw64/share/aclocal/lt~obsolete.m4: 77
+aclocal-1.16: ignoring macro _LT_AC_LANG_CXX in /mingw64/share/aclocal/lt~obsolete.m4: 78
+aclocal-1.16: ignoring macro _LT_AC_LANG_F77 in /mingw64/share/aclocal/lt~obsolete.m4: 79
+aclocal-1.16: ignoring macro _LT_AC_LANG_GCJ in /mingw64/share/aclocal/lt~obsolete.m4: 80
+aclocal-1.16: ignoring macro AC_LIBTOOL_LANG_C_CONFIG in /mingw64/share/aclocal/lt~obsolete.m4: 81
+aclocal-1.16: ignoring macro _LT_AC_LANG_C_CONFIG in /mingw64/share/aclocal/lt~obsolete.m4: 82
+aclocal-1.16: ignoring macro AC_LIBTOOL_LANG_CXX_CONFIG in /mingw64/share/aclocal/lt~obsolete.m4: 83
+aclocal-1.16: ignoring macro _LT_AC_LANG_CXX_CONFIG in /mingw64/share/aclocal/lt~obsolete.m4: 84
+aclocal-1.16: ignoring macro AC_LIBTOOL_LANG_F77_CONFIG in /mingw64/share/aclocal/lt~obsolete.m4: 85
+aclocal-1.16: ignoring macro _LT_AC_LANG_F77_CONFIG in /mingw64/share/aclocal/lt~obsolete.m4: 86
+aclocal-1.16: ignoring macro AC_LIBTOOL_LANG_GCJ_CONFIG in /mingw64/share/aclocal/lt~obsolete.m4: 87
+aclocal-1.16: ignoring macro _LT_AC_LANG_GCJ_CONFIG in /mingw64/share/aclocal/lt~obsolete.m4: 88
+aclocal-1.16: ignoring macro AC_LIBTOOL_LANG_RC_CONFIG in /mingw64/share/aclocal/lt~obsolete.m4: 89
+aclocal-1.16: ignoring macro _LT_AC_LANG_RC_CONFIG in /mingw64/share/aclocal/lt~obsolete.m4: 90
+aclocal-1.16: ignoring macro AC_LIBTOOL_CONFIG in /mingw64/share/aclocal/lt~obsolete.m4: 91
+aclocal-1.16: ignoring macro _LT_AC_FILE_LTDLL_C in /mingw64/share/aclocal/lt~obsolete.m4: 92
+aclocal-1.16: ignoring macro _LT_REQUIRED_DARWIN_CHECKS in /mingw64/share/aclocal/lt~obsolete.m4: 93
+aclocal-1.16: ignoring macro _LT_AC_PROG_CXXCPP in /mingw64/share/aclocal/lt~obsolete.m4: 94
+aclocal-1.16: ignoring macro _LT_PREPARE_SED_QUOTE_VARS in /mingw64/share/aclocal/lt~obsolete.m4: 95
+aclocal-1.16: ignoring macro _LT_PROG_ECHO_BACKSLASH in /mingw64/share/aclocal/lt~obsolete.m4: 96
+aclocal-1.16: ignoring macro _LT_PROG_F77 in /mingw64/share/aclocal/lt~obsolete.m4: 97
+aclocal-1.16: ignoring macro _LT_PROG_FC in /mingw64/share/aclocal/lt~obsolete.m4: 98
+aclocal-1.16: ignoring macro _LT_PROG_CXX in /mingw64/share/aclocal/lt~obsolete.m4: 99
+aclocal-1.16: ignoring macro LTVERSION_VERSION in /mingw64/share/aclocal/ltversion.m4: 19
+aclocal-1.16: ignoring macro LTSUGAR_VERSION in /mingw64/share/aclocal/ltsugar.m4: 14
+aclocal-1.16: ignoring macro LTOPTIONS_VERSION in /mingw64/share/aclocal/ltoptions.m4: 14
+aclocal-1.16: ignoring macro AC_LIBTOOL_DLOPEN in /mingw64/share/aclocal/ltoptions.m4: 113
+aclocal-1.16: ignoring macro AC_LIBTOOL_WIN32_DLL in /mingw64/share/aclocal/ltoptions.m4: 148
+aclocal-1.16: ignoring macro AC_ENABLE_SHARED in /mingw64/share/aclocal/ltoptions.m4: 197
+aclocal-1.16: ignoring macro AC_DISABLE_SHARED in /mingw64/share/aclocal/ltoptions.m4: 201
+aclocal-1.16: ignoring macro AM_ENABLE_SHARED in /mingw64/share/aclocal/ltoptions.m4: 205
+aclocal-1.16: ignoring macro AM_DISABLE_SHARED in /mingw64/share/aclocal/ltoptions.m4: 206
+aclocal-1.16: ignoring macro AC_ENABLE_STATIC in /mingw64/share/aclocal/ltoptions.m4: 251
+aclocal-1.16: ignoring macro AC_DISABLE_STATIC in /mingw64/share/aclocal/ltoptions.m4: 255
+aclocal-1.16: ignoring macro AM_ENABLE_STATIC in /mingw64/share/aclocal/ltoptions.m4: 259
+aclocal-1.16: ignoring macro AM_DISABLE_STATIC in /mingw64/share/aclocal/ltoptions.m4: 260
+aclocal-1.16: ignoring macro AC_ENABLE_FAST_INSTALL in /mingw64/share/aclocal/ltoptions.m4: 305
+aclocal-1.16: ignoring macro AC_DISABLE_FAST_INSTALL in /mingw64/share/aclocal/ltoptions.m4: 312
+aclocal-1.16: ignoring macro AC_LIBTOOL_PICMODE in /mingw64/share/aclocal/ltoptions.m4: 411
+aclocal-1.16: ignoring macro AC_TYPE_LONG_LONG_INT in /mingw64/share/aclocal/longlong.m4: 17
+aclocal-1.16: ignoring macro AC_TYPE_UNSIGNED_LONG_LONG_INT in /mingw64/share/aclocal/longlong.m4: 67
+aclocal-1.16: ignoring macro _AC_TYPE_LONG_LONG_SNIPPET in /mingw64/share/aclocal/longlong.m4: 89
+aclocal-1.16: ignoring macro gl_LOCK in /mingw64/share/aclocal/lock.m4: 9
+aclocal-1.16: ignoring macro gl_PREREQ_LOCK in /mingw64/share/aclocal/lock.m4: 42
+aclocal-1.16: ignoring macro LT_INIT in /mingw64/share/aclocal/libtool.m4: 62
+aclocal-1.16: ignoring macro AC_PROG_LIBTOOL in /mingw64/share/aclocal/libtool.m4: 100
+aclocal-1.16: ignoring macro AM_PROG_LIBTOOL in /mingw64/share/aclocal/libtool.m4: 101
+aclocal-1.16: ignoring macro LT_OUTPUT in /mingw64/share/aclocal/libtool.m4: 621
+aclocal-1.16: ignoring macro LT_SUPPORTED_TAG in /mingw64/share/aclocal/libtool.m4: 814
+aclocal-1.16: ignoring macro LT_LANG in /mingw64/share/aclocal/libtool.m4: 825
+aclocal-1.16: ignoring macro AC_LIBTOOL_CXX in /mingw64/share/aclocal/libtool.m4: 917
+aclocal-1.16: ignoring macro AC_LIBTOOL_F77 in /mingw64/share/aclocal/libtool.m4: 918
+aclocal-1.16: ignoring macro AC_LIBTOOL_FC in /mingw64/share/aclocal/libtool.m4: 919
+aclocal-1.16: ignoring macro AC_LIBTOOL_GCJ in /mingw64/share/aclocal/libtool.m4: 920
+aclocal-1.16: ignoring macro AC_LIBTOOL_RC in /mingw64/share/aclocal/libtool.m4: 921
+aclocal-1.16: ignoring macro _LT_WITH_SYSROOT in /mingw64/share/aclocal/libtool.m4: 1244
+aclocal-1.16: ignoring macro _LT_COMPILER_OPTION in /mingw64/share/aclocal/libtool.m4: 1589
+aclocal-1.16: ignoring macro AC_LIBTOOL_COMPILER_OPTION in /mingw64/share/aclocal/libtool.m4: 1631
+aclocal-1.16: ignoring macro _LT_LINKER_OPTION in /mingw64/share/aclocal/libtool.m4: 1640
+aclocal-1.16: ignoring macro AC_LIBTOOL_LINKER_OPTION in /mingw64/share/aclocal/libtool.m4: 1675
+aclocal-1.16: ignoring macro LT_CMD_MAX_LEN in /mingw64/share/aclocal/libtool.m4: 1682
+aclocal-1.16: ignoring macro AC_LIBTOOL_SYS_MAX_CMD_LEN in /mingw64/share/aclocal/libtool.m4: 1821
+aclocal-1.16: ignoring macro LT_SYS_DLOPEN_SELF in /mingw64/share/aclocal/libtool.m4: 1932
+aclocal-1.16: ignoring macro AC_LIBTOOL_DLOPEN_SELF in /mingw64/share/aclocal/libtool.m4: 2057
+aclocal-1.16: ignoring macro _LT_PATH_TOOL_PREFIX in /mingw64/share/aclocal/libtool.m4: 3175
+aclocal-1.16: ignoring macro AC_PATH_TOOL_PREFIX in /mingw64/share/aclocal/libtool.m4: 3237
+aclocal-1.16: ignoring macro LT_PATH_LD in /mingw64/share/aclocal/libtool.m4: 3260
+aclocal-1.16: ignoring macro AM_PROG_LD in /mingw64/share/aclocal/libtool.m4: 3349
+aclocal-1.16: ignoring macro AC_PROG_LD in /mingw64/share/aclocal/libtool.m4: 3350
+aclocal-1.16: ignoring macro LT_PATH_NM in /mingw64/share/aclocal/libtool.m4: 3679
+aclocal-1.16: ignoring macro AM_PROG_NM in /mingw64/share/aclocal/libtool.m4: 3774
+aclocal-1.16: ignoring macro AC_PROG_NM in /mingw64/share/aclocal/libtool.m4: 3775
+aclocal-1.16: ignoring macro _LT_DLL_DEF_P in /mingw64/share/aclocal/libtool.m4: 3846
+aclocal-1.16: ignoring macro LT_LIB_M in /mingw64/share/aclocal/libtool.m4: 3860
+aclocal-1.16: ignoring macro AC_CHECK_LIBM in /mingw64/share/aclocal/libtool.m4: 3879
+aclocal-1.16: ignoring macro LT_PROG_GCJ in /mingw64/share/aclocal/libtool.m4: 8147
+aclocal-1.16: ignoring macro LT_AC_PROG_GCJ in /mingw64/share/aclocal/libtool.m4: 8156
+aclocal-1.16: ignoring macro LT_PROG_GO in /mingw64/share/aclocal/libtool.m4: 8163
+aclocal-1.16: ignoring macro LT_PROG_RC in /mingw64/share/aclocal/libtool.m4: 8170
+aclocal-1.16: ignoring macro LT_AC_PROG_RC in /mingw64/share/aclocal/libtool.m4: 8175
+aclocal-1.16: ignoring macro LT_AC_PROG_SED in /mingw64/share/aclocal/libtool.m4: 8303
+aclocal-1.16: ignoring macro AC_LIB_PREFIX in /mingw64/share/aclocal/lib-prefix.m4: 15
+aclocal-1.16: ignoring macro AC_LIB_PREPARE_PREFIX in /mingw64/share/aclocal/lib-prefix.m4: 115
+aclocal-1.16: ignoring macro AC_LIB_WITH_FINAL_PREFIX in /mingw64/share/aclocal/lib-prefix.m4: 138
+aclocal-1.16: ignoring macro AC_LIB_PREPARE_MULTILIB in /mingw64/share/aclocal/lib-prefix.m4: 155
+aclocal-1.16: ignoring macro AC_LIB_LINKFLAGS in /mingw64/share/aclocal/lib-link.m4: 17
+aclocal-1.16: ignoring macro AC_LIB_HAVE_LINKFLAGS in /mingw64/share/aclocal/lib-link.m4: 57
+aclocal-1.16: ignoring macro AC_LIB_RPATH in /mingw64/share/aclocal/lib-link.m4: 125
+aclocal-1.16: ignoring macro AC_LIB_FROMPACKAGE in /mingw64/share/aclocal/lib-link.m4: 161
+aclocal-1.16: ignoring macro AC_LIB_LINKFLAGS_BODY in /mingw64/share/aclocal/lib-link.m4: 181
+aclocal-1.16: ignoring macro AC_LIB_APPENDTOVAR in /mingw64/share/aclocal/lib-link.m4: 718
+aclocal-1.16: ignoring macro AC_LIB_LINKFLAGS_FROM_LIBS in /mingw64/share/aclocal/lib-link.m4: 742
+aclocal-1.16: ignoring macro AC_LIB_PROG_LD_GNU in /mingw64/share/aclocal/lib-ld.m4: 12
+aclocal-1.16: ignoring macro AC_LIB_PROG_LD in /mingw64/share/aclocal/lib-ld.m4: 27
+aclocal-1.16: ignoring macro gt_LC_MESSAGES in /mingw64/share/aclocal/lcmessage.m4: 22
+aclocal-1.16: ignoring macro gl_AC_HEADER_INTTYPES_H in /mingw64/share/aclocal/inttypes_h.m4: 12
+aclocal-1.16: ignoring macro gt_INTTYPES_PRI in /mingw64/share/aclocal/inttypes-pri.m4: 14
+aclocal-1.16: ignoring macro gt_TYPE_INTMAX_T in /mingw64/share/aclocal/intmax.m4: 11
+aclocal-1.16: ignoring macro gt_INTL_MACOSX in /mingw64/share/aclocal/intlmacosx.m4: 18
+aclocal-1.16: ignoring macro AM_GNU_GETTEXT_INTL_SUBDIR in /mingw64/share/aclocal/intldir.m4: 19
+aclocal-1.16: ignoring macro AM_INTL_SUBDIR in /mingw64/share/aclocal/intl.m4: 25
+aclocal-1.16: ignoring macro gt_INTL_SUBDIR_CORE in /mingw64/share/aclocal/intl.m4: 211
+aclocal-1.16: ignoring macro gt_GL_ATTRIBUTE in /mingw64/share/aclocal/intl.m4: 282
+aclocal-1.16: ignoring macro gt_INTDIV0 in /mingw64/share/aclocal/intdiv0.m4: 9
+aclocal-1.16: ignoring macro AM_ICONV_LINKFLAGS_BODY in /mingw64/share/aclocal/iconv.m4: 16
+aclocal-1.16: ignoring macro AM_ICONV_LINK in /mingw64/share/aclocal/iconv.m4: 27
+aclocal-1.16: ignoring macro AM_ICONV in /mingw64/share/aclocal/iconv.m4: 237
+aclocal-1.16: ignoring macro gl_HOST_CPU_C_ABI in /mingw64/share/aclocal/host-cpu-c-abi.m4: 50
+aclocal-1.16: ignoring macro gl_HOST_CPU_C_ABI_32BIT in /mingw64/share/aclocal/host-cpu-c-abi.m4: 466
+aclocal-1.16: ignoring macro gl_GLIBC21 in /mingw64/share/aclocal/glibc21.m4: 11
+aclocal-1.16: ignoring macro gt_GLIBC2 in /mingw64/share/aclocal/glibc2.m4: 11
+aclocal-1.16: ignoring macro AM_GNU_GETTEXT in /mingw64/share/aclocal/gettext.m4: 57
+aclocal-1.16: ignoring macro AM_GNU_GETTEXT_NEED in /mingw64/share/aclocal/gettext.m4: 394
+aclocal-1.16: ignoring macro AM_GNU_GETTEXT_VERSION in /mingw64/share/aclocal/gettext.m4: 401
+aclocal-1.16: ignoring macro AM_GNU_GETTEXT_REQUIRE_VERSION in /mingw64/share/aclocal/gettext.m4: 405
+aclocal-1.16: ignoring macro gl_FCNTL_O_FLAGS in /mingw64/share/aclocal/fcntl-o.m4: 12
+aclocal-1.16: ignoring macro gl_EXTERN_INLINE in /mingw64/share/aclocal/extern-inline.m4: 8
+aclocal-1.16: ignoring macro AM_LANGINFO_CODESET in /mingw64/share/aclocal/codeset.m4: 10
+aclocal-1.16: ignoring macro gl_BUILD_TO_HOST in /mingw64/share/aclocal/build-to-host.m4: 32
+aclocal-1.16: ignoring macro gl_BUILD_TO_HOST_INIT in /mingw64/share/aclocal/build-to-host.m4: 65
+aclocal-1.16: ignoring macro gl_XSIZE in /c/libidn2/m4/xsize.m4: 7
+aclocal-1.16: ignoring macro gt_TYPE_WINT_T in /c/libidn2/m4/wint_t.m4: 11
+aclocal-1.16: ignoring macro gt_TYPE_WCHAR_T in /c/libidn2/m4/wchar_t.m4: 11
+aclocal-1.16: ignoring macro gl_VISIBILITY in /c/libidn2/m4/visibility.m4: 23
+aclocal-1.16: ignoring macro gl_AC_TYPE_UINTMAX_T in /c/libidn2/m4/uintmax_t.m4: 14
+aclocal-1.16: ignoring macro gl_THREADLIB_EARLY in /c/libidn2/m4/threadlib.m4: 29
+aclocal-1.16: ignoring macro gl_THREADLIB_EARLY_BODY in /c/libidn2/m4/threadlib.m4: 36
+aclocal-1.16: ignoring macro gl_THREADLIB_BODY in /c/libidn2/m4/threadlib.m4: 107
+aclocal-1.16: ignoring macro gl_THREADLIB in /c/libidn2/m4/threadlib.m4: 318
+aclocal-1.16: ignoring macro gl_DISABLE_THREADS in /c/libidn2/m4/threadlib.m4: 331
+aclocal-1.16: ignoring macro gl_AC_HEADER_STDINT_H in /c/libidn2/m4/stdint_h.m4: 12
+aclocal-1.16: ignoring macro gl_SIZE_MAX in /c/libidn2/m4/size_max.m4: 9
+aclocal-1.16: ignoring macro AC_COMPUTE_INT in /c/libidn2/m4/size_max.m4: 78
+aclocal-1.16: ignoring macro AM_PATH_PROG_WITH_TEST in /c/libidn2/m4/progtest.m4: 25
+aclocal-1.16: ignoring macro gt_PRINTF_POSIX in /c/libidn2/m4/printf-posix.m4: 11
+aclocal-1.16: ignoring macro AM_PO_SUBDIRS in /c/libidn2/m4/po.m4: 23
+aclocal-1.16: ignoring macro AM_POSTPROCESS_PO_MAKEFILE in /c/libidn2/m4/po.m4: 220
+aclocal-1.16: ignoring macro AM_XGETTEXT_OPTION_INIT in /c/libidn2/m4/po.m4: 443
+aclocal-1.16: ignoring macro AM_XGETTEXT_OPTION in /c/libidn2/m4/po.m4: 449
+aclocal-1.16: ignoring macro PKG_PROG_PKG_CONFIG in /c/libidn2/m4/pkg.m4: 26
+aclocal-1.16: ignoring macro PKG_CHECK_EXISTS in /c/libidn2/m4/pkg.m4: 56
+aclocal-1.16: ignoring macro _PKG_SHORT_ERRORS_SUPPORTED in /c/libidn2/m4/pkg.m4: 84
+aclocal-1.16: ignoring macro PKG_CHECK_MODULES in /c/libidn2/m4/pkg.m4: 104
+aclocal-1.16: ignoring macro AM_NLS in /c/libidn2/m4/nls.m4: 23
+aclocal-1.16: ignoring macro LTOBSOLETE_VERSION in /c/libidn2/m4/lt~obsolete.m4: 37
+aclocal-1.16: ignoring macro AC_LIBTOOL_LINKER_OPTION in /c/libidn2/m4/lt~obsolete.m4: 39
+aclocal-1.16: ignoring macro AC_PROG_EGREP in /c/libidn2/m4/lt~obsolete.m4: 40
+aclocal-1.16: ignoring macro _LT_AC_PROG_ECHO_BACKSLASH in /c/libidn2/m4/lt~obsolete.m4: 41
+aclocal-1.16: ignoring macro _LT_AC_SHELL_INIT in /c/libidn2/m4/lt~obsolete.m4: 42
+aclocal-1.16: ignoring macro _LT_AC_SYS_LIBPATH_AIX in /c/libidn2/m4/lt~obsolete.m4: 43
+aclocal-1.16: ignoring macro _LT_PROG_LTMAIN in /c/libidn2/m4/lt~obsolete.m4: 44
+aclocal-1.16: ignoring macro _LT_AC_TAGVAR in /c/libidn2/m4/lt~obsolete.m4: 45
+aclocal-1.16: ignoring macro AC_LTDL_ENABLE_INSTALL in /c/libidn2/m4/lt~obsolete.m4: 46
+aclocal-1.16: ignoring macro AC_LTDL_PREOPEN in /c/libidn2/m4/lt~obsolete.m4: 47
+aclocal-1.16: ignoring macro _LT_AC_SYS_COMPILER in /c/libidn2/m4/lt~obsolete.m4: 48
+aclocal-1.16: ignoring macro _LT_AC_LOCK in /c/libidn2/m4/lt~obsolete.m4: 49
+aclocal-1.16: ignoring macro AC_LIBTOOL_SYS_OLD_ARCHIVE in /c/libidn2/m4/lt~obsolete.m4: 50
+aclocal-1.16: ignoring macro _LT_AC_TRY_DLOPEN_SELF in /c/libidn2/m4/lt~obsolete.m4: 51
+aclocal-1.16: ignoring macro AC_LIBTOOL_PROG_CC_C_O in /c/libidn2/m4/lt~obsolete.m4: 52
+aclocal-1.16: ignoring macro AC_LIBTOOL_SYS_HARD_LINK_LOCKS in /c/libidn2/m4/lt~obsolete.m4: 53
+aclocal-1.16: ignoring macro AC_LIBTOOL_OBJDIR in /c/libidn2/m4/lt~obsolete.m4: 54
+aclocal-1.16: ignoring macro AC_LTDL_OBJDIR in /c/libidn2/m4/lt~obsolete.m4: 55
+aclocal-1.16: ignoring macro AC_LIBTOOL_PROG_LD_HARDCODE_LIBPATH in /c/libidn2/m4/lt~obsolete.m4: 56
+aclocal-1.16: ignoring macro AC_LIBTOOL_SYS_LIB_STRIP in /c/libidn2/m4/lt~obsolete.m4: 57
+aclocal-1.16: ignoring macro AC_PATH_MAGIC in /c/libidn2/m4/lt~obsolete.m4: 58
+aclocal-1.16: ignoring macro AC_PROG_LD_GNU in /c/libidn2/m4/lt~obsolete.m4: 59
+aclocal-1.16: ignoring macro AC_PROG_LD_RELOAD_FLAG in /c/libidn2/m4/lt~obsolete.m4: 60
+aclocal-1.16: ignoring macro AC_DEPLIBS_CHECK_METHOD in /c/libidn2/m4/lt~obsolete.m4: 61
+aclocal-1.16: ignoring macro AC_LIBTOOL_PROG_COMPILER_NO_RTTI in /c/libidn2/m4/lt~obsolete.m4: 62
+aclocal-1.16: ignoring macro AC_LIBTOOL_SYS_GLOBAL_SYMBOL_PIPE in /c/libidn2/m4/lt~obsolete.m4: 63
+aclocal-1.16: ignoring macro AC_LIBTOOL_PROG_COMPILER_PIC in /c/libidn2/m4/lt~obsolete.m4: 64
+aclocal-1.16: ignoring macro AC_LIBTOOL_PROG_LD_SHLIBS in /c/libidn2/m4/lt~obsolete.m4: 65
+aclocal-1.16: ignoring macro AC_LIBTOOL_POSTDEP_PREDEP in /c/libidn2/m4/lt~obsolete.m4: 66
+aclocal-1.16: ignoring macro LT_AC_PROG_EGREP in /c/libidn2/m4/lt~obsolete.m4: 67
+aclocal-1.16: ignoring macro LT_AC_PROG_SED in /c/libidn2/m4/lt~obsolete.m4: 68
+aclocal-1.16: ignoring macro _LT_CC_BASENAME in /c/libidn2/m4/lt~obsolete.m4: 69
+aclocal-1.16: ignoring macro _LT_COMPILER_BOILERPLATE in /c/libidn2/m4/lt~obsolete.m4: 70
+aclocal-1.16: ignoring macro _LT_LINKER_BOILERPLATE in /c/libidn2/m4/lt~obsolete.m4: 71
+aclocal-1.16: ignoring macro _AC_PROG_LIBTOOL in /c/libidn2/m4/lt~obsolete.m4: 72
+aclocal-1.16: ignoring macro AC_LIBTOOL_SETUP in /c/libidn2/m4/lt~obsolete.m4: 73
+aclocal-1.16: ignoring macro _LT_AC_CHECK_DLFCN in /c/libidn2/m4/lt~obsolete.m4: 74
+aclocal-1.16: ignoring macro AC_LIBTOOL_SYS_DYNAMIC_LINKER in /c/libidn2/m4/lt~obsolete.m4: 75
+aclocal-1.16: ignoring macro _LT_AC_TAGCONFIG in /c/libidn2/m4/lt~obsolete.m4: 76
+aclocal-1.16: ignoring macro AC_DISABLE_FAST_INSTALL in /c/libidn2/m4/lt~obsolete.m4: 77
+aclocal-1.16: ignoring macro _LT_AC_LANG_CXX in /c/libidn2/m4/lt~obsolete.m4: 78
+aclocal-1.16: ignoring macro _LT_AC_LANG_F77 in /c/libidn2/m4/lt~obsolete.m4: 79
+aclocal-1.16: ignoring macro _LT_AC_LANG_GCJ in /c/libidn2/m4/lt~obsolete.m4: 80
+aclocal-1.16: ignoring macro AC_LIBTOOL_LANG_C_CONFIG in /c/libidn2/m4/lt~obsolete.m4: 81
+aclocal-1.16: ignoring macro _LT_AC_LANG_C_CONFIG in /c/libidn2/m4/lt~obsolete.m4: 82
+aclocal-1.16: ignoring macro AC_LIBTOOL_LANG_CXX_CONFIG in /c/libidn2/m4/lt~obsolete.m4: 83
+aclocal-1.16: ignoring macro _LT_AC_LANG_CXX_CONFIG in /c/libidn2/m4/lt~obsolete.m4: 84
+aclocal-1.16: ignoring macro AC_LIBTOOL_LANG_F77_CONFIG in /c/libidn2/m4/lt~obsolete.m4: 85
+aclocal-1.16: ignoring macro _LT_AC_LANG_F77_CONFIG in /c/libidn2/m4/lt~obsolete.m4: 86
+aclocal-1.16: ignoring macro AC_LIBTOOL_LANG_GCJ_CONFIG in /c/libidn2/m4/lt~obsolete.m4: 87
+aclocal-1.16: ignoring macro _LT_AC_LANG_GCJ_CONFIG in /c/libidn2/m4/lt~obsolete.m4: 88
+aclocal-1.16: ignoring macro AC_LIBTOOL_LANG_RC_CONFIG in /c/libidn2/m4/lt~obsolete.m4: 89
+aclocal-1.16: ignoring macro _LT_AC_LANG_RC_CONFIG in /c/libidn2/m4/lt~obsolete.m4: 90
+aclocal-1.16: ignoring macro AC_LIBTOOL_CONFIG in /c/libidn2/m4/lt~obsolete.m4: 91
+aclocal-1.16: ignoring macro _LT_AC_FILE_LTDLL_C in /c/libidn2/m4/lt~obsolete.m4: 92
+aclocal-1.16: ignoring macro _LT_REQUIRED_DARWIN_CHECKS in /c/libidn2/m4/lt~obsolete.m4: 93
+aclocal-1.16: ignoring macro _LT_AC_PROG_CXXCPP in /c/libidn2/m4/lt~obsolete.m4: 94
+aclocal-1.16: ignoring macro _LT_PREPARE_SED_QUOTE_VARS in /c/libidn2/m4/lt~obsolete.m4: 95
+aclocal-1.16: ignoring macro _LT_PROG_ECHO_BACKSLASH in /c/libidn2/m4/lt~obsolete.m4: 96
+aclocal-1.16: ignoring macro _LT_PROG_F77 in /c/libidn2/m4/lt~obsolete.m4: 97
+aclocal-1.16: ignoring macro _LT_PROG_FC in /c/libidn2/m4/lt~obsolete.m4: 98
+aclocal-1.16: ignoring macro _LT_PROG_CXX in /c/libidn2/m4/lt~obsolete.m4: 99
+aclocal-1.16: ignoring macro LTVERSION_VERSION in /c/libidn2/m4/ltversion.m4: 19
+aclocal-1.16: ignoring macro LTSUGAR_VERSION in /c/libidn2/m4/ltsugar.m4: 14
+aclocal-1.16: ignoring macro LTOPTIONS_VERSION in /c/libidn2/m4/ltoptions.m4: 14
+aclocal-1.16: ignoring macro AC_LIBTOOL_DLOPEN in /c/libidn2/m4/ltoptions.m4: 113
+aclocal-1.16: ignoring macro AC_LIBTOOL_WIN32_DLL in /c/libidn2/m4/ltoptions.m4: 148
+aclocal-1.16: ignoring macro AC_ENABLE_SHARED in /c/libidn2/m4/ltoptions.m4: 197
+aclocal-1.16: ignoring macro AC_DISABLE_SHARED in /c/libidn2/m4/ltoptions.m4: 201
+aclocal-1.16: ignoring macro AM_ENABLE_SHARED in /c/libidn2/m4/ltoptions.m4: 205
+aclocal-1.16: ignoring macro AM_DISABLE_SHARED in /c/libidn2/m4/ltoptions.m4: 206
+aclocal-1.16: ignoring macro AC_ENABLE_STATIC in /c/libidn2/m4/ltoptions.m4: 251
+aclocal-1.16: ignoring macro AC_DISABLE_STATIC in /c/libidn2/m4/ltoptions.m4: 255
+aclocal-1.16: ignoring macro AM_ENABLE_STATIC in /c/libidn2/m4/ltoptions.m4: 259
+aclocal-1.16: ignoring macro AM_DISABLE_STATIC in /c/libidn2/m4/ltoptions.m4: 260
+aclocal-1.16: ignoring macro AC_ENABLE_FAST_INSTALL in /c/libidn2/m4/ltoptions.m4: 305
+aclocal-1.16: ignoring macro AC_DISABLE_FAST_INSTALL in /c/libidn2/m4/ltoptions.m4: 312
+aclocal-1.16: ignoring macro AC_LIBTOOL_PICMODE in /c/libidn2/m4/ltoptions.m4: 411
+aclocal-1.16: ignoring macro AC_TYPE_LONG_LONG_INT in /c/libidn2/m4/longlong.m4: 17
+aclocal-1.16: ignoring macro AC_TYPE_UNSIGNED_LONG_LONG_INT in /c/libidn2/m4/longlong.m4: 67
+aclocal-1.16: ignoring macro _AC_TYPE_LONG_LONG_SNIPPET in /c/libidn2/m4/longlong.m4: 89
+aclocal-1.16: ignoring macro gl_LOCK in /c/libidn2/m4/lock.m4: 9
+aclocal-1.16: ignoring macro gl_PREREQ_LOCK in /c/libidn2/m4/lock.m4: 42
+aclocal-1.16: ignoring macro LT_INIT in /c/libidn2/m4/libtool.m4: 62
+aclocal-1.16: ignoring macro AC_PROG_LIBTOOL in /c/libidn2/m4/libtool.m4: 100
+aclocal-1.16: ignoring macro AM_PROG_LIBTOOL in /c/libidn2/m4/libtool.m4: 101
+aclocal-1.16: ignoring macro LT_OUTPUT in /c/libidn2/m4/libtool.m4: 621
+aclocal-1.16: ignoring macro LT_SUPPORTED_TAG in /c/libidn2/m4/libtool.m4: 814
+aclocal-1.16: ignoring macro LT_LANG in /c/libidn2/m4/libtool.m4: 825
+aclocal-1.16: ignoring macro AC_LIBTOOL_CXX in /c/libidn2/m4/libtool.m4: 917
+aclocal-1.16: ignoring macro AC_LIBTOOL_F77 in /c/libidn2/m4/libtool.m4: 918
+aclocal-1.16: ignoring macro AC_LIBTOOL_FC in /c/libidn2/m4/libtool.m4: 919
+aclocal-1.16: ignoring macro AC_LIBTOOL_GCJ in /c/libidn2/m4/libtool.m4: 920
+aclocal-1.16: ignoring macro AC_LIBTOOL_RC in /c/libidn2/m4/libtool.m4: 921
+aclocal-1.16: ignoring macro _LT_WITH_SYSROOT in /c/libidn2/m4/libtool.m4: 1244
+aclocal-1.16: ignoring macro _LT_COMPILER_OPTION in /c/libidn2/m4/libtool.m4: 1589
+aclocal-1.16: ignoring macro AC_LIBTOOL_COMPILER_OPTION in /c/libidn2/m4/libtool.m4: 1631
+aclocal-1.16: ignoring macro _LT_LINKER_OPTION in /c/libidn2/m4/libtool.m4: 1640
+aclocal-1.16: ignoring macro AC_LIBTOOL_LINKER_OPTION in /c/libidn2/m4/libtool.m4: 1675
+aclocal-1.16: ignoring macro LT_CMD_MAX_LEN in /c/libidn2/m4/libtool.m4: 1682
+aclocal-1.16: ignoring macro AC_LIBTOOL_SYS_MAX_CMD_LEN in /c/libidn2/m4/libtool.m4: 1821
+aclocal-1.16: ignoring macro LT_SYS_DLOPEN_SELF in /c/libidn2/m4/libtool.m4: 1932
+aclocal-1.16: ignoring macro AC_LIBTOOL_DLOPEN_SELF in /c/libidn2/m4/libtool.m4: 2057
+aclocal-1.16: ignoring macro _LT_PATH_TOOL_PREFIX in /c/libidn2/m4/libtool.m4: 3175
+aclocal-1.16: ignoring macro AC_PATH_TOOL_PREFIX in /c/libidn2/m4/libtool.m4: 3237
+aclocal-1.16: ignoring macro LT_PATH_LD in /c/libidn2/m4/libtool.m4: 3260
+aclocal-1.16: ignoring macro AM_PROG_LD in /c/libidn2/m4/libtool.m4: 3349
+aclocal-1.16: ignoring macro AC_PROG_LD in /c/libidn2/m4/libtool.m4: 3350
+aclocal-1.16: ignoring macro LT_PATH_NM in /c/libidn2/m4/libtool.m4: 3679
+aclocal-1.16: ignoring macro AM_PROG_NM in /c/libidn2/m4/libtool.m4: 3774
+aclocal-1.16: ignoring macro AC_PROG_NM in /c/libidn2/m4/libtool.m4: 3775
+aclocal-1.16: ignoring macro _LT_DLL_DEF_P in /c/libidn2/m4/libtool.m4: 3846
+aclocal-1.16: ignoring macro LT_LIB_M in /c/libidn2/m4/libtool.m4: 3860
+aclocal-1.16: ignoring macro AC_CHECK_LIBM in /c/libidn2/m4/libtool.m4: 3879
+aclocal-1.16: ignoring macro LT_PROG_GCJ in /c/libidn2/m4/libtool.m4: 8147
+aclocal-1.16: ignoring macro LT_AC_PROG_GCJ in /c/libidn2/m4/libtool.m4: 8156
+aclocal-1.16: ignoring macro LT_PROG_GO in /c/libidn2/m4/libtool.m4: 8163
+aclocal-1.16: ignoring macro LT_PROG_RC in /c/libidn2/m4/libtool.m4: 8170
+aclocal-1.16: ignoring macro LT_AC_PROG_RC in /c/libidn2/m4/libtool.m4: 8175
+aclocal-1.16: ignoring macro LT_AC_PROG_SED in /c/libidn2/m4/libtool.m4: 8303
+aclocal-1.16: ignoring macro AC_LIB_PREFIX in /c/libidn2/m4/lib-prefix.m4: 22
+aclocal-1.16: ignoring macro AC_LIB_PREPARE_PREFIX in /c/libidn2/m4/lib-prefix.m4: 122
+aclocal-1.16: ignoring macro AC_LIB_WITH_FINAL_PREFIX in /c/libidn2/m4/lib-prefix.m4: 145
+aclocal-1.16: ignoring macro AC_LIB_PREPARE_MULTILIB in /c/libidn2/m4/lib-prefix.m4: 162
+aclocal-1.16: ignoring macro AC_LIB_LINKFLAGS in /c/libidn2/m4/lib-link.m4: 17
+aclocal-1.16: ignoring macro AC_LIB_HAVE_LINKFLAGS in /c/libidn2/m4/lib-link.m4: 57
+aclocal-1.16: ignoring macro AC_LIB_RPATH in /c/libidn2/m4/lib-link.m4: 125
+aclocal-1.16: ignoring macro AC_LIB_FROMPACKAGE in /c/libidn2/m4/lib-link.m4: 161
+aclocal-1.16: ignoring macro AC_LIB_LINKFLAGS_BODY in /c/libidn2/m4/lib-link.m4: 181
+aclocal-1.16: ignoring macro AC_LIB_APPENDTOVAR in /c/libidn2/m4/lib-link.m4: 684
+aclocal-1.16: ignoring macro AC_LIB_LINKFLAGS_FROM_LIBS in /c/libidn2/m4/lib-link.m4: 708
+aclocal-1.16: ignoring macro AC_LIB_PROG_LD_GNU in /c/libidn2/m4/lib-ld.m4: 12
+aclocal-1.16: ignoring macro AC_LIB_PROG_LD in /c/libidn2/m4/lib-ld.m4: 27
+aclocal-1.16: ignoring macro gt_LC_MESSAGES in /c/libidn2/m4/lcmessage.m4: 22
+aclocal-1.16: ignoring macro gl_AC_HEADER_INTTYPES_H in /c/libidn2/m4/inttypes_h.m4: 12
+aclocal-1.16: ignoring macro gt_INTTYPES_PRI in /c/libidn2/m4/inttypes-pri.m4: 14
+aclocal-1.16: ignoring macro gt_TYPE_INTMAX_T in /c/libidn2/m4/intmax.m4: 11
+aclocal-1.16: ignoring macro gt_INTL_MACOSX in /c/libidn2/m4/intlmacosx.m4: 18
+aclocal-1.16: ignoring macro AM_GNU_GETTEXT_INTL_SUBDIR in /c/libidn2/m4/intldir.m4: 19
+aclocal-1.16: ignoring macro AM_INTL_SUBDIR in /c/libidn2/m4/intl.m4: 25
+aclocal-1.16: ignoring macro gt_INTL_SUBDIR_CORE in /c/libidn2/m4/intl.m4: 211
+aclocal-1.16: ignoring macro gt_GL_ATTRIBUTE in /c/libidn2/m4/intl.m4: 282
+aclocal-1.16: ignoring macro gt_INTDIV0 in /c/libidn2/m4/intdiv0.m4: 9
+aclocal-1.16: ignoring macro AM_ICONV_LINKFLAGS_BODY in /c/libidn2/m4/iconv.m4: 9
+aclocal-1.16: ignoring macro AM_ICONV_LINK in /c/libidn2/m4/iconv.m4: 20
+aclocal-1.16: ignoring macro AM_ICONV in /c/libidn2/m4/iconv.m4: 233
+aclocal-1.16: ignoring macro GTK_DOC_CHECK in /c/libidn2/m4/gtk-doc.m4: 32
+aclocal-1.16: ignoring macro gl_GLIBC21 in /c/libidn2/m4/glibc21.m4: 11
+aclocal-1.16: ignoring macro gt_GLIBC2 in /c/libidn2/m4/glibc2.m4: 11
+aclocal-1.16: ignoring macro AM_GNU_GETTEXT in /c/libidn2/m4/gettext.m4: 57
+aclocal-1.16: ignoring macro AM_GNU_GETTEXT_NEED in /c/libidn2/m4/gettext.m4: 409
+aclocal-1.16: ignoring macro AM_GNU_GETTEXT_VERSION in /c/libidn2/m4/gettext.m4: 416
+aclocal-1.16: ignoring macro AM_GNU_GETTEXT_REQUIRE_VERSION in /c/libidn2/m4/gettext.m4: 420
+aclocal-1.16: ignoring macro gl_FCNTL_O_FLAGS in /c/libidn2/m4/fcntl-o.m4: 12
+aclocal-1.16: ignoring macro gl_EXTERN_INLINE in /c/libidn2/m4/extern-inline.m4: 8
+aclocal-1.16: ignoring macro AM_LANGINFO_CODESET in /c/libidn2/m4/codeset.m4: 10
+aclocal-1.16: ignoring macro gl_MODULE_INDICATOR_FOR_TESTS in m4/gnulib-common.m4: 1056
+(수정)
+configure.ac 수정
+AC_DEFINE([gl_MODULE_INDICATOR_FOR_TESTS], [], [Description of the macro])
+
+(오류)
+m4_divert_push: cannot change diversion to 'GROW' inside m4_expand
+(수정)
+configure.ac 파일에서 m4 매크로를 사용하는 과정에서 발생하는 문제
+매크로 정의나 분기 처리 방식에 문제가 있을 때 발생
+
+고유 매크로 선언 중복 경고들
+aclocal-1.16: saw macro LT_PROG_RC
+aclocal-1.16: saw macro LT_PROG_RC
+aclocal-1.16: saw macro LT_AC_PROG_RC
+aclocal-1.16: saw macro AC_PROG_EGREP
+aclocal-1.16: saw macro LT_AC_PROG_SED
+aclocal-1.16: saw macro LTOPTIONS_VERSION
+...
+
+(오류)
+checking for getprogname... no
+(수정)
+lib/Makefile.gnulib 선언확인
+if GL_COND_OBJ_GETPROGNAME
+libtextstyle_la_SOURCES += getprogname.c
+endif
+=> configure.ac, config.h에 GL_COND_OBJ_GETPROGNAME 선언이 없음
+
+configure.ac 수정
+AC_INIT([libtextstyle], [1.0], [bug-libtextstyle@example.com])
+# GNULIB 모듈 정의
+GNULIB_MODULES="
+    ncurses
+    terminfo
+    xmalloc
+    xrealloc
+    xgethostname
+    _gl_nothrow_get_osfhandle
+    getprogname
+"
+=>GL_COND_OBJ_GETHOSTNAME는 Gnulib의 모듈이 초기화되면 자동으로 정의
+별도로 ac_define을 사용할 필요가 없습
+
+(오류)
+checking for attributes.h... no
+(수정)
+configure.ac 수정
+# Check for required system headers
+//AC_CHECK_HEADERS([stdio.h stdlib.h wchar.h attributes.h])
+AC_CHECK_HEADERS([stdio.h stdlib.h wchar.h]) #attributes.h존재하지않음
+
+(오류)
+checking for fsync... no
+(수정)
+configure.ac 수정
+# GNULIB 모듈 정의
+GNULIB_MODULES="
+    ncurses \
+    terminfo \
+    xmalloc \
+    xrealloc \
+    xgethostname \
+    _gl_nothrow_get_osfhandle \
+    fsync \
+    getprogname
+"
+# Check for fsync
+#fsync가 사용 가능한지 확인하고, 그렇지 않은 경우 FlushFileBuffers를 사용하도록 설정
+AC_COMPILE_IFELSE([
+    AC_LANG_SOURCE([
+        #include <unistd.h>
+        int main() {
+            int fd = 0; // 예시로 stdin 사용
+            fsync(fd);
+            return 0;
+        }
+    ])
+],
+[
+    AC_DEFINE([HAVE_FSYNC], [1], [Define to 1 if you have the `fsync' function.])
+],
+[
+    AC_DEFINE([HAVE_FLUSH_FILE_BUFFERS], [1], [Define to 1 if using FlushFileBuffers on Windows.])
+])
+
+(오류)
+checking whether the compiler supports __attribute__((__malloc__))... done
+(수정)
+__attribute__((__malloc__)) 속성을 지원하는지에 대한 체크가 성공적으로 완료되었음을 나타냄.
+
+(오류)
+checking whether -lc should be explicitly linked in... yes
+(수정)
+C 라이브러리(libc)를 링크해야 한다는 것을 의미합니다.
+configure.ac 확인
+# GNULIB 모듈 정의
+GNULIB_MODULES=" \
+    ncurses \
+    terminfo \
+    xmalloc \
+    xrealloc \
+    xgethostname \
+    _gl_nothrow_get_osfhandle \
+    getprogname \
+    fsync \
+"
+
+AC_CHECK_HEADERS([stdio.h stdlib.h wchar.h])
+
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([
+#include <unistd.h>
+int main() {
+    int fd = 0; // 예시로 stdin 사용
+    fsync(fd);
+    return 0;
+}])],
+    [AC_DEFINE([HAVE_FSYNC], [1], [Define to 1 if you have the `fsync' function.])],
+    [AC_DEFINE([HAVE_FLUSH_FILE_BUFFERS], [1], [Define to 1 if using FlushFileBuffers on Windows.])]
+)
+
+# GL_COND_OBJ_FSYNC : configure.ac, config.h에 없음
+# GL_COND_OBJ_FSYNC를 사용하기 위해, configure.ac 파일에 fsync에 대한 조건부 체크를 추가
+# fsync 함수 체크 추가
+# Check for the presence of getprogname function
+//AC_CHECK_FUNCS([getprogname printf malloc])
+AC_CHECK_FUNCS([getprogname printf malloc fsync], [GL_COND_OBJ_FSYNC=1])
+
+lib/Makefile.gnulib 선언확인
+if GL_COND_OBJ_GETPROGNAME
+libtextstyle_la_SOURCES += getprogname.c
+endif
+
+if GL_COND_OBJ_FSYNC
+libtextstyle_la_SOURCES += fsync.c
+endif
+
+(오류)
+checking if /mingw64/bin/gcc supports -fno-rtti -fno-exceptions... no
+(수정)
+사용 중인 GCC 컴파일러가 -fno-rtti 및 -fno-exceptions 플래그를 지원하지 않음을 의미
+C++ 코드에서 런타임 타입 정보(RTTI)와 예외 처리를 비활성화하는 데 사용
+C++에서 이러한 플래그가 필요하지 않다면, configure.ac 또는 Makefile에서 이들을 제거하는 것이 좋음
+gcc 버전 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# gcc --version
+gcc.exe (Rev1, Built by MSYS2 project) 14.2.0
+Copyright (C) 2024 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+-fno-rtti와 -fno-exceptions 플래그를 지원하는지 확인하고, 조건부로 해당 플래그를 적용할 수 있음
+
+configure.ac 수정
+# Set C++ standard to C++17
+CXXFLAGS="$CXXFLAGS -std=c++17"   # C++ 표준을 C++17로 설정
+AC_SUBST(CXXFLAGS)                # Makefile에 전달
+
+AC_COMPILE_IFELSE([    # C++ 컴파일러가 해당 플래그를 지원하는지 여부에 따라 동적으로 플래그가 추가
+  AC_LANG_SOURCE([
+    #include <cstdlib>
+    int main() { return 0; }
+  ])
+],
+[
+  # C++ 컴파일러가 -fno-rtti와 -fno-exceptions 플래그를 지원하는 경우
+  CXXFLAGS="$CXXFLAGS -fno-rtti -fno-exceptions"
+])
+
+
+
+
+
 
