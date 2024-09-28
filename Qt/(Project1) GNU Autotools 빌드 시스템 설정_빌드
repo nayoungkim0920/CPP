@@ -13083,7 +13083,243 @@ nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
 수정 후
 # source ~/.bashrc 
 
-일단 무시해도된다고하여 다음단계로 진행
+(오류)
+aclocal-1.16: ignoring macro gl_MODULE_INDICATOR_FOR_TESTS in m4/gnulib-common.m4: 1056
+aclocal-1.16: ignoring macro AC_LIBTOOL_PROG_CC_C_O in /usr/share/aclocal/lt~obsolete.m4: 52
+aclocal-1.16: ignoring macro AC_LIBTOOL_SYS_HARD_LINK_LOCKS in /usr/share/aclocal/lt~obsolete.m4: 53
+aclocal-1.16: ignoring macro AC_LIBTOOL_OBJDIR in /usr/share/aclocal/lt~obsolete.m4: 54
+aclocal-1.16: ignoring macro AC_DISABLE_FAST_INSTALL in /usr/share/aclocal/ltoptions.m4: 312
+aclocal-1.16: ignoring macro AC_LIBTOOL_LINKER_OPTION in /usr/share/aclocal/libtool.m4: 1675
+aclocal-1.16: ignoring macro LT_AC_PROG_SED in /usr/share/aclocal/libtool.m4: 8303
+...
+(수정)
+ignoring만 터미널에 출력/ build_output.log 저장되도록 함
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# {
+    {
+        aclocal --verbose
+    } 2>&1 | awk '/ignoring/ {print}'
+
+    {
+        autoconf --verbose
+    } 2>&1 | awk '/ignoring/ {print}'
+
+    {
+        autoheader --verbose
+    } 2>&1 | awk '/ignoring/ {print}'
+
+    {
+        automake --add-missing --verbose
+    } 2>&1 | awk '/ignoring/ {print}'
+
+    {
+        libtoolize --verbose
+    } 2>&1 | awk '/ignoring/ {print}'
+
+    {
+        autoreconf -ivf
+    } 2>&1 | awk '/ignoring/ {print}'
+
+    {
+        ./configure --verbose
+    } 2>&1 | awk '/ignoring/ {print}'
+
+    {
+        make clean
+    } 2>&1 | awk '/ignoring/ {print}'
+
+    {
+        make
+    } 2>&1 | awk '/ignoring/ {print}'
+} 2>&1 | tee build_output.log || echo "An error occurred in the build process."
+
+(일단 gl_MODULE_INDICATOR_FOR_TESTS 샘플로 확인)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# # 예: 특정 매크로가 정의된 파일 검색
+grep -r "gl_MODULE_INDICATOR_FOR_TESTS" m4/
+...
+(선언된파일)
+m4/gnulib-common.m4:  AC_DEFUN([gl_MODULE_INDICATOR_FOR_TESTS], [])
+...
+(사용된파일)
+m4/dirent_h.m4, m4/fcntl_h.m4, m4/fenv_h.m4, m4/fnmatch_h.m4, m4/glob_h.m4, 
+m4/langinfo_h.m4, m4/locale_h.m4, m4/malloc_h.m4, m4/math_h.m4, m4/mntent_h.m4,
+m4/netdb_h.m4, m4/poll_h.m4, m4/pthread_h.m4, m4/pty_h.m4, m4/sched_h.m4,
+m4/search_h.m4, m4/signal_h.m4, m4/spawn_h.m4, m4/stdio_h.m4, m4/stdlib_h.m4,
+m4/string_h.m4, m4/sys_ioctl_h.m4, m4/sys_random_h.m4, m4/sys_resource_h.m4, ...
+
+(매크로마다 정의와 사용된 부분을 출력하는 sh파일생성: 일단 gl_MODULE_INDICATOR_FOR_TESTS 테스트)
+#!/bin/bash
+
+# 매크로 이름 정의
+macro="gl_MODULE_INDICATOR_FOR_TESTS"
+
+# 매크로 정의 상태 확인
+define_status=$(grep -i "AC_DEFUN(\[$macro\]" macro_definitions.txt)
+
+# 매크로 호출 상태 확인
+call_status=$(grep -i "$macro" macro_calls.txt | grep -v "AC_DEFUN")
+
+# 결과 출력
+echo "[macro]"
+echo "$macro"
+echo
+echo "[define]"
+if [ -n "$define_status" ]; then
+    echo "$define_status"
+else
+    echo "N/A"
+fi
+echo
+echo "[call]"
+if [ -n "$call_status" ]; then
+    echo "$call_status"
+else
+    echo "N/A"
+fi
+(파일만들기)
+# 매크로 목록
+c:/ignor/macros.txt
+
+# 매크로 정의를 찾아 파일 생성
+grep -r "AC_DEFUN(\[$macro\]" m4/ > macro_definitions.txt 
+
+# 매크로 호출을 찾아 파일 생성
+grep -r "\[$macro\]" m4/ > macro_calls.txt
+
+(결과)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ./ignor_check_macros.sh
+[macro]
+gl_MODULE_INDICATOR_FOR_TESTS
+
+[define]
+m4/gnulib-common.m4:AC_DEFUN([gl_MODULE_INDICATOR_FOR_TESTS],
+m4/gnulib-common.m4:  AC_DEFUN([gl_MODULE_INDICATOR_FOR_TESTS], [])
+
+[call]
+m4/dirent_h.m4:  gl_MODULE_INDICATOR_FOR_TESTS([$1])
+m4/fcntl_h.m4:  gl_MODULE_INDICATOR_FOR_TESTS([$1])
+m4/fenv_h.m4:  gl_MODULE_INDICATOR_FOR_TESTS([$1])
+m4/fnmatch_h.m4:  gl_MODULE_INDICATOR_FOR_TESTS([$1])
+m4/glob_h.m4:  gl_MODULE_INDICATOR_FOR_TESTS([$1])
+m4/gnulib-common.m4:# gl_MODULE_INDICATOR_FOR_TESTS([modulename])
+m4/gnulib-common.m4:  dnl Override gl_MODULE_INDICATOR_FOR_TESTS.
+m4/langinfo_h.m4:  gl_MODULE_INDICATOR_FOR_TESTS([$1])
+m4/locale_h.m4:  gl_MODULE_INDICATOR_FOR_TESTS([$1])
+m4/malloc_h.m4:  gl_MODULE_INDICATOR_FOR_TESTS([$1])
+m4/math_h.m4:  gl_MODULE_INDICATOR_FOR_TESTS([$1])
+m4/mntent_h.m4:  gl_MODULE_INDICATOR_FOR_TESTS([$1])
+m4/netdb_h.m4:  gl_MODULE_INDICATOR_FOR_TESTS([$1])
+m4/poll_h.m4:  gl_MODULE_INDICATOR_FOR_TESTS([$1])
+m4/pthread_h.m4:  gl_MODULE_INDICATOR_FOR_TESTS([$1])
+m4/pty_h.m4:  gl_MODULE_INDICATOR_FOR_TESTS([$1])
+m4/sched_h.m4:  gl_MODULE_INDICATOR_FOR_TESTS([$1])
+m4/search_h.m4:  gl_MODULE_INDICATOR_FOR_TESTS([$1])
+m4/signal_h.m4:  gl_MODULE_INDICATOR_FOR_TESTS([$1])
+m4/spawn_h.m4:  gl_MODULE_INDICATOR_FOR_TESTS([$1])
+m4/stdio_h.m4:  gl_MODULE_INDICATOR_FOR_TESTS([$1])
+m4/stdlib_h.m4:  gl_MODULE_INDICATOR_FOR_TESTS([$1])
+m4/string_h.m4:  gl_MODULE_INDICATOR_FOR_TESTS([$1])
+m4/sys_ioctl_h.m4:  gl_MODULE_INDICATOR_FOR_TESTS([$1])
+m4/sys_random_h.m4:  gl_MODULE_INDICATOR_FOR_TESTS([$1])
+m4/sys_resource_h.m4:  gl_MODULE_INDICATOR_FOR_TESTS([$1])
+m4/sys_select_h.m4:  gl_MODULE_INDICATOR_FOR_TESTS([$1])
+m4/sys_socket_h.m4:  gl_MODULE_INDICATOR_FOR_TESTS([$1])
+m4/sys_stat_h.m4:  gl_MODULE_INDICATOR_FOR_TESTS([$1])
+m4/sys_time_h.m4:  gl_MODULE_INDICATOR_FOR_TESTS([$1])
+m4/sys_uio_h.m4:  gl_MODULE_INDICATOR_FOR_TESTS([$1])
+m4/sys_wait_h.m4:  gl_MODULE_INDICATOR_FOR_TESTS([$1])
+m4/termios_h.m4:  gl_MODULE_INDICATOR_FOR_TESTS([$1])
+m4/threads_h.m4:  gl_MODULE_INDICATOR_FOR_TESTS([$1])
+m4/time_h.m4:  gl_MODULE_INDICATOR_FOR_TESTS([$1])
+m4/uchar_h.m4:  gl_MODULE_INDICATOR_FOR_TESTS([$1])
+m4/unicase_h.m4:  gl_MODULE_INDICATOR_FOR_TESTS([$1])
+m4/unictype_h.m4:  gl_MODULE_INDICATOR_FOR_TESTS([$1])
+m4/unimetadata_h.m4:  gl_MODULE_INDICATOR_FOR_TESTS([$1])
+m4/uninorm_h.m4:  gl_MODULE_INDICATOR_FOR_TESTS([$1])
+m4/unistd_h.m4:  gl_MODULE_INDICATOR_FOR_TESTS([$1])
+m4/utime_h.m4:  gl_MODULE_INDICATOR_FOR_TESTS([$1])
+m4/utmp_h.m4:  gl_MODULE_INDICATOR_FOR_TESTS([$1])
+m4/wchar_h.m4:  gl_MODULE_INDICATOR_FOR_TESTS([$1])
+m4/wctype_h.m4:  gl_MODULE_INDICATOR_FOR_TESTS([$1])
+
+=> 정의도 되어있고 호출도 다양하게 하는데 왜 ignoring, saw 경고가 나는지 확인해야함
+=> Autoconf와 M4 매크로 시스템에서 매크로가 적절하게 정의되거나 사용되지 않았을 때 발생
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+(오류)
+autoreconf: running: aclocal --force -I m4 -I gnulib-m4 -I /mingw64/share/aclocal
+autoreconf: running: /mingw64/bin/autoconf --force
+configure.ac:50: warning: AC_COMPILE_IFELSE was called before AC_USE_SYSTEM_EXTENSIONS
+./lib/autoconf/specific.m4:541: AC_USE_SYSTEM_EXTENSIONS is expanded from...
+configure.ac:50: the top level
+configure.ac:68: error: possibly undefined macro: AC_DEFINE
+      If this token and others are legitimate, please use m4_pattern_allow.
+      See the Autoconf documentation.
+configure.ac:168: error: possibly undefined macro: gl_MODULE
+configure.ac:514: error: possibly undefined macro: m4_ifndef
+autoreconf: error: /mingw64/bin/autoconf failed with exit status: 1
+(수정)
+gnulib 서브모듈 초기화
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# git submodule init
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# git submodule update
+
+
+AC_COMPILE_IFELSE가 AC_USE_SYSTEM_EXTENSIONS보다 먼저 호출 경고
+제일 처음에 나오는 AC_COMPILE_IFELSE 위로 이동
+configure.ac 수정
+# Enable system extensions before other checks
+AC_USE_SYSTEM_EXTENSIONS
+
+m4_pattern_allow 사용
+m4_pattern_allow([AC_DEFINE])
+m4_pattern_allow([gl_MODULES])
+m4_pattern_allow([m4_ifndef])
+
+AC_DEFINE, gl_MODULE, m4_ifndef 등의 매크로는 추가적인 M4 매크로 파일이 필요할 수 있음
+Makefile.am 수정
+ACLOCAL_AMFLAGS = -I m4 -I gnulib-m4 -I /mingw64/share/aclocal
+
+lib,m4 폴더 백업 후 
+gnulib-tool --add-import
+
+(오류)
+./configure: line 9248: syntax error near unexpected token `xsize'
+./configure: line 9248: `gl_MODULE(xsize)'
+
+(수정)
+//gl_MODULE([xsize])
+gl_MODULES([xsize])
+
+
+
+
+
+
+
+
+
 
 (make install)
 # make install
