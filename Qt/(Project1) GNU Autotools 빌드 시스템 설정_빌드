@@ -13291,15 +13291,255 @@ gl_MODULE_INDICATOR_FOR_TESTS를 재정의하는 부분을 주석 처리하거�
 #  AC_DEFUN([gl_MODULE_INDICATOR_FOR_TESTS], [])
 #])
 
+(수정전 빌드)
+aclocal-1.16: ignoring macro gl_MODULE_INDICATOR_FOR_TESTS in m4/gnulib-common.m4: 1056
+aclocal-1.16: ignoring macro AC_LIBTOOL_PROG_CC_C_O in /usr/share/aclocal/lt~obsolete.m4: 52
+aclocal-1.16: ignoring macro AC_LIBTOOL_SYS_HARD_LINK_LOCKS in /usr/share/aclocal/lt~obsolete.m4: 53
+aclocal-1.16: ignoring macro AC_LIBTOOL_OBJDIR in /usr/share/aclocal/lt~obsolete.m4: 54
+aclocal-1.16: ignoring macro AC_DISABLE_FAST_INSTALL in /usr/share/aclocal/ltoptions.m4: 312
+aclocal-1.16: ignoring macro AC_LIBTOOL_LINKER_OPTION in /usr/share/aclocal/libtool.m4: 1675
+aclocal-1.16: ignoring macro LT_AC_PROG_SED in /usr/share/aclocal/libtool.m4: 8303
+(수정 후 빌드)
+aclocal-1.16: ignoring macro AC_LIBTOOL_PROG_CC_C_O in /usr/share/aclocal/lt~obsolete.m4: 52
+aclocal-1.16: ignoring macro AC_LIBTOOL_SYS_HARD_LINK_LOCKS in /usr/share/aclocal/lt~obsolete.m4: 53
+aclocal-1.16: ignoring macro AC_LIBTOOL_OBJDIR in /usr/share/aclocal/lt~obsolete.m4: 54
+aclocal-1.16: ignoring macro AC_DISABLE_FAST_INSTALL in /usr/share/aclocal/ltoptions.m4: 312
+aclocal-1.16: ignoring macro AC_LIBTOOL_LINKER_OPTION in /usr/share/aclocal/libtool.m4: 1675
+aclocal-1.16: ignoring macro LT_AC_PROG_SED in /usr/share/aclocal/libtool.m4: 8303
+aclocal-1.16: ignoring macro gl_XSIZE in /mingw64/share/aclocal/xsize.m4: 7
+=> aclocal-1.16: ignoring macro gl_MODULE_INDICATOR_FOR_TESTS in m4/gnulib-common.m4: 1056 사라짐
 
+ignoring warning이 한두개가 아닌관계로 
+aclocal에 --warnings=none 옵션을 추가해 경고를 무시
+모든 출력 나오도록 빌드 명령어 수정
+{
+    {
+        aclocal --warnings=none --verbose;
+    } 2>&1;
+    
+    {
+        autoconf --verbose;
+    } 2>&1;
+    
+    {
+        autoheader --verbose;
+    } 2>&1;
+    
+    {
+        automake --add-missing --verbose;
+    } 2>&1;
+    
+    {
+        libtoolize --verbose;
+    } 2>&1;
+    
+    {
+        autoreconf -ivf;
+    } 2>&1;
+    
+    {
+        ./configure --verbose;
+    } 2>&1;
+    
+    {
+        make clean;
+    } 2>&1;
+    
+    {
+        make;
+    } 2>&1;
+} 2>&1 | tee build_output.log || echo "An error occurred in the build process."
 
+(오류)
+error: implicit declaration of function 'sigemptyset' [-Wimplicit-function-declaration]
+error: implicit declaration of function 'sigaddset' [-Wimplicit-function-declaration]
+error: implicit declaration of function 'sigprocmask' [-Wimplicit-function-declaration]
+(수정)
+lib/term-style-control.h 수정
+#ifdef _WIN32 // window는 posix를 완벽히지원하지 않음. Windows API SetConsoleCtrlHandler 콘솔신호유사기능 구현
+typedef unsigned int sigset_t;
 
+#ifndef sigemptyset
+int sigemptyset(sigset_t *set) { //extern 제거
+    if (set) {
+        *set = 0;
+        return 0;
+    }
+    return -1;
+}
+#endif
 
+#ifndef sigaddset
+int sigaddset(sigset_t *set, int signal) { //extern 제거
+    if (set && signal > 0 && signal < 32) {
+        *set |= (1U << signal);
+        return 0;
+    }
+    return -1;
+}
+#endif
 
+#ifndef sigprocmask
+int sigprocmask(int how, const sigset_t *set, sigset_t *oldset) { //extern 제거
+	(void)how;  // 사용하지 않음을 명시
+	(void)set; // 사용하지 않음을 명시
+	(void)oldset; // 사용하지 않음을 명시
+    return 0;
+}
+#endif
 
+#endif /* _WIN32 */
 
+(오류)
+libtool: error: cannot find the library 'libintl.la'
+(수정)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -Q
+libtool 2.4.7-4
+gettext 0.22.4-1
+gettext-devel 0.22.4-1
 
+"C:\libidn2\gettext-0.22.5\gettext-runtime\intl\libintl.la"
+"C:\libidn2\gettext-0.22.5\gettext-runtime\intl\.libs\libintl.lai"
+"C:\libidn2\gettext-0.22.5\gettext-runtime\intl\.libs\libintl.la"
 
+notepad ~/.bashrc 수정
+export PKG_CONFIG_PATH="/c/libidn2/gettext-0.22.5/gettext-runtime/intl:/mingw64/lib/pkgconfig:/usr/lib/pkgconfig"
+source ~/.bashrc 적
+
+configure.ac 수정
+# 패키지 설정
+PKG_CHECK_MODULES([ITL], [libintl], [NCURSES], [ncurses], [have_ncurses=yes], [have_ncurses=no])
+
+# 인클루드 경로와 라이브러리 경로 추가 : libtool이 자동으로 올바른 경로에서 libintl을 찾아 사용할 수 있도록 함
+AC_SUBST([INTL_CFLAGS], [$INTL_CFLAGS])
+AC_SUBST([INTL_LIBS], [$INTL_LIBS])
+
+Makefile.am 수정
+bin_PROGRAMS = libtextstyle
+libtextstyle_la_LIBS = -lncurses $(GNULIB_LIBS) # libtextstyle 라이브러리에 링크할 라이브러리들
+libtextstyle_SOURCES = libtextstyle.o
+libtextstyle_LDADD = libtextstyle.la -L/c/libidn2/gettext-0.22.5/gettext-runtime/intl/.libs -lintl
+libtextstyle_LIBADD = $(NCURSES_LIBS) #ncurses 라이브러리를 링크하기 위해 $(NCURSES_LIBS)를 사용# 설치할 라이브러리의 위치
+libtextstyle_la_LDFLAGS = -shared -Wl,--out-implib=libtextstyle.dll.a $(LDFLAGS) #DLL을 생성하기 위한 필수 플래그를 추가
+# -shared는 공유 라이브러리를 생성하는 옵션이며, 
+# -Wl, --out-implib=libtextstyle.dll.a는 DLL의 import 라이브러리를 생성
+
+# Add the static archive to be installed
+# 정적 라이브러리 설치 코드를 추가(주석제거)
+install: all
+  $(INSTALL) -m 755 lib/libtextstyle.a $(prefix)/lib
+
+(오류)
+onfigure.ac:554: error: possibly undefined macro: AC_GNU_LIBTOOL_WIN32
+      If this token and others are legitimate, please use m4_pattern_allow.
+      See the Autoconf documentation.
+configure.ac:561: error: possibly undefined macro: AC_GNU_LIBTOOL
+(수정)
+configure.ac 수정
+AM_INIT_AUTOMAKE([1.9.6 foreign])
+AC_PROG_LIBTOOL
+
+(오류)
+configure.ac:24: warning: The macro 'AC_PROG_LIBTOOL' is obsolete.
+configure.ac:24: You should run autoupdate.
+(수정)
+AC_PROG_LIBTOOL 매크로는 구식이므로, AC_ENABLE_SHARED 및 AC_LIBTOOL_WIN32와 같은 새로운 매크로로 대체
+configure.ac 수정
+AC_INIT([libtextstyle], [1.0], [bug-libtextstyle@example.com])
+AC_USE_SYSTEM_EXTENSIONS # AC_INIT 보다 먼저 호출하면 안됨
+#AM_INIT_AUTOMAKE([1.9.6 foreign]) 
+#AC_PROG_LIBTOOL 제거됨 -> LT_INIT 
+LT_INIT([win32-dll])
+gl_INIT_PACKAGE([libtextstyle], [$VERSION_NUMBER])
+AM_INIT_AUTOMAKE([1.13 silent-rules]) #gl_INIT_PACKAGE보다 먼저 선언되면 안됨
+
+#AC_GNU_LIBTOOL_WIN32 및 AC_GNU_LIBTOOL, 이들 매크로를 사용하지 않고 LT_INIT만 사용하면 해결
+#AC_GNU_LIBTOOL_WIN32 # LT_INIT대체
+#AC_GNU_LIBTOOL # LT_INIT대체
+
+(오류)
+Makefile.am:47: error: use 'libtextstyle_LDADD', not 'libtextstyle_LIBADD'
+Makefile.am:47: warning: variable 'libtextstyle_LIBADD' is defined but no program or
+Makefile.am:47: library has 'libtextstyle' as canonical name (possible typo)
+make: *** [Makefile:816: Makefile.in] 오류 1
+ cd . && /bin/sh /c/libidn2/gettext-0.22.5/libtextstyle/build-aux/missing automake-1.16 --gnu
+Makefile.am:47: error: use 'libtextstyle_LDADD', not 'libtextstyle_LIBADD'
+Makefile.am:47: warning: variable 'libtextstyle_LIBADD' is defined but no program or
+Makefile.am:47: library has 'libtextstyle' as canonical name (possible typo)
+
+(수정)
+#bin_PROGRAMS = libtextstyle_la 실행가능한 프로그램인 경우
+libtextstyle_la_LIBS = -lncurses $(GNULIB_LIBS) # libtextstyle 라이브러리에 링크할 라이브러리들
+libtextstyle_la_SOURCES = libtextstyle.o
+libtextstyle_la_LDADD = libtextstyle.la -L/c/libidn2/gettext-0.22.5/gettext-runtime/intl/.libs -lintl
+#libtextstyle_la_LIBADD = $(NCURSES_LIBS) #ncurses 라이브러리를 링크하기 위해 $(NCURSES_LIBS)를 사용# 설치할 라이브러리의 위치
+libtextstyle_la_LDFLAGS = -shared -Wl,--out-implib=libtextstyle.dll.a $(LDFLAGS) #DLL을 생성하기 위한 필수 플래그를 추가
+# -shared는 공유 라이브러리를 생성하는 옵션이며, 
+# -Wl, --out-implib=libtextstyle.dll.a는 DLL의 import 라이브러리를 생성
+
+(오류)
+Makefile.am:45: warning: libtextstyle_la_SOURCES multiply defined in condition TRUE ...
+Makefile.am:29: ... 'libtextstyle_la_SOURCES' previously defined here
+(수정)
+Makefile.am 수정
+#libtextstyle_la_SOURCES = libtextstyle.o
+
+(오류)
+Makefile.am:46: error: use 'libtextstyle_la_LIBADD', not 'libtextstyle_la_LDADD'
+Makefile.am:46: warning: variable 'libtextstyle_la_LDADD' is defined but no program or
+Makefile.am:46: library has 'libtextstyle_la' as canonical name (possible typo)
+(수정)
+Makefile.am 수정
+#libtextstyle_la_LDADD = libtextstyle.la -L/c/libidn2/gettext-0.22.5/gettext-runtime/intl/.libs -lintl
+libtextstyle_la_LIBADD = $(NCURSES_LIBS) #ncurses 라이브러리를 링크하기 위해 $(NCURSES_LIBS)를 사용# 설치할 라이브러리의 위치
+
+(오류)
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/msys64/mingw64/lib/libtextstyle.a(term-ostream.o):term-ostream.c:(.text+0x0): multiple definition of `sigemptyset'; C:/msys64/mingw64/lib/libtextstyle.a(color.o):color.c:(.text+0x43): first defined here
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/msys64/mingw64/lib/libtextstyle.a(term-ostream.o):term-ostream.c:(.text+0x27): multiple definition of `sigaddset'; C:/msys64/mingw64/lib/libtextstyle.a(color.o):color.c:(.text+0x6a): first defined here
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/msys64/mingw64/lib/libtextstyle.a(term-ostream.o):term-ostream.c:(.text+0x72): multiple definition of `sigprocmask'; C:/msys64/mingw64/lib/libtextstyle.a(color.o):color.c:(.text+0xb5): first defined here
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/msys64/mingw64/lib/libtextstyle.a(term-style-control.o):term-style-control.c:(.text+0x0): multiple definition of `sigemptyset'; C:/msys64/mingw64/lib/libtextstyle.a(color.o):color.c:(.text+0x43): first defined here
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/msys64/mingw64/lib/libtextstyle.a(term-style-control.o):term-style-control.c:(.text+0x27): multiple definition of `sigaddset'; C:/msys64/mingw64/lib/libtextstyle.a(color.o):color.c:(.text+0x6a): first defined here
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/msys64/mingw64/lib/libtextstyle.a(term-style-control.o):term-style-control.c:(.text+0x72): multiple definition of `sigprocmask'; C:/msys64/mingw64/lib/libtextstyle.a(color.o):color.c:(.text+0xb5): first defined here
+(수정)
+lib/term-style-control.h 수정
+함수 앞에 static 붙일것
+#ifdef _WIN32 // window는 posix를 완벽히지원하지 않음. Windows API SetConsoleCtrlHandler 콘솔신호유사기능 구현
+typedef unsigned int sigset_t;
+
+#ifndef sigemptyset
+static int sigemptyset(sigset_t *set) {
+    if (set) {
+        *set = 0;
+        return 0;
+    }
+    return -1;
+}
+#endif
+
+#ifndef sigaddset
+static int sigaddset(sigset_t *set, int signal) {
+    if (set && signal > 0 && signal < 32) {
+        *set |= (1U << signal);
+        return 0;
+    }
+    return -1;
+}
+#endif
+
+#ifndef sigprocmask
+static  int sigprocmask(int how, const sigset_t *set, sigset_t *oldset) {
+	(void)how;  // 사용하지 않음을 명시
+	(void)set; // 사용하지 않음을 명시
+	(void)oldset; // 사용하지 않음을 명시
+    return 0;
+}
+#endif
+
+#endif /* _WIN32 */
+(오류)
+
+(수정)
 
 
 
