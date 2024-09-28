@@ -13246,12 +13246,50 @@ m4/wctype_h.m4:  gl_MODULE_INDICATOR_FOR_TESTS([$1])
 
 => 정의도 되어있고 호출도 다양하게 하는데 왜 ignoring, saw 경고가 나는지 확인해야함
 => Autoconf와 M4 매크로 시스템에서 매크로가 적절하게 정의되거나 사용되지 않았을 때 발생
+=> m4/gnulib-common.m4 파일을 열어 gl_MODULE_INDICATOR_FOR_TESTS 매크로의 정의가 완전하게 작성되었는지 확인
+"C:\libidn2\gettext-0.22.5\libtextstyle\m4\gnulib-common.m4"
+# 매크로 정의가 끝나지 않은 것처럼 보일 수 있습니다. 
+# AC_DEFINE에서 인자를 전달할 때 $1이 정의되지 않은 경우에 문제가 발생할 수 있음.
+# $1이 적절한 값을 가져오는지 확인
+AC_DEFUN([gl_MODULE_INDICATOR_FOR_TESTS],
+[
+  AC_DEFINE([GNULIB_TEST_]m4_translit([[$1]],
+      [abcdefghijklmnopqrstuvwxyz./-],
+      [ABCDEFGHIJKLMNOPQRSTUVWXYZ___]), [1],
+    [Define to 1 when the gnulib module $1 should be tested.])
+])
 
+# gl_ASSERT_NO_GNULIB_TESTS 매크로가 호출될 때 gl_MODULE_INDICATOR_FOR_TESTS를 재정의합니다. 
+# 이 부분에서 gl_MODULE_INDICATOR_FOR_TESTS 매크로가 사용되지 않을 때 경고가 발생할 수 있다.
+AC_DEFUN([gl_ASSERT_NO_GNULIB_TESTS],
+[
+  dnl Override gl_MODULE_INDICATOR_FOR_TESTS.
+  AC_DEFUN([gl_MODULE_INDICATOR_FOR_TESTS], [])
+])
 
+#Ignoring"은 매크로가 정의되었지만 호출되지 않았다는 의미
+#"Saw"는 매크로가 호출되었지만 해당 매크로에 대한 정의가 없다는 의미
 
+#Gnulib 모듈 확인
+# terminfo 확인
+C:\libidn2\gettext-0.22.5\libtextstyle\m4\terminfo.m4
+configure.ac수정
+AC_GNU_LIBTOOL_WIN32
+AC_CHECK_LIB([ncurses], [tputs], [initscr]) # ncurses 라이브러리 링크 추가
 
+매크로 정의 확인
+terminfo.m4 내에서 gl_MODULE_INDICATOR_FOR_TESTS 매크로가 어떻게 사용되고 있는지 확인
+=>없음
 
-
+gl_ASSERT_NO_GNULIB_TESTS 매크로가 
+gl_MODULE_INDICATOR_FOR_TESTS를 재정의하는 부분을 주석 처리하거나 삭제합니다.
+"C:\libidn2\gettext-0.22.5\libtextstyle\m4\gnulib-common.m4" 수정
+# ignoring warning으로 제거
+#AC_DEFUN([gl_ASSERT_NO_GNULIB_TESTS],
+#[
+#  dnl Override gl_MODULE_INDICATOR_FOR_TESTS.
+#  AC_DEFUN([gl_MODULE_INDICATOR_FOR_TESTS], [])
+#])
 
 
 
