@@ -13538,8 +13538,726 @@ static  int sigprocmask(int how, const sigset_t *set, sigset_t *oldset) {
 
 #endif /* _WIN32 */
 (오류)
-
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+hello.o:hello.c:(.text.startup+0xea): undefined reference to styled_ostream_create'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+hello.o:hello.c:(.text.startup+0x115): undefined reference to styled_ostream_begin_use_class'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+hello.o:hello.c:(.text.startup+0x12f): undefined reference to styled_ostream_begin_use_class'
+...
 (수정)
+hello.c 파일과 libtextstyle.a 라이브러리를 컴파일하는 과정에서 여러 가지 함수들이 정의되지 않았다는 오류
+누락된목록
+styled_ostream_create
+styled_ostream_begin_use_class
+styled_ostream_set_hyperlink
+file_ostream_create
+html_styled_ostream_create
+xmalloc, xrealloc, xgethostname, xalloc_die
+_gl_nothrow_get_osfhandle
+safe_write
+get_fatal_signals, at_fatal_signal
+rpl_stpcpy
+...
+libtextstyle.a 라이브러리 안에 정의되어 있는지 확인
+"C:\libidn2\gettext-0.22.5\libtextstyle\.libs\libtextstyle.a"
+(정의되지 않은예)
+외부에서 참조되는 함수(U로 표시됨)로, 
+라이브러리 내에서 정의된 것이 아니라 다른 라이브러리에서 제공될 것으로 예상됩니다. 
+이 말은 해당 함수들이 이 라이브러리에서는 구현되지 않았으며, 링크 시 외부에서 참조되어야 한다는 의미
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# nm .libs/libtextstyle.a | grep -e styled_ostream_create -e styled_ostream_begin_use_class -e styled_ostream_set_hyperlink -e file_ostream_create -e html_styled_ostream_create -e xmalloc -e xrealloc -e xgethostname -e xalloc_die -e _gl_nothrow_get_osfhandle -e safe_write -e get_fatal_signals -e at_fatal_signal -e rpl_stpcpy
+                 U _gl_nothrow_get_osfhandle
+                 U xgethostname
+                 U xmalloc
+                 U xrealloc
+                 U rpl_stpcpy
+                 U xalloc_die
+                 U _gl_nothrow_get_osfhandle
+                 U safe_write
+                 U at_fatal_signal
+                 U get_fatal_signals
+                 U xalloc_die
+                 U _gl_nothrow_get_osfhandle
+
+styled_ostream_create, styled_ostream_begin_use_class, 
+styled_ostream_set_hyperlink, file_ostream_create, html_styled_ostream_create는 검색되지 않음
+
+(라이브러리 내에 styled_ostream_create 함수가 잘정의된 예)
+term_ostream_create, term_ostream_free 등과 같은 함수들이 T로 표시되어 있어, 이들은 정의된 함수라는 것을 나타냅니다.
+U로 표시된 함수들은 외부에서 제공되는 함수들이며, 정의는 이 라이브러리 내에 없다는 것을 의미합니다. 
+예를 들어 ostream_free, ostream_write_mem, ostream_write_str 등이 외부에서 참조되고 있습니다.
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# nm .libs/libtextstyle.a | grep ostream
+                 U ostream_free
+                 U ostream_write_mem
+                 U ostream_write_str
+                 U term_ostream_create
+                 U term_ostream_get_bgcolor
+                 U term_ostream_get_color
+                 U term_ostream_get_posture
+                 U term_ostream_get_underline
+                 U term_ostream_get_weight
+                 U term_ostream_rgb_to_color
+                 U term_ostream_set_bgcolor
+                 U term_ostream_set_color
+                 U term_ostream_set_posture
+                 U term_ostream_set_underline
+                 U term_ostream_set_weight
+term-ostream.o:
+0000000000005586 T is_instance_of_term_ostream
+                 U ostream_typeinfo
+0000000000004099 t term_ostream__flush
+000000000000489d t term_ostream__flush_to_current_style
+00000000000040fc t term_ostream__free
+00000000000043d5 t term_ostream__get_bgcolor
+000000000000432f t term_ostream__get_color
+000000000000553e t term_ostream__get_descriptor
+0000000000005572 t term_ostream__get_effective_tty_control
+000000000000554f t term_ostream__get_filename
+00000000000046a8 t term_ostream__get_hyperlink_id
+0000000000004671 t term_ostream__get_hyperlink_ref
+000000000000451f t term_ostream__get_posture
+0000000000005561 t term_ostream__get_tty_control
+00000000000045c8 t term_ostream__get_underline
+000000000000447b t term_ostream__get_weight
+0000000000003c93 t term_ostream__rgb_to_color
+00000000000043ef t term_ostream__set_bgcolor
+0000000000004349 t term_ostream__set_color
+00000000000046df t term_ostream__set_hyperlink
+000000000000453d t term_ostream__set_posture
+00000000000045e6 t term_ostream__set_underline
+0000000000004498 t term_ostream__set_weight
+0000000000003d72 t term_ostream__write_mem
+0000000000004ab5 T term_ostream_create
+0000000000005622 T term_ostream_flush
+0000000000005970 T term_ostream_flush_to_current_style
+0000000000005658 T term_ostream_free
+0000000000005735 T term_ostream_get_bgcolor
+00000000000056d1 T term_ostream_get_color
+00000000000059a2 T term_ostream_get_descriptor
+0000000000005a35 T term_ostream_get_effective_tty_control
+00000000000059d3 T term_ostream_get_filename
+00000000000058f9 T term_ostream_get_hyperlink_id
+00000000000058c8 T term_ostream_get_hyperlink_ref
+00000000000057fd T term_ostream_get_posture
+0000000000005a04 T term_ostream_get_tty_control
+0000000000005861 T term_ostream_get_underline
+0000000000005799 T term_ostream_get_weight
+0000000000005687 T term_ostream_rgb_to_color
+0000000000005763 T term_ostream_set_bgcolor
+00000000000056ff T term_ostream_set_color
+000000000000592a T term_ostream_set_hyperlink
+000000000000582b T term_ostream_set_posture
+000000000000588f T term_ostream_set_underline
+00000000000057c7 T term_ostream_set_weight
+0000000000000640 r term_ostream_superclasses
+0000000000000630 R term_ostream_typeinfo
+0000000000000b40 R term_ostream_vtable
+00000000000055df T term_ostream_write_mem
+ostream.o:
+000000000000015a T ostream__flush
+000000000000016f T ostream__free
+0000000000000140 T ostream__write_mem
+00000000000001c4 T ostream_flush
+00000000000001fa T ostream_free
+000000000000006a T ostream_printf
+0000000000000010 r ostream_superclasses
+0000000000000008 R ostream_typeinfo
+00000000000000db T ostream_vprintf
+0000000000000020 R ostream_vtable
+0000000000000181 T ostream_write_mem
+0000000000000031 T ostream_write_str
+
+configure.ac 수정
+CPPFLAGS="$CPPFLAGS -DNEED_MACRO"
+AC_SUBST([LIBS], [-ltextstyle])
+# 함수 등록
+AC_CHECK_FUNC([_gl_nothrow_get_osfhandle], [], [AC_MSG_ERROR([Function _gl_nothrow_get_osfhandle not found])])
+AC_CHECK_FUNC([xgethostname], [], [AC_MSG_ERROR([Function xgethostname not found])])
+AC_CHECK_FUNC([xmalloc], [], [AC_MSG_ERROR([Function xmalloc not found])])
+AC_CHECK_FUNC([xrealloc], [], [AC_MSG_ERROR([Function xrealloc not found])])
+AC_CHECK_FUNC([rpl_stpcpy], [], [AC_MSG_ERROR([Function rpl_stpcpy not found])])
+AC_CHECK_FUNC([xalloc_die], [], [AC_MSG_ERROR([Function xalloc_die not found])])
+AC_CHECK_FUNC([safe_write], [], [AC_MSG_ERROR([Function safe_write not found])])
+AC_CHECK_FUNC([at_fatal_signal], [], [AC_MSG_ERROR([Function at_fatal_signal not found])])
+AC_CHECK_FUNC([styled_ostream_create], [], [AC_MSG_ERROR([Function styled_ostream_create not found])])
+AC_CHECK_FUNC([styled_ostream_begin_use_class], [], [AC_MSG_ERROR([Function styled_ostream_begin_use_class not found])])
+AC_CHECK_FUNC([styled_ostream_set_hyperlink], [], [AC_MSG_ERROR([Function styled_ostream_set_hyperlink not found])])
+AC_CHECK_FUNC([file_ostream_create], [], [AC_MSG_ERROR([Function file_ostream_create not found])])
+AC_CHECK_FUNC([html_styled_ostream_create], [], [AC_MSG_ERROR([Function html_styled_ostream_create not found])])
+AC_CHECK_FUNC([get_fatal_signals], [], [AC_MSG_ERROR([Function get_fatal_signals not found])])
+
+(오류)
+configure: error: Function _gl_nothrow_get_osfhandle not found
+(수정)
+configure 스크립트를 실행할 때 _gl_nothrow_get_osfhandle 함수가 발견되지 않아 오류가 발생
+# GNULIB 모듈 정의
+GNULIB_MODULES="
+ncurses \
+terminfo \
+xmalloc \
+xrealloc \
+xgethostname \
+_gl_nothrow_get_osfhandle \
+fsync \
+getprogname \
+_get_osfhandle #추가
+"
+빌드하면 
+checking for _get_osfhandle... yes
+이렇게 나옴
+
+c:\gnulib or c:\libidn2에서 get-osfhandle.c, osfhandle.c 찾을 수 없음
+[https://www.codeproject.com/Messages/5715893/Re-get-osfhandle-identifier-not-found.aspx]
+Go to ParentMicrosoft have helpfully changed the name, 
+it is now _get_osfhandle (with a leading underscore), as defined in io.h.
+
+configure.ac 수정정
+# 함수 등록
+# 체크하고 없을 경우 선언하기
+AC_CHECK_FUNC([_get_osfhandle], [], [
+    AC_MSG_NOTICE([Defining _gl_nothrow_get_osfhandle as a wrapper for _get_osfhandle])
+    AC_DEFINE([GL_NOTHROW_GET_OSFHANDLE_NOT_FOUND], [1], [Define to 1 if _gl_nothrow_get_osfhandle is not available])
+    AC_CAT([m4_include], [
+        void _gl_nothrow_get_osfhandle(int fd) {
+            return _get_osfhandle(fd);
+        }
+    ])
+])
+
+AC_CHECK_FUNC([xgethostname], [], [
+    AC_MSG_NOTICE([Defining xgethostname as a placeholder])
+    AC_CAT([m4_include], [
+        int xgethostname(char *name, size_t len) {
+            return gethostname(name, len);
+        }
+    ])
+])
+
+AC_CHECK_FUNC([xmalloc], [], [
+    AC_MSG_NOTICE([Defining xmalloc as a placeholder])
+    AC_CAT([m4_include], [
+        void *xmalloc(size_t size) {
+            void *ptr = malloc(size);
+            if (!ptr) {
+                exit(EXIT_FAILURE);
+            }
+            return ptr;
+        }
+    ])
+])
+
+AC_CHECK_FUNC([xrealloc], [], [
+    AC_MSG_NOTICE([Defining xrealloc as a placeholder])
+    AC_CAT([m4_include], [
+        void *xrealloc(void *ptr, size_t size) {
+            void *new_ptr = realloc(ptr, size);
+            if (!new_ptr) {
+                exit(EXIT_FAILURE);
+            }
+            return new_ptr;
+        }
+    ])
+])
+
+AC_CHECK_FUNC([rpl_stpcpy], [], [
+    AC_MSG_NOTICE([Defining rpl_stpcpy as a placeholder])
+    AC_CAT([m4_include], [
+        char *rpl_stpcpy(char *dest, const char *src) {
+            return stpcpy(dest, src);
+        }
+    ])
+])
+
+AC_CHECK_FUNC([xalloc_die], [], [
+    AC_MSG_NOTICE([Defining xalloc_die as a placeholder])
+    AC_CAT([m4_include], [
+        void xalloc_die() {
+            fprintf(stderr, "Memory allocation failed\n");
+            exit(EXIT_FAILURE);
+        }
+    ])
+])
+
+AC_CHECK_FUNC([safe_write], [], [
+    AC_MSG_NOTICE([Defining safe_write as a placeholder])
+    AC_CAT([m4_include], [
+        ssize_t safe_write(int fd, const void *buf, size_t count) {
+            ssize_t result = write(fd, buf, count);
+            if (result < 0) {
+                // handle error
+            }
+            return result;
+        }
+    ])
+])
+
+AC_CHECK_FUNC([at_fatal_signal], [], [
+    AC_MSG_NOTICE([Defining at_fatal_signal as a placeholder])
+    AC_CAT([m4_include], [
+        void at_fatal_signal(void (*handler)(int)) {
+            signal(SIGTERM, handler);
+        }
+    ])
+])
+
+AC_CHECK_FUNC([styled_ostream_create], [], [
+    AC_MSG_NOTICE([Defining styled_ostream_create as a placeholder])
+    AC_CAT([m4_include], [
+        void *styled_ostream_create() {
+            return NULL; // placeholder implementation
+        }
+    ])
+])
+
+AC_CHECK_FUNC([styled_ostream_begin_use_class], [], [
+    AC_MSG_NOTICE([Defining styled_ostream_begin_use_class as a placeholder])
+    AC_CAT([m4_include], [
+        void styled_ostream_begin_use_class() {
+            // placeholder implementation
+        }
+    ])
+])
+
+AC_CHECK_FUNC([styled_ostream_set_hyperlink], [], [
+    AC_MSG_NOTICE([Defining styled_ostream_set_hyperlink as a placeholder])
+    AC_CAT([m4_include], [
+        void styled_ostream_set_hyperlink(void *stream, const char *url) {
+            // placeholder implementation
+        }
+    ])
+])
+
+AC_CHECK_FUNC([file_ostream_create], [], [
+    AC_MSG_NOTICE([Defining file_ostream_create as a placeholder])
+    AC_CAT([m4_include], [
+        void *file_ostream_create(const char *filename) {
+            return NULL; // placeholder implementation
+        }
+    ])
+])
+
+AC_CHECK_FUNC([html_styled_ostream_create], [], [
+    AC_MSG_NOTICE([Defining html_styled_ostream_create as a placeholder])
+    AC_CAT([m4_include], [
+        void *html_styled_ostream_create() {
+            return NULL; // placeholder implementation
+        }
+    ])
+])
+
+AC_CHECK_FUNC([get_fatal_signals], [], [
+    AC_MSG_NOTICE([Defining get_fatal_signals as a placeholder])
+    AC_CAT([m4_include], [
+        void get_fatal_signals() {
+            // placeholder implementation
+        }
+    ])
+])
+
+(오류)
+configure.ac:149: error: possibly undefined macro: m4_include
+      If this token and others are legitimate, please use m4_pattern_allow.
+      See the Autoconf documentation.
+configure.ac:567: error: possibly undefined macro: AC_CAT
+autoreconf: error: /mingw64/bin/autoconf failed with exit status: 1
+configure: error: cannot find required auxiliary files: missing
+(수정)
+m4_include와 AC_CAT 매크로가 configure.ac 파일에서 사용되고 있으나, 
+이 매크로들이 정의된 M4 파일이 없거나 설치되지 않았습니다. 이로 인해 autoreconf가 실패
+AC_CHECK_FUNC([_get_osfhandle], [], [
+    AC_MSG_NOTICE([Defining _gl_nothrow_get_osfhandle as a wrapper for _get_osfhandle])
+    AC_DEFINE([GL_NOTHROW_GET_OSFHANDLE_NOT_FOUND], [1], [Define to 1 if _gl_nothrow_get_osfhandle is not available])
+    AC_CAT([m4_include], [ <= error
+        void _gl_nothrow_get_osfhandle(int fd) {
+            return _get_osfhandle(fd);
+        }
+    ])
+])
+
+missing 파일이 없다는 오류를 해결하기 위해 automake를 다시 실행하여 필요한 파일들을 생성
+빌드명령어 수정 autoreconf --install (추가)
+{
+    { 
+        aclocal --warnings=none --verbose; 
+    } 2>&1 | { 
+        echo "Error in aclocal"; 
+        cat; 
+    }
+    
+    { 
+        autoconf --verbose; 
+    } 2>&1 | { 
+        echo "Error in autoconf"; 
+        cat; 
+    }
+    
+    { 
+        autoheader --verbose; 
+    } 2>&1 | { 
+        echo "Error in autoheader"; 
+        cat; 
+    }
+    
+    { 
+        automake --add-missing --verbose; 
+    } 2>&1 | { 
+        echo "Error in automake"; 
+        cat; 
+    }
+    
+    { 
+        libtoolize --verbose; 
+    } 2>&1 | { 
+        echo "Error in libtoolize"; 
+        cat; 
+    }
+    
+    { 
+        autoreconf --install; 
+    } 2>&1 | { 
+        echo "Error in autoreconf"; 
+        cat; 
+    }
+    
+    { 
+        ./configure --verbose; 
+    } 2>&1 | { 
+        echo "Error in configure"; 
+        cat; 
+    }
+    
+    { 
+        make clean; 
+    } 2>&1 | { 
+        echo "Error in make clean"; 
+        cat; 
+    }
+    
+    { 
+        make; 
+    } 2>&1 | { 
+        echo "Error in make"; 
+        cat; 
+    }
+} 2>&1 | tee build_output.log || echo "An error occurred in the build process."
+
+(오류)
+./configure: line 9740: syntax error near unexpected token `m4_include,'
+./configure: line 9740: `    AC_CAT(m4_include,'
+(수정)
+configure.ac 수정
+AC_CHECK_FUNC([xgethostname], [], [
+    AC_MSG_NOTICE([Defining xgethostname as a placeholder])
+    AC_LANG_PUSH([C])
+    AC_COMPILE_IFELSE([
+        AC_LANG_PROGRAM([
+            #include <unistd.h>
+            int xgethostname(char *name, size_t len) {
+                return gethostname(name, len);
+            }
+        ])
+    ], [], [
+        AC_MSG_ERROR([Failed to define xgethostname])
+    ])
+    AC_LANG_POP
+])
+
+AC_CHECK_FUNC([xmalloc], [], [
+    AC_MSG_NOTICE([Defining xmalloc as a placeholder])
+    AC_LANG_PUSH([C])
+    AC_COMPILE_IFELSE([
+        AC_LANG_PROGRAM([
+            #include <stdlib.h>
+            void *xmalloc(size_t size) {
+                void *ptr = malloc(size);
+                if (!ptr) {
+                    exit(EXIT_FAILURE);
+                }
+                return ptr;
+            }
+        ])
+    ], [], [
+        AC_MSG_ERROR([Failed to define xmalloc])
+    ])
+    AC_LANG_POP
+])
+
+AC_CHECK_FUNC([xrealloc], [], [
+    AC_MSG_NOTICE([Defining xrealloc as a placeholder])
+    AC_LANG_PUSH([C])
+    AC_COMPILE_IFELSE([
+        AC_LANG_PROGRAM([
+            #include <stdlib.h>
+            void *xrealloc(void *ptr, size_t size) {
+                void *new_ptr = realloc(ptr, size);
+                if (!new_ptr) {
+                    exit(EXIT_FAILURE);
+                }
+                return new_ptr;
+            }
+        ])
+    ], [], [
+        AC_MSG_ERROR([Failed to define xrealloc])
+    ])
+    AC_LANG_POP
+])
+
+AC_CHECK_FUNC([rpl_stpcpy], [], [
+    AC_MSG_NOTICE([Defining rpl_stpcpy as a placeholder])
+    AC_LANG_PUSH([C])
+    AC_COMPILE_IFELSE([
+        AC_LANG_PROGRAM([
+            #include <string.h>
+            char *rpl_stpcpy(char *dest, const char *src) {
+                return stpcpy(dest, src);
+            }
+        ])
+    ], [], [
+        AC_MSG_ERROR([Failed to define rpl_stpcpy])
+    ])
+    AC_LANG_POP
+])
+
+AC_CHECK_FUNC([xalloc_die], [], [
+    AC_MSG_NOTICE([Defining xalloc_die as a placeholder])
+    AC_LANG_PUSH([C])
+    AC_COMPILE_IFELSE([
+        AC_LANG_PROGRAM([
+            #include <stdio.h>
+            void xalloc_die() {
+                fprintf(stderr, "Memory allocation failed\n");
+                exit(EXIT_FAILURE);
+            }
+        ])
+    ], [], [
+        AC_MSG_ERROR([Failed to define xalloc_die])
+    ])
+    AC_LANG_POP
+])
+
+AC_CHECK_FUNC([safe_write], [], [
+    AC_MSG_NOTICE([Defining safe_write as a placeholder])
+    AC_LANG_PUSH([C])
+    AC_COMPILE_IFELSE([
+        AC_LANG_PROGRAM([
+            #include <unistd.h>
+            ssize_t safe_write(int fd, const void *buf, size_t count) {
+                ssize_t result = write(fd, buf, count);
+                if (result < 0) {
+                    // handle error
+                }
+                return result;
+            }
+        ])
+    ], [], [
+        AC_MSG_ERROR([Failed to define safe_write])
+    ])
+    AC_LANG_POP
+])
+
+AC_CHECK_FUNC([at_fatal_signal], [], [
+    AC_MSG_NOTICE([Defining at_fatal_signal as a placeholder])
+    AC_LANG_PUSH([C])
+    AC_COMPILE_IFELSE([
+        AC_LANG_PROGRAM([
+            #include <signal.h>
+            void at_fatal_signal(void (*handler)(int)) {
+                signal(SIGTERM, handler);
+            }
+        ])
+    ], [], [
+        AC_MSG_ERROR([Failed to define at_fatal_signal])
+    ])
+    AC_LANG_POP
+])
+
+AC_CHECK_FUNC([styled_ostream_create], [], [
+    AC_MSG_NOTICE([Defining styled_ostream_create as a placeholder])
+    AC_LANG_PUSH([C])
+    AC_COMPILE_IFELSE([
+        AC_LANG_PROGRAM([
+            void *styled_ostream_create() {
+                return NULL; // placeholder implementation
+            }
+        ])
+    ], [], [
+        AC_MSG_ERROR([Failed to define styled_ostream_create])
+    ])
+    AC_LANG_POP
+])
+
+AC_CHECK_FUNC([styled_ostream_begin_use_class], [], [
+    AC_MSG_NOTICE([Defining styled_ostream_begin_use_class as a placeholder])
+    AC_LANG_PUSH([C])
+    AC_COMPILE_IFELSE([
+        AC_LANG_PROGRAM([
+            void styled_ostream_begin_use_class() {
+                // placeholder implementation
+            }
+        ])
+    ], [], [
+        AC_MSG_ERROR([Failed to define styled_ostream_begin_use_class])
+    ])
+    AC_LANG_POP
+])
+
+AC_CHECK_FUNC([styled_ostream_set_hyperlink], [], [
+    AC_MSG_NOTICE([Defining styled_ostream_set_hyperlink as a placeholder])
+    AC_LANG_PUSH([C])
+    AC_COMPILE_IFELSE([
+        AC_LANG_PROGRAM([
+            void styled_ostream_set_hyperlink(void *stream, const char *url) {
+                // placeholder implementation
+            }
+        ])
+    ], [], [
+        AC_MSG_ERROR([Failed to define styled_ostream_set_hyperlink])
+    ])
+    AC_LANG_POP
+])
+
+AC_CHECK_FUNC([file_ostream_create], [], [
+    AC_MSG_NOTICE([Defining file_ostream_create as a placeholder])
+    AC_LANG_PUSH([C])
+    AC_COMPILE_IFELSE([
+        AC_LANG_PROGRAM([
+            void *file_ostream_create(const char *filename) {
+                return NULL; // placeholder implementation
+            }
+        ])
+    ], [], [
+        AC_MSG_ERROR([Failed to define file_ostream_create])
+    ])
+    AC_LANG_POP
+])
+
+AC_CHECK_FUNC([html_styled_ostream_create], [], [
+    AC_MSG_NOTICE([Defining html_styled_ostream_create as a placeholder])
+    AC_LANG_PUSH([C])
+    AC_COMPILE_IFELSE([
+        AC_LANG_PROGRAM([
+            void *html_styled_ostream_create() {
+                return NULL; // placeholder implementation
+            }
+        ])
+    ], [], [
+        AC_MSG_ERROR([Failed to define html_styled_ostream_create])
+    ])
+    AC_LANG_POP
+])
+
+AC_CHECK_FUNC([get_fatal_signals], [], [
+    AC_MSG_NOTICE([Defining get_fatal_signals as a placeholder])
+    AC_LANG_PUSH([C])
+    AC_COMPILE_IFELSE([
+        AC_LANG_PROGRAM([
+            void get_fatal_signals() {
+                // placeholder implementation
+            }
+        ])
+    ], [], [
+        AC_MSG_ERROR([Failed to define get_fatal_signals])
+    ])
+    AC_LANG_POP
+])
+
+(오류)
+checking for xgethostname... no
+configure: Defining xgethostname as a placeholder
+configure: error: Failed to define xgethostname
+(수정)
+include "xgethostname.h" 체크
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -rn 'xgethostname' ./lib
+./lib/term-ostream.c:50:#include "xgethostname.h"       // 호스트 이름 얻기
+./lib/term-ostream.oo.c:53:#include "xgethostname.h"       // 호스트 이름 얻기
+
+configure.ac 수
+# 체크하고 없을 경우 오류출력 lib/xgethostname.h, lib/xgethostname.c 있음
+AC_CHECK_FUNC([xgethostname], [], [AC_MSG_ERROR([xgethostname not found])])
+
+Makefile.am 수정
+# DLL 추가
+lib_LTLIBRARIES = libtextstyle.la #공유 라이브러리로 설정
+libtextstyle_la_SOURCES = \ #라이브러리에 포함될 소스 파일 목록을 나열
+lib/color.c \
+lib/gl_array_list.c \
+lib/term-ostream.c \
+lib/ostream.c \
+lib/concat-filename.c \
+lib/xconcat-filename.c \
+lib/xsize.c \
+lib/error.c \
+lib/full-write.c \
+lib/term-style-control.c \
+lib/fsync.c \
+lib/xstrdup.c \
+lib/xgethostname.c #추가
+
+configure.ac 수정
+#AC_CHECK_FUNC([xgethostname], [], [
+#    AC_MSG_NOTICE([Defining xgethostname as a placeholder])
+#    AC_LANG_PUSH([C])
+#    AC_COMPILE_IFELSE([
+#        AC_LANG_PROGRAM([
+#            #include <unistd.h>
+#            int xgethostname(char *name, size_t len) {
+#                return gethostname(name, len);
+#            }
+#        ])
+#    ], [], [
+#        AC_MSG_ERROR([Failed to define xgethostname])
+#    ])
+#    AC_LANG_POP
+#])
+
+# GNULIB 모듈 정의
+GNULIB_MODULES="
+ncurses \
+terminfo \
+xmalloc \
+xrealloc \
+xgethostname \ # 확인
+_gl_nothrow_get_osfhandle \
+fsync \
+getprogname \
+_get_osfhandle  
+"
+
+Makefile.am 수정
+libtextstyle_la_SOURCES = \ #라이브러리에 포함될 소스 파일 목록을 나열
+lib/color.c \
+lib/gl_array_list.c \
+lib/term-ostream.c \
+lib/ostream.c \
+lib/concat-filename.c \
+lib/xconcat-filename.c \
+lib/xsize.c \
+lib/error.c \
+lib/full-write.c \
+lib/term-style-control.c \
+lib/fsync.c \
+lib/xstrdup.c \
+lib/xgethostname.c #확
+
+lib/xgethostname.c 가 구현이 안돼어있음 확인됐으나.
+xgethostname.c는 이미 올바르게 구현되어 있으며,
+xgetaname-impl.h를 포함하여 gethostname 함수의 래퍼로 작동하도록 설계됨
+
+configure.ac 수정
+# xgethostname 함수 확인
+AC_CHECK_HEADERS([xgethostname.h])
+AC_CHECK_FUNCS([xgethostname])
+
+
+
+
+
+
+
+
 
 
 
@@ -13587,7 +14305,7 @@ gnulib-tool --add-import
 ./configure: line 9248: `gl_MODULE(xsize)'
 
 (수정)
-//gl_MODULE([xsize])
+#gl_MODULE([xsize])
 gl_MODULES([xsize])
 
 
