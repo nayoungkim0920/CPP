@@ -14264,12 +14264,24 @@ nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
 /c/libidn2/gettext-0.22.5/libtextstyle/lib/xgethostname.c 또는 lib/xgethostname.h 파일이 있는지 확인
 
 configure.ac 수정
+CPPFLAGS="$CPPFLAGS -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -DNEED_MACRO"
+AC_SUBST([CPPFLAGS])
+
 # xgethostname 함수 확인
 AC_CHECK_HEADERS([xgethostname.h xgetaname-impl.h])
 AC_CHECK_FUNC([XGETANAME], [], [AC_MSG_ERROR([XGETANAME not found])])
 
-CPPFLAGS="$CPPFLAGS -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -DNEED_MACRO"
-AC_SUBST([CPPFLAGS])
+
+
+
+
+
+
+
+
+
+
+
 
 
 
