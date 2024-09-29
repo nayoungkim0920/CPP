@@ -14251,11 +14251,25 @@ configure.ac 수정
 AC_CHECK_HEADERS([xgethostname.h])
 AC_CHECK_FUNCS([xgethostname])
 
+xgethostname은 시스템 라이브러리 함수가 아니므로 AC_CHECK_FUNCS를 사용하는 것은 적절하지 않음
+AC_CHECK_FUNCS([xgethostname]) # 제거 
 
+xgethostname 계속 인식을 못할경우..
+xgethostname을 추가하기 위해선 이 테이블이 빌드 시스템에서 인식되도록 설정되어 있어야 함
+추가적으로, Gnulib 모듈이 필요할 경우 gnulib-tool --import 명령어를 사용해 xgethostname 모듈을 가져오는 것이 필요
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# /c/gnulib/gnulib-tool --import xgethostname
+(xgethostname설치확인)
+/c/gnulib/modules/xgethostname 파일이 있어야 합니다. ("C:\gnulib\modules\xgethostname")
+/c/libidn2/gettext-0.22.5/libtextstyle/lib/xgethostname.c 또는 lib/xgethostname.h 파일이 있는지 확인
 
+configure.ac 수정
+# xgethostname 함수 확인
+AC_CHECK_HEADERS([xgethostname.h xgetaname-impl.h])
+AC_CHECK_FUNC([XGETANAME], [], [AC_MSG_ERROR([XGETANAME not found])])
 
-
-
+CPPFLAGS="$CPPFLAGS -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -DNEED_MACRO"
+AC_SUBST([CPPFLAGS])
 
 
 
