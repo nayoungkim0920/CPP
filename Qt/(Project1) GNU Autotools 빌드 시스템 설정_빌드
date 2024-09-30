@@ -14569,7 +14569,14 @@ libtoolize: Not copying 'm4/ltargz.m4', libltdl not used.
 libtoolize: Not copying 'm4/ltdl.m4', libltdl not used.
 (수정)
 configure.ac 수정
-LT_INIT([win32-dll dlopen libltdl]) # 중복선언안됨. dlopen 모드를 활성화하여 libltdl 사용. win32-dll과 dlopen을 동시에 초기화
+# Initialize Automake
+AM_INIT_AUTOMAKE([1.13 silent-rules]) #gl_INIT_PACKAGE보다 먼저 선언되면 안됨
+
+# Additional configuration for libraries and tools
+LT_INIT([win32-dll], [dlopen], [libltdl]) # 중복선언안됨. dlopen 모드를 활성화하여 libltdl 사용. win32-dll과 dlopen을 동시에 초기화
+LT_LANG([C])
+LT_LANG([C++])
+LT_LANG([Windows Resource])
 
 Makefile.am 수정
 lib_LTLIBRARIES = libtextstyle.la #공유 라이브러리로 설정
@@ -14595,6 +14602,64 @@ libtextstyle_la_LDFLAGS = -shared -Wl,--out-implib=libtextstyle.dll.a -lltdl $(L
 { autoheader --verbose; autoheader; } 2>&1 | tee autoheader_log.log &&
 { automake --add-missing --verbose; automake; } 2>&1 | tee automake_log.log &&
 { libtoolize --verbose; libtoolize; } 2>&1 | tee libtoolize_log.log
+
+libltdl 설치 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -Ss libltdl
+clangarm64/mingw-w64-clang-aarch64-libltdl 2.4.7-2
+    A system independent dlopen wrapper for GNU libtool
+mingw32/mingw-w64-i686-libltdl 2.4.7-2
+    A system independent dlopen wrapper for GNU libtool
+mingw64/mingw-w64-x86_64-libltdl 2.4.7-2 [설치함]
+    A system independent dlopen wrapper for GNU libtool
+ucrt64/mingw-w64-ucrt-x86_64-libltdl 2.4.7-2
+    A system independent dlopen wrapper for GNU libtool
+clang32/mingw-w64-clang-i686-libltdl 2.4.7-2
+    A system independent dlopen wrapper for GNU libtool
+clang64/mingw-w64-clang-x86_64-libltdl 2.4.7-2
+    A system independent dlopen wrapper for GNU libtool
+msys/libltdl 2.4.7-4 [설치함]
+    A system independent dlopen wrapper for GNU libtool
+
+libltdl 설치 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -Q | grep libltdl
+libltdl 2.4.7-4
+mingw-w64-x86_64-libltdl 2.4.7-2
+
+파일 위치 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l /mingw64/include/ltdl.h
+-rw-r--r-- 1 nayou nayou 5709  8월 27 20:52 /mingw64/include/ltdl.h
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l /mingw64/lib/libltdl.a
+-rw-r--r-- 1 nayou nayou 199018  8월 27 20:52 /mingw64/lib/libltdl.a
+
+m4 디렉토리에 ltargz.m4와 ltdl.m4 파일이 있는지 확인
+"C:\msys64\usr\share\aclocal\ltargz.m4"
+"C:\msys64\usr\share\aclocal\ltdl.m4"
+
+환경변수확인(/mingw64/bin, /usr/share/aclocal이 포함)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# echo $PATH
+/mingw64/bin:/usr/bin:/bin:/usr/share/aclocal:/mingw64/share/aclocal:/c/libidn2/autoconf-2.72/bin:/c/libidn2/libtool-2.4.6:/c/Program Files/Java/jdk-21/bin:/usr/local/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/c/Users/nayou/AppData/Local/Programs/Python/Python312
+
+두 번 실행하라고 한 이유
+필수 설정: 각 단계에서 필요로 하는 파일이나 설정이 없을 수 있습니다. 예를 들어, libtoolize, aclocal, autoconf, autoheader, automake 등의 명령어가 처음 실행할 때 필요한 파일을 생성하거나 업데이트하는데, 이 과정에서 종속성이나 다른 설정이 제대로 반영되지 않을 수 있습니다.
+의존성 해결: 첫 번째 실행에서 발생한 경고나 오류가 다음 실행에 영향을 미칠 수 있기 때문에, 모든 명령어를 한 번 실행한 후에 그 결과를 바탕으로 다시 실행하여 필요한 설정이나 파일을 모두 생성하게끔 합니다.
+반복적인 구성 과정: 특정 도구들이 서로 연관된 작업을 하기 때문에, 한 번의 실행만으로는 모든 설정이 완료되지 않을 수 있습니다. 따라서 이러한 도구들을 두 번 실행함으로써, 첫 번째 실행에서의 결과를 두 번째 실행에서 활용할 수 있습니다.
+{ libtoolize --verbose; libtoolize; } 2>&1 | tee libtoolize_log.log
+{ aclocal --verbose; aclocal; } 2>&1 | tee aclocal_log.log 
+{ autoconf --verbose; autoconf; } 2>&1 | tee autoconf_log.log
+{ autoheader --verbose; autoheader; } 2>&1 | tee autoheader_log.log
+{ automake --add-missing --verbose; automake; } 2>&1 | tee automake_log.log
+{ ./configure --ennable-shared --enable-static; ./configure; } 2>&1 | tee configure_log.log
+
+
+
+
+
 
 
 
