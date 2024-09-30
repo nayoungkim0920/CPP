@@ -14393,89 +14393,211 @@ autom4te: reading /tmp/am4tcapTH0/warnings
 autoheader: 'config.h.in' is unchanged
 4. { automake --add-missing --verbose; automake; } 2>&1 | tee automake_log.log
 (오류)
-automake-1.16: thread 0: refusing to override the user definition of: TEXI2DVI
-(수정)
-Makefile.am 수정
-TEXI2DVI 정의를 확인하고 필요하다면 제거하거나 주석 처리 => 없음
-TEXI2DVI = texi2dvi # 추가
-configure.ac 수정
-AC_SUBST([TEXI2DVI], [texi2dvi]) # 추가
-(오류)
-automake-1.16: thread 0: refusing to override the user definition of: TEXI2PDF
-(수정)
-Makefile.am 수정
-TEXI2PDF = $(TEXI2DVI) --pdf # 추가
-configure.ac 수정
-AC_SUBST([TEXI2PDF], [$(TEXI2DVI) --pdf]) # 추가
-(오류)
-automake-1.16: thread 0: refusing to override the user definition of: DVIPS
-(수정)
-Makefile.am 수정
-DVIPS = dvips -D600 # 추가
-configure.ac 수정
-AC_SUBST([DVIPS], [dvips -D600]) # 추가
-(오류)
-automake-1.16: thread 0: refusing to override the user definition of: DEFAULT_INCLUDES
-(수정)
-Makefile.am 수정
-DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/lib -I$(top_builddir) # Include directory 설정 추가
-configure.ac 수정
-AC_SUBST([DEFAULT_INCLUDES], [-I. -I$(srcdir) -I$(top_builddir)/lib -I$(top_builddir)]) # 추가
-(오류)
-automake-1.16: refusing to override the user definition of:
-automake-1.16: DEFAULT_INCLUDES: 
+automake-1.16: DEFAULT_INCLUDES:
 automake-1.16:   {
 automake-1.16:     TRUE => {
 automake-1.16:       type: =
-automake-1.16:       where: configure.ac:44:
-automake-1.16:       comment: 
-automake-1.16:       value: @DEFAULT_INCLUDES@
-automake-1.16:       owner: Configure
+automake-1.16:       where: Makefile.am:29: (여기)
+automake-1.16:       comment:
+automake-1.16: #TEXI2DVI = texi2dvi # 추가
+automake-1.16: #TEXI2PDF = $(TEXI2DVI) --pdf # 추가
+automake-1.16: #DVIPS = dvips -D600 # 추가
+automake-1.16:
+automake-1.16: #DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/lib -I$(top_builddir) # Include directory 설정 추가
+automake-1.16:
+automake-1.16:       value: -I$(srcdir) -I.
+automake-1.16:       owner: Makefile
+automake-1.16:     }
+automake-1.16:   }
+automake-1.16: with 'TRUE' => '-I.@am__isrc@'
+(수정)
+where: Makefile.am:29:
+Makefile.am 수정
+#DEFAULT_INCLUDES = -I$(srcdir) -I.
+(오류)
+automake-1.16: thread 0: refusing to override the user definition of:
+automake-1.16: TEXI2DVI:
+automake-1.16:   {
+automake-1.16:     TRUE => {
+automake-1.16:       type: =
+automake-1.16:       where: doc/Makefile.am:80: (여기)
+automake-1.16:       comment:
+automake-1.16: # Documentation in DVI format.
+automake-1.16:
+automake-1.16: # Override of automake's definition:
+automake-1.16: #TEXI2DVI = @TEXI2DVI@
+automake-1.16:
+automake-1.16:       value: @TEXI2DVI@ $(TEXINCLUDES)
+automake-1.16:       owner: Makefile
+automake-1.16:     }
+automake-1.16:   }
+automake-1.16: with 'TRUE' => 'texi2dvi'
+(수정)
+doc/Makefile.am:80
+doc/Makefile.am 수정
+#TEXI2DVI = @TEXI2DVI@ $(TEXINCLUDES)
+(오류)
+automake-1.16: thread 0: refusing to override the user definition of:
+automake-1.16: TEXI2PDF:
+automake-1.16:   {
+automake-1.16:     TRUE => {
+automake-1.16:       type: =
+automake-1.16:       where: doc/Makefile.am:113: (요기)
+automake-1.16:       comment:
+automake-1.16: # Documentation in Portable Document Format.
+automake-1.16:
+automake-1.16: # Override of automake's definition:
+automake-1.16: #TEXI2PDF = @TEXI2DVI@ --pdf
+automake-1.16:
+automake-1.16:       value: @TEXI2DVI@ --pdf $(TEXINCLUDES)
+automake-1.16:       owner: Makefile
+automake-1.16:     }
+automake-1.16:   }
+automake-1.16: with 'TRUE' => '$(TEXI2DVI) --pdf --batch'
+(수정)
+automake-1.16:       where: doc/Makefile.am:113:
+doc/Makefile.am 수정
+#TEXI2PDF = @TEXI2DVI@ --pdf $(TEXINCLUDES)
+(오류)
+automake-1.16: thread 0: refusing to override the user definition of:
+automake-1.16: DVIPS:
+automake-1.16:   {
+automake-1.16:     TRUE => {
+automake-1.16:       type: =
+automake-1.16:       where: doc/Makefile.am:95: (요기)
+automake-1.16:       comment:
+automake-1.16: # Documentation in Postscript format.
+automake-1.16:
+automake-1.16: # Override of automake's definition:
+automake-1.16: #DVIPS = @DVIPS@
+automake-1.16:
+automake-1.16:       value: @DVIPS@ -D600
+automake-1.16:       owner: Makefile
+automake-1.16:     }
+automake-1.16:   }
+automake-1.16: with 'TRUE' => 'dvips'
+(수정)
+where: doc/Makefile.am:95
+doc/Makefile.am 수정
+#DVIPS = @DVIPS@ -D600
+(오류)
+automake-1.16: thread 0: refusing to override the user definition of:
+automake-1.16: DEFAULT_INCLUDES:
+automake-1.16:   {
+automake-1.16:     TRUE => {
+automake-1.16:       type: =
+automake-1.16:       where: tests/Makefile.am:25: (요기)
+automake-1.16:       comment:
+automake-1.16: # Ensure that ../lib/config.h is seen before ../config.h.
+automake-1.16:
+automake-1.16:       value: -I. -I$(srcdir) -I$(top_builddir)/lib -I$(top_builddir)
+automake-1.16:       owner: Makefile
 automake-1.16:     }
 automake-1.16:   }
 automake-1.16: with 'TRUE' => '-I.@am__isrc@ -I$(top_builddir)'
 (수정)
-" refusing to override the user definition "
-doc/Makefile.am:113:TEXI2PDF = @TEXI2DVI@ --pdf $(TEXINCLUDES)
-doc/Makefile.in:1327:TEXI2PDF = @TEXI2DVI@ --pdf $(TEXINCLUDES)
+where: tests/Makefile.am:25:
+tests/Makefile.am 수정
+#DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/lib -I$(top_builddir)
+(오류)
+automake-1.16: TEXI2DVI:
+automake-1.16:   {
+automake-1.16:     TRUE => {
+automake-1.16:       type: =
+automake-1.16:       where: configure.ac:901: (요기)
+automake-1.16:       comment:
+automake-1.16:       value: @TEXI2DVI@
+automake-1.16:       owner: Configure
+automake-1.16:     }
+automake-1.16:   }
+automake-1.16: with 'TRUE' => 'texi2dvi'
+(수정)
+where: configure.ac:901:
+configure.ac 수정
+#AC_PATH_PROG([TEXI2DVI], [texi2dvi], [$ac_aux_dir_abs/missing texi2dvi])
+(오류)
+automake-1.16: thread 0: refusing to override the user definition of:
+automake-1.16: DVIPS:
+automake-1.16:   {
+automake-1.16:     TRUE => {
+automake-1.16:       type: =
+automake-1.16:       where: configure.ac:902: (요기)
+automake-1.16:       comment:
+automake-1.16:       value: @DVIPS@
+automake-1.16:       owner: Configure
+automake-1.16:     }
+automake-1.16:   }
+automake-1.16: with 'TRUE' => 'dvips'
+(수정)
+where: configure.ac:902: 
+configure.ac 수정
+#AC_PATH_PROG([DVIPS], [dvips], [$ac_aux_dir_abs/missing dvips])
+(오류)
+automake-1.16: DEFAULT_INCLUDES:
+automake-1.16:   {
+automake-1.16:     TRUE => {
+automake-1.16:       type: =
+automake-1.16:       where: Makefile.am:29: (요기)
+automake-1.16:       comment:
+automake-1.16: #TEXI2DVI = texi2dvi # 추가
+automake-1.16: #TEXI2PDF = $(TEXI2DVI) --pdf # 추가
+automake-1.16: #DVIPS = dvips -D600 # 추가
+automake-1.16:
+automake-1.16: #DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/lib -I$(top_builddir) # Include directory 설정 추가
+automake-1.16:
+automake-1.16:       value: -I$(srcdir) -I.
+automake-1.16:       owner: Makefile
+automake-1.16:     }
+automake-1.16:   }
+automake-1.16: with 'TRUE' => '-I.@am__isrc@'
+(수정)
+where: Makefile.am:29:
+Makefile.am 수정
+#DEFAULT_INCLUDES = -I$(srcdir) -I.
 
-doc/Makefile.am 수정
-# Override of automake's definition:
-#TEXI2DVI = @TEXI2DVI@
-#TEXI2DVI = @TEXI2DVI@ $(TEXINCLUDES)
+(빌드명령어)
+2>&1 표준 오류 출력을 표준 출력으로 리다이렉트하라
+tee 데이터를 처리하면서 동시에 그 결과를 파일에 저장
+{ aclocal --verbose; aclocal; } 2>&1 | tee aclocal_log.log 
+{ autoconf --verbose; autoconf; } 2>&1 | tee autoconf_log.log
+{ autoheader --verbose; autoheader; } 2>&1 | tee autoheader_log.log
+{ automake --add-missing --verbose; automake; } 2>&1 | tee automake_log.log
+{ libtoolize --verbose; libtoolize; } 2>&1 | tee libtoolize_log.log
 
-# Override of automake's definition:
-#TEXI2PDF = @TEXI2DVI@ --pdf
-#TEXI2PDF = @TEXI2DVI@ --pdf $(TEXINCLUDES)
+(오류)
+libtoolize: Not copying 'm4/ltargz.m4', libltdl not used.
+libtoolize: Not copying 'm4/ltdl.m4', libltdl not used.
+(수정)
+configure.ac 수정
+LT_INIT([win32-dll dlopen libltdl]) # 중복선언안됨. dlopen 모드를 활성화하여 libltdl 사용. win32-dll과 dlopen을 동시에 초기화
 
-# Override of automake's definition:
-#DVIPS = @DVIPS@
-#DVIPS = @DVIPS@ -D600
-#libtextstyle.ps: libtextstyle.dvi
-#   $(DVIPS) -o $@ `if test -f libtextstyle.dvi; then echo libtextstyle.dvi; else echo $(srcdir)/libtextstyle.dvi; fi`
+Makefile.am 수정
+lib_LTLIBRARIES = libtextstyle.la #공유 라이브러리로 설정
+libtextstyle_la_SOURCES = \ #라이브러리에 포함될 소스 파일 목록을 나열
+lib/color.c \
+lib/gl_array_list.c \
+lib/term-ostream.c \
+lib/ostream.c \
+lib/concat-filename.c \
+lib/xconcat-filename.c \
+lib/xsize.c \
+lib/error.c \
+lib/full-write.c \
+lib/term-style-control.c \
+lib/fsync.c \
+lib/xstrdup.c \
+lib/xgethostname.c
+libtextstyle_la_LDFLAGS = -shared -Wl,--out-implib=libtextstyle.dll.a -lltdl $(LDFLAGS) #DLL을 생성하기 위한 필수 플래그를 추가
 
-doc/Makefile.in 수정
-#AM_V_TEXI2DVI = $(am__v_TEXI2DVI_@AM_V@)
-#TEXI2DVI = @TEXI2DVI@
+(빌드)
+{ aclocal --verbose; aclocal; } 2>&1 | tee aclocal_log.log &&
+{ autoconf --verbose; autoconf; } 2>&1 | tee autoconf_log.log &&
+{ autoheader --verbose; autoheader; } 2>&1 | tee autoheader_log.log &&
+{ automake --add-missing --verbose; automake; } 2>&1 | tee automake_log.log &&
+{ libtoolize --verbose; libtoolize; } 2>&1 | tee libtoolize_log.log
 
-#AM_V_TEXI2PDF = $(am__v_TEXI2PDF_@AM_V@)
-#am__v_TEXI2PDF_ = $(am__v_TEXI2PDF_@AM_DEFAULT_V@)
-#am__v_TEXI2PDF_0 = @echo "  TEXI2PDF" $@;
-#am__v_TEXI2PDF_1 = 
-#AM_V_texinfo = $(am__v_texinfo_@AM_V@)
-#TEXI2PDF = $(TEXI2DVI) --pdf --batch
 
-#AM_V_DVIPS = $(am__v_DVIPS_@AM_V@)
-#am__v_DVIPS_ = $(am__v_DVIPS_@AM_DEFAULT_V@)
-#am__v_DVIPS_0 = @echo "  DVIPS   " $@;
-#am__v_DVIPS_1 = 
-#AM_V_MAKEINFO = $(am__v_MAKEINFO_@AM_V@)
-#DVIPS = @DVIPS@
-#.dvi.ps:
-#	$(AM_V_DVIPS)TEXINPUTS="$(am__TEXINFO_TEX_DIR)$(PATH_SEPARATOR)$$TEXINPUTS" \
-#	$(DVIPS) $(AM_V_texinfo) -o $@ $<
 
-=> TEXI2PDF만 처리되고 나머지는 처리되지않아 원복함 다른방법을 찾아야함.
 
 
 
