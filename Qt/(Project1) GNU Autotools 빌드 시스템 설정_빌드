@@ -14271,19 +14271,211 @@ AC_SUBST([CPPFLAGS])
 AC_CHECK_HEADERS([xgethostname.h xgetaname-impl.h])
 AC_CHECK_FUNC([XGETANAME], [], [AC_MSG_ERROR([XGETANAME not found])])
 
+(오류)
+checking for _get_osfhandle... no
+configure: Defining _gl_nothrow_get_osfhandle as a wrapper for _get_osfhandle
+configure: error: Failed to define _gl_nothrow_get_osfhandle
+(수정)
+_get_osfhandle 함수는 Windows에서 사용되며, io.h 헤더 파일에 정의되어 있다.
+#include <io.h>가 제대로 추가되어 있는지 확인
 
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -rn '_get_osfhandle' ./lib
 
+check_io_h.sh 생성(<io.h>가 없으면 파일 최상단에 #include <io.h>를 넣어주도록 함)
+#!/bin/bash
 
+# 찾은 파일 목록
+files=(
+  ./lib/accept4.c
+  ./lib/dup2.c
+  ./lib/error.c
+  ./lib/execute.c
+  ./lib/fcntl.c
+  ./lib/flock.c
+  ./lib/fstat.c
+  ./lib/ftruncate.c
+  ./lib/ioctl.c
+  ./lib/isapipe.c
+  ./lib/isatty.c
+  ./lib/lseek.c
+  ./lib/msvc-nothrow.c
+  ./lib/nonblocking.c
+  ./lib/poll.c
+  ./lib/read.c
+  ./lib/select.c
+  ./lib/spawn-pipe.c
+  ./lib/stdio-read.c
+  ./lib/stdio-write.c
+  ./lib/term-ostream.c
+  ./lib/utimens.c
+  ./lib/w32sock.h
+  ./lib/windows-spawn.c
+  ./lib/write.c
+)
 
+# 각각의 파일을 검사하고 없을 경우 최상단에 #include <io.h> 추가
+for file in "${files[@]}"
+do
+  if grep -q '<io.h>' "$file"; then
+    echo "'<io.h>' exists in $file."
+  else
+    echo "'<io.h>' does NOT exist in $file. Adding it..."
+    # 파일의 최상단에 #include <io.h> 추가
+    sed -i '1i#include <io.h>' "$file"
+  fi
+done
 
+echo "Check and update complete."
 
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ./check_io_h.sh
+...
+'<io.h>' does NOT exist in ./lib/msvc-nothrow.c. Adding it...
+'<io.h>' exists in ./lib/nonblocking.c.
+'<io.h>' exists in ./lib/poll.c.
+'<io.h>' exists in ./lib/read.c.
+...
+Check and update complete.
 
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ./check_io_h.sh
+...
+'<io.h>' exists in ./lib/msvc-nothrow.c.
+'<io.h>' exists in ./lib/nonblocking.c.
+'<io.h>' exists in ./lib/poll.c.
+'<io.h>' exists in ./lib/read.c.
+...
+Check and update complete.
 
+configure.ac 수정
+AC_CHECK_FUNCS([_get_osfhandle)
 
+# 체크하고 없을 경우 선언하기
+#AC_CHECK_FUNC([_get_osfhandle], [], [
+#    AC_MSG_NOTICE([Defining _gl_nothrow_get_osfhandle as a wrapper for _get_osfhandle])
+#    AC_DEFINE([GL_NOTHROW_GET_OSFHANDLE_NOT_FOUND], [1], [Define to 1 if _gl_nothrow_get_osfhandle is not available])
+#
+#    AC_LANG_PUSH([C])
+#    AC_COMPILE_IFELSE([
+#        AC_LANG_PROGRAM([
+#            #include <unistd.h>
+#            int _gl_nothrow_get_osfhandle(int fd) {
+#                return _get_osfhandle(fd);
+#            }
+#        ])
+#    ], [
+#        # 성공적으로 컴파일된 경우에 대한 추가 작업
+#    ], [
+#        # 컴파일 실패 시 메시지
+#        AC_MSG_ERROR([Failed to define _gl_nothrow_get_osfhandle])
+#    ])
+#    AC_LANG_POP
+#])
 
+(빌드오류)
+1. { aclocal --verbose; aclocal; } 2>&1 | tee aclocal_log.log
+(오류)
+aclocal-1.16: m4/gnulib-common.m4 is already included by configure.ac
+aclocal-1.16: m4/gnulib-tool.m4 is already included by configure.ac
+(수정)
+configure.ac 수정
+#m4_include([m4/gnulib-common.m4])
+#m4_include([m4/gnulib-tool.m4])
+2. { autoconf --verbose; autoconf; } 2>&1 | tee autoconf_log.log
+autom4te: formatting traces for '/tmp/am4tVLxt1g/warnings': _m4_warn
+autom4te: reading /tmp/am4tVLxt1g/warnings
+3. { autoheader --verbose; autoheader; } 2>&1 | tee autoheader_log.log
+autom4te: formatting traces for '/tmp/am4tcapTH0/dependencies': include, m4_include
+autom4te: up_to_date (autom4te.cache/traces.1): up to date
+autom4te: formatting traces for '/tmp/am4tcapTH0/warnings': _m4_warn
+autom4te: reading /tmp/am4tcapTH0/warnings
+autoheader: 'config.h.in' is unchanged
+4. { automake --add-missing --verbose; automake; } 2>&1 | tee automake_log.log
+(오류)
+automake-1.16: thread 0: refusing to override the user definition of: TEXI2DVI
+(수정)
+Makefile.am 수정
+TEXI2DVI 정의를 확인하고 필요하다면 제거하거나 주석 처리 => 없음
+TEXI2DVI = texi2dvi # 추가
+configure.ac 수정
+AC_SUBST([TEXI2DVI], [texi2dvi]) # 추가
+(오류)
+automake-1.16: thread 0: refusing to override the user definition of: TEXI2PDF
+(수정)
+Makefile.am 수정
+TEXI2PDF = $(TEXI2DVI) --pdf # 추가
+configure.ac 수정
+AC_SUBST([TEXI2PDF], [$(TEXI2DVI) --pdf]) # 추가
+(오류)
+automake-1.16: thread 0: refusing to override the user definition of: DVIPS
+(수정)
+Makefile.am 수정
+DVIPS = dvips -D600 # 추가
+configure.ac 수정
+AC_SUBST([DVIPS], [dvips -D600]) # 추가
+(오류)
+automake-1.16: thread 0: refusing to override the user definition of: DEFAULT_INCLUDES
+(수정)
+Makefile.am 수정
+DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/lib -I$(top_builddir) # Include directory 설정 추가
+configure.ac 수정
+AC_SUBST([DEFAULT_INCLUDES], [-I. -I$(srcdir) -I$(top_builddir)/lib -I$(top_builddir)]) # 추가
+(오류)
+automake-1.16: refusing to override the user definition of:
+automake-1.16: DEFAULT_INCLUDES: 
+automake-1.16:   {
+automake-1.16:     TRUE => {
+automake-1.16:       type: =
+automake-1.16:       where: configure.ac:44:
+automake-1.16:       comment: 
+automake-1.16:       value: @DEFAULT_INCLUDES@
+automake-1.16:       owner: Configure
+automake-1.16:     }
+automake-1.16:   }
+automake-1.16: with 'TRUE' => '-I.@am__isrc@ -I$(top_builddir)'
+(수정)
+" refusing to override the user definition "
+doc/Makefile.am:113:TEXI2PDF = @TEXI2DVI@ --pdf $(TEXINCLUDES)
+doc/Makefile.in:1327:TEXI2PDF = @TEXI2DVI@ --pdf $(TEXINCLUDES)
 
+doc/Makefile.am 수정
+# Override of automake's definition:
+#TEXI2DVI = @TEXI2DVI@
+#TEXI2DVI = @TEXI2DVI@ $(TEXINCLUDES)
 
+# Override of automake's definition:
+#TEXI2PDF = @TEXI2DVI@ --pdf
+#TEXI2PDF = @TEXI2DVI@ --pdf $(TEXINCLUDES)
 
+# Override of automake's definition:
+#DVIPS = @DVIPS@
+#DVIPS = @DVIPS@ -D600
+#libtextstyle.ps: libtextstyle.dvi
+#   $(DVIPS) -o $@ `if test -f libtextstyle.dvi; then echo libtextstyle.dvi; else echo $(srcdir)/libtextstyle.dvi; fi`
+
+doc/Makefile.in 수정
+#AM_V_TEXI2DVI = $(am__v_TEXI2DVI_@AM_V@)
+#TEXI2DVI = @TEXI2DVI@
+
+#AM_V_TEXI2PDF = $(am__v_TEXI2PDF_@AM_V@)
+#am__v_TEXI2PDF_ = $(am__v_TEXI2PDF_@AM_DEFAULT_V@)
+#am__v_TEXI2PDF_0 = @echo "  TEXI2PDF" $@;
+#am__v_TEXI2PDF_1 = 
+#AM_V_texinfo = $(am__v_texinfo_@AM_V@)
+#TEXI2PDF = $(TEXI2DVI) --pdf --batch
+
+#AM_V_DVIPS = $(am__v_DVIPS_@AM_V@)
+#am__v_DVIPS_ = $(am__v_DVIPS_@AM_DEFAULT_V@)
+#am__v_DVIPS_0 = @echo "  DVIPS   " $@;
+#am__v_DVIPS_1 = 
+#AM_V_MAKEINFO = $(am__v_MAKEINFO_@AM_V@)
+#DVIPS = @DVIPS@
+#.dvi.ps:
+#	$(AM_V_DVIPS)TEXINPUTS="$(am__TEXINFO_TEX_DIR)$(PATH_SEPARATOR)$$TEXINPUTS" \
+#	$(DVIPS) $(AM_V_texinfo) -o $@ $<
+
+=> TEXI2PDF만 처리되고 나머지는 처리되지않아 원복함 다른방법을 찾아야함.
 
 
 
