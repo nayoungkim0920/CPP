@@ -15015,6 +15015,47 @@ nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
 nayou@kimnayooung MINGW64 /c/gnulib
 # git submodule update --init --recursive
 
+(오류)
+autopoint: *** AM_GNU_GETTEXT without 'external' argument is no longer supported in version 0.22.4
+autopoint: *** Stop.
+autoreconf: error: autopoint failed with exit status: 1
+(수정)
+gettext 버전 0.22.4부터는 AM_GNU_GETTEXT를 호출할 때 반드시 'external' 인자를 포함해야 한다.
+그렇지 않으면 이 매크로가 제대로 작동하지 않으며, 그 결과로 autopoint가 실패함
+configure.ac 수정
+AM_GNU_GETTEXT([external]) # GNU Gettext의 사용을 활성화, AC_INIT 바로 아래에 위치
+AM_GNU_GETTEXT_VERSION([0.22.4])
+#AM_GNU_GETTEXT([prefer-ngettext]) <= 주석처리
+
+(오류)
+autopoint: File build-aux/config.rpath has been locally modified.
+autopoint: File m4/build-to-host.m4 has been locally modified.
+autopoint: File m4/gettext.m4 has been locally modified.
+autopoint: File m4/host-cpu-c-abi.m4 has been locally modified.
+autopoint: File m4/iconv.m4 has been locally modified.
+autopoint: File m4/intlmacosx.m4 has been locally modified.
+autopoint: File m4/lib-ld.m4 has been locally modified.
+autopoint: File m4/lib-link.m4 has been locally modified.
+autopoint: File m4/lib-prefix.m4 has been locally modified.
+autopoint: File m4/nls.m4 has been locally modified.
+autopoint: File m4/po.m4 has been locally modified.
+autopoint: File m4/progtest.m4 has been locally modified.
+autopoint: File po/Makefile.in.in has been locally modified.
+autopoint: *** Some files have been locally modified. Not overwriting them because --force has not been specified. For your convenience, you find the local modifications in the file '/tmp/ar7Gt9ZV/gtFlJ9Y5/autopoint.diff'.
+autopoint: *** Stop.
+autoreconf: error: autopoint failed with exit status: 1
+(수정)
+
+
+
+
+
+
+
+
+
+
+
 
 
 
