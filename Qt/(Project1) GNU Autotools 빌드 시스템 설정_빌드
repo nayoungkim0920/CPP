@@ -14656,6 +14656,364 @@ nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
 { automake --add-missing --verbose; automake; } 2>&1 | tee automake_log.log
 { ./configure --ennable-shared --enable-static; ./configure; } 2>&1 | tee configure_log.log
 
+autoreconf는 libtoolize, aclocal, autoconf, autoheader, automake의 여러 단계를 자동으로 실행해주는 유틸리티
+
+{ autoreconf -i --verbose; } 2>&1 | tee autoreconf_log.log &&
+{ ./configure --enable-shared --enable-static; } 2>&1 | tee configure_log.log
+
+autoreconf -i --verbose 2>&1 | tee autoreconf_log.log
+autoreconf -i --verbose:
+
+1. autoreconf는 자동으로 configure 스크립트 생성
+-i : 필요한 파일을 자동 생성
+--verbose : 실행 중에 더 많은 정보를 출력
+2>&1: 표준 오류(에러 메시지)를 표준 출력으로 리다이렉트. 명령어의 오류 메시지가 
+표준 출력과 동일한 스트림으로 전송. 오류 메시지도 tee로 전달.
+| tee autoreconf_log.log:파이프(|)는 왼쪽 명령어의 출력을 오른쪽 명령어의 입력으로 전달
+tee는 입력으로 받은 내용을 화면에 출력하는 동시에 autoreconf_log.log라는 파일에 기록
+실시간으로 진행 상황을 확인하면서도 나중에 로그를 볼수있음.
+
+2. ./configure --enable-shared --enable-static 2>&1 | tee configure_log.log
+./configure --enable-shared --enable-static:소스 코드의 설정을 구성하는 스크립트
+--enable-shared: 공유 라이브러리 생성을 활성화
+--enable-static: 정적 라이브러리 생성을 활성화
+2>&1 | tee configure_log.log: 오류 메시지를 표준 출력으로 리다이렉트하고, 
+tee를 사용하여 화면에 출력하면서 configure_log.log 파일에 기록.
+
+(오류)
+configure.ac:611: error: possibly undefined macro: AC_MSG_WARN
+      If this token and others are legitimate, please use m4_pattern_allow.
+      See the Autoconf documentation.
+(수정)
+configure.ac 수정
+m4_pattern_allow([AC_MSG_WARN])
+
+(오류)
+./configure: line 34032: syntax error near unexpected token `[_GL_NOTHROW_GET_OSFHANDLE],'
+./configure: line 34032: `  AC_DEFINE([_GL_NOTHROW_GET_OSFHANDLE], [1], [Define if _get_osfhandle is available])'
+(수정)
+AC_CHECK_FUNCS
+(
+ [
+  _get_osfhandle
+ ],
+ [
+  AC_DEFINE([_GL_NOTHROW_GET_OSFHANDLE], [1], [Define if _get_osfhandle is available])
+ ],
+...
+빈칸,개행없이 수정
+AC_CHECK_FUNCS([_get_osfhandle],
+ [AC_DEFINE([_GL_NOTHROW_GET_OSFHANDLE], [1], [Define if _get_osfhandle is available])],
+ [AC_DEFINE([_GL_NOTHROW_GET_OSFHANDLE], [0], [Define if _get_osfhandle is not available])
+...
+(오류)
+./configure: line 38257: warning: here-document at line 34042 delimited by end-of-file (wanted `END')
+./configure: line 38258: syntax error: unexpected end of file
+(수정)
+configure.ac 수정
+AC_CHECK_FUNCS([_get_osfhandle],
+ [AC_DEFINE([_GL_NOTHROW_GET_OSFHANDLE], [1], [Define if _get_osfhandle is available])],
+ [AC_DEFINE([_GL_NOTHROW_GET_OSFHANDLE], [0], [Define if _get_osfhandle is not available])
+  AC_MSG_WARN([_get_osfhandle not found. Defining _gl_nothrow_get_osfhandle as a no-op.])
+	# Provide a fallback implementation
+	AC_MSG_NOTICE([Providing a fallback implementation for _gl_nothrow_get_osfhandle])
+
+	# Create the fallback code in conftest.c
+	cat >> conftest.c <<END 
+	#include <stdio.h>
+	#include <stdlib.h>
+
+	// Fallback implementation
+	int _gl_nothrow_get_osfhandle(int fd) {
+		fprintf(stderr, "Warning: _get_osfhandle is not available. Returning -1 as a fallback.\n");
+		return -1; // Return -1 or any appropriate error code
+	}
+END
+])
+
+(오류)
+autoreconf 경고
+autoreconf: not using Gettext
+autoreconf: not using Intltool
+autoreconf: not using Gtkdoc
+(수정)
+해당 도구들이 시스템에 설치되어 있지 않거나, 필요하지 않다고 판단되어 사용되지 않음을 의미
+
+[Gettext: 다양한 언어로 메시지를 번역하는 데 사용됨]
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -Qs gettext
+local/gettext 0.22.4-1
+    GNU internationalization library
+local/gettext-devel 0.22.4-1 (development)
+    GNU Internationalization development utilities
+local/libgettextpo 0.22.4-1 (libraries)
+    GNU Internationalization runtime library
+local/mingw-w64-x86_64-gettext-runtime 0.22.5-2
+    GNU internationalization runtime library (mingw-w64)
+local/mingw-w64-x86_64-gettext-tools 0.22.5-2
+    GNU internationalization tools (mingw-w64)
+
+[Intltool: 다국어 지원을 위한 도구]
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -Qs intltool
+local/intltool 0.51.0-3
+    The internationalization tool collection
+
+[Gtkdoc: GTK 및 Gnome 라이브러리에 대한 문서 생성을 지원]
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -Qs gtk-doc
+local/gtk-doc 1.34.0-1
+    Documentation tool for public library API
+
+GETTEXT, INTLTOOL, GTKDOC 설정확인
+configure.ac 수정
+AM_GNU_GETTEXT([external]) # GNU Gettext의 사용을 활성화
+IT_PROG_INTLTOOL([0.50]) # intltool의 버전을 확인하고 필요한 경우 설치
+GTK_DOC_CHECK([1.34])  # Gtkdoc 버전 요구 사항을 설정합니다.
+
+autoconf, automake 버전확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# autoconf --version
+autoconf (GNU Autoconf) 2.72
+Copyright (C) 2023 Free Software Foundation, Inc.
+License GPLv3+/Autoconf: GNU GPL version 3 or later
+<https://gnu.org/licenses/gpl.html>, <https://gnu.org/licenses/exceptions.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+Written by David J. MacKenzie and Akim Demaille.
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# automake --version
+automake (GNU automake) 1.16.5
+Copyright (C) 2021 Free Software Foundation, Inc.
+License GPLv2+: GNU GPL version 2 or later <https://gnu.org/licenses/gpl-2.0.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+Written by Tom Tromey <tromey@redhat.com>
+       and Alexandre Duret-Lutz <adl@gnu.org>.
+
+[gettext.pc 파일이 없음]
+설치확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -Qs gettext
+
+local/gettext 0.22.4-1
+    GNU internationalization library
+local/gettext-devel 0.22.4-1 (development)
+    GNU Internationalization development utilities
+local/libgettextpo 0.22.4-1 (libraries)
+    GNU Internationalization runtime library
+local/mingw-w64-x86_64-gettext-runtime 0.22.5-2
+    GNU internationalization runtime library (mingw-w64)
+local/mingw-w64-x86_64-gettext-tools 0.22.5-2
+    GNU internationalization tools (mingw-w64)
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -Ql mingw-w64-x86_64-gettext-runtime
+=> 없음
+
+패키지 데이터베이스 업데이트
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -Sy
+:: 꾸러미 데이터베이스 동기화 중...
+ clangarm64                     420.1 KiB  26.0 KiB/s 00:16 [###############################] 100%
+ mingw32                        209.7 KiB  19.4 KiB/s 00:11 [###############################] 100%
+ mingw64                        448.1 KiB   122 KiB/s 00:04 [###############################] 100%
+ ucrt64                         476.5 KiB  40.3 KiB/s 00:12 [###############################] 100%
+ clang32                        104.9 KiB  21.2 KiB/s 00:05 [###############################] 100%
+ clang64                        460.6 KiB  35.1 KiB/s 00:13 [###############################] 100%
+ msys                           305.1 KiB   616 KiB/s 00:00 [###############################] 100%
+
+(오류)
+autoreconf: warning: AM_GNU_GETTEXT is used, but not AM_GNU_GETTEXT_VERSION or AM_GNU_GETTEXT_REQUIRE_VERSION
+(수정)
+AM_GNU_GETTEXT가 사용되었지만, AM_GNU_GETTEXT_VERSION 또는 AM_GNU_GETTEXT_REQUIRE_VERSION이 정의되지 않음
+configure.ac 수정
+AM_GNU_GETTEXT([external]) # GNU Gettext의 사용을 활성화
+AM_GNU_GETTEXT_VERSION([0.22.4])
+AM_GNU_GETTEXT([prefer-ngettext])
+
+(오류)
+cp: cannot create regular file 'po/Makefile.in.in': No such file or directory
+intltoolize: cannot copy '/usr/share/intltool/Makefile.in.in' to 'po/Makefile.in.in'
+autoreconf: error: intltoolize failed with exit status: 1
+(수정)
+intltoolize가 /usr/share/intltool/Makefile.in.in 파일을 po 디렉토리로 복사할 수 없다
+intltoolize 실행 실패
+
+po 디렉토리 생성
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# mkdir -p po
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -S mingw-w64-x86_64-intltool
+오류: 대상이 없습니다: mingw-w64-x86_64-intltool
+
+intltool 패키지가 mingw-w64 환경에서 사용 가능한지 확인(패키지 이름이 다른 형식일 수 있음)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -Ss intltool
+msys/intltool 0.51.0-3 [설치함]
+    The internationalization tool collection
+
+MSYS2 업데이트
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -Sy
+:: 꾸러미 데이터베이스 동기화 중...
+ clangarm64는 최신입니다
+ mingw32는 최신입니다
+ mingw64는 최신입니다
+ ucrt64는 최신입니다
+ clang32는 최신입니다
+ clang64는 최신입니다
+ msys는 최신입니다
+
+(오류)
+autoreconf: export WARNINGS=
+autoreconf: Entering directory '.'
+autoreconf: running: autopoint
+autopoint: *** AM_GNU_GETTEXT without 'external' argument is no longer supported in version 0.22.4
+autopoint: *** Stop.
+autoreconf: error: autopoint failed with exit status: 1
+(수정)
+AM_GNU_GETTEXT 매크로가 external 인수 없이 사용되었지만, 
+버전 0.22.4에서는 더 이상 지원되지 않습니다. 이로 인해 autopoint가 실패
+
+버전확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# autoconf --version
+automake --version
+gettext --version
+autoconf: 2.72
+automake: 1.16.5
+gettext: 0.22.5
+
+AM_GNU_GETTEXT 매크로 확인
+configure.ac 수정
+AM_GNU_GETTEXT([external])
+
+intltool 설치 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -Qs intltool
+local/intltool 0.51.0-3
+    The internationalization tool collection
+
+po 디렉토리 및 파일 확인
+POTFILES.in 파일은 gettext를 사용하여 소프트웨어 프로젝트에서 번역할 문자열을 추출하는 데 필요한 파일 목록을 지정합니다. 
+주로 .c 파일에 포함된 번역 대상 문자열을 수집하기 위해 사용
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l po
+합계 8
+-rw-r--r-- 1 nayou nayou 7150 10월  1 19:05 Makefile.in.in
+po 디렉토리에는 Makefile.in.in 파일이 존재하지만, po 디렉토리의 구조와 내용이 불완전
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# cd po
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle/po
+# intltool-update --pot
+intltool-update: POTFILES.in not found.
+
+po/POTFILES.in 생성
+lib/*.h
+lib/*.c
+tests/*.h
+tests/*.c
+examples/*.h
+examples/*.c
+adhoc-tests/*.h
+adhoc-tests/*.c
+
+#lib/bitset/*.h
+#lib/bitset/*.c
+#gnulib-local/lib/*.h
+#gnulib-local/lib/*.c
+#*.h
+#*.c
+
+intltool-update --pot 명령을 실행하여 .pot 파일이 잘 생성되는지 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle/po
+# intltool-update --pot
+
+(오류)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle/po
+# intltool-update --pot
+C:\msys64\mingw64\bin\xgettext.exe: error while opening "../lib/*.h" for reading: Invalid argument
+ERROR: xgettext failed to generate PO template file. Please consult
+       error message above if there is any.
+
+(수정)
+지정한 패턴이 유효하지 않다는 것을 의미
+xgettext는 와일드카드(*)를 지원하지 않기 때문에 파일 경로에 이러한 패턴을 사용할 수 없음
+파일에 와일드카드 대신 실제 파일 경로를 나열
+POTFILES.in에 자동으로 추가하기 위해서는 다음과 같은 find 명령어를 사용
+
+po/POTFILES.in 빈파일로만듬
+주요 코드 디렉토리에서 .c 파일만을 선택하여 자동으로 POTFILES.in에 기록하는 간단한 방법입니다. 
+.h 파일은 번역과 관련이 없으므로 이 검색에서는 제외
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# find lib -name '*.c' > po/POTFILES.in
+
+(결과) 너무많아 임의로 나머지 삭제
+lib/abort-debug.c
+lib/accept.c
+lib/accept4.c
+lib/access.c
+lib/acl-errno-valid.c
+lib/acl-internal.c
+lib/acl_entries.c
+lib/acosf.c
+lib/acosl.c
+lib/af_alg.c
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# cd po
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle/po
+# intltool-update --pot
+
+POTFILES.in 생성완료
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle/po
+# ls
+Makefile.in.in  POTFILES.in
+
+po 디렉토리를 SUBDIRS에 추가
+Makefile.am 수정
+# The list of subdirectories containing Makefiles.
+SUBDIRS = po lib tests adhoc-tests doc
+
+(빌드)
+{ autoreconf -i --verbose; } 2>&1 | tee autoreconf_log.log &&
+{ ./configure --enable-shared --enable-static; } 2>&1 | tee configure_log.log
+
+(오류)
+autoreconf: export WARNINGS=
+autoreconf: Entering directory '.'
+autoreconf: running: autopoint
+autopoint: *** AM_GNU_GETTEXT without 'external' argument is no longer supported in version 0.22.4
+autopoint: *** Stop.
+autoreconf: error: autopoint failed with exit status: 1
+
+(수정)
+configure.ac 수정
+AC_INIT([libtextstyle], [1.0], [bug-libtextstyle@example.com])
+AM_GNU_GETTEXT([external]) # GNU Gettext의 사용을 활성화, AC_INIT 바로 아래에 위치
+
+버전확인
+autoconf: 2.72
+automake: 1.16.5
+gettext: 0.22.5
+
+autopoint 도구 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# which autopoint
+/mingw64/bin/autopoint
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# git submodule update --init --recursive
+
+nayou@kimnayooung MINGW64 /c/gnulib
+# git submodule update --init --recursive
 
 
 
