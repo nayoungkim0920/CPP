@@ -14654,7 +14654,7 @@ nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
 { autoconf --verbose; autoconf; } 2>&1 | tee autoconf_log.log
 { autoheader --verbose; autoheader; } 2>&1 | tee autoheader_log.log
 { automake --add-missing --verbose; automake; } 2>&1 | tee automake_log.log
-{ ./configure --ennable-shared --enable-static; ./configure; } 2>&1 | tee configure_log.log
+{ ./configure --enable-shared --enable-static; ./configure; } 2>&1 | tee configure_log.log
 
 autoreconf는 libtoolize, aclocal, autoconf, autoheader, automake의 여러 단계를 자동으로 실행해주는 유틸리티
 
@@ -15045,72 +15045,610 @@ autopoint: *** Some files have been locally modified. Not overwriting them becau
 autopoint: *** Stop.
 autoreconf: error: autopoint failed with exit status: 1
 (수정)
+로컬에서 수정된 파일을 감지했으며, --force 옵션을 지정하지 않았기 때문에 덮어쓰지 않음
+백업
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# mkdir -p backup_autopoint/build-aux backup_autopoint/m4 backup_autopoint/po
 
+cp build-aux/config.rpath backup_autopoint/build-aux/
+cp m4/build-to-host.m4 backup_autopoint/m4/
+cp m4/gettext.m4 backup_autopoint/m4/
+cp m4/host-cpu-c-abi.m4 backup_autopoint/m4/
+cp m4/iconv.m4 backup_autopoint/m4/
+cp m4/intlmacosx.m4 backup_autopoint/m4/
+cp m4/lib-ld.m4 backup_autopoint/m4/
+cp m4/lib-link.m4 backup_autopoint/m4/
+cp m4/lib-prefix.m4 backup_autopoint/m4/
+cp m4/nls.m4 backup_autopoint/m4/
+cp m4/po.m4 backup_autopoint/m4/
+cp m4/progtest.m4 backup_autopoint/m4/
+cp po/Makefile.in.in backup_autopoint/po/
 
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l backup_autopoint
+합계 4
+drwxr-xr-x 1 nayou nayou 0 10월  2 06:59 build-aux
+drwxr-xr-x 1 nayou nayou 0 10월  2 06:59 m4
+drwxr-xr-x 1 nayou nayou 0 10월  2 06:59 po
 
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l backup_autopoint/m4
+합계 144
+-rw-r--r-- 1 nayou nayou  3237 10월  2 06:59 build-to-host.m4
+-rw-r--r-- 1 nayou nayou 15489 10월  2 06:59 gettext.m4
+-rw-r--r-- 1 nayou nayou 17140 10월  2 06:59 host-cpu-c-abi.m4
+-rw-r--r-- 1 nayou nayou 10998 10월  2 06:59 iconv.m4
+-rw-r--r-- 1 nayou nayou  3506 10월  2 06:59 intlmacosx.m4
+-rw-r--r-- 1 nayou nayou  5386 10월  2 06:59 lib-ld.m4
+-rw-r--r-- 1 nayou nayou 35742 10월  2 06:59 lib-link.m4
+-rw-r--r-- 1 nayou nayou 12528 10월  2 06:59 lib-prefix.m4
+-rw-r--r-- 1 nayou nayou  1236 10월  2 06:59 nls.m4
+-rw-r--r-- 1 nayou nayou 19021 10월  2 06:59 po.m4
+-rw-r--r-- 1 nayou nayou  3091 10월  2 06:59 progtest.m4
 
+(빌드)
+{ autopoint --force; } 2>&1 | tee autopoint_log.log && 
+{ autoreconf -i --verbose; } 2>&1 | tee autoreconf_log.log && 
+{ ./configure --enable-shared --enable-static; } 2>&1 | tee configure_log.log
+Copying file ABOUT-NLS
+Copying file build-aux/config.rpath
+Copying file m4/build-to-host.m4
+Copying file m4/gettext.m4
+Copying file m4/host-cpu-c-abi.m4
+Copying file m4/iconv.m4
+Copying file m4/intlmacosx.m4
+Copying file m4/lib-ld.m4
+Copying file m4/lib-link.m4
+Copying file m4/lib-prefix.m4
+Copying file m4/nls.m4
+Copying file m4/po.m4
+Copying file m4/progtest.m4
+Copying file po/Makefile.in.in
+Copying file po/Makevars.template
+Copying file po/Rules-quot
+Copying file po/boldquot.sed
+Copying file po/en@boldquot.header
+Copying file po/en@quot.header
+Copying file po/insert-header.sin
+Copying file po/quot.sed
+Copying file po/remove-potcdate.sin
 
+(오류)
+intltoolize: 'po/Makefile.in.in' exists: use '--force' to overwrite
+intltoolize: 'po/Makefile.in.in' is out of date: use '--force' to overwrite
+autoreconf: error: intltoolize failed with exit status: 1
+(수정)
+삭제 및 백업 po/Makefile.in.in_back
+(빌드 명령어 수정)
+1. autopoint --force
+--force: 이 옵션은 autopoint가 수정된 파일을 덮어쓰도록 강제한다.
+기본적으로 수정된 파일이 있으면 경고를 표시하고 작업을 중단.
+--force를 사용하면 이 경고를 무시하고 파일을 덮어쓴다.
+2. intltoolize --copy --force
+--copy: 이 옵션은 intltoolize가 필요한 파일을 복사하도록 지시.
+복사하는 이유는 원본 파일을 보존하고, 새로운 파일을 생성하여 충돌을 피하기 위해서
+--force: 이 옵션은 intltoolize가 기존의 파일을 덮어쓰도록 강제. 수정된 파일이 있을 경우 경고 없이 덮어씀.
+3. rm po/Makefile.in.in
+rm: 이 명령은 파일을 삭제, 여기서는 po/Makefile.in.in 파일을 삭제하여, 
+이후의 autoreconf 실행 시 충돌 문제를 피하고 새롭게 생성된 파일을 반영할 수 있도록 한다.
+4. autoreconf -i --verbose
+-i: 이 옵션은 필요한 파일들을 초기화하고 생성하는 데 사용.
+autoreconf가 configure.ac 및 Makefile.am 파일을 읽고 필요한 파일들을 자동으로 생성
+--verbose: 이 옵션은 autoreconf의 실행 과정을 상세히 출력하도록 함
+5. ./configure --enable-shared --enable-static
+--enable-shared: 이 옵션은 공유 라이브러리 생성을 활성화.
+이는 프로그램이 여러 프로세스에서 메모리를 공유할 수 있도록 함
+--enable-static: 이 옵션은 정적 라이브러리 생성을 활성화. 
+정적 라이브러리는 프로그램이 실행될 때 프로그램과 함께 결합되어 독립적으로 실행될 수 있다.
+6. aclocal -I m4 -I gnulib-m4 -I /mingw64/share/aclocal
+m4, gnulib-m4, 그리고 /mingw64/share/aclocal 디렉토리에서 매크로 파일을 찾는다.
+주어진 매크로 경로에서 매크로를 수집하여 aclocal.m4 파일을 생성
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+(빌드명령어 수정)
+{ autopoint --force; } 2>&1 | tee autopoint_log.log && \
+{ rm po/Makefile.in.in; } && \
+{ aclocal -I m4 -I gnulib-m4 -I /mingw64/share/aclocal; } 2>&1 | tee aclocal_log.log && \
+{ libtoolize --copy --force --verbose; } 2>&1 | tee libtoolize_log.log && \
+{ autoconf --verbose; } 2>&1 | tee autoconf_log.log && \
+{ autoheader --verbose; } 2>&1 | tee autoheader_log.log && \
+{ automake --add-missing --force --verbose; } 2>&1 | tee automake_log.log && \
+{ ./configure --enable-shared --enable-static; } 2>&1 | tee configure_log.log
 
 
 (오류)
-autoreconf: running: aclocal --force -I m4 -I gnulib-m4 -I /mingw64/share/aclocal
-autoreconf: running: /mingw64/bin/autoconf --force
-configure.ac:50: warning: AC_COMPILE_IFELSE was called before AC_USE_SYSTEM_EXTENSIONS
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# libtoolize --copy --force --verbose;
+libtoolize: Not copying 'm4/ltargz.m4', libltdl not used.
+libtoolize: Not copying 'm4/ltdl.m4', libltdl not used.
+(수정)
+libltdl 설치확인
+C:\libidn2\libtool-2.4.6\libltdl
+"C:\libidn2\libtool-2.4.6\libltdl\ltdl.h"
+"C:\libidn2\libtool-2.4.6\libltdl\ltdl.c"
+
+nayou@kimnayooung MINGW64 /c/libidn2/libtool-2.4.6/libltdl
+# ./configure
+
+nayou@kimnayooung MINGW64 /c/libidn2/libtool-2.4.6/libltdl
+# make
+  GEN      libltdl/lt__argz.h
+make  all-am
+make[1]: 디렉터리 '/c/libidn2/libtool-2.4.6/libltdl' 들어감
+  CC       loaders/loadlibrary.lo
+  CCLD     loadlibrary.la
+C:\msys64\mingw64\bin\ar.exe: `u' modifier ignored since `D' is the default (see `U')
+  CC       loaders/libltdlc_la-preopen.lo
+  CC       libltdlc_la-lt__alloc.lo
+  CC       libltdlc_la-lt_dlloader.lo
+  CC       libltdlc_la-lt_error.lo
+  CC       libltdlc_la-ltdl.lo
+  CC       libltdlc_la-slist.lo
+  CC       lt__argz.lo
+  CC       lt__strl.lo
+  CCLD     libltdlc.la
+C:\msys64\mingw64\bin\ar.exe: `u' modifier ignored since `D' is the default (see `U')
+make[1]: 디렉터리 '/c/libidn2/libtool-2.4.6/libltdl' 나감
+
+(오류)
+ltdl.o가 생성이 안됌
+(수정)
+nayou@kimnayooung MINGW64 /c/libidn2/libtool-2.4.6/libltdl
+# ls  | grep -E 'lt__alloc.c|lt__argz.c|lt_dlloader.c|lt_error.c|ltdl.c|slist.c'
+lt__alloc.c
+lt__argz.c
+lt_dlloader.c
+lt_error.c
+ltdl.c
+slist.c
+
+Makefile.am에서 ltdl.o 설정 확인
+libtextstyle_la_SOURCES = \ #라이브러리에 포함될 소스 파일 목록을 나열
+lib/color.c \
+lib/gl_array_list.c \
+lib/term-ostream.c \
+lib/ostream.c \
+lib/concat-filename.c \
+lib/xconcat-filename.c \
+lib/xsize.c \
+lib/error.c \
+lib/full-write.c \
+lib/term-style-control.c \
+lib/fsync.c \
+lib/xstrdup.c \
+lib/xgethostname.c \
+libltdl/lt__alloc.c \
+libltdl/lt__argz.c \
+libltdl/lt_dlloader.c \
+libltdl/lt_error.c \
+libltdl/ltdl.c \
+libltdl/slist.c
+
+libtextstyle_la_LIBS = -lncurses $(GNULIB_LIBS) # libtextstyle 라이브러리에 링크할 라이브러리들
+libtextstyle_la_LDFLAGS = -shared -Wl,--out-implib=libtextstyle.dll.a -lltdl #DLL을 생성하기 위한 필수 플래그를 추가
+
+configure.ac 수정 ( [NCURSES], [ncurses] 체크)
+PKG_CHECK_MODULES([ITL], [libintl], [NCURSES], [ncurses], [have_ncurses=yes], [have_ncurses=no])
+LT_INIT # ltdl 모듈 초기화
+
+libltdl 관련 파일을 프로젝트에 복사(새로운 파일로 덮어쓰기)
+nayou@kimnayooung MINGW64 /c
+# cp /c/libidn2/libtool-2.4.6/libltdl/*.* /c/libidn2/gettext-0.22.5/libtextstyle/lib/ltdl 
+덮어쓰기를 방지하고 싶다면: -n
+덮어쓰기 전에 확인하고 싶다면: -i
+(참고 폴더생성복사)
+mkdir -p /c/libidn2/gettext-0.22.5/libtextstyle/lib/ltdl && cp /c/libidn2/libtool-2.4.6/libltdl/*.* /c/libidn2/gettext-0.22.5/libtextstyle/lib/ltdl
+rsync -a /c/libidn2/libtool-2.4.6/libltdl/*.* /c/libidn2/gettext-0.22.5/libtextstyle/lib/ltdl
+
+(빌드)
+{ autopoint --force; } 2>&1 | tee autopoint_log.log && \
+{ rm -f po/Makefile.in.in; } && \
+{ aclocal -I m4 -I gnulib-m4 -I /mingw64/share/aclocal; } 2>&1 | tee aclocal_log.log && \
+{ libtoolize --copy --force --verbose; } 2>&1 | tee libtoolize_log.log && \
+{ autoconf --verbose; } 2>&1 | tee autoconf_log.log && \
+{ autoheader --verbose; } 2>&1 | tee autoheader_log.log && \
+{ automake --add-missing --force --verbose; } 2>&1 | tee automake_log.log && \
+{ ./configure --enable-shared --enable-static; } 2>&1 | tee configure_log.log
+
+(오류)
+libtoolize: Not copying 'm4/ltargz.m4', libltdl not used.
+libtoolize: Not copying 'm4/ltdl.m4', libltdl not used.
+(수정)
+#libltdlc 라이브러리 설정
+lib_LTLIBRARIES = ${lib_LTLIBRARIES} libltdlc.la
+libltdlc_la_SOURCES = \
+  libltdl/lt__alloc.c \
+  libltdl/lt__argz.c \
+  libltdl/lt_dlloader.c \
+  libltdl/lt_error.c \
+  libltdl/ltdl.c \
+  libltdl/slist.c
+libltdlc_la_LIBS = $(LIBS_la_)
+libltdlc_la_LIBADD = $(LIBADD_la_)
+libltdlc_la_LDFLAGS = $(LDFLAGS_la_)
+
+파일존재확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l m4/ltargz.m4 m4/ltdl.m4
+ls: cannot access 'm4/ltargz.m4': No such file or directory
+ls: cannot access 'm4/ltdl.m4': No such file or directory
+
+autopoint --force && rm -f po/Makefile.in.in && ls -l m4/ltargz.m4 m4/ltdl.m4;
+aclocal -I m4 -I gnulib-m4 -I /mingw64/share/aclocal && ls -l m4/ltargz.m4 m4/ltdl.m4;
+
+libtoolize --copy --force --verbose && ls -l m4/ltargz.m4 m4/ltdl.m4;
+
+configure.ac 수정
+LT_WITH_LTDL #LT_INIT바로아래설정
+LT_CONFIG_LTDL_DIR([libltdl])
+
+Makefile.am 수정
+#libltdlc 라이브러리 설정
+lib_LTLIBRARIES = ${lib_LTLIBRARIES} libltdlc.la
+libltdlc_la_SOURCES = \
+  libltdl/lt__alloc.c \
+  libltdl/lt__argz.c \
+  libltdl/lt_dlloader.c \
+  libltdl/lt_error.c \
+  libltdl/ltdl.c \
+  libltdl/slist.c
+libltdlc_la_LIBS = -lncurses $(GNULIB_LIBS)
+libltdlc_la_LIBADD = -lltdl
+libltdlc_la_LDFLAGS = -shared -Wl,--out-implib=libltdlc.dll.a
+
+(빌드)
+{ autopoint --force; } 2>&1 | tee autopoint_log.log && \
+{ rm -f po/Makefile.in.in; } && \
+{ aclocal -I m4 -I gnulib-m4 -I /mingw64/share/aclocal; } 2>&1 | tee aclocal_log.log && \
+{ libtoolize --copy --force --verbose; } 2>&1 | tee libtoolize_log.log && \
+{ autoconf --verbose; } 2>&1 | tee autoconf_log.log
+
+(오류)
+autom4te: up_to_date (autom4te.cache/traces.2): outdated: aclocal.m4
+(수정)
+aclocal.m4 파일이 최신 상태가 아님. aclocal이 실행되어야 함
+aclocal.m4를 업데이트
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# aclocal
+
+(오류)
+autom4te: up_to_date (autom4te.cache/traces.2): outdated
+(수정)
+configure.ac 파일이 최신 상태가 아님
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# libtoolize --force
+
+(오류)
+Makefile.am:62: warning: lib_LTLIBRARIES multiply defined in condition TRUE ...
+Makefile.am:35: ... 'lib_LTLIBRARIES' previously defined here
+Makefile.am:62: error: variable 'lib_LTLIBRARIES' recursively defined
+(수정)
+Makefile.am 수정
+lib_LTLIBRARIES가 여러 번 정의되었습니다. 이로 인해 재귀적으로 정의된 오류가 발생
+# 공유 라이브러리로 설정
+lib_LTLIBRARIES = libtextstyle.la libltdlc.la
+#lib_LTLIBRARIES = libtextstyle.la
+#lib_LTLIBRARIES = ${lib_LTLIBRARIES} libltdlc.la
+
+(오류)
+Makefile.am:22: warning: 'CFLAGS' is a user variable, you should not override it;
+Makefile.am:22: use 'AM_CFLAGS' instead
+(수정)
+CFLAGS는 사용자가 정의한 변수로, 직접 덮어쓰지 말고 AM_CFLAGS를 사용
+#CFLAGS = -Wall -Wextra -Wpedantic -fdiagnostics-show-option # 모든 경고와 추가적인 경고를 활성화
+AM_CFLAGS = -Wall -Wextra -Wpedantic -fdiagnostics-show-option # 모든 경고와 추가적인 경고를 활성화
+
+(오류)
+Makefile.am:65: warning: lib_LTLIBRARIES multiply defined in condition TRUE ...
+Makefile.am:36: ... 'lib_LTLIBRARIES' previously defined here
+Makefile.am:65: error: variable 'lib_LTLIBRARIES' recursively defined
+Makefile.am:39: warning: variable 'libtextstyle_la_SOURCES' is defined but no program or
+Makefile.am:39: library has 'libtextstyle_la' as canonical name (possible typo)
+Makefile.am:58: warning: variable 'libtextstyle_la_LIBADD' is defined but no program or
+Makefile.am:58: library has 'libtextstyle_la' as canonical name (possible typo)
+Makefile.am:60: warning: variable 'libtextstyle_la_LDFLAGS' is defined but no program or
+Makefile.am:60: library has 'libtextstyle_la' as canonical name (possible typo)
+autoreconf: error: automake failed with exit status: 1
+
+(빌드)
+{ autopoint --force; } 2>&1 | tee autopoint_log.log && \
+{ rm -f po/Makefile.in.in; } && \
+{ aclocal -I m4 -I gnulib-m4 -I /mingw64/share/aclocal; } 2>&1 | tee aclocal_log.log && \
+{ libtoolize --copy --force --verbose; } 2>&1 | tee libtoolize_log.log && \
+{ autoconf --verbose; } 2>&1 | tee autoconf_log.log
+
+(오류)
+autom4te: up_to_date (autom4te.cache/traces.2): outdated: m4/libtool.m4
+(수정)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l ./m4/libtool.m4
+-rw-r--r-- 1 nayou nayou 307384 10월  2 14:09 ./m4/libtool.m4
+
+libtool.m4 파일 업데이트(m4 디렉토리의 libtool.m4 파일을 최신 상태로 덮어씌움)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# libtoolize --copy --force --verbose;
+
+autom4te.cache 폴더 삭제
+rm -rf autom4te.cache
+
+autoreconf 다시 실행
+autoreconf -ivf
+
+(오류)
+libtoolize: Remember to add 'LTDL_INIT' to configure.ac.
+libtoolize: Consider adding 'AC_CONFIG_MACRO_DIRS([../m4])' to configure.ac,
+libtoolize: and rerunning libtoolize and aclocal.
+
+(수정)
+configure.ac 수정
+AC_INIT([libtextstyle], [1.0], [bug-libtextstyle@example.com])
+LTDL_INIT #라이브러리 동적 로딩을 위한 초기화
+AC_CONFIG_MACRO_DIRS([m4]) 
+
+(빌드명령어)
+autopoint --force :  gettext 관련 파일을 자동으로 생성. po/Makefile.in.in: gettext에서 사용할 메시지 파일의 템플릿. 추가 .po 파일과 관련된 기타 파일을 생성
+aclocal -I m4 -I gnulib-m4 -I /mingw64/share/aclocal -v : m4 매크로 파일을 찾고 aclocal.m4 파일을 생성. aclocal.m4: configure.ac에서 사용하는 매크로 정의를 포함
+libtoolize --copy --force --verbose : libtool과 관련된 파일을 준비. Makefile.am, Makefile.in: 자동화된 빌드를 위한 메이크파일. ltmain.sh, compile, config.guess, config.sub, install-sh, missing: libtool의 지원 파일들
+autoconf -v : configure 스크립트를 생성
+autoheader -v : config.h.in 파일을 생성. #define과 관련된 변수를 정의하는 템플릿 파일
+automake --add-missing --copy --verbose : Makefile.in 파일을 생성하고, 필요한 파일을 추가. Makefile.in: 최종 Makefile 생성을 위한 템플릿.
+./configure --enable-debug : 프트웨어의 컴파일 및 설치를 위한 설정을 구성. config.status: 설정 후의 상태를 기록하는 스크립트. config.h: configure 스크립트에 의해 생성된 C/C++ 헤더 파일
+make -B VERBOSE=1  : 소스 코드를 컴파일. 바이너리 실행 파일과 라이브러리. Makefile에서 정의된 대로 생성된 출력 파일들.
+-j4 : 병렬로 빌드를 수행하여 여러 작업을 동시에 실행. N은 병렬로 실행할 작업의 수를 지정. N 값을 지정하지 않으면 가능한 모든 CPU 코어를 사용
+-k : 하나의 작업에서 오류가 발생해도 다른 작업을 계속 진행
+-i : 빌드 중에 발생한 오류를 무시하고 작업을 계속 진행
+-n : 실제로 빌드를 실행하지 않고, 어떤 명령어가 실행될지 미리 출력
+-s : make 명령어가 실행 중인 명령어를 출력하지 않음(출력량 줄일경우)
+-r : C 소스 파일을 컴파일하는 기본 규칙을 무시하고 수동으로 제어할 때 유용. 기본적으로 제공되는 내장 규칙을 사용하지 않도록 함
+-B : 파일의 타임스탬프에 관계없이 항상 모든 대상(target)을 다시 빌드
+-C : 지정한 디렉토리로 이동하여 빌드를 실행
+-f : 사용할 Makefile을 지정
+VERBOSE=1 : 자세한 컴파일 명령을 보고 싶을 때 사용
+make install : 컴파일된 프로그램, 라이브러리, 문서 등을 지정된 디렉토리에 설치. /usr/local/bin 에 복사. 
+동적 라이브러리(예: .so 파일)나 정적 라이브러리(예: .a 파일)가 시스템의 라이브러리 경로(예: /usr/local/lib)에 설치. 
+C/C++ 헤더 파일이 포함된 디렉토리(예: /usr/local/include)에 복사. README 파일 등이 /usr/local/share/doc와 같은 경로에 설치. 
+./configure --prefix=/usr/local # 설치 경로를 지정 PREFIX(프로그램을 설치할 기본 경로), LIBDIR(라이브러리를 설치할 디렉토리), 
+BINDIR(실행파일설치할 디렉토리), MANDIR(매뉴얼 페이지를 설치할 디렉토리), DATADIR(데이터 파일을 설치할 디렉토리)
+
+(개별빌드)
+autopoint --force &&  
+aclocal -I m4 -I gnulib-m4 -I /mingw64/share/aclocal -v && 
+libtoolize --copy --force --verbose && 
+autoconf -v && 
+autoheader -v && 
+automake --add-missing --copy --verbose && 
+./configure --enable-debug && 
+make -B VERBOSE=1 && 
+make install
+
+(묶음빌드)
+autoreconf -ivf  
+./configure --enable-debug && 
+make -B VERBOSE=1 && 
+make install
+
+(configure.ac/Makefile.am 수정 후 빌드)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# autopoint --force &&
+aclocal -I m4 -I gnulib-m4 -I /mingw64/share/aclocal &&
+libtoolize --copy --force --verbose &&
+autoconf -v &&
+autoheader -v &&
+automake --add-missing --copy --verbose
+
+(오류)
+configure.ac:35: warning: AC_COMPILE_IFELSE was called before AC_USE_SYSTEM_EXTENSIONS
 ./lib/autoconf/specific.m4:541: AC_USE_SYSTEM_EXTENSIONS is expanded from...
+configure.ac:35: the top level
+(수정)
+직/간접호출에 포함되어있는 AC_COMPILE_IFELSE가 AC_USE_SYSTEM_EXTENSIONS이 매크로보다 먼저나와 경고
+AC_USE_SYSTEM_EXTENSIONS은 AC_INIT 다음에 위치시킬것
+AC_INIT([libtextstyle], [1.0], [bug-libtextstyle@example.com])
+# Enable system extensions before other checks
+AC_USE_SYSTEM_EXTENSIONS # AC_INIT 보다 먼저 호출하면 안됨
+
+(오류)
+configure.ac:50: warning: LTDL_INIT was called before LT_INIT
+m4/libtool.m4:62: LT_INIT is expanded from...
 configure.ac:50: the top level
-configure.ac:68: error: possibly undefined macro: AC_DEFINE
+(수정)
+LTDL_INIT이 LT_INIT보다 먼저 호출되었다는 경고
+configure.ac 수정
+LT_INIT
+LTDL_INIT #라이브러리 동적 로딩을 위한 초기화, LT_INIT보다 먼저 선언되면 안됨
+
+(오류)
+configure.ac:52: warning: The macro 'LT_WITH_LTDL' is obsolete.
+configure.ac:52: You should run autoupdate.
+m4/ltdl.m4:355: LT_WITH_LTDL is expanded from...
+configure.ac:52: the top level
+(수정)
+LT_WITH_LTDL 매크로는 더 이상 사용되지 않는 구식 매크로 이다.
+이를 제거하거나 대체하라.
+LT_WITH_LTDL를 사용하는 구문을 제거하고 autoupdate 명령을 실행하여 최신 형태로 업데이트된 configure.ac를 생성
+
+configure.ac 수정
+# LT_WITH_LTDL # 더이상 제공되지 않음
+
+(오류)
+configure.ac:53: warning: LTDL_INIT was called before LT_CONFIG_LTDL_DIR
+m4/ltdl.m4:17: LT_CONFIG_LTDL_DIR is expanded from...
+configure.ac:53: the top level
+(수정)
+LT_INIT
+LT_CONFIG_LTDL_DIR([libltdl]) #libltdl의 경로를 설정
+LTDL_INIT #라이브러리 동적 로딩을 위한 초기화, LT_INIT보다 먼저 선언되면 안됨
+
+(오류)
+autom4te: forbidden token : ^LIBOBJS$ => do not use LIBOBJS directly, use AC_LIBOBJ (see section 'AC_LIBOBJ vs LIBOBJS'
+(수정)
+LIBOBJS 토큰이 직접 사용되었다는 경고
+LIBOBJS는 내부적으로 자동 생성된 오브젝트 파일 목록을 참조하는 데 사용되지만, 직접 사용하면 예기치 않은 결과를 초래할 수 있음
+AC_LIBOBJ 매크로를 사용해야 함. AC_LIBOBJ는 Libtool이 오브젝트 파일을 올바르게 생성하고 관리하도록 도와줌
+configure.ac, Makefile.am 확인 
+LIBOBJS 사용안함
+
+configure.ac 수정
+# gl_LIBOBJS 설정
+if test -n "$gl_LIBOBJS"; then
+    AC_SUBST([GL_LIBOBJS], ["$gl_LIBOBJS"])
+fi
+
+# _LT_LIBOBJS 설정
+if test -n "$_LT_LIBOBJS"; then
+    AC_SUBST([LT_LIBOBJS], ["$_LT_LIBOBJS"])
+fi
+
+Makefile.am 수정
+libtextstyle_la_LIBS = -lncurses $(GNULIB_LIBS) $(GL_LIBOBJS) $(LTDLIBS) $(LT_LIBOBJS) # libtextstyle 라이브러리에 링크할 라이브러리들
+libltdlc_la_LIBS = -lncurses $(GNULIB_LIBS) $(GL_LIBOBJS) $(LTDLIBS) $(LT_LIBOBJS)
+
+(오류)
+/usr/bin/m4:aclocal.m4:1729: cannot open m4/ltdl.m4': No such file or directory
+(수정)
+파일위치확인
+"C:\libidn2\gettext-0.22.5\libtextstyle\lib\ltdl\m4\ltdl.m4"
+"C:\msys64\usr\share\aclocal\ltdl.m4"
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# find /usr/share/aclocal -name ltdl.m4
+/usr/share/aclocal/ltdl.m4
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l /usr/share/aclocal/ltdl.m4
+-rw-r--r-- 1 nayou nayou 30069  7월  5 17:31 /usr/share/aclocal/ltdl.m4
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# notepad ~/.bashrc
+export ACLOCAL_PATH="/c/msys64/usr/share/aclocal:/usr/share/aclocal:/mingw64/share/aclocal:/c/libidn2/m4"
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# source ~/.bashrc
+configure.ac 수정
+LT_INIT #Libtool을 초기화
+
+(오류)
+configure.ac:65: error: possibly undefined macro: _LT_LIBOBJS
       If this token and others are legitimate, please use m4_pattern_allow.
       See the Autoconf documentation.
-configure.ac:168: error: possibly undefined macro: gl_MODULE
-configure.ac:514: error: possibly undefined macro: m4_ifndef
-autoreconf: error: /mingw64/bin/autoconf failed with exit status: 1
 (수정)
-gnulib 서브모듈 초기화
-nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
-# git submodule init
-nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
-# git submodule update
-
-
-AC_COMPILE_IFELSE가 AC_USE_SYSTEM_EXTENSIONS보다 먼저 호출 경고
-제일 처음에 나오는 AC_COMPILE_IFELSE 위로 이동
+_LT_LIBOBJS 매크로가 정의되지 않았음을 나타냄
+필요한 libtool 매크로가 제대로 포함되지 않았거나 libtool이 올바르게 초기화되지 않았을 때 발생
 configure.ac 수정
-# Enable system extensions before other checks
-AC_USE_SYSTEM_EXTENSIONS
+LT_INIT([win32-dll], [dlopen], [libltdl]) # 중복선언안됨. dlopen 모드를 활성화하여 libltdl 사용. win32-dll과 dlopen을 동시에 초기화
+m4_pattern_allow([_LT_LIBOBJS])
 
-m4_pattern_allow 사용
-m4_pattern_allow([AC_DEFINE])
-m4_pattern_allow([gl_MODULES])
-m4_pattern_allow([m4_ifndef])
+매크로 파일이 있는지 확인(m4 디렉터리에 libtool 매크로 파일이 있는지 확인)
+libtool.m4, ltoptions.m4, ltsugar.m4, ltversion.m4
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l ./m4/libtool.m4 ./m4/ltoptions.m4 ./m4/ltsugar.m4 ./m4/ltversion.m4
+-rw-r--r-- 1 nayou nayou 307384 10월  2 18:47 ./m4/libtool.m4
+-rw-r--r-- 1 nayou nayou  14537 10월  2 18:47 ./m4/ltoptions.m4
+-rw-r--r-- 1 nayou nayou   4395 10월  2 18:47 ./m4/ltsugar.m4
+-rw-r--r-- 1 nayou nayou    714 10월  2 18:47 ./m4/ltversion.m4
 
-AC_DEFINE, gl_MODULE, m4_ifndef 등의 매크로는 추가적인 M4 매크로 파일이 필요할 수 있음
+(오류)
+autom4te: forbidden token : ^LIBOBJS$ => do not use LIBOBJS directly, use AC_LIBOBJ (see section 'AC_LIBOBJ vs LIBOBJS'
+(수정)
+LIBOBJS를 사용한 부분을 찾아 AC_LIBOBJ로 변경하세요.
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -rn 'LIBOBJS' ./lib
+./lib/ltdl/ChangeLog.old:1178:  (LTDL_SUBDIR_LIBOBJS): Remove now-obsolete conditional and
+./lib/ltdl/ChangeLog.old:4894:  ltdl_LIBOBJS automake macro, instead of the global LIBOBJS
+./lib/ltdl/ChangeLog.old:4901:  initialise ltdl_LIBOBJS and ltdl_LTLIBOBJS.
+./lib/ltdl/ChangeLog.old:4902:  * libtoolize.m4sh (func_fixup_Makefile): Substitute ltdl_LIBOBJS
+./lib/ltdl/ChangeLog.old:4903:  and ltdl_LTLIBOBJS for LIBOBJS and LTLIBOBJS during copying
+./lib/ltdl/ChangeLog.old:8055:  (SUBDIR_LIBOBJS): Renamed from this...
+....
+
+LIBOBJS를 사용하여 객체 파일을 지정하는 대신 AC_LIBOBJ를 사용하여 객체 파일을 설정하는 방법
+configure.ac 수정
+AC_CONFIG_HEADERS([config.h]) # config.h.in => config.h 생성
+
+AC_LIBOBJ([color])
+AC_LIBOBJ([gl_array_list])
+AC_LIBOBJ([term-ostream])
+AC_LIBOBJ([ostream])
+AC_LIBOBJ([concat-filename])
+AC_LIBOBJ([xconcat-filename])
+AC_LIBOBJ([xsize])
+AC_LIBOBJ([error])
+AC_LIBOBJ([full-write])
+AC_LIBOBJ([term-style-control])
+AC_LIBOBJ([fsync])
+AC_LIBOBJ([xstrdup])
+AC_LIBOBJ([xgethostname])
+AC_LIBOBJ([lt__alloc]) 
+AC_LIBOBJ([lt__argz])
+AC_LIBOBJ([lt_dlloader])
+AC_LIBOBJ([lt_error])
+AC_LIBOBJ([ltdl])
+AC_LIBOBJ([slist])
+
+AC_OUTPUT
 Makefile.am 수정
-ACLOCAL_AMFLAGS = -I m4 -I gnulib-m4 -I /mingw64/share/aclocal
+# 공유 라이브러리로 설정
+lib_LTLIBRARIES = libtextstyle.la libltdlc.la
 
-lib,m4 폴더 백업 후 
-gnulib-tool --add-import
+# libtextstyle 라이브러리 설정
+libtextstyle_la_SOURCES = \ #라이브러리에 포함될 소스 파일 목록을 나열
+	lib/color.c \
+	lib/gl_array_list.c \
+	lib/term-ostream.c \
+	lib/ostream.c \
+	lib/concat-filename.c \
+	lib/xconcat-filename.c \
+    lib/xsize.c \
+	lib/error.c \
+	lib/full-write.c \
+	lib/term-style-control.c \
+	lib/fsync.c \
+	lib/xstrdup.c \
+	lib/xgethostname.c
 
-(오류)
-./configure: line 9248: syntax error near unexpected token `xsize'
-./configure: line 9248: `gl_MODULE(xsize)'
+# libtextstyle 라이브러리에 사용할 객체 파일을 지정
+#libtextstyle_la_LDADD = \
+#    color$(EXEEXT) \
+#    gl_array_list$(EXEEXT) \
+#    term-ostream$(EXEEXT) \
+#    ostream$(EXEEXT) \
+#    concat-filename$(EXEEXT) \
+#    xconcat-filename$(EXEEXT) \
+#    xsize$(EXEEXT) \
+#    error$(EXEEXT) \
+#    full-write$(EXEEXT) \
+#    term-style-control$(EXEEXT) \
+#    fsync$(EXEEXT) \
+#    xstrdup$(EXEEXT) \
+#    xgethostname$(EXEEXT)
 
-(수정)
-#gl_MODULE([xsize])
-gl_MODULES([xsize])
+#bin_PROGRAMS = libtextstyle_la 실행가능한 프로그램인 경우
+libtextstyle_la_LIBS = -lncurses $(GNULIB_LIBS) $(GL_LIBOBJS) $(LTDLIBS) $(LT_LIBOBJS) # libtextstyle 라이브러리에 링크할 라이브러리들
+#libtextstyle_la_SOURCES = libtextstyle.o
+#libtextstyle_la_LDADD = libtextstyle.la -L/c/libidn2/gettext-0.22.5/gettext-runtime/intl/.libs -lintl
+libtextstyle_la_LIBADD = $(NCURSES_LIBS) #ncurses 라이브러리를 링크하기 위해 $(NCURSES_LIBS)를 사용# 설치할 라이브러리의 위치
+#libtextstyle_la_LDFLAGS = -shared -Wl,--out-implib=libtextstyle.dll.a -lltdl $(LDFLAGS) #DLL을 생성하기 위한 필수 플래그를 추가
+libtextstyle_la_LDFLAGS = -shared -Wl,--out-implib=libtextstyle.dll.a -lltdl #DLL을 생성하기 위한 필수 플래그를 추가
+# -shared는 공유 라이브러리를 생성하는 옵션이며, 
+# -Wl, --out-implib=libtextstyle.dll.a는 DLL의 import 라이브러리를 생성
+
+#libltdlc 라이브러리 설정
+libltdlc_la_SOURCES = \
+  libltdl/lt__alloc.c \
+  libltdl/lt__argz.c \
+  libltdl/lt_dlloader.c \
+  libltdl/lt_error.c \
+  libltdl/ltdl.c \
+  libltdl/slist.c
+
+# libltdlc 라이브러리에 사용할 객체 파일을 지정
+#libltdlc_la_LDADD = \
+#    lt__alloc$(EXEEXT) \
+#    lt__argz$(EXEEXT) \
+#    lt_dlloader$(EXEEXT) \
+#    lt_error$(EXEEXT) \
+#    ltdl$(EXEEXT) \
+#    slist$(EXEEXT)
+	
+libltdlc_la_LIBS = -lncurses $(GNULIB_LIBS) $(GL_LIBOBJS) $(LTDLIBS) $(LT_LIBOBJS)
+libltdlc_la_LIBADD = -lltdl
+libltdlc_la_LDFLAGS = -shared -Wl,--out-implib=libltdlc.dll.a
 
 
 
@@ -15121,109 +15659,28 @@ gl_MODULES([xsize])
 
 
 
-(make install)
-# make install
-nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
-# make install
-Making install in lib
-make[1]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/lib' 들어감
-make  install-recursive
-make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/lib' 들어감
-make[3]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/lib' 들어감
-make[4]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/lib' 들어감
-make[4]: 'install-exec-am'을(를) 위해 할 일이 없습니다.
-make[4]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/lib' 나감
-make[3]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/lib' 나감
-make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/lib' 나감
-make[1]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/lib' 나감
-Making install in tests
-make[1]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/tests' 들어감
-make  install-recursive
-make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/tests' 들어감
-Making install in .
-make[3]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/tests' 들어감
-make[4]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/tests' 들어감
-make[4]: 'install-exec-am'을(를) 위해 할 일이 없습니다.
-make[4]: 'install-data-am'을(를) 위해 할 일이 없습니다.
-make[4]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/tests' 나감
-make[3]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/tests' 나감
-make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/tests' 나감
-make[1]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/tests' 나감
-Making install in adhoc-tests
-make[1]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/adhoc-tests' 들어감
-make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/adhoc-tests' 들어감
-make[2]: 'install-exec-am'을(를) 위해 할 일이 없습니다.
-make[2]: 'install-data-am'을(를) 위해 할 일이 없습니다.
-make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/adhoc-tests' 나감
-make[1]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/adhoc-tests' 나감
-Making install in doc
-make[1]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/doc' 들어감
-make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/doc' 들어감
-make[2]: 'install-exec-am'을(를) 위해 할 일이 없습니다.
-/usr/bin/mkdir -p /mingw64/share/doc/libtextstyle
-for file in `if test -f libtextstyle_toc.html; then echo .; else echo .; fi`/libtextstyle_*.html; do \
-  /usr/bin/install -c -m 644 $file /mingw64/share/doc/libtextstyle/`basename $file`; \
-done
- /usr/bin/mkdir -p '/mingw64/share/info'
- /usr/bin/install -c -m 644 ./libtextstyle.info '/mingw64/share/info'
- install-info --info-dir='/mingw64/share/info' '/mingw64/share/info/libtextstyle.info'
-make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/doc' 나감
-make[1]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/doc' 나감
-make[1]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle' 들어감
-make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle' 들어감
- /usr/bin/mkdir -p '/mingw64/lib'
- /bin/sh ./libtool   --mode=install /usr/bin/install -c   libtextstyle.la '/mingw64/lib'
-libtool: install: /usr/bin/install -c .libs/libtextstyle.lai /mingw64/lib/libtextstyle.la
-libtool: install: /usr/bin/install -c .libs/libtextstyle.a /mingw64/lib/libtextstyle.a
-libtool: install: chmod 644 /mingw64/lib/libtextstyle.a
-libtool: install: ranlib /mingw64/lib/libtextstyle.a
-make[2]: 'install-data-am'을(를) 위해 할 일이 없습니다.
-make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle' 나감
-make[1]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle' 나감
 
-(make check)
-nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
-# make check
-Making check in lib
-make[1]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/lib' 들어감
-make  check-recursive
-make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/lib' 들어감
-make[3]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/lib' 들어감
-make[3]: 'check-am'을(를) 위해 할 일이 없습니다.
-make[3]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/lib' 나감
-make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/lib' 나감
-make[1]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/lib' 나감
-Making check in tests
-make[1]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/tests' 들어감
-make  check-recursive
-make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/tests' 들어감
-Making check in .
-make[3]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/tests' 들어감
-## ---------------------------------------------------------------------- ##
-## ---------------------------- Gnulib tests ---------------------------- ##
-## Please report test failures in this directory to <bug-gnulib@gnu.org>. ##
-## ---------------------------------------------------------------------- ##
-make  test-memory-ostream.exe test-term-ostream.exe test-instanceof.exe test-accessors.exe libtests.a
-make[4]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/tests' 들어감
-depbase=`echo test-memory-ostream.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
-/mingw64/bin/gcc -DHAVE_CONFIG_H -I. -I. -I../lib -I..  -D@ltstests_WITNESS@=1 -I. -I. -I.. -I./.. -I../lib -I./../lib -DSRCDIR=\"./\" -I/mingw64/include  -Wno-error -Wno-cast-qual -Wno-conversion -Wno-float-equal -Wno-sign-compare -Wno-undef -Wno-unused-function -Wno-unused-parameter -Wno-float-conversion -Wimplicit-fallthrough -Wno-pedantic -Wno-sign-conversion -Wno-type-limits -Wno-unsuffixed-float-constants -I/mingw64/include -O2 -std=c11 -fno-inline -UNDEFINED_MACRO -MT test-memory-ostream.o -MD -MP -MF $depbase.Tpo -c -o test-memory-ostream.o test-memory-ostream.c &&\
-mv -f $depbase.Tpo $depbase.Po
-<command-line>: error: macro names must be identifiers
-make[4]: *** [Makefile:1053: test-memory-ostream.o] 오류 1
-make[4]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/tests' 나감
-make[3]: *** [Makefile:1423: check-am] 오류 2
-make[3]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/tests' 나감
-make[2]: *** [Makefile:1089: check-recursive] 오류 1
-make[2]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/tests' 나감
-make[1]: *** [Makefile:1426: check] 오류 2
-make[1]: 디렉터리 '/c/libidn2/gettext-0.22.5/libtextstyle/tests' 나감
-make: *** [Makefile:926: check-recursive] 오류 1
 
-(오류)
-<command-line>: error: macro names must be identifiers
-(수정)
-매크로 이름이 잘못되었다는 것을 의미
-일반적으로 매크로 이름은 알파벳, 숫자, 그리고 언더스코어(_)로 구성되어야 하며, 숫자로 시작할 수 없음
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
