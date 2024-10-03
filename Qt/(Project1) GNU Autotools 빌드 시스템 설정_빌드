@@ -15725,7 +15725,7 @@ There is NO WARRANTY, to the extent permitted by law.
 
 Written by René Seindal.
 
-파일이 없어서 복사실패 파일을 미리 복사해놓음
+파일이 없어서 복사실패 파일을 미리 복사해 놓음
 nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
 # cp /c/msys64/usr/share/aclocal/ltdl.m4 ./m4
 nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
@@ -15739,6 +15739,323 @@ nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
 # cp /c/msys64/usr/share/aclocal/ltargz.m4 /usr/bin/m4                        
 nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
 # cp /c/msys64/usr/share/aclocal/ltdl.m4 /usr/bin/m4
+
+(빌드)
+{ autopoint --force; } 2>&1 | tee autopoint_log.log && 
+{ rm -f po/Makefile.in.in; } &&
+{ rm -rf autom4te.cache; } &&
+{ aclocal -I m4 -I gnulib-m4 -I /mingw64/share/aclocal; } 2>&1 | tee aclocal_log.log && 
+{ libtoolize --copy --force --verbose; } 2>&1 | tee libtoolize_log.log && 
+{ autoconf --verbose; } 2>&1 | tee autoconf_log.log
+
+(오류)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# { autopoint --force; } 2>&1 | tee autopoint_log.log &&
+{ rm -f po/Makefile.in.in; } &&
+{ rm -rf autom4te.cache; } &&
+{ aclocal -I m4 -I gnulib-m4 -I /mingw64/share/aclocal; } 2>&1 | tee aclocal_log.log &&
+{ libtoolize --copy --force --verbose; } 2>&1 | tee libtoolize_log.log &&
+{ autoconf --verbose; } 2>&1 | tee autoconf_log.log
+autom4te: error: need GNU m4 1.4 or later: /usr/bin/m4
+Copying file po/Makefile.in.in
+autom4te: error: need GNU m4 1.4 or later: /usr/bin/m4
+aclocal-1.16: error: autom4te failed with exit status: 1
+libtoolize: found 'configure.ac'
+libtoolize:   error: One of these is required:
+libtoolize:                 gm4 gnum4 m4
+libtoolize:   error: Please install GNU M4, or 'export M4=/path/to/gnu/m4'.
+autoconf: running /mingw64/bin/autom4te --verbose '--language=autoconf' '--output=configure' /mingw64/share/autoconf/autoconf/trailer.m4 configure.ac
+autom4te: error: need GNU m4 1.4 or later: /usr/bin/m4
+(수정)
+m4의 버전이 낮거나 설치되어 있지 않아서 발생
+GNU m4 1.4 이상 버전이 필요
+GNU M4 설치 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# m4 --version
+/usr/bin/m4: 줄 17: 예기치 않은 토큰 `[LT_CONFIG_LTDL_DIR],' 근처에서 문법 오류
+/usr/bin/m4: 줄 17: `AC_DEFUN([LT_CONFIG_LTDL_DIR],'
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l /mingw64/bin/m4
+ls: cannot access '/mingw64/bin/m4': No such file or directory
+
+패키지업데이트
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -Sy
+:: 꾸러미 데이터베이스 동기화 중...
+ clangarm64            420.3 KiB   108 KiB/s 00:04 [#######################] 100%
+ mingw32               209.8 KiB   115 KiB/s 00:02 [#######################] 100%
+ mingw64               448.1 KiB   201 KiB/s 00:02 [#######################] 100%
+ ucrt64                476.4 KiB   251 KiB/s 00:02 [#######################] 100%
+ clang32               104.8 KiB  35.4 KiB/s 00:03 [#######################] 100%
+ clang64               460.7 KiB   272 KiB/s 00:02 [#######################] 100%
+ msys는 최신입니다
+
+pacman에서 제공하는 m4 관련 패키지를 검색
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -Ss m4
+clangarm64/mingw-w64-clang-aarch64-gtkmm-4.0 4.16.0-1
+    C++ bindings for GTK+4 (mingw-w64)
+mingw32/mingw-w64-i686-gtkmm-4.0 4.16.0-1
+    C++ bindings for GTK+4 (mingw-w64)
+mingw64/mingw-w64-x86_64-gtkmm-4.0 4.16.0-1
+    C++ bindings for GTK+4 (mingw-w64)
+ucrt64/mingw-w64-ucrt-x86_64-gtkmm-4.0 4.16.0-1
+    C++ bindings for GTK+4 (mingw-w64)
+clang64/mingw-w64-clang-x86_64-gtkmm-4.0 4.16.0-1
+    C++ bindings for GTK+4 (mingw-w64)
+msys/m4 1.4.19-2 [설치함]
+    The GNU macro processor
+=> 이미 msys/m4 패키지가 설치된 상태
+경로 설정을 확인하여 MSYS2의 m4가 올바르게 사용되도록 해야 함
+autom4te 및 autoconf와 같은 도구들이 m4 경로를 찾지 못하는 경우일 수 있음
+(M4 환경 변수를 설정)
+MinGW64 환경에서 사용하려는 m4는 /mingw64/bin/m4가 아니라 
+MSYS2 환경에서 설치된 /usr/bin/m4
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l /usr/bin/m4
+-rwxr-xr-x 1 nayou nayou 30069 10월  3 12:28 /usr/bin/m4
+
+(MSYS2 환경: /usr/bin 디렉토리에 GNU 도구들이 위치하며, bash, autoconf, m4 등의 도구가 이 환경에서 기본적으로 제공됩니다. 이 환경은 Unix-like 환경으로 Windows에서 POSIX 호환 작업을 쉽게 처리할 수 있게 합니다.)
+(MinGW64 환경: /mingw64/bin 경로는 MinGW64 툴체인을 위한 환경으로, Windows 네이티브 응용 프로그램을 만들 때 사용됩니다. MinGW64에서는 POSIX 호환성보다는 Windows에서 직접 실행 가능한 바이너리를 생성하는 데 초점이 맞춰져 있습니다.)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# notepad ~/.bashrc
+export M4=/usr/bin/m4
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# source ~/.bashrc
+
+Libtool 및 libltdl 설치 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -S libtool
+경고: libtool-2.4.7-4는 최신 버전입니다.
+
+configure.ac 수정
+#LT_CONFIG_LTDL_DIR([libltdl]) #libltdl의 경로를 설정
+LT_CONFIG_LTDL_DIR([/c/libidn2/gettext-0.22.5/libtextstyle/libltdl])
+
+libtool 매크로 파일 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls /usr/share/aclocal/libtool.m4
+/usr/share/aclocal/libtool.m4
+
+(빌드) /usr/share/aclocal 변경
+{ autopoint --force; } 2>&1 | tee autopoint_log.log && 
+{ rm -f po/Makefile.in.in; } &&
+{ rm -rf autom4te.cache; } &&
+{ aclocal -I m4 -I gnulib-m4 -I /usr/share/aclocal; } 2>&1 | tee aclocal_log.log && 
+{ libtoolize --copy --force --verbose; } 2>&1 | tee libtoolize_log.log && 
+{ autoconf --verbose; } 2>&1 | tee autoconf_log.log
+
+(오류)
+autom4te: error: need GNU m4 1.4 or later: /usr/bin/m4
+Copying file po/Makefile.in.in
+autom4te: error: need GNU m4 1.4 or later: /usr/bin/m4
+aclocal-1.16: error: autom4te failed with exit status: 1
+(수정)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# /usr/bin/m4 --version
+/usr/bin/m4: 줄 17: 예기치 않은 토큰 `[LT_CONFIG_LTDL_DIR],' 근처에서 문법 오류
+/usr/bin/m4: 줄 17: `AC_DEFUN([LT_CONFIG_LTDL_DIR],'
+
+재설치
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -R m4
+의존성 검사 중...
+오류: 트랜잭션 준비에 실패했습니다(의존성이 만족되지 못하였습니다.)
+:: m4 제거로 의존성 'm4'(autoconf2.13가 요구)가 깨집니다
+:: m4 제거로 의존성 'm4'(autoconf2.69가 요구)가 깨집니다
+:: m4 제거로 의존성 'm4'(autoconf2.71가 요구)가 깨집니다
+:: m4 제거로 의존성 'm4'(autoconf2.72가 요구)가 깨집니다
+:: m4 제거로 의존성 'm4'(bison가 요구)가 깨집니다
+:: m4 제거로 의존성 'm4'(flex가 요구)가 깨집니다
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -S m4 --noconfirm
+
+M4 경로 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# which m4
+/usr/bin/m4
+
+환경변수확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# echo $M4
+/usr/bin/m4
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# $M4 --version
+m4 (GNU M4) 1.4.19
+Copyright (C) 2021 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+Written by René Seindal.
+
+(오류)
+libtoolize: Not copying 'm4/ltargz.m4', libltdl not used.
+libtoolize: Not copying 'm4/ltdl.m4', libltdl not used.
+(수정)
+복사를 해놓아도 계속 삭제가되어 빌드과정에 복사를 넣음
+빌드명령어 수정
+# 로그 디렉토리 생성
+mkdir -p ./log
+
+# autopoint 실행 및 로그 저장
+{ autopoint --force; } 2>&1 | tee ./log/autopoint.log && 
+
+# Makefile.in.in 파일 삭제
+{ rm -f po/Makefile.in.in; } && 
+
+# autom4te 캐시 삭제
+{ rm -rf autom4te.cache; } && 
+
+# aclocal 실행 및 로그 저장
+{ aclocal -I m4 -I gnulib-m4 -I /usr/share/aclocal; } 2>&1 | tee ./log/aclocal.log && 
+
+# 필요한 m4 파일 복사
+{ cp /c/msys64/usr/share/aclocal/ltargz.m4 /c/libidn2/gettext-0.22.5/libtextstyle/m4/; cp /c/msys64/usr/share/aclocal/ltdl.m4 /c/libidn2/gettext-0.22.5/libtextstyle/m4/; } && 
+
+# libtoolize 실행 및 로그 저장
+{ libtoolize --copy --force --verbose; } 2>&1 | tee ./log/libtoolize.log && 
+
+# autoconf 실행 및 로그 저장
+{ autoconf --verbose; } 2>&1 | tee ./log/autoconf.log && 
+
+# autoheader 실행 및 로그 저장
+{ autoheader; } 2>&1 | tee ./log/autoheader.log && 
+
+# automake 실행 및 로그 저장
+{ automake --add-missing --force-missing; } 2>&1 | tee ./log/automake.log && 
+
+# configure 실행 및 로그 저장
+{ ./configure; } 2>&1 | tee ./log/configure.log && 
+
+# make 실행 및 로그 저장
+{ make; } 2>&1 | tee ./log/make.log
+
+(빌드명령어)
+{ autopoint --force; } 2>&1 | tee ./log/autopoint.log && 
+{ rm -f po/Makefile.in.in; } && 
+{ rm -rf autom4te.cache; } && 
+{ aclocal -I m4 -I gnulib-m4 -I /usr/share/aclocal; } 2>&1 | tee ./log/aclocal.log && 
+{ libtoolize --copy --force --verbose; } 2>&1 | tee ./log/libtoolize.log && 
+{ cp /c/msys64/usr/share/aclocal/ltargz.m4 /c/libidn2/gettext-0.22.5/libtextstyle/m4/; cp /c/msys64/usr/share/aclocal/ltdl.m4 /c/libidn2/gettext-0.22.5/libtextstyle/m4/; } &&
+{ autoconf --verbose; } 2>&1 | tee ./log/autoconf.log && 
+{ autoheader; } 2>&1 | tee ./log/autoheader.log && 
+{ automake --add-missing --force-missing; } 2>&1 | tee ./log/automake.log && 
+{ ./configure; } 2>&1 | tee ./log/configure.log && 
+{ make; } 2>&1 | tee ./log/make.log
+
+(오류)
+libtoolize: Not copying 'm4/ltargz.m4', libltdl not used.
+libtoolize: Not copying 'm4/ltdl.m4', libltdl not used.
+(수정)
+libtoolize가 m4/ltargz.m4와 m4/ltdl.m4 파일을 삭제하는 이유는 libltdl이 사용되지 않기 때문
+configure.ac 파일 수정
+# LT_INIT([libltdl]) #libtool을 초기화할 때 libltdl을 포함하도록 지시
+LT_INIT([win32-dll], [dlopen], [libltdl]) # 중복선언안됨. dlopen 모드를 활성화하여 libltdl 사용. win32-dll과 dlopen을 동시에 초기화
+
+필요한 패키지 설치 확인
+pacman -S mingw-w64-x86_64-libtool
+
+libltdl을 사용하도록 설정
+Makefile.am
+lib_LTLIBRARIES = libmylibrary.la
+libmylibrary_la_LDFLAGS = -version-info 1:0:0
+
+libtoolize를 실행하여 자동으로 파일을 생성하도록 한다.
+
+(최종 빌드명령어)
+{ autopoint --force; } 2>&1 | tee ./log/autopoint.log && 
+{ rm -f po/Makefile.in.in; } && 
+{ rm -rf autom4te.cache; } && 
+{ aclocal -I m4 -I gnulib-m4 -I /usr/share/aclocal; } 2>&1 | tee ./log/aclocal.log && 
+{ libtoolize --copy --force --verbose; } 2>&1 | tee ./log/libtoolize.log && 
+{ autoconf --verbose; } 2>&1 | tee ./log/autoconf.log && 
+{ autoheader; } 2>&1 | tee ./log/autoheader.log && 
+{ automake --add-missing --force-missing; } 2>&1 | tee ./log/automake.log && 
+{ ./configure; } 2>&1 | tee ./log/configure.log && 
+{ make; } 2>&1 | tee ./log/make.log
+
+(오류)
+autom4te: error: need GNU m4 1.4 or later: /usr/bin/m4
+(수정)
+GNU m4 1.4 또는 그 이상의 버전이 필요(M4가 잘 깨짐)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -S m4
+경고: m4-1.4.19-2는 최신 버전입니다. -- 재설치
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# m4 --version
+m4 (GNU M4) 1.4.19
+Copyright (C) 2021 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+Written by René Seindal.
+
+(오류)
+checking for glib-2.0 >= 2.10.0 gobject-2.0  >= 2.10.0... no
+./configure: line 18507: syntax error near unexpected token `2.0'
+./configure: line 18507: `GL_REQUIRE_VERSION(2.0)'
+make: *** [Makefile:843: config.status] 오류 2
+(수정)
+패키지 데이터베이스 업데이트
+pacman -Syu
+필요한 패키지 설치: 필요한 개발 패키지를 설치
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -S mingw-w64-x86_64-glib2 mingw-w64-x86_64-gcc
+경고: mingw-w64-x86_64-gcc-14.2.0-1는 최신 버전입니다. -- 재설치
+의존성 해결 중...
+꾸러미 충돌을 찾는 중...
+
+꾸러미 (5) mingw-w64-x86_64-pcre2-10.44-1
+           mingw-w64-x86_64-python-packaging-24.1-1
+           mingw-w64-x86_64-wineditline-2.206-1  mingw-w64-x86_64-gcc-14.2.0-1
+           mingw-w64-x86_64-glib2-2.82.1-1
+
+총 다운로드 크기:        6.23 MiB
+총 설치 크기:          269.13 MiB
+알짜 업그레이드 크기:   44.30 MiB
+
+:: 설치를 진행하시겠습니까? [Y/n] y
+:: 꾸러미 가져오는 중...
+ mingw-w64-x86_64...  1077.2 KiB   445 KiB/s 00:02 [#######################] 100%
+ mingw-w64-x86_64...    59.2 KiB  24.1 KiB/s 00:02 [#######################] 100%
+ mingw-w64-x86_64...   102.3 KiB  39.7 KiB/s 00:03 [#######################] 100%
+ mingw-w64-x86_64...     5.0 MiB  1251 KiB/s 00:04 [#######################] 100%
+ 총합 (4/4)              6.2 MiB  1403 KiB/s 00:05 [#######################] 100%
+(5/5) 키링의 키를 검사 중                          [#######################] 100%
+(5/5) 꾸러미 무결성 검사 중                        [#######################] 100%
+(5/5) 꾸러미 파일 불러오는 중                      [#######################] 100%
+(5/5) 파일 충돌 검사 중                            [#######################] 100%
+(5/5) 사용 가능한 디스크 공간 검사 중              [#######################] 100%
+:: 꾸러미 변경사항을 처리 중...
+(1/5) 설치 중 mingw-w64-x86_64-wineditline         [#######################] 100%
+(2/5) 설치 중 mingw-w64-x86_64-pcre2               [#######################] 100%
+(3/5) 설치 중 mingw-w64-x86_64-python-packaging    [#######################] 100%
+(4/5) 설치 중 mingw-w64-x86_64-glib2               [#######################] 100%
+(5/5) 재설치 중 mingw-w64-x86_64-gcc               [#######################] 100%
+
+환경 변수 설정
+export PKG_CONFIG_PATH="/c/Program\ Files/GLib/lib/pkgconfig:/c/libidn2/gettext-0.22.5/gettext-runtime/intl:/mingw64/lib/pkgconfig:/usr/lib/pkgconfig"
+
+glib-2.0 라이브러리의 버전을 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pkg-config --modversion glib-2.0
+2.82.1
+=> glib-2.0이 필요한 프로그램이나 라이브러리를 구성하는 데 충분
+
+configure.ac 수정
+GL_REQUIRE_VERSION"([2.0])" # GLib의 최소 버전
+
+(오류)
+onfigure.ac:23: warning: Unknown LT_INIT option 'libltdl'
+(수정)
+#LT_INIT([libltdl]) # 단독으로 썼을경우 인식안될 수 있음 
+LT_INIT([win32-dll], [dlopen], [libltdl])
 
 
 
