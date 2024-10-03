@@ -15650,22 +15650,95 @@ libltdlc_la_LIBS = -lncurses $(GNULIB_LIBS) $(GL_LIBOBJS) $(LTDLIBS) $(LT_LIBOBJ
 libltdlc_la_LIBADD = -lltdl
 libltdlc_la_LDFLAGS = -shared -Wl,--out-implib=libltdlc.dll.a
 
+(오류)
+libtoolize: Not copying 'm4/ltargz.m4', libltdl not used.
+libtoolize: Not copying 'm4/ltdl.m4', libltdl not used.
+(수정)
+configure.ac 수정
+# LT_INIT 삭제
+LT_INIT([win32-dll], [dlopen], [libltdl]) # 중복선언안됨. dlopen 모드를 활성화하여 libltdl 사용. win32-dll과 dlopen을 동시에 초기화
+LT_WITH_LTDL([libltdl])
+LT_CONFIG_LTDL_DIR([libltdl]) #libltdl의 경로를 설정
 
+(빌드)
+libtoolize가 자동으로 m4/ltargz.m4 및 m4/ltdl.m4 파일을 복사해야 함
+libtoolize --force --copy --install --verbose
 
+자동 생성 캐시 정리 추가
+{ autopoint --force; } 2>&1 | tee autopoint_log.log && { rm -f po/Makefile.in.in; } && \
+{ rm -rf autom4te.cache; } && \
+{ aclocal -I m4 -I gnulib-m4 -I /mingw64/share/aclocal; } 2>&1 | tee aclocal_log.log && \
+{ libtoolize --copy --force --verbose; } 2>&1 | tee libtoolize_log.log && \
+{ autoconf --verbose; } 2>&1 | tee autoconf_log.log
 
+(오류)
+/usr/bin/m4:aclocal.m4:1729: cannot open `m4/ltdl.m4': No such file or directory
+(수정)
+autom4te가 aclocal.m4 파일의 1729번째 줄에서 m4/ltdl.m4 파일을 찾을 수 없음 경고
 
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# which aclocal
+/usr/bin/aclocal
+=>m4/ltdl.m4 없음
 
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# find / -name aclocal.m4 2>/dev/null
+/home/nayou/_bazel_nayou/4yp365mj/external/protobuf~/aclocal.m4
+/home/nayou/_bazel_nayou/4yp365mj/external/protobuf~/third_party/googletest/aclocal.m4
+/home/nayou/_bazel_nayou/4yp365mj/external/protobuf~/third_party/googletest/googlemock/aclocal.m4
+/home/nayou/_bazel_nayou/4yp365mj/external/protobuf~/third_party/googletest/googletest/aclocal.m4
+/mingw64/share/libtool/aclocal.m4
+/usr/share/libtool/aclocal.m4
+=> /mingw64/share/libtool/aclocal.m4
+=> /usr/share/libtool/aclocal.m4
 
+aclocal.m4
+"C:\libidn2\gettext-0.22.5\libtextstyle\lib\ltdl\aclocal.m4"
+"C:\libidn2\gettext-0.22.5\libtextstyle\libltdl\aclocal.m4"
+"C:\libidn2\gettext-0.22.5\libtextstyle\aclocal.m4"
 
+m4/ltdl.m4
+"C:\libidn2\gettext-0.22.5\libtextstyle\lib\ltdl\m4\ltdl.m4"
+"C:\msys64\usr\share\aclocal\ltdl.m4"
 
+결과적으로 
+"C:\libidn2\gettext-0.22.5\libtextstyle\lib\ltdl\aclocal.m4"
+"C:\libidn2\gettext-0.22.5\libtextstyle\lib\ltdl\m4\ltdl.m4"
 
+환경변수설정&적용
+notepad ~/.bashrc
+export ACLOCAL_PATH="/c/libidn2/gettext-0.22.5/libtextstyle/lib/ltdl:/c/libidn2/gettext-0.22.5/libtextstyle/lib/ltdl/m4:/c/msys64/usr/share/aclocal:/usr/share/aclocal:/mingw64/share/aclocal:/c/libidn2/m4"
+source ~/.bashrc
 
+(오류)
+undefine=__m4_version__ aclocal.m4 /mingw64/share/autoconf/autoconf/trailer.m4 configure.ac > autom4te.cache/output.1t
+(수정)
+aclocal.m4 파일에서 __m4_version__ 변수를 정의하지 않았다
+M4의 버전 정의가 누락되었거나 aclocal.m4를 찾을 수 없는 경우에 발생
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# m4 --version
+m4 (GNU M4) 1.4.19
+Copyright (C) 2021 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
 
+Written by René Seindal.
 
+파일이 없어서 복사실패 파일을 미리 복사해놓음
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# cp /c/msys64/usr/share/aclocal/ltdl.m4 ./m4
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# cp /c/msys64/usr/share/aclocal/ltargz.m4 ./m4
 
-
-
-
+(오류)
+/usr/bin/m4:aclocal.m4:1729: cannot open `m4/ltdl.m4': No such file or directory
+autom4te: error: /usr/bin/m4 failed with exit status: 1
+(수정)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# cp /c/msys64/usr/share/aclocal/ltargz.m4 /usr/bin/m4                        
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# cp /c/msys64/usr/share/aclocal/ltdl.m4 /usr/bin/m4
 
 
 
