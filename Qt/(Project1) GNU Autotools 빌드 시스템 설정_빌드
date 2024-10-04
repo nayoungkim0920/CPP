@@ -16057,13 +16057,113 @@ onfigure.ac:23: warning: Unknown LT_INIT option 'libltdl'
 #LT_INIT([libltdl]) # 단독으로 썼을경우 인식안될 수 있음 
 LT_INIT([win32-dll], [dlopen], [libltdl])
 
+(오류)
+libtoolize: Not copying 'm4/ltargz.m4', libltdl not used.
+libtoolize: Not copying 'm4/ltdl.m4', libltdl not used.
+(수정)
+configure.ac 수정
+LT_INIT([dlopen])
+LTDL_INIT([libltdl])
 
+(오류)
+configure.ac:24: warning: Unknown LTDL_INIT option 'dlopen'
+(수정)
+configure.ac 수정
+LT_INIT([win32-dll], [dlopen])
+LTDL_INIT([libltdl])
 
+(오류)
+configure.ac:26: error: multiple libltdl directories: 
+'libltdl', '/c/libidn2/gettext-0.22.5/libtextstyle/libltdl'
+(수정)
+"C:\libidn2\gettext-0.22.5\libtextstyle\libltdl\libltdl"
+"C:\libidn2\gettext-0.22.5\libtextstyle\lib\ltdl\libltdl\libltdl"
+"C:\libidn2\gettext-0.22.5\libtextstyle\libltdl"
+"C:\libidn2\gettext-0.22.5\libtextstyle\lib\ltdl\libltdl" 
 
+configure.ac 수정
+LT_INIT([win32-dll], [dlopen])
+LTDL_INIT([libltdl])
+LT_CONFIG_LTDL_DIR([/c/libidn2/gettext-0.22.5/libtextstyle/lib/ltdl])
 
+(오류)
+configure.ac:24: warning: Unknown LTDL_INIT option 'libltdl'
+(수정)
+LT_INIT: 라이브러리 설정을 위한 기본 매크로입니다.
+LTDL_INIT: libltdl을 설정하기 위한 매크로로, 옵션 없이 사용해야 합니다.
+configure.ac 수정
+LT_INIT([win32-dll], [dlopen])
+LTDL_INIT
+LT_CONFIG_LTDL_DIR([libltdl])
 
+[동적 라이브러리를 쉽게 관리하고 로드할 수 있는 환경을 구성]
+LT_INIT([win32-dll], [dlopen])
+LTDL_INIT
+LT_CONFIG_LTDL_DIR([libltdl])
 
+(빌드)
+{ autopoint --force; } 2>&1 | tee ./log/autopoint.log && 
+{ rm -f po/Makefile.in.in; } && 
+{ rm -rf autom4te.cache; } && 
+{ aclocal -I m4 -I gnulib-m4 -I /usr/share/aclocal; } 2>&1 | tee ./log/aclocal.log && 
+{ libtoolize --copy --force --verbose; } 2>&1 | tee ./log/libtoolize.log && 
+{ autoconf --verbose; } 2>&1 | tee ./log/autoconf.log && 
+{ autoheader; } 2>&1 | tee ./log/autoheader.log && 
+{ automake --add-missing --force-missing; } 2>&1 | tee ./log/automake.log && 
+{ ./configure; } 2>&1 | tee ./log/configure.log && 
+{ make; } 2>&1 | tee ./log/make.log
 
+(오류)
+autom4te: forbidden token : ^LIBOBJS$ => do not use LIBOBJS directly, 
+use AC_LIBOBJ (see section 'AC_LIBOBJ vs LIBOBJS'
+(수정)
+LIBOBJS를 직접 사용하지 말고, 대신 AC_LIBOBJ를 사용하라
+
+Makefile.am 수정
+#libltdlc_la_LIBS = -lncurses $(GNULIB_LIBS) $(GL_LIBOBJS) $(LTDLIBS) $(LT_LIBOBJS)
+libltdlc_la_LIBS = -lncurses $(GNULIB_LIBS) $(AC_LIBOBJ(GL_LIBS)) $(LTDLIBS) $(AC_LIBOBJ(LT_LIBS))
+
+(오류)
+autom4te: forbidden token : ^LIBOBJS$ => do not use LIBOBJS directly, use AC_LIBOBJ (see section 'AC_LIBOBJ vs LIBOBJS'
+Makefile.am:99: warning: AC_LIBOBJ(GL_LIBS: non-POSIX variable name
+Makefile.am:99: warning: AC_LIBOBJ(LT_LIBS: non-POSIX variable name
+(수정)
+LIBOBJS라는 변수를 직접 사용하면 안 되며, 대신 AC_LIBOBJ를 사용해야 한다는 경고
+AC_LIBOBJ(GL_LIBS) 및 AC_LIBOBJ(LT_LIBS)에서 비-포지스 이름 경고가 발생
+
+Makefile.am 수정
+#libltdlc_la_LIBS = -lncurses $(GNULIB_LIBS) $(AC_LIBOBJ(GL_LIBS)) $(LTDLIBS) $(AC_LIBOBJ(LT_LIBS))
+libltdlc_la_LIBS = -lncurses $(GNULIB_LIBS) $(AC_LIBOBJ(GL_LIBS)) $(LTDLIBS) $(AC_LIBOBJ(LT_LIBS))
+
+configure.ac 수정
+# gl_LIBOBJS 설정
+#if test -n "$gl_LIBOBJS"; then
+#    AC_SUBST([GL_LIBOBJS], ["$gl_LIBOBJS"])
+#fi
+
+# _LT_LIBOBJS 설정
+#if test -n "$_LT_LIBOBJS"; then
+#    AC_SUBST([LT_LIBOBJS], ["$_LT_LIBOBJS"])
+#fi
+
+# gl_libs 설정
+if test -n "$gl_libs"; then
+    AC_SUBST([GL_LIBS], ["$gl_libs"])
+fi
+
+# lt_libs 설정
+if test -n "$_lt_libs"; then
+    AC_SUBST([LT_LIBS], ["$_lt_libs"])
+fi
+
+(오류)
+configure.ac:27: warning: LTDL_INIT was called before LT_CONFIG_LTDL_DIR
+m4/ltdl.m4:17: LT_CONFIG_LTDL_DIR is expanded from...
+(수정)
+LT_CONFIG_LTDL_DIR([libltdl])
+LT_INIT([win32-dll], [dlopen])
+LTDL_INIT
+L_INLTDIT #라이브러리 동적 로딩을 위한 초기화, LT_INIT보다 먼저 선언되면 안됨
 
 
 
