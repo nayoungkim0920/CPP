@@ -16165,11 +16165,261 @@ LT_INIT([win32-dll], [dlopen])
 LTDL_INIT
 L_INLTDIT #라이브러리 동적 로딩을 위한 초기화, LT_INIT보다 먼저 선언되면 안됨
 
+(오류)
+autom4te: forbidden token : ^LIBOBJS$ => do not use LIBOBJS directly, use AC_LIBOBJ (see section 'AC_LIBOBJ vs LIBOBJS'
+(수정)
+LIBOBJS->AC_LIBOBJ 수정
+추출한 파일명들을 정렬하고, 중복되는 파일명을 제거하여 최종 결과로 고유한 파일명만 출력
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -rn 'LIBOBJS' ./lib | awk -F: '{print $1}' | sort -u
+./lib/ltdl/ChangeLog.old
+./lib/ltdl/config.log
+./lib/ltdl/config.status
+./lib/ltdl/configure
+./lib/ltdl/doc/libtool.texi
+./lib/ltdl/libltdl/ltdl.mk
+./lib/ltdl/libtoolize.in
+./lib/ltdl/m4/ltdl.m4
+./lib/ltdl/mail/LTLIBOBJ
+./lib/ltdl/Makefile.am
+./lib/ltdl/Makefile.in
+./lib/Makefile
+./lib/Makefile.am
+./lib/Makefile.am~
+./lib/Makefile.gnulib
+./lib/Makefile.in
+Binary file ./lib/ltdl/.git/objects/pack/pack-19f43a0211c8d07d4c0843d649b1b8b4074e6434.pack matches
 
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# notepad change_LIBOBJS_to_AC_LIBOBJ.sh
 
+#!/bin/bash
 
+# 파일 경로
+file_path="./lib/ltdl/ChangeLog.old"
 
+# 'LIBOBJS'를 'AC_LIBOBJ'로 변경
+sed -i 's/LIBOBJS/AC_LIBOBJ/g' "$file_path"
 
+echo "$file_path 에서 모든 'LIBOBJS'를 'AC_LIBOBJ'로 변경했습니다."
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ./change_LIBOBJS_to_AC_LIBOBJ.sh
+./lib/ltdl/ChangeLog.old 에서 모든 'LIBOBJS'를 'AC_LIBOBJ'로 변경했습니다.
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -rn 'LIBOBJS' ./lib | awk -F: '{print $1}' | sort | uniq -d
+./lib/ltdl/config.log
+./lib/ltdl/config.status
+./lib/ltdl/configure
+./lib/ltdl/doc/libtool.texi
+./lib/ltdl/libltdl/ltdl.mk
+./lib/ltdl/libtoolize.in
+./lib/ltdl/m4/ltdl.m4
+./lib/ltdl/mail/LTLIBOBJ
+./lib/ltdl/Makefile.am
+./lib/ltdl/Makefile.in
+./lib/Makefile
+./lib/Makefile.am
+./lib/Makefile.am~
+./lib/Makefile.gnulib
+./lib/Makefile.in
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# notepad change_LIBOBJS_to_AC_LIBOBJ.sh
+#!/bin/bash
+
+# 변경할 파일 목록
+files=(
+  "./lib/ltdl/ChangeLog.old"
+  "./lib/ltdl/config.log"
+  "./lib/ltdl/config.status"
+  "./lib/ltdl/configure"
+  "./lib/ltdl/doc/libtool.texi"
+  "./lib/ltdl/libltdl/ltdl.mk"
+  "./lib/ltdl/libtoolize.in"
+  "./lib/ltdl/m4/ltdl.m4"
+  "./lib/ltdl/mail/LTLIBOBJ"
+  "./lib/ltdl/Makefile.am"
+  "./lib/ltdl/Makefile.in"
+  "./lib/Makefile"
+  "./lib/Makefile.am"
+  "./lib/Makefile.am~"
+  "./lib/Makefile.gnulib"
+  "./lib/Makefile.in"
+)
+
+# 각 파일에서 'LIBOBJS'를 'AC_LIBOBJ'로 변경
+for file in "${files[@]}"; do
+  if [ -f "$file" ]; then
+    sed -i 's/LIBOBJS/AC_LIBOBJ/g' "$file"
+    echo "$file 에서 모든 'LIBOBJS'를 'AC_LIBOBJ'로 변경했습니다."
+  else
+    echo "$file 파일을 찾을 수 없습니다."
+  fi
+done
+
+스크립트에 실행 권한을 부여
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# chmod +x change_LIBOBJS_to_AC_LIBOBJ.sh
+
+스크립트를 실행
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ./change_LIBOBJS_to_AC_LIBOBJ.sh
+./lib/ltdl/ChangeLog.old 에서 모든 'LIBOBJS'를 'AC_LIBOBJ'로 변경했습니다.
+./lib/ltdl/config.log 에서 모든 'LIBOBJS'를 'AC_LIBOBJ'로 변경했습니다.
+./lib/ltdl/config.status 에서 모든 'LIBOBJS'를 'AC_LIBOBJ'로 변경했습니다.
+./lib/ltdl/configure 에서 모든 'LIBOBJS'를 'AC_LIBOBJ'로 변경했습니다.
+./lib/ltdl/doc/libtool.texi 에서 모든 'LIBOBJS'를 'AC_LIBOBJ'로 변경했습니다.
+./lib/ltdl/libltdl/ltdl.mk 에서 모든 'LIBOBJS'를 'AC_LIBOBJ'로 변경했습니다.
+./lib/ltdl/libtoolize.in 에서 모든 'LIBOBJS'를 'AC_LIBOBJ'로 변경했습니다.
+./lib/ltdl/m4/ltdl.m4 에서 모든 'LIBOBJS'를 'AC_LIBOBJ'로 변경했습니다.
+./lib/ltdl/mail/LTLIBOBJ 에서 모든 'LIBOBJS'를 'AC_LIBOBJ'로 변경했습니다.
+./lib/ltdl/Makefile.am 에서 모든 'LIBOBJS'를 'AC_LIBOBJ'로 변경했습니다.
+./lib/ltdl/Makefile.in 에서 모든 'LIBOBJS'를 'AC_LIBOBJ'로 변경했습니다.
+./lib/Makefile 에서 모든 'LIBOBJS'를 'AC_LIBOBJ'로 변경했습니다.
+./lib/Makefile.am 에서 모든 'LIBOBJS'를 'AC_LIBOBJ'로 변경했습니다.
+./lib/Makefile.am~ 에서 모든 'LIBOBJS'를 'AC_LIBOBJ'로 변경했습니다.
+./lib/Makefile.gnulib 에서 모든 'LIBOBJS'를 'AC_LIBOBJ'로 변경했습니다.
+./lib/Makefile.in 에서 모든 'LIBOBJS'를 'AC_LIBOBJ'로 변경했습니다.
+
+(결과확인)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -rn 'LIBOBJS' ./lib | awk -F: '{print $1}' | sort | uniq -d
+
+[무조건 바꾸면 안돼서 하나씩 체크하면서 변경]
+
+(오류)
+autom4te: forbidden token : ^LIBOBJS$ => do not use LIBOBJS directly, use AC_LIBOBJ (see section 'AC_LIBOBJ vs LIBOBJS'
+
+(수정)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -rn "\<LIBOBJS\>" ./lib
+
+./lib/ltdl/Makefile.am 수정
+#m4_pushdef([LIBOBJS], m4_defn([_LT_LIBOBJ]))
+m4_pushdef([AC_LIBOBJ], m4_defn([_LT_LIBOBJ]))
+
+#AC_CHECK_FUNCS([closedir opendir readdir], [], [LIBOBJS([lt__dirent])])
+AC_CHECK_FUNCS([closedir opendir readdir], [], [AC_LIBOBJ([lt__dirent])])
+#AC_CHECK_FUNCS([strlcat strlcpy], [], [LIBOBJS([lt__strl])])
+AC_CHECK_FUNCS([strlcat strlcpy], [], [AC_LIBOBJ([lt__strl])])
+
+./lib/ltdl/Makefile.am 수정
+#CLEANFILES	       += $(LIBOBJS) $(LTLIBOBJS)
+CLEANFILES	       += $(AC_LIBOBJ) $(LTLIBOBJS)
+
+./lib/ltdl/libltdl/ltdl.mk 수정
+#CLEANFILES	       += $(LIBOBJS) $(LTLIBOBJS)
+CLEANFILES	       += $(AC_LIBOBJ) $(LTLIBOBJS)
+
+./lib/ltdl/Makefile.in 수정
+#LIBOBJS = @LIBOBJS@
+LIBOBJS = @AC_LIBOBJ@
+
+Makefile.am 수정
+libtextstyle_la_LIBS = -lncurses $(GNULIB_LIBS) $(GL_LIBOBJS) $(LTDLIBS) $(LT_LIBOBJS) -lltdl # libtextstyle 라이브러리에 링크할 라이브러리들
+
+(오류)
+autom4te: forbidden token : ^LIBOBJS$ => do not use LIBOBJS directly, use AC_LIBOBJ (see section 'AC_LIBOBJ vs LIBOBJS'
+(수정)
+./adhoc-tests/Makefile 수정
+#LIBOBJS =
+AC_LIBOBJ =  
+
+./adhoc-tests/Makefile.in 수정
+#LIBOBJS = @LIBOBJS@
+AC_LIBOBJ = @AC_LIBOBJ@
+
+./doc/Makefile 수정
+#LIBOBJS = 
+AC_LIBOBJ = 
+
+./doc/Makefile.in 수정
+#LIBOBJS = @LIBOBJS@
+AC_LIBOBJ = @AC_LIBOBJ@
+
+Makefile.am 수정
+libtextstyle_la_LIBOBJS = $(LIBOBJS)
+libltdlc_la_LIBOBJS = $(LIBOBJS)
+
+#포함된 객체 파일의 최적화를 설정
+libtextstyle_la_CFLAGS = -g -02
+libltdlc_la_CFLAGS = -g -02
+
+# 헤더 파일을 설치할 디렉토리
+include_HEADERS = \
+    foo.h \
+    bar.h \
+    color.h \
+    gl_array_list.h \
+    term-ostream.h \
+    ostream.h \
+    concat-filename.h \
+    xconcat-filename.h \
+    xsize.h \
+    error.h \
+    full-write.h \
+    term-style-control.h \
+    fsync.h \
+    xstrdup.h \
+    xgethostname.h
+
+(오류)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# aclocal
+configure.ac:25: error: m4_popdef: undefined macro: LIBOBJS
+/c/libidn2/gettext-0.22.5/libtextstyle/lib/ltdl/m4/ltdl.m4:226: LTDL_INIT is expanded from...
+configure.ac:25: the top level
+autom4te: error: /usr/bin/m4 failed with exit status: 1
+aclocal-1.16: error: autom4te failed with exit status: 1
+(수정)
+ aclocal -I m4 -I gnulib-m4 -I /usr/share/aclocal; 
+
+[./configure;]
+(오류)
+/mingw64/bin/gcc option to enable C23 features... unsupported
+configure.ac:71: warning: The macro 'AC_LANG_C' is obsolete.
+configure.ac:71: You should run autoupdate.
+./lib/autoconf/c.m4:72: AC_LANG_C is expanded from...
+configure.ac:71: the top level
+configure.ac:76: warning: The macro 'AC_LANG_CPLUSPLUS' is obsolete.
+configure.ac:76: You should run autoupdate.
+./lib/autoconf/c.m4:270: AC_LANG_CPLUSPLUS is expanded from...
+configure.ac:76: the top level
+(수정)
+MinGW의 GCC가 C23 기능을 지원하지 않습니다
+C23 기능이 필요한 경우, GCC의 최신 버전을 설치하거나, C11 또는 C17과 같은 이전 표준으로 코드를 조정하는 방법을 고려해야 함.
+
+configure.ac 확인 및 수정
+# Set C standard to C23
+#AC_LANG_C # 더 이상 사용되지 않는다는 경고
+CFLAGS="$CFLAGS -std=c23" # C 표준을 C23으로 설정
+AC_SUBST(CFLAGS) # Makefile에 전달
+
+# Set C++ standard to C++17
+#AC_LANG_CPLUSPLUS # 더 이상 사용되지 않는다는 경고
+CXXFLAGS="$CXXFLAGS -std=c++17" # C++ 표준을 C++17로 설정
+AC_SUBST(CXXFLAGS) # Makefile에 전달 
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# gcc --version
+gcc.exe (Rev1, Built by MSYS2 project) 14.2.0
+Copyright (C) 2024 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+=> C23 표준을 지원
+
+(참고  CMakeLists.txt)
+# C와 C++ 표준 설정
+set(CMAKE_C_STANDARD 23)
+set(CMAKE_CXX_STANDARD 17)
+
+(오류)
+checking for netdb.h... no
+(수정)
+netdb.h 헤더 파일이 발견되지 않음
+네트워크 데이터베이스에 대한 정의를 포함
 
 
 
