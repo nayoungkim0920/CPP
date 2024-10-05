@@ -16421,6 +16421,1365 @@ checking for netdb.h... no
 netdb.h 헤더 파일이 발견되지 않음
 네트워크 데이터베이스에 대한 정의를 포함
 
+MinGW는 Windows에서 POSIX 호환 라이브러리를 제공하는 툴
+mingw32에서 netdb.h가 포함된 패키지를 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -Ss netdb.h
+
+기본 개발 패키지를 설치
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -S mingw-w64-x86_64-toolchain
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# find /mingw64/include -name winsock2.h
+/mingw64/include/winsock2.h
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# find /mingw64/include -name netdb.h
+netdb.h는 POSIX 시스템에서 네트워크 데이터베이스 관련 함수들을 제공하는 헤더 파일로, 
+일반적으로 Windows 환경에서는 기본적으로 제공되지 않음
+POSIX 호환성을 추가적으로 제공하는 MSYS2 환경을 사용하여 netdb.h를 설치하는 것이 좋다.
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -S mingw-w64-x86_64-libwinpthread-git
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# find /mingw64/include -name netdb.h
+
+mingw-w64-x86_64-libwinpthread-git 패키지를 성공적으로 재설치했지만, 
+여전히 netdb.h 파일을 찾을 수 없는 것 같습니다. 
+이는 mingw-w64 환경에서 기본적으로 netdb.h를 제공하지 않기 때문입니다. 
+대신, Winsock API를 사용하는 것이 일반적이므로 netdb.h 대신 
+winsock2.h와 Winsock 관련 함수로 대체하는 것이 권장된다.
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -r '#include <netdb.h>' .
+./config.log:   49 | #include <netdb.h>
+./config.log:| #include <netdb.h>
+./lib/canon-host.c:#include <netdb.h>
+./lib/gai_strerror.c:#include <netdb.h>
+./lib/getaddrinfo.c:#include <netdb.h>
+./lib/libxml/nanoftp.c:#include <netdb.h>
+./lib/libxml/nanohttp.c:#include <netdb.h>
+./m4/getaddrinfo.m4:#include <netdb.h>
+./m4/getaddrinfo.m4:#include <netdb.h>
+./m4/getaddrinfo.m4:#include <netdb.h>
+./m4/getaddrinfo.m4:#include <netdb.h>
+./m4/getaddrinfo.m4:#include <netdb.h>
+./m4/getaddrinfo.m4:#include <netdb.h>
+./m4/getaddrinfo.m4:#include <netdb.h>
+./m4/getdomainname.m4:      #include <netdb.h>
+./m4/getdomainname.m4:              #include <netdb.h>
+./m4/netdb_h.m4:  gl_WARN_ON_USE_PREPARE([[#include <netdb.h>]],
+./macro_calls.txt:m4/netdb_h.m4:  gl_WARN_ON_USE_PREPARE([[#include <netdb.h>]],
+./tests/test-getaddrinfo.c:#include <netdb.h>
+./tests/test-netdb-c++.cc:#include <netdb.h>
+./tests/test-netdb.c:#include <netdb.h>
+
+(수정)
+소스 파일
+lib/canon-host.c
+lib/gai_strerror.c
+lib/getaddrinfo.c
+lib/libxml/nanoftp.c
+lib/libxml/nanohttp.c
+tests/test-getaddrinfo.c
+tests/test-netdb-c++.cc
+tests/test-netdb.c
+매크로 파일
+m4/getaddrinfo.m4
+m4/getdomainname.m4
+m4/netdb_h.m4
+
+수정 방법
+[공통수정]
+#include <netdb.h>를 #include <winsock2.h>와 #include <ws2tcpip.h>로 변경
+#ifdef _WIN32
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#else
+#include <netdb.h>
+#endif
+
+gl_CHECK_NEXT_HEADERS([winsock2.h])
+
+[canon-host.c 수정]
+char *
+canon_host_r (char const *host, int *cherror)
+{
+
+else if (cherror)
+  {
+      // Windows에서는 getaddrinfo가 다르게 오류를 반환할 수 있음
+      #ifdef _WIN32
+      *cherror = WSAGetLastError(); // Windows 오류 코드 가져오기
+      #else
+      *cherror = status; // POSIX 시스템의 경우
+      #endif
+  }
+  //else if (cherror)
+  //  *cherror = status;
+}
+
+[gai_strerror.c 수정]
+{ WSAEAFNOSUPPORT, N_("Address family for hostname not supported") },  // EAI_ADDRFAMILY
+{ WSAHOST_NOT_FOUND, N_("Temporary failure in name resolution") },     // EAI_AGAIN
+{ WSA_INVALID_PARAMETER, N_("Bad value for ai_flags") },              // EAI_BADFLAGS
+{ WSAEFAULT, N_("Non-recoverable failure in name resolution") },      // EAI_FAIL
+{ WSANO_DATA, N_("No address associated with hostname") },            // EAI_NODATA
+{ WSANOTINITIALISED, N_("Name or service not known") },              // EAI_NONAME
+{ WSAEINPROGRESS, N_("Processing request in progress") },           // EAI_INPROGRESS
+{ WSAEWOULDBLOCK, N_("Request canceled") },                          // EAI_CANCELED
+{ WSAENOTCONN, N_("Request not canceled") },                         // EAI_NOTCANCELED
+{ WSAEINTR, N_("Interrupted by a signal") },                        // EAI_INTR
+{ WSAENOMORE, N_("All requests done") }                              // EAI_ALLDONE
+
+//     { EAI_ADDRFAMILY, N_("Address family for hostname not supported") },
+//     { EAI_AGAIN, N_("Temporary failure in name resolution") },
+//     { EAI_BADFLAGS, N_("Bad value for ai_flags") },
+//     { EAI_FAIL, N_("Non-recoverable failure in name resolution") },
+//     { EAI_FAMILY, N_("ai_family not supported") },
+//     { EAI_MEMORY, N_("Memory allocation failure") },
+//     { EAI_NODATA, N_("No address associated with hostname") },
+//     { EAI_NONAME, N_("Name or service not known") },
+//     { EAI_SERVICE, N_("Servname not supported for ai_socktype") },
+//     { EAI_SOCKTYPE, N_("ai_socktype not supported") },
+//     { EAI_SYSTEM, N_("System error") },
+//     { EAI_OVERFLOW, N_("Argument buffer too small") },
+// #ifdef EAI_INPROGRESS
+//     { EAI_INPROGRESS, N_("Processing request in progress") },
+//     { EAI_CANCELED, N_("Request canceled") },
+//     { EAI_NOTCANCELED, N_("Request not canceled") },
+//     { EAI_ALLDONE, N_("All requests done") },
+//     { EAI_INTR, N_("Interrupted by a signal") },
+//     { EAI_IDN_ENCODE, N_("Parameter string not correctly encoded") }
+// #endif
+
+nanoftp.c 수정
+// 소켓 초기화
+void initialize_winsock() { //netdb->winsock2추가
+    WSADATA wsaData;
+    int result = WSAStartup(MAKEWORD(2, 2), &wsaData);
+    if (result != 0) {
+        fprintf(stderr, "WSAStartup failed: %d\n", result);
+        exit(1);
+    }
+}
+
+// 소켓 종료
+void cleanup_winsock() { //netdb->winsock2추가
+    WSACleanup();
+}
+
+int
+xmlNanoFTPConnect(void *ctx) { /*netdb->winsock2 수정*/
+    xmlNanoFTPCtxtPtr ctxt = (xmlNanoFTPCtxtPtr) ctx;
+    struct addrinfo hints, *result, *tmp;
+    int port;
+    int res;
+    int addrlen = sizeof (struct sockaddr_in);
+
+    if (ctxt == NULL)
+        return (-1);
+    if (ctxt->hostname == NULL)
+        return (-1);
+
+    /*
+     * do the blocking DNS query.
+     */
+    if (proxy) {
+        port = proxyPort;
+    } else {
+        port = ctxt->port;
+    }
+    if (port == 0)
+        port = 21;
+
+    memset(&ctxt->ftpAddr, 0, sizeof(ctxt->ftpAddr));
+
+#ifdef SUPPORT_IP6
+    if (have_ipv6()) {
+        memset(&hints, 0, sizeof(hints));
+        hints.ai_family = AF_UNSPEC; // IPv4 또는 IPv6
+        hints.ai_socktype = SOCK_STREAM;
+
+        if (proxy) {
+            if (getaddrinfo(proxy, NULL, &hints, &result) != 0) {
+                __xmlIOErr(XML_FROM_FTP, 0, "getaddrinfo failed");
+                return (-1);
+            }
+        } else {
+            if (getaddrinfo(ctxt->hostname, NULL, &hints, &result) != 0) {
+                __xmlIOErr(XML_FROM_FTP, 0, "getaddrinfo failed");
+                return (-1);
+            }
+        }
+
+        for (tmp = result; tmp; tmp = tmp->ai_next)
+            if (tmp->ai_family == AF_INET || tmp->ai_family == AF_INET6)
+                break;
+
+        if (!tmp) {
+            if (result)
+                freeaddrinfo(result);
+            __xmlIOErr(XML_FROM_FTP, 0, "getaddrinfo failed");
+            return (-1);
+        }
+        if ((size_t)tmp->ai_addrlen > sizeof(ctxt->ftpAddr)) {
+            if (result)
+                freeaddrinfo(result);
+            __xmlIOErr(XML_FROM_FTP, 0, "gethostbyname address mismatch");
+            return (-1);
+        }
+        memcpy(&ctxt->ftpAddr, tmp->ai_addr, tmp->ai_addrlen);
+        if (tmp->ai_family == AF_INET6) {
+            ((struct sockaddr_in6 *) &ctxt->ftpAddr)->sin6_port = htons(port);
+            ctxt->controlFd = socket(AF_INET6, SOCK_STREAM, 0);
+        } else {
+            ((struct sockaddr_in *) &ctxt->ftpAddr)->sin_port = htons(port);
+            ctxt->controlFd = socket(AF_INET, SOCK_STREAM, 0);
+        }
+        addrlen = tmp->ai_addrlen;
+        freeaddrinfo(result);
+    } else
+#endif
+    {
+        struct hostent *hp;
+
+        if (proxy)
+            hp = gethostbyname(GETHOSTBYNAME_ARG_CAST proxy);
+        else
+            hp = gethostbyname(GETHOSTBYNAME_ARG_CAST ctxt->hostname);
+
+        if (hp == NULL) {
+            __xmlIOErr(XML_FROM_FTP, 0, "gethostbyname failed");
+            return (-1);
+        }
+        if ((unsigned int) hp->h_length >
+            sizeof(((struct sockaddr_in *)&ctxt->ftpAddr)->sin_addr)) {
+            __xmlIOErr(XML_FROM_FTP, 0, "gethostbyname address mismatch");
+            return (-1);
+        }
+
+        /*
+         * Prepare the socket
+         */
+        ((struct sockaddr_in *)&ctxt->ftpAddr)->sin_family = AF_INET;
+        memcpy(&((struct sockaddr_in *)&ctxt->ftpAddr)->sin_addr,
+               hp->h_addr_list[0], hp->h_length);
+        ((struct sockaddr_in *)&ctxt->ftpAddr)->sin_port =
+            (unsigned short)htons((unsigned short)port);
+        ctxt->controlFd = socket(AF_INET, SOCK_STREAM, 0);
+        addrlen = sizeof(struct sockaddr_in);
+    }
+
+    if (ctxt->controlFd == INVALID_SOCKET) {
+        __xmlIOErr(XML_FROM_FTP, 0, "socket failed");
+        return (-1);
+    }
+...
+}
+
+void*
+xmlNanoFTPConnectTo(const char *server, int port) { /*netdb->winsock2 수정*/
+    xmlNanoFTPCtxtPtr ctxt;
+    int res;
+
+    xmlNanoFTPInit();
+    if (server == NULL)
+        return(NULL);
+    if (port <= 0)
+        return(NULL);
+    ctxt = (xmlNanoFTPCtxtPtr) xmlNanoFTPNewCtxt(NULL);
+    if (ctxt == NULL)
+        return(NULL);
+    ctxt->hostname = xmlMemStrdup(server);
+    if (ctxt->hostname == NULL) {
+        xmlNanoFTPFreeCtxt(ctxt);
+        return(NULL);
+    }
+    if (port != 0)
+        ctxt->port = port;
+    res = xmlNanoFTPConnect(ctxt);
+    if (res < 0) {
+        xmlNanoFTPFreeCtxt(ctxt);
+        return(NULL);
+    }
+    return(ctxt);
+}
+
+int
+xmlNanoFTPCwd(void *ctx, const char *directory) { /*netdb->winsock2 수정*/
+    xmlNanoFTPCtxtPtr ctxt = (xmlNanoFTPCtxtPtr) ctx;
+    char buf[400];
+    int len;
+    int res;
+
+    if ((ctxt == NULL) || (ctxt->controlFd == INVALID_SOCKET)) return(-1);
+    if (directory == NULL) return 0;
+
+    snprintf(buf, sizeof(buf), "CWD %s\r\n", directory);
+    buf[sizeof(buf) - 1] = 0;
+    len = strlen(buf);
+#ifdef DEBUG_FTP
+    xmlGenericError(xmlGenericErrorContext, "%s", buf);
+#endif
+    res = send(ctxt->controlFd, buf, len, 0); // 수정: SEND_ARG2_CAST 삭제
+    if (res < 0) {
+        __xmlIOErr(XML_FROM_FTP, 0, "send failed");
+        return(res);
+    }
+    res = xmlNanoFTPGetResponse(ctxt);
+    if (res == 4) {
+        return(-1);
+    }
+    if (res == 2) return(1);
+    if (res == 5) {
+        return(0);
+    }
+    return(0);
+}
+
+int
+xmlNanoFTPConnect(void *ctx) { /*netdb->winsock2 수정*/
+xmlNanoFTPCtxtPtr ctxt = (xmlNanoFTPCtxtPtr) ctx;
+    struct addrinfo hints, *result, *tmp;
+    int port;
+    int res;
+    int addrlen = sizeof (struct sockaddr_in);
+
+    if (ctxt == NULL)
+        return (-1);
+    if (ctxt->hostname == NULL)
+        return (-1);
+
+    /*
+     * do the blocking DNS query.
+     */
+    if (proxy) {
+        port = proxyPort;
+    } else {
+        port = ctxt->port;
+    }
+    if (port == 0)
+        port = 21;
+
+    memset(&ctxt->ftpAddr, 0, sizeof(ctxt->ftpAddr));
+
+#ifdef SUPPORT_IP6
+    if (have_ipv6()) {
+        memset(&hints, 0, sizeof(hints));
+        hints.ai_family = AF_UNSPEC; // IPv4 또는 IPv6
+        hints.ai_socktype = SOCK_STREAM;
+
+        if (proxy) {
+            if (getaddrinfo(proxy, NULL, &hints, &result) != 0) {
+                __xmlIOErr(XML_FROM_FTP, 0, "getaddrinfo failed");
+                return (-1);
+            }
+        } else {
+            if (getaddrinfo(ctxt->hostname, NULL, &hints, &result) != 0) {
+                __xmlIOErr(XML_FROM_FTP, 0, "getaddrinfo failed");
+                return (-1);
+            }
+        }
+
+        for (tmp = result; tmp; tmp = tmp->ai_next)
+            if (tmp->ai_family == AF_INET || tmp->ai_family == AF_INET6)
+                break;
+
+        if (!tmp) {
+            if (result)
+                freeaddrinfo(result);
+            __xmlIOErr(XML_FROM_FTP, 0, "getaddrinfo failed");
+            return (-1);
+        }
+        if ((size_t)tmp->ai_addrlen > sizeof(ctxt->ftpAddr)) {
+            if (result)
+                freeaddrinfo(result);
+            __xmlIOErr(XML_FROM_FTP, 0, "gethostbyname address mismatch");
+            return (-1);
+        }
+        memcpy(&ctxt->ftpAddr, tmp->ai_addr, tmp->ai_addrlen);
+        if (tmp->ai_family == AF_INET6) {
+            ((struct sockaddr_in6 *) &ctxt->ftpAddr)->sin6_port = htons(port);
+            ctxt->controlFd = socket(AF_INET6, SOCK_STREAM, 0);
+        } else {
+            ((struct sockaddr_in *) &ctxt->ftpAddr)->sin_port = htons(port);
+            ctxt->controlFd = socket(AF_INET, SOCK_STREAM, 0);
+        }
+        addrlen = tmp->ai_addrlen;
+        freeaddrinfo(result);
+    } else
+#endif
+    {
+        struct hostent *hp;
+
+        if (proxy)
+            hp = gethostbyname(GETHOSTBYNAME_ARG_CAST proxy);
+        else
+            hp = gethostbyname(GETHOSTBYNAME_ARG_CAST ctxt->hostname);
+
+        if (hp == NULL) {
+            __xmlIOErr(XML_FROM_FTP, 0, "gethostbyname failed");
+            return (-1);
+        }
+        if ((unsigned int) hp->h_length >
+            sizeof(((struct sockaddr_in *)&ctxt->ftpAddr)->sin_addr)) {
+            __xmlIOErr(XML_FROM_FTP, 0, "gethostbyname address mismatch");
+            return (-1);
+        }
+
+        /*
+         * Prepare the socket
+         */
+        ((struct sockaddr_in *)&ctxt->ftpAddr)->sin_family = AF_INET;
+        memcpy(&((struct sockaddr_in *)&ctxt->ftpAddr)->sin_addr,
+               hp->h_addr_list[0], hp->h_length);
+        ((struct sockaddr_in *)&ctxt->ftpAddr)->sin_port =
+            (unsigned short)htons((unsigned short)port);
+        ctxt->controlFd = socket(AF_INET, SOCK_STREAM, 0);
+        addrlen = sizeof(struct sockaddr_in);
+    }
+
+    if (ctxt->controlFd == INVALID_SOCKET) {
+        __xmlIOErr(XML_FROM_FTP, 0, "socket failed");
+        return (-1);
+    }
+
+    /*
+     * Do the connect.
+     */
+    if (connect(ctxt->controlFd, (struct sockaddr *) &ctxt->ftpAddr,
+                 addrlen) < 0) {
+        __xmlIOErr(XML_FROM_FTP, 0, "Failed to create a connection");
+        closesocket(ctxt->controlFd); 
+        ctxt->controlFd = INVALID_SOCKET;
+        return (-1);
+    }
+
+    /*
+     * Wait for the HELLO from the server.
+     */
+    res = xmlNanoFTPGetResponse(ctxt);
+    if (res != 2) {
+        closesocket(ctxt->controlFd); 
+        ctxt->controlFd = INVALID_SOCKET;
+        return (-1);
+    }
+...
+}
+
+int main(int argc, char **argv){
+...
+initialize_winsock(); //netdb->winsock2추가
+...
+cleanup_windosk(); //netdb->winsock2추가
+...
+}
+SOCKET
+xmlNanoFTPGetConnection(void *ctx) { /*netdb->winsock2 수정*/
+    xmlNanoFTPCtxtPtr ctxt = (xmlNanoFTPCtxtPtr) ctx;
+    char buf[200], *cur;
+    int len, i;
+    int res;
+    unsigned char ad[6], *adp, *portp;
+    unsigned int temp[6];
+#ifdef SUPPORT_IP6
+    struct sockaddr_storage dataAddr; // 수정: 소켓 주소 저장
+#else
+    struct sockaddr_in dataAddr; // 수정: IPv4 소켓 주소
+#endif
+    int dataAddrLen = sizeof(dataAddr); // 수정: XML_SOCKLEN_T 타입을 int로 변경
+
+    if (ctxt == NULL) return INVALID_SOCKET;
+
+    memset (&dataAddr, 0, sizeof(dataAddr));
+#ifdef SUPPORT_IP6
+    if ((ctxt->ftpAddr).ss_family == AF_INET6) {
+        ctxt->dataFd = socket (AF_INET6, SOCK_STREAM, IPPROTO_TCP);
+        ((struct sockaddr_in6 *)&dataAddr)->sin6_family = AF_INET6;
+        dataAddrLen = sizeof(struct sockaddr_in6);
+    } else
+#endif
+    {
+        ctxt->dataFd = socket (AF_INET, SOCK_STREAM, IPPROTO_TCP);
+        ((struct sockaddr_in *)&dataAddr)->sin_family = AF_INET;
+        dataAddrLen = sizeof (struct sockaddr_in);
+    }
+
+    if (ctxt->dataFd == INVALID_SOCKET) {
+        __xmlIOErr(XML_FROM_FTP, 0, "socket failed");
+        return INVALID_SOCKET;
+    }
+
+    if (ctxt->passive) {
+#ifdef SUPPORT_IP6
+        if ((ctxt->ftpAddr).ss_family == AF_INET6)
+            snprintf (buf, sizeof(buf), "EPSV\r\n");
+        else
+#endif
+            snprintf (buf, sizeof(buf), "PASV\r\n");
+        len = strlen (buf);
+#ifdef DEBUG_FTP
+        xmlGenericError(xmlGenericErrorContext, "%s", buf);
+#endif
+        res = send(ctxt->controlFd, buf, len, 0); // 수정: SEND_ARG2_CAST 삭제
+        if (res < 0) {
+            __xmlIOErr(XML_FROM_FTP, 0, "send failed");
+            closesocket(ctxt->dataFd); ctxt->dataFd = INVALID_SOCKET;
+            return INVALID_SOCKET;
+        }
+        res = xmlNanoFTPReadResponse(ctx);
+        if (res != 2) {
+            if (res == 5) {
+                closesocket(ctxt->dataFd); ctxt->dataFd = INVALID_SOCKET;
+                return INVALID_SOCKET;
+            } else {
+                closesocket(ctxt->dataFd); ctxt->dataFd = INVALID_SOCKET;
+                ctxt->passive = 0;
+            }
+        }
+        cur = &ctxt->controlBuf[ctxt->controlBufAnswer];
+        while (((*cur < '0') || (*cur > '9')) && *cur != '\0') cur++;
+#ifdef SUPPORT_IP6
+        if ((ctxt->ftpAddr).ss_family == AF_INET6) {
+            if (sscanf (cur, "%u", &temp[0]) != 1) {
+                __xmlIOErr(XML_FROM_FTP, XML_FTP_EPSV_ANSWER,
+                    "Invalid answer to EPSV\n");
+                if (ctxt->dataFd != INVALID_SOCKET) {
+                    closesocket (ctxt->dataFd); ctxt->dataFd = INVALID_SOCKET;
+                }
+                return INVALID_SOCKET;
+            }
+            memcpy (&((struct sockaddr_in6 *)&dataAddr)->sin6_addr, &((struct sockaddr_in6 *)&ctxt->ftpAddr)->sin6_addr, sizeof(struct in6_addr));
+            ((struct sockaddr_in6 *)&dataAddr)->sin6_port = htons (temp[0]);
+        } else
+#endif
+        {
+            if (sscanf (cur, "%u,%u,%u,%u,%u,%u", &temp[0], &temp[1], &temp[2],
+                &temp[3], &temp[4], &temp[5]) != 6) {
+                __xmlIOErr(XML_FROM_FTP, XML_FTP_PASV_ANSWER,
+                    "Invalid answer to PASV\n");
+                if (ctxt->dataFd != INVALID_SOCKET) {
+                    closesocket (ctxt->dataFd); ctxt->dataFd = INVALID_SOCKET;
+                }
+                return INVALID_SOCKET;
+            }
+            ((struct sockaddr_in *)&dataAddr)->sin_addr.s_addr =
+                htonl((temp[0] << 24) | (temp[1] << 16) |
+                      (temp[2] << 8) | (temp[3]));
+            ((struct sockaddr_in *)&dataAddr)->sin_port =
+                htons((temp[4] << 8) | temp[5]);
+        }
+    } else {
+        // ACTIVE MODE: Implementation here.
+    }
+
+    // 연결 설정
+    if (connect(ctxt->dataFd, (struct sockaddr*)&dataAddr, dataAddrLen) == SOCKET_ERROR) {
+        __xmlIOErr(XML_FROM_FTP, 0, "connect failed");
+        closesocket(ctxt->dataFd); ctxt->dataFd = INVALID_SOCKET;
+        return INVALID_SOCKET;
+    }
+
+    return ctxt->dataFd;
+}
+
+int xmlNanoFTPCloseConnection(void *ctx) { /*netdb->winsock2 수정*/
+    xmlNanoFTPCtxtPtr ctxt = (xmlNanoFTPCtxtPtr) ctx;
+    int res;
+    fd_set rfd, efd;
+    struct timeval tv;
+
+    if ((ctxt == NULL) || (ctxt->controlFd == INVALID_SOCKET)) return(-1);
+
+    closesocket(ctxt->dataFd); ctxt->dataFd = INVALID_SOCKET;
+    tv.tv_sec = 15;
+    tv.tv_usec = 0;
+    FD_ZERO(&rfd);
+    FD_SET(ctxt->controlFd, &rfd);
+    FD_ZERO(&efd);
+    FD_SET(ctxt->controlFd, &efd);
+    res = select(ctxt->controlFd + 1, &rfd, NULL, &efd, &tv);
+    if (res < 0) {
+#ifdef DEBUG_FTP
+        perror("select");
+#endif
+        closesocket(ctxt->controlFd); ctxt->controlFd = INVALID_SOCKET;
+        return(-1);
+    }
+    if (res == 0) {
+#ifdef DEBUG_FTP
+        xmlGenericError(xmlGenericErrorContext, "xmlNanoFTPCloseConnection: timeout\n");
+#endif
+        closesocket(ctxt->controlFd); ctxt->controlFd = INVALID_SOCKET;
+    } else {
+        res = xmlNanoFTPGetResponse(ctxt);
+        if (res != 2) {
+            closesocket(ctxt->controlFd); ctxt->controlFd = INVALID_SOCKET;
+            return(-1);
+        }
+    }
+    return(0);
+}
+
+
+int xmlNanoFTPList(void *ctx, ftpListCallback callback, void *userData, const char *filename) { /*netdb->winsock2 수정*/
+    xmlNanoFTPCtxtPtr ctxt = (xmlNanoFTPCtxtPtr) ctx;
+    char buf[4096 + 1];
+    int len, res;
+    int indx = 0, base;
+    fd_set rfd, efd;
+    struct timeval tv;
+
+    if (ctxt == NULL) return (-1);
+    if (filename == NULL) {
+        if (xmlNanoFTPCwd(ctxt, ctxt->path) < 1) return(-1);
+        ctxt->dataFd = xmlNanoFTPGetConnection(ctxt);
+        if (ctxt->dataFd == INVALID_SOCKET) return(-1);
+        snprintf(buf, sizeof(buf), "LIST -L\r\n");
+    } else {
+        if (filename[0] != '/') {
+            if (xmlNanoFTPCwd(ctxt, ctxt->path) < 1) return(-1);
+        }
+        ctxt->dataFd = xmlNanoFTPGetConnection(ctxt);
+        if (ctxt->dataFd == INVALID_SOCKET) return(-1);
+        snprintf(buf, sizeof(buf), "LIST -L %s\r\n", filename);
+    }
+    buf[sizeof(buf) - 1] = 0;
+    len = strlen(buf);
+#ifdef DEBUG_FTP
+    xmlGenericError(xmlGenericErrorContext, "%s", buf);
+#endif
+    res = send(ctxt->controlFd, buf, len, 0);  // SEND_ARG2_CAST 제거
+    if (res < 0) {
+        __xmlIOErr(XML_FROM_FTP, 0, "send failed");
+        closesocket(ctxt->dataFd); ctxt->dataFd = INVALID_SOCKET;
+        return(res);
+    }
+    res = xmlNanoFTPReadResponse(ctxt);
+    if (res != 1) {
+        closesocket(ctxt->dataFd); ctxt->dataFd = INVALID_SOCKET;
+        return(-res);
+    }
+
+    do {
+        tv.tv_sec = 1;
+        tv.tv_usec = 0;
+        FD_ZERO(&rfd);
+        FD_SET(ctxt->dataFd, &rfd);
+        FD_ZERO(&efd);
+        FD_SET(ctxt->dataFd, &efd);
+        res = select(ctxt->dataFd + 1, &rfd, NULL, &efd, &tv);
+        if (res < 0) {
+#ifdef DEBUG_FTP
+            perror("select");
+#endif
+            closesocket(ctxt->dataFd); ctxt->dataFd = INVALID_SOCKET;
+            return(-1);
+        }
+        if (res == 0) {
+            res = xmlNanoFTPCheckResponse(ctxt);
+            if (res < 0) {
+                closesocket(ctxt->dataFd); ctxt->dataFd = INVALID_SOCKET;
+                return(-1);
+            }
+            if (res == 2) {
+                closesocket(ctxt->dataFd); ctxt->dataFd = INVALID_SOCKET;
+                return(0);
+            }
+            continue;
+        }
+
+        if ((len = recv(ctxt->dataFd, &buf[indx], sizeof(buf) - (indx + 1), 0)) < 0) {
+            __xmlIOErr(XML_FROM_FTP, 0, "recv");
+            closesocket(ctxt->dataFd); ctxt->dataFd = INVALID_SOCKET;
+            return(-1);
+        }
+#ifdef DEBUG_FTP
+        write(1, &buf[indx], len);
+#endif
+        indx += len;
+        buf[indx] = 0;
+        base = 0;
+        do {
+            res = xmlNanoFTPParseList(&buf[base], callback, userData);
+            base += res;
+        } while (res > 0);
+
+        memmove(&buf[0], &buf[base], indx - base);
+        indx -= base;
+    } while (len != 0);
+    xmlNanoFTPCloseConnection(ctxt);
+    return(0);
+}
+
+int
+xmlNanoFTPGet(void *ctx, ftpDataCallback callback, void *userData,
+              const char *filename) { /*netdb->winsock2 수정*/
+    xmlNanoFTPCtxtPtr ctxt = (xmlNanoFTPCtxtPtr) ctx;
+    char buf[4096];
+    int len = 0, res;
+    fd_set rfd;
+    struct timeval tv;
+
+    if (ctxt == NULL) return(-1);
+    if ((filename == NULL) && (ctxt->path == NULL))
+        return(-1);
+    if (callback == NULL)
+        return(-1);
+    if (xmlNanoFTPGetSocket(ctxt, filename) == INVALID_SOCKET)
+        return(-1);
+
+    do {
+        tv.tv_sec = 1;
+        tv.tv_usec = 0;
+        FD_ZERO(&rfd);
+        FD_SET(ctxt->dataFd, &rfd);
+        res = select(ctxt->dataFd + 1, &rfd, NULL, NULL, &tv);
+        if (res < 0) {
+#ifdef DEBUG_FTP
+            perror("select");
+#endif
+            closesocket(ctxt->dataFd); ctxt->dataFd = INVALID_SOCKET;
+            return(-1);
+        }
+        if (res == 0) {
+            res = xmlNanoFTPCheckResponse(ctxt);
+            if (res < 0) {
+                closesocket(ctxt->dataFd); ctxt->dataFd = INVALID_SOCKET;
+                ctxt->dataFd = INVALID_SOCKET;
+                return(-1);
+            }
+            if (res == 2) {
+                closesocket(ctxt->dataFd); ctxt->dataFd = INVALID_SOCKET;
+                return(0);
+            }
+
+            continue;
+        }
+        if ((len = recv(ctxt->dataFd, buf, sizeof(buf), 0)) < 0) {
+            __xmlIOErr(XML_FROM_FTP, 0, "recv failed");
+            callback(userData, buf, len);
+            closesocket(ctxt->dataFd); ctxt->dataFd = INVALID_SOCKET;
+            return(-1);
+        }
+        callback(userData, buf, len);
+    } while (len != 0);
+
+    return(xmlNanoFTPCloseConnection(ctxt));
+}
+
+int
+xmlNanoFTPRead(void *ctx, void *dest, int len) { /*netdb->winsock2 수정*/
+    xmlNanoFTPCtxtPtr ctxt = (xmlNanoFTPCtxtPtr) ctx;
+
+    if (ctx == NULL) return(-1);
+    if (ctxt->dataFd == INVALID_SOCKET) return(0);
+    if (dest == NULL) return(-1);
+    if (len <= 0) return(0);
+
+    len = recv(ctxt->dataFd, dest, len, 0);
+    if (len <= 0) {
+        if (len < 0)
+            __xmlIOErr(XML_FROM_FTP, 0, "recv failed");
+        xmlNanoFTPCloseConnection(ctxt);
+    }
+#ifdef DEBUG_FTP
+    xmlGenericError(xmlGenericErrorContext, "Recvd %d bytes\n", len);
+#endif
+    return(len);
+}
+
+void*
+xmlNanoFTPOpen(const char *URL) { /*netdb->winsock2 수정*/
+    xmlNanoFTPCtxtPtr ctxt;
+    SOCKET sock;
+
+    xmlNanoFTPInit();
+    if (URL == NULL) return(NULL);
+    if (strncmp("ftp://", URL, 6)) return(NULL);
+
+    ctxt = (xmlNanoFTPCtxtPtr) xmlNanoFTPNewCtxt(URL);
+    if (ctxt == NULL) return(NULL);
+    if (xmlNanoFTPConnect(ctxt) < 0) {
+        xmlNanoFTPFreeCtxt(ctxt);
+        return(NULL);
+    }
+    sock = xmlNanoFTPGetSocket(ctxt, ctxt->path);
+    if (sock == INVALID_SOCKET) {
+        xmlNanoFTPFreeCtxt(ctxt);
+        return(NULL);
+    }
+    return(ctxt);
+}
+
+int
+xmlNanoFTPClose(void *ctx) { /*netdb->winsock2 수정*/
+    xmlNanoFTPCtxtPtr ctxt = (xmlNanoFTPCtxtPtr) ctx;
+
+    if (ctxt == NULL)
+        return(-1);
+
+    if (ctxt->dataFd != INVALID_SOCKET) {
+        closesocket(ctxt->dataFd); // 소켓 닫기
+        ctxt->dataFd = INVALID_SOCKET;
+    }
+    if (ctxt->controlFd != INVALID_SOCKET) {
+        xmlNanoFTPQuit(ctxt);
+        closesocket(ctxt->controlFd); // 소켓 닫기
+        ctxt->controlFd = INVALID_SOCKET;
+    }
+    xmlNanoFTPFreeCtxt(ctxt);
+    return(0);
+}
+
+static
+void ftpList(void *userData, const char *filename, const char* attrib,
+	     const char *owner, const char *group, unsigned long size, int links,
+	     int year, const char *month, int day, int hour, int minute) { /*netdb->winsock2 수정*/
+    xmlGenericError(xmlGenericErrorContext,
+	    "%s %s %s %ld %s\n", attrib, owner, group, size, filename);
+}
+
+static
+void ftpData(void *userData, const char *data, int len) { /*netdb->winsock2 수정*/
+    if (userData == NULL) return;
+    if (len <= 0) {
+	fclose((FILE*)userData);
+	return;
+    }
+    fwrite(data, len, 1, (FILE*)userData);
+}
+
+int main(int argc, char **argv) {
+    void *ctxt;
+    FILE *output;
+    char *tstfile = NULL;
+
+    initialize_winsock(); // Winsock 초기화
+
+    xmlNanoFTPInit();
+    if (argc > 1) {
+	ctxt = xmlNanoFTPNewCtxt(argv[1]);
+	if (xmlNanoFTPConnect(ctxt) < 0) {
+	    xmlGenericError(xmlGenericErrorContext,
+		    "Couldn't connect to %s\n", argv[1]);
+	    exit(1);
+	}
+	if (argc > 2)
+	    tstfile = argv[2];
+    } else
+	ctxt = xmlNanoFTPConnectTo("localhost", 0);
+    if (ctxt == NULL) {
+        xmlGenericError(xmlGenericErrorContext,
+		"Couldn't connect to localhost\n");
+        exit(1);
+    }
+    xmlNanoFTPList(ctxt, ftpList, NULL, tstfile);
+    
+    output = fopen("/tmp/tstdata", "w");
+    if (output != NULL) {
+	if (xmlNanoFTPGet(ctxt, ftpData, (void *) output, tstfile) < 0)
+	    xmlGenericError(xmlGenericErrorContext,
+		    "Failed to get file\n");
+    }
+    
+    xmlNanoFTPClose(ctxt);
+    xmlMemoryDump();
+    
+    cleanup_winsock(); // Winsock 정리
+    exit(0);
+}
+#endif /* STANDALONE */
+
+#else /* !LIBXML_FTP_ENABLED */
+#ifdef STANDALONE
+#include <stdio.h>
+int main(int argc, char **argv) {
+    xmlGenericError(xmlGenericErrorContext,
+	    "%s : FTP support not compiled in\n", argv[0]);
+    return(0);
+}
+#endif /* STANDALONE */
+#endif /* LIBXML_FTP_ENABLED */
+
+#define bottom_nanoftp
+#include "elfgcchack.h"
+
+[nanohttp.c 수정]
+/**
+ * xmlHTTPErrMemory:
+ * @extra:  extra informations
+ *
+ * Handle an out of memory condition
+ */
+static void
+xmlHTTPErrMemory(const char *extra) { /*netdb->winsock2 수정*/
+    __xmlSimpleError(XML_FROM_HTTP, XML_ERR_NO_MEMORY, NULL, NULL, extra);
+}
+
+/**
+ * A portability function
+ */
+static int socket_errno(void) { /*netdb->winsock2 수정*/
+#ifdef _WIN32
+    int err = WSAGetLastError();  // Windows 소켓 오류 코드 가져오기
+    switch(err) {
+        case WSAECONNRESET:
+            return(ECONNRESET);
+        case WSAEINPROGRESS:
+            return(EINPROGRESS);
+        case WSAEINTR:
+            return(EINTR);
+        case WSAESHUTDOWN:
+            return(ESHUTDOWN);
+        case WSAEWOULDBLOCK:
+            return(EWOULDBLOCK);
+        default:
+            return(err);
+    }
+#else
+    return(errno);  // 비-Windows 환경에서는 errno 반환
+#endif
+}
+
+#ifdef SUPPORT_IP6
+static int have_ipv6(void) { /*netdb->winsock2 추가*/
+    SOCKET s;  // Windows 소켓 타입 사용
+
+    s = socket(AF_INET6, SOCK_STREAM, 0);
+    if (s != INVALID_SOCKET) {
+        closesocket(s);  // Windows 소켓에서 소켓 닫기
+        return (1);
+    }
+    return (0);
+}
+#endif
+
+/**
+ * xmlNanoHTTPInit:
+ *
+ * Initialize the HTTP protocol layer.
+ * Currently it just checks for proxy informations
+ */
+
+void xmlNanoHTTPInit(void) { /*netdb->winsock2 수정*/
+    const char *env;
+#ifdef _WIN32
+    WSADATA wsaData;  // Windows 소켓 데이터 구조체
+#endif
+
+    if (initialized)
+        return;
+
+#ifdef _WIN32
+    if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)  // WSAStartup 호출
+        return;
+#endif
+
+    if (proxy == NULL) {
+        proxyPort = 80;
+        env = getenv("no_proxy");
+        if (env && ((env[0] == '*') && (env[1] == 0)))
+            goto done;
+        env = getenv("http_proxy");
+        if (env != NULL) {
+            xmlNanoHTTPScanProxy(env);
+            goto done;
+        }
+        env = getenv("HTTP_PROXY");
+        if (env != NULL) {
+            xmlNanoHTTPScanProxy(env);
+            goto done;
+        }
+    }
+done:
+    initialized = 1;
+}
+
+/**
+ * xmlNanoHTTPCleanup:
+ *
+ * Cleanup the HTTP protocol layer.
+ */
+
+void xmlNanoHTTPCleanup(void) { /*netdb->winsock2 수정*/
+    if (proxy != NULL) {
+        xmlFree(proxy);
+        proxy = NULL;
+    }
+#ifdef _WIN32
+    if (initialized)
+        WSACleanup();  // WSACleanup 호출
+#endif
+    initialized = 0;
+}
+
+
+/**
+ * xmlNanoHTTPScanURL:
+ * @ctxt:  an HTTP context
+ * @URL:  The URL used to initialize the context
+ *
+ * (Re)Initialize an HTTP context by parsing the URL and finding
+ * the protocol host port and path it indicates.
+ */
+
+static void xmlNanoHTTPScanURL(xmlNanoHTTPCtxtPtr ctxt, const char *URL) { /*netdb->winsock2 수정*/
+    xmlURIPtr uri;
+    int len;
+
+    // Clear any existing data from the context
+    if (ctxt->protocol != NULL) {
+        xmlFree(ctxt->protocol);
+        ctxt->protocol = NULL;
+    }
+    if (ctxt->hostname != NULL) {
+        xmlFree(ctxt->hostname);
+        ctxt->hostname = NULL;
+    }
+    if (ctxt->path != NULL) {
+        xmlFree(ctxt->path);
+        ctxt->path = NULL;
+    }
+    if (ctxt->query != NULL) {
+        xmlFree(ctxt->query);
+        ctxt->query = NULL;
+    }
+    if (URL == NULL) return;
+
+    uri = xmlParseURIRaw(URL, 1);
+    if (uri == NULL)
+        return;
+
+    if ((uri->scheme == NULL) || (uri->server == NULL)) {
+        xmlFreeURI(uri);
+        return;
+    }
+
+    ctxt->protocol = xmlMemStrdup(uri->scheme);
+    // special case of IPv6 addresses, the [] need to be removed
+    if ((uri->server != NULL) && (*uri->server == '[')) {
+        len = strlen(uri->server);
+        if ((len > 2) && (uri->server[len - 1] == ']')) {
+            ctxt->hostname = (char *) xmlCharStrndup(uri->server + 1, len - 2);
+        } else
+            ctxt->hostname = xmlMemStrdup(uri->server);
+    } else
+        ctxt->hostname = xmlMemStrdup(uri->server);
+    if (uri->path != NULL)
+        ctxt->path = xmlMemStrdup(uri->path);
+    else
+        ctxt->path = xmlMemStrdup("/");
+    if (uri->query != NULL)
+        ctxt->query = xmlMemStrdup(uri->query);
+    if (uri->port != 0)
+        ctxt->port = uri->port;
+
+    xmlFreeURI(uri);
+}
+
+/**
+ * xmlNanoHTTPScanProxy:
+ * @URL:  The proxy URL used to initialize the proxy context
+ *
+ * (Re)Initialize the HTTP Proxy context by parsing the URL and finding
+ * the protocol host port it indicates.
+ * Should be like http://myproxy/ or http://myproxy:3128/
+ * A NULL URL cleans up proxy informations.
+ */
+
+void xmlNanoHTTPScanProxy(const char *URL) { /*netdb->winsock2 수정*/
+    xmlURIPtr uri;
+
+    if (proxy != NULL) {
+        xmlFree(proxy);
+        proxy = NULL;
+    }
+    proxyPort = 0;
+
+#ifdef DEBUG_HTTP
+    if (URL == NULL)
+        xmlGenericError(xmlGenericErrorContext,
+            "Removing HTTP proxy info\n");
+    else
+        xmlGenericError(xmlGenericErrorContext,
+            "Using HTTP proxy %s\n", URL);
+#endif
+    if (URL == NULL) return;
+
+    uri = xmlParseURIRaw(URL, 1);
+    if ((uri == NULL) || (uri->scheme == NULL) ||
+        (strcmp(uri->scheme, "http") != 0) || (uri->server == NULL)) {
+        __xmlIOErr(XML_FROM_HTTP, XML_HTTP_URL_SYNTAX, "Syntax Error\n");
+        if (uri != NULL)
+            xmlFreeURI(uri);
+        return;
+    }
+
+    proxy = xmlMemStrdup(uri->server);
+    if (uri->port != 0)
+        proxyPort = uri->port;
+
+    xmlFreeURI(uri);
+}
+
+/**
+ * xmlNanoHTTPNewCtxt:
+ * @URL:  The URL used to initialize the context
+ *
+ * Allocate and initialize a new HTTP context.
+ *
+ * Returns an HTTP context or NULL in case of error.
+ */
+
+static xmlNanoHTTPCtxtPtr
+xmlNanoHTTPNewCtxt(const char *URL) {
+    xmlNanoHTTPCtxtPtr ret;
+
+    ret = (xmlNanoHTTPCtxtPtr) xmlMalloc(sizeof(xmlNanoHTTPCtxt));
+    if (ret == NULL) {
+        xmlHTTPErrMemory("allocating context");
+        return(NULL);
+    }
+
+    memset(ret, 0, sizeof(xmlNanoHTTPCtxt));
+    ret->port = 80;
+    ret->returnValue = 0;
+    ret->fd = INVALID_SOCKET; // INVALID_SOCKET 정의
+    ret->ContentLength = -1;
+
+    xmlNanoHTTPScanURL(ret, URL);
+
+    return(ret);
+}
+
+/**
+ * xmlNanoHTTPFreeCtxt:
+ * @ctxt:  an HTTP context
+ *
+ * Frees the context after closing the connection.
+ */
+
+static void
+xmlNanoHTTPFreeCtxt(xmlNanoHTTPCtxtPtr ctxt) {
+    if (ctxt == NULL) return;
+    // 메모리 해제 부분은 동일하게 유지
+    if (ctxt->hostname != NULL) xmlFree(ctxt->hostname);
+    if (ctxt->protocol != NULL) xmlFree(ctxt->protocol);
+    if (ctxt->path != NULL) xmlFree(ctxt->path);
+    if (ctxt->query != NULL) xmlFree(ctxt->query);
+    if (ctxt->out != NULL) xmlFree(ctxt->out);
+    if (ctxt->in != NULL) xmlFree(ctxt->in);
+    if (ctxt->contentType != NULL) xmlFree(ctxt->contentType);
+    if (ctxt->encoding != NULL) xmlFree(ctxt->encoding);
+    if (ctxt->mimeType != NULL) xmlFree(ctxt->mimeType);
+    if (ctxt->location != NULL) xmlFree(ctxt->location);
+    if (ctxt->authHeader != NULL) xmlFree(ctxt->authHeader);
+#ifdef LIBXML_ZLIB_ENABLED
+    if (ctxt->strm != NULL) {
+        inflateEnd(ctxt->strm);
+        xmlFree(ctxt->strm);
+    }
+#endif
+
+    ctxt->state = XML_NANO_HTTP_NONE;
+    if (ctxt->fd != INVALID_SOCKET) closesocket(ctxt->fd); // 소켓 닫기
+    ctxt->fd = INVALID_SOCKET; 
+    xmlFree(ctxt);
+}
+
+/**
+ * xmlNanoHTTPSend:
+ * @ctxt:  an HTTP context
+ *
+ * Send the input needed to initiate the processing on the server side
+ * Returns number of bytes sent or -1 on error.
+ */
+
+static int
+xmlNanoHTTPSend(xmlNanoHTTPCtxtPtr ctxt, const char *xmt_ptr, int outlen)
+{
+    int total_sent = 0;
+#ifdef HAVE_POLL_H
+    struct pollfd p;
+#else
+    struct timeval tv;
+    fd_set wfd;
+#endif
+
+    if ((ctxt->state & XML_NANO_HTTP_WRITE) && (xmt_ptr != NULL)) {
+        while (total_sent < outlen) {
+            int nsent = send(ctxt->fd, SEND_ARG2_CAST (xmt_ptr + total_sent),
+                             outlen - total_sent, 0);
+
+            if (nsent > 0)
+                total_sent += nsent;
+            else if ((nsent == SOCKET_ERROR) && // SOCKET_ERROR로 변경
+                     (socket_errno() != WSAEWOULDBLOCK)) { // 소켓 오류 코드 변경
+                __xmlIOErr(XML_FROM_HTTP, 0, "send failed\n");
+                if (total_sent == 0)
+                    total_sent = -1;
+                break;
+            } else {
+                /*
+                 * No data sent
+                 * Since non-blocking sockets are used, wait for
+                 * socket to be writable or default timeout prior
+                 * to retrying.
+                 */
+#ifndef HAVE_POLL_H
+#ifndef _WINSOCKAPI_
+                if (ctxt->fd > FD_SETSIZE)
+                    return -1;
+#endif
+
+                tv.tv_sec = timeout;
+                tv.tv_usec = 0;
+                FD_ZERO(&wfd);
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 4018)
+#endif
+                FD_SET(ctxt->fd, &wfd);
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+                (void) select(ctxt->fd + 1, NULL, &wfd, NULL, &tv);
+#else
+                p.fd = ctxt->fd;
+                p.events = POLLOUT;
+                (void) poll(&p, 1, timeout * 1000);
+#endif /* !HAVE_POLL_H */
+            }
+        }
+    }
+
+    return total_sent;
+}
+
+/**
+ * xmlNanoHTTPRecv:
+ * @ctxt:  an HTTP context
+ *
+ * Read information coming from the HTTP connection.
+ * This is a blocking call (but it blocks in select(), not read()).
+ *
+ * Returns the number of byte read or -1 in case of error.
+ */
+
+static int
+xmlNanoHTTPRecv(xmlNanoHTTPCtxtPtr ctxt)
+{
+#ifdef HAVE_POLL_H
+    struct pollfd p;
+#else
+    fd_set rfd;
+    struct timeval tv;
+#endif
+
+    while (ctxt->state & XML_NANO_HTTP_READ) {
+        if (ctxt->in == NULL) {
+            ctxt->in = (char *) xmlMallocAtomic(65000 * sizeof(char));
+            if (ctxt->in == NULL) {
+                xmlHTTPErrMemory("allocating input");
+                ctxt->last = -1;
+                return (-1);
+            }
+            ctxt->inlen = 65000;
+            ctxt->inptr = ctxt->content = ctxt->inrptr = ctxt->in;
+        }
+        if (ctxt->inrptr > ctxt->in + XML_NANO_HTTP_CHUNK) {
+            int delta = ctxt->inrptr - ctxt->in;
+            int len = ctxt->inptr - ctxt->inrptr;
+
+            memmove(ctxt->in, ctxt->inrptr, len);
+            ctxt->inrptr -= delta;
+            ctxt->content -= delta;
+            ctxt->inptr -= delta;
+        }
+        if ((ctxt->in + ctxt->inlen) < (ctxt->inptr + XML_NANO_HTTP_CHUNK)) {
+            int d_inptr = ctxt->inptr - ctxt->in;
+            int d_content = ctxt->content - ctxt->in;
+            int d_inrptr = ctxt->inrptr - ctxt->in;
+            char *tmp_ptr = ctxt->in;
+
+            ctxt->inlen *= 2;
+            ctxt->in = (char *) xmlRealloc(tmp_ptr, ctxt->inlen);
+            if (ctxt->in == NULL) {
+                xmlHTTPErrMemory("allocating input buffer");
+                xmlFree(tmp_ptr);
+                ctxt->last = -1;
+                return (-1);
+            }
+            ctxt->inptr = ctxt->in + d_inptr;
+            ctxt->content = ctxt->in + d_content;
+            ctxt->inrptr = ctxt->in + d_inrptr;
+        }
+        ctxt->last = recv(ctxt->fd, ctxt->inptr, XML_NANO_HTTP_CHUNK, 0);
+        if (ctxt->last > 0) {
+            ctxt->inptr += ctxt->last;
+            return (ctxt->last);
+        }
+        if (ctxt->last == 0) {
+            return (0);
+        }
+        if (ctxt->last == SOCKET_ERROR) { // SOCKET_ERROR로 변경
+            switch (socket_errno()) {
+                case WSAEWOULDBLOCK: // WSAEWOULDBLOCK으로 변경
+                    break;
+
+                case WSAECONNRESET:
+                case WSAESHUTDOWN:
+                    return (0);
+
+                default:
+                    __xmlIOErr(XML_FROM_HTTP, 0, "recv failed\n");
+                    return (-1);
+            }
+        }
+#ifdef HAVE_POLL_H
+        p.fd = ctxt->fd;
+        p.events = POLLIN;
+        if ((poll(&p, 1, timeout * 1000) < 1)
+#if defined(EINTR)
+            && (errno != EINTR)
+#endif
+            )
+            return (0);
+#else /* !HAVE_POLL_H */
+#ifndef _WINSOCKAPI_
+        if (ctxt->fd > FD_SETSIZE)
+            return -1;
+#endif
+        tv.tv_sec = timeout;
+        tv.tv_usec = 0;
+        FD_ZERO(&rfd);
+        FD_SET(ctxt->fd, &rfd);
+        if (select(ctxt->fd + 1, &rfd, NULL, NULL, &tv) <= 0)
+            return (0);
+#endif /* HAVE_POLL_H */
+    }
+    return (-1);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
