@@ -17763,10 +17763,1047 @@ xmlNanoHTTPRecv(xmlNanoHTTPCtxtPtr ctxt)
     return (-1);
 }
 
+static char *
+xmlNanoHTTPReadLine(xmlNanoHTTPCtxtPtr ctxt) { /*netdb->winsock2 수정*/
+    char buf[4096];
+    char *bp = buf;
+    int rc;
 
+    while (bp - buf < 4095) {
+        if (ctxt->inrptr == ctxt->inptr) {
+            if ((rc = xmlNanoHTTPRecv(ctxt)) == 0) {
+                if (bp == buf)
+                    return(NULL);
+                else
+                    *bp = 0;
+                return(xmlMemStrdup(buf));
+            }
+            else if (rc == -1) {
+                return(NULL);
+            }
+        }
+        *bp = *ctxt->inrptr++;
+        if (*bp == '\n') {
+            *bp = 0;
+            return(xmlMemStrdup(buf));
+        }
+        if (*bp != '\r')
+            bp++;
+    }
+    buf[4095] = 0;
+    return(xmlMemStrdup(buf));
+}
 
+static void
+xmlNanoHTTPScanAnswer(xmlNanoHTTPCtxtPtr ctxt, const char *line) { /*netdb->winsock2 수정*/
+    const char *cur = line;
 
+    if (line == NULL) return;
 
+    if (!strncmp(line, "HTTP/", 5)) {
+        int version = 0;
+        int ret = 0;
+
+        cur += 5;
+        while ((*cur >= '0') && (*cur <= '9')) {
+            version *= 10;
+            version += *cur - '0';
+            cur++;
+        }
+        if (*cur == '.') {
+            cur++;
+            if ((*cur >= '0') && (*cur <= '9')) {
+                version *= 10;
+                version += *cur - '0';
+                cur++;
+            }
+            while ((*cur >= '0') && (*cur <= '9'))
+                cur++;
+        } else
+            version *= 10;
+        if ((*cur != ' ') && (*cur != '\t')) return;
+        while ((*cur == ' ') || (*cur == '\t')) cur++;
+        if ((*cur < '0') || (*cur > '9')) return;
+        while ((*cur >= '0') && (*cur <= '9')) {
+            ret *= 10;
+            ret += *cur - '0';
+            cur++;
+        }
+        if ((*cur != 0) && (*cur != ' ') && (*cur != '\t')) return;
+        ctxt->returnValue = ret;
+        ctxt->version = version;
+    } else if (!xmlStrncasecmp(BAD_CAST line, BAD_CAST "Content-Type:", 13)) {
+        const xmlChar *charset, *last, *mime;
+        cur += 13;
+        while ((*cur == ' ') || (*cur == '\t')) cur++;
+        if (ctxt->contentType != NULL)
+            xmlFree(ctxt->contentType);
+        ctxt->contentType = xmlMemStrdup(cur);
+        mime = (const xmlChar *) cur;
+        last = mime;
+        while ((*last != 0) && (*last != ' ') && (*last != '\t') &&
+               (*last != ';') && (*last != ','))
+            last++;
+        if (ctxt->mimeType != NULL)
+            xmlFree(ctxt->mimeType);
+        ctxt->mimeType = (char *) xmlStrndup(mime, last - mime);
+        charset = xmlStrstr(BAD_CAST ctxt->contentType, BAD_CAST "charset=");
+        if (charset != NULL) {
+            charset += 8;
+            last = charset;
+            while ((*last != 0) && (*last != ' ') && (*last != '\t') &&
+                   (*last != ';') && (*last != ','))
+                last++;
+            if (ctxt->encoding != NULL)
+                xmlFree(ctxt->encoding);
+            ctxt->encoding = (char *) xmlStrndup(charset, last - charset);
+        }
+    } else if (!xmlStrncasecmp(BAD_CAST line, BAD_CAST "ContentType:", 12)) {
+        const xmlChar *charset, *last, *mime;
+        cur += 12;
+        if (ctxt->contentType != NULL) return;
+        while ((*cur == ' ') || (*cur == '\t')) cur++;
+        ctxt->contentType = xmlMemStrdup(cur);
+        mime = (const xmlChar *) cur;
+        last = mime;
+        while ((*last != 0) && (*last != ' ') && (*last != '\t') &&
+               (*last != ';') && (*last != ','))
+            last++;
+        if (ctxt->mimeType != NULL)
+            xmlFree(ctxt->mimeType);
+        ctxt->mimeType = (char *) xmlStrndup(mime, last - mime);
+        charset = xmlStrstr(BAD_CAST ctxt->contentType, BAD_CAST "charset=");
+        if (charset != NULL) {
+            charset += 8;
+            last = charset;
+            while ((*last != 0) && (*last != ' ') && (*last != '\t') &&
+                   (*last != ';') && (*last != ','))
+                last++;
+            if (ctxt->encoding != NULL)
+                xmlFree(ctxt->encoding);
+            ctxt->encoding = (char *) xmlStrndup(charset, last - charset);
+        }
+    } else if (!xmlStrncasecmp(BAD_CAST line, BAD_CAST "Location:", 9)) {
+        cur += 9;
+        while ((*cur == ' ') || (*cur == '\t')) cur++;
+        if (ctxt->location != NULL)
+            xmlFree(ctxt->location);
+        if (*cur == '/') {
+            xmlChar *tmp_http = xmlStrdup(BAD_CAST "http://");
+            xmlChar *tmp_loc =
+                xmlStrcat(tmp_http, (const xmlChar *) ctxt->hostname);
+            ctxt->location =
+                (char *) xmlStrcat(tmp_loc, (const xmlChar *) cur);
+        } else {
+            ctxt->location = xmlMemStrdup(cur);
+        }
+    } else if (!xmlStrncasecmp(BAD_CAST line, BAD_CAST "WWW-Authenticate:", 17)) {
+        cur += 17;
+        while ((*cur == ' ') || (*cur == '\t')) cur++;
+        if (ctxt->authHeader != NULL)
+            xmlFree(ctxt->authHeader);
+        ctxt->authHeader = xmlMemStrdup(cur);
+    } else if (!xmlStrncasecmp(BAD_CAST line, BAD_CAST "Proxy-Authenticate:", 19)) {
+        cur += 19;
+        while ((*cur == ' ') || (*cur == '\t')) cur++;
+        if (ctxt->authHeader != NULL)
+            xmlFree(ctxt->authHeader);
+        ctxt->authHeader = xmlMemStrdup(cur);
+#ifdef LIBXML_ZLIB_ENABLED
+    } else if (!xmlStrncasecmp(BAD_CAST line, BAD_CAST "Content-Encoding:", 17)) {
+        cur += 17;
+        while ((*cur == ' ') || (*cur == '\t')) cur++;
+        if (!xmlStrncasecmp(BAD_CAST cur, BAD_CAST "gzip", 4)) {
+            ctxt->usesGzip = 1;
+
+            ctxt->strm = xmlMalloc(sizeof(z_stream));
+
+            if (ctxt->strm != NULL) {
+                ctxt->strm->zalloc = Z_NULL;
+                ctxt->strm->zfree = Z_NULL;
+                ctxt->strm->opaque = Z_NULL;
+                ctxt->strm->avail_in = 0;
+                ctxt->strm->next_in = Z_NULL;
+
+                inflateInit2(ctxt->strm, 15 | 32);
+            }
+        }
+#endif
+    }
+}
+
+static SOCKET
+xmlNanoHTTPConnectHost(const char *host, int port)
+{
+    struct sockaddr *addr = NULL;
+    struct sockaddr_in sockin;
+
+#ifdef SUPPORT_IP6
+    struct in6_addr ia6;
+    struct sockaddr_in6 sockin6;
+#endif
+    SOCKET s;
+
+    memset(&sockin, 0, sizeof(sockin));
+#ifdef SUPPORT_IP6
+    memset(&sockin6, 0, sizeof(sockin6));
+#endif
+
+    int status;
+    struct addrinfo hints, *res, *result;
+
+    result = NULL;
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_socktype = SOCK_STREAM;
+
+    status = getaddrinfo(host, NULL, &hints, &result);
+    if (status) {
+        fprintf(stderr, "getaddrinfo failed: %s\n", gai_strerror(status));
+        return INVALID_SOCKET;
+    }
+
+    for (res = result; res; res = res->ai_next) {
+        if (res->ai_family == AF_INET) {
+            if ((size_t)res->ai_addrlen > sizeof(sockin)) {
+                fprintf(stderr, "address size mismatch\n");
+                freeaddrinfo(result);
+                return INVALID_SOCKET;
+            }
+            memcpy(&sockin, res->ai_addr, res->ai_addrlen);
+            sockin.sin_port = htons(port);
+            addr = (struct sockaddr *)&sockin;
+#ifdef SUPPORT_IP6
+        } else if (have_ipv6() && (res->ai_family == AF_INET6)) {
+            if ((size_t)res->ai_addrlen > sizeof(sockin6)) {
+                fprintf(stderr, "address size mismatch\n");
+                freeaddrinfo(result);
+                return INVALID_SOCKET;
+            }
+            memcpy(&sockin6, res->ai_addr, res->ai_addrlen);
+            sockin6.sin6_port = htons(port);
+            addr = (struct sockaddr *)&sockin6;
+#endif
+        } else
+            continue;              /* for */
+
+        s = xmlNanoHTTPConnectAttempt(addr);
+        if (s != INVALID_SOCKET) {
+            freeaddrinfo(result);
+            return (s);
+        }
+    }
+
+    if (result)
+        freeaddrinfo(result);
+
+#ifdef DEBUG_HTTP
+    fprintf(stderr, "xmlNanoHTTPConnectHost:  unable to connect to '%s'.\n", host);
+#endif
+    return INVALID_SOCKET;
+}
+
+void*
+xmlNanoHTTPOpen(const char *URL, char **contentType) {
+    if (contentType != NULL) *contentType = NULL;
+    return (xmlNanoHTTPMethod(URL, NULL, NULL, contentType, NULL, 0));
+}
+
+int
+xmlNanoHTTPRead(void *ctx, void *dest, int len) { /*netdb->winsock2 수정*/
+
+    xmlNanoHTTPCtxtPtr ctxt = (xmlNanoHTTPCtxtPtr) ctx;
+
+    if (ctx == NULL) return (-1);
+    if (dest == NULL) return (-1);
+    if (len <= 0) return (0);
+
+    while (ctxt->inptr - ctxt->inrptr < len) {
+        if (xmlNanoHTTPRecv(ctxt) <= 0) break;
+    }
+    if (ctxt->inptr - ctxt->inrptr < len)
+        len = ctxt->inptr - ctxt->inrptr;
+    memcpy(dest, ctxt->inrptr, len);
+    ctxt->inrptr += len;
+    return (len);
+}
+
+void
+xmlNanoHTTPClose(void *ctx) {/*netdb->winsock2 수정*/
+
+    xmlNanoHTTPCtxtPtr ctxt = (xmlNanoHTTPCtxtPtr) ctx;
+
+    if (ctx == NULL) return;
+
+    xmlNanoHTTPFreeCtxt(ctxt);
+}
+
+void*
+xmlNanoHTTPMethodRedir(const char *URL, const char *method, const char *input,
+                  char **contentType, char **redir,
+                  const char *headers, int ilen) { /*netdb->winsock2 수정*/
+    xmlNanoHTTPCtxtPtr ctxt;
+    char *bp, *p;
+    int blen;
+    SOCKET ret;
+    int nbRedirects = 0;
+    char *redirURL = NULL;
+#ifdef DEBUG_HTTP
+    int xmt_bytes;
+#endif
+
+    if (URL == NULL) return (NULL);
+    if (method == NULL) method = "GET";
+    xmlNanoHTTPInit();
+
+retry:
+    if (redirURL == NULL) {
+        ctxt = xmlNanoHTTPNewCtxt(URL);
+        if (ctxt == NULL)
+            return (NULL);
+    } else {
+        ctxt = xmlNanoHTTPNewCtxt(redirURL);
+        if (ctxt == NULL)
+            return (NULL);
+        ctxt->location = xmlMemStrdup(redirURL);
+    }
+
+    if ((ctxt->protocol == NULL) || (strcmp(ctxt->protocol, "http"))) {
+        __xmlIOErr(XML_FROM_HTTP, XML_HTTP_URL_SYNTAX, "Not a valid HTTP URI");
+        xmlNanoHTTPFreeCtxt(ctxt);
+        if (redirURL != NULL) xmlFree(redirURL);
+        return (NULL);
+    }
+    if (ctxt->hostname == NULL) {
+        __xmlIOErr(XML_FROM_HTTP, XML_HTTP_UNKNOWN_HOST,
+                   "Failed to identify host in URI");
+        xmlNanoHTTPFreeCtxt(ctxt);
+        if (redirURL != NULL) xmlFree(redirURL);
+        return (NULL);
+    }
+    if (proxy) {
+        blen = strlen(ctxt->hostname) * 2 + 16;
+        ret = xmlNanoHTTPConnectHost(proxy, proxyPort);
+    } else {
+        blen = strlen(ctxt->hostname);
+        ret = xmlNanoHTTPConnectHost(ctxt->hostname, ctxt->port);
+    }
+    if (ret == INVALID_SOCKET) {
+        xmlNanoHTTPFreeCtxt(ctxt);
+        if (redirURL != NULL) xmlFree(redirURL);
+        return (NULL);
+    }
+    ctxt->fd = ret;
+
+    if (input == NULL)
+        ilen = 0;
+    else
+        blen += 36;
+
+    if (headers != NULL)
+        blen += strlen(headers) + 2;
+    if (contentType && *contentType)
+        /* reserve for string plus 'Content-Type: \r\n" */
+        blen += strlen(*contentType) + 16;
+    if (ctxt->query != NULL)
+        /* 1 for '?' */
+        blen += strlen(ctxt->query) + 1;
+    blen += strlen(method) + strlen(ctxt->path) + 24;
+#ifdef LIBXML_ZLIB_ENABLED
+    /* reserve for possible 'Accept-Encoding: gzip' string */
+    blen += 23;
+#endif
+    if (ctxt->port != 80) {
+        /* reserve space for ':xxxxx', incl. potential proxy */
+        if (proxy)
+            blen += 17;
+        else
+            blen += 11;
+    }
+    bp = (char *)xmlMallocAtomic(blen);
+    if (bp == NULL) {
+        xmlNanoHTTPFreeCtxt(ctxt);
+        xmlHTTPErrMemory("allocating header buffer");
+        return (NULL);
+    }
+
+    p = bp;
+
+    if (proxy) {
+        if (ctxt->port != 80) {
+            p += snprintf(p, blen - (p - bp), "%s http://%s:%d%s",
+                          method, ctxt->hostname,
+                          ctxt->port, ctxt->path);
+        } else
+            p += snprintf(p, blen - (p - bp), "%s http://%s%s", method,
+                          ctxt->hostname, ctxt->path);
+    } else
+        p += snprintf(p, blen - (p - bp), "%s %s", method, ctxt->path);
+
+    if (ctxt->query != NULL)
+        p += snprintf(p, blen - (p - bp), "?%s", ctxt->query);
+
+    if (ctxt->port == 80) {
+        p += snprintf(p, blen - (p - bp), " HTTP/1.0\r\nHost: %s\r\n",
+                      ctxt->hostname);
+    } else {
+        p += snprintf(p, blen - (p - bp), " HTTP/1.0\r\nHost: %s:%d\r\n",
+                      ctxt->hostname, ctxt->port);
+    }
+
+#ifdef LIBXML_ZLIB_ENABLED
+    p += snprintf(p, blen - (p - bp), "Accept-Encoding: gzip\r\n");
+#endif
+
+    if (contentType != NULL && *contentType)
+        p += snprintf(p, blen - (p - bp), "Content-Type: %s\r\n", *contentType);
+
+    if (headers != NULL)
+        p += snprintf(p, blen - (p - bp), "%s", headers);
+
+    if (input != NULL)
+        snprintf(p, blen - (p - bp), "Content-Length: %d\r\n\r\n", ilen);
+    else
+        snprintf(p, blen - (p - bp), "\r\n");
+
+#ifdef DEBUG_HTTP
+    xmlGenericError(xmlGenericErrorContext,
+                    "-> %s%s", proxy ? "(Proxy) " : "", bp);
+    if ((blen -= strlen(bp) + 1) < 0)
+        xmlGenericError(xmlGenericErrorContext,
+                        "ERROR: overflowed buffer by %d bytes\n", -blen);
+#endif
+    ctxt->outptr = ctxt->out = bp;
+    ctxt->state = XML_NANO_HTTP_WRITE;
+    blen = strlen(ctxt->out);
+#ifdef DEBUG_HTTP
+    xmt_bytes = xmlNanoHTTPSend(ctxt, ctxt->out, blen);
+    if (xmt_bytes != blen)
+        xmlGenericError(xmlGenericErrorContext,
+                        "xmlNanoHTTPMethodRedir:  Only %d of %d %s %s\n",
+                        xmt_bytes, blen,
+                        "bytes of HTTP headers sent to host",
+                        ctxt->hostname);
+#else
+    xmlNanoHTTPSend(ctxt, ctxt->out, blen);
+#endif
+
+    if (input != NULL) {
+#ifdef DEBUG_HTTP
+        xmt_bytes = xmlNanoHTTPSend(ctxt, input, ilen);
+
+        if (xmt_bytes != ilen)
+            xmlGenericError(xmlGenericErrorContext,
+                            "xmlNanoHTTPMethodRedir:  Only %d of %d %s %s\n",
+                            xmt_bytes, ilen,
+                            "bytes of HTTP content sent to host",
+                            ctxt->hostname);
+#else
+        xmlNanoHTTPSend(ctxt, input, ilen);
+#endif
+    }
+
+    ctxt->state = XML_NANO_HTTP_READ;
+
+    while ((p = xmlNanoHTTPReadLine(ctxt)) != NULL) {
+        if (*p == 0) {
+            ctxt->content = ctxt->inrptr;
+            xmlFree(p);
+            break;
+        }
+        xmlNanoHTTPScanAnswer(ctxt, p);
+
+#ifdef DEBUG_HTTP
+        xmlGenericError(xmlGenericErrorContext, "<- %s\n", p);
+#endif
+        xmlFree(p);
+    }
+
+    if ((ctxt->location != NULL) && (ctxt->returnValue >= 300) &&
+        (ctxt->returnValue < 400)) {
+#ifdef DEBUG_HTTP
+        xmlGenericError(xmlGenericErrorContext,
+                        "\nRedirect to: %s\n", ctxt->location);
+#endif
+        while (xmlNanoHTTPRecv(ctxt) > 0)
+            ;
+        if (nbRedirects < XML_NANO_HTTP_MAX_REDIR) {
+            nbRedirects++;
+            if (redirURL != NULL)
+                xmlFree(redirURL);
+            redirURL = xmlMemStrdup(ctxt->location);
+            xmlNanoHTTPFreeCtxt(ctxt);
+            goto retry;
+        }
+        xmlNanoHTTPFreeCtxt(ctxt);
+        if (redirURL != NULL) xmlFree(redirURL);
+#ifdef DEBUG_HTTP
+        xmlGenericError(xmlGenericErrorContext,
+                        "xmlNanoHTTPMethodRedir: Too many redirects, aborting ...\n");
+#endif
+        return (NULL);
+    }
+
+    if (contentType != NULL) {
+        if (ctxt->contentType != NULL)
+            *contentType = xmlMemStrdup(ctxt->contentType);
+        else
+            *contentType = NULL;
+    }
+
+    if ((redir != NULL) && (redirURL != NULL)) {
+        *redir = redirURL;
+    } else {
+        if (redirURL != NULL)
+            xmlFree(redirURL);
+    }
+
+    xmlNanoHTTPFreeCtxt(ctxt);
+    return (ctxt->content);
+}
+
+void*
+xmlNanoHTTPMethod(const char *URL, const char *method, const char *input,
+                  char **contentType, const char *headers, int ilen) { /*netdb->winsock2 수정*/
+    return(xmlNanoHTTPMethodRedir(URL, method, input, contentType,
+                                  NULL, headers, ilen));
+}
+
+int
+xmlNanoHTTPFetch(const char *URL, const char *filename, char **contentType) { /*netdb->winsock2 수정*/
+    void *ctxt = NULL;
+    char *buf = NULL;
+    HANDLE hFile;
+    DWORD bytesWritten;
+    int len;
+    int ret = 0;
+
+    if (filename == NULL) return(-1);
+    ctxt = xmlNanoHTTPOpen(URL, contentType);
+    if (ctxt == NULL) return(-1);
+
+    if (!strcmp(filename, "-"))
+        hFile = GetStdHandle(STD_OUTPUT_HANDLE);
+    else {
+        hFile = CreateFile(filename, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+        if (hFile == INVALID_HANDLE_VALUE) {
+            xmlNanoHTTPClose(ctxt);
+            if ((contentType != NULL) && (*contentType != NULL)) {
+                xmlFree(*contentType);
+                *contentType = NULL;
+            }
+            return(-1);
+        }
+    }
+
+    xmlNanoHTTPFetchContent(ctxt, &buf, &len);
+    if (len > 0) {
+        if (WriteFile(hFile, buf, len, &bytesWritten, NULL) == FALSE) {
+            ret = -1;
+        }
+    }
+
+    xmlNanoHTTPClose(ctxt);
+    CloseHandle(hFile);
+    return(ret);
+}
+
+#ifdef LIBXML_OUTPUT_ENABLED
+/**
+ * xmlNanoHTTPSave:
+ * @ctxt:  the HTTP context
+ * @filename:  the filename where the content should be saved
+ *
+ * This function saves the output of the HTTP transaction to a file
+ * It closes and frees the context at the end
+ *
+ * Returns -1 in case of failure, 0 in case of success.
+ */
+int
+xmlNanoHTTPSave(void *ctxt, const char *filename) { /*netdb->winsock2 수정*/
+    char *buf = NULL;
+    HANDLE hFile;
+    DWORD bytesWritten;
+    int len;
+    int ret = 0;
+
+    if ((ctxt == NULL) || (filename == NULL)) return(-1);
+
+    if (!strcmp(filename, "-"))
+        hFile = GetStdHandle(STD_OUTPUT_HANDLE);
+    else {
+        hFile = CreateFile(filename, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+        if (hFile == INVALID_HANDLE_VALUE) {
+            xmlNanoHTTPClose(ctxt);
+            return(-1);
+        }
+    }
+
+    xmlNanoHTTPFetchContent(ctxt, &buf, &len);
+    if (len > 0) {
+        if (WriteFile(hFile, buf, len, &bytesWritten, NULL) == FALSE) {
+            ret = -1;
+        }
+    }
+
+    xmlNanoHTTPClose(ctxt);
+    CloseHandle(hFile);
+    return(ret);
+}
+#endif /* LIBXML_OUTPUT_ENABLED */
+
+int
+xmlNanoHTTPReturnCode(void *ctx) { /*netdb->winsock2 수정*/
+    xmlNanoHTTPCtxtPtr ctxt = (xmlNanoHTTPCtxtPtr) ctx;
+
+    if (ctxt == NULL) return(-1);
+
+    return(ctxt->returnValue);
+}
+
+const char *
+xmlNanoHTTPAuthHeader(void *ctx) { /*netdb->winsock2 수정*/
+    xmlNanoHTTPCtxtPtr ctxt = (xmlNanoHTTPCtxtPtr) ctx;
+
+    if (ctxt == NULL) return(NULL);
+
+    return(ctxt->authHeader);
+}
+
+int
+xmlNanoHTTPContentLength(void *ctx) { /*netdb->winsock2 수정*/
+    xmlNanoHTTPCtxtPtr ctxt = (xmlNanoHTTPCtxtPtr)ctx;
+
+    return((ctxt == NULL) ? -1 : ctxt->ContentLength);
+}
+
+const char *
+xmlNanoHTTPRedir(void *ctx) { /*netdb->winsock2 수정*/
+    xmlNanoHTTPCtxtPtr ctxt = (xmlNanoHTTPCtxtPtr)ctx;
+
+    return((ctxt == NULL) ? NULL : ctxt->location);
+}
+
+const char *
+xmlNanoHTTPEncoding( void * ctx ) { /*netdb->winsock2 수정*/
+    xmlNanoHTTPCtxtPtr	ctxt = (xmlNanoHTTPCtxtPtr)ctx;
+
+    return ( ( ctxt == NULL ) ? NULL : ctxt->encoding );
+}
+
+const char *
+xmlNanoHTTPMimeType(void *ctx) { /*netdb->winsock2 수정*/
+    xmlNanoHTTPCtxtPtr ctxt = (xmlNanoHTTPCtxtPtr)ctx;
+
+    return((ctxt == NULL) ? NULL : ctxt->mimeType);
+}
+
+test-getaddinfo.c 수정
+/* Test the getaddrinfo module.
+
+   Copyright (C) 2006-2024 Free Software Foundation, Inc.
+
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
+
+/* Written by Simon Josefsson.  */
+
+#include <config.h>
+
+#ifdef _WIN32
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#else
+#include <netdb.h>
+#endif
+
+#include "signature.h"
+SIGNATURE_CHECK (gai_strerror, char const *, (int));
+/* On native Windows, these two functions may have the __stdcall calling
+   convention.  But the SIGNATURE_CHECK works only for functions with __cdecl
+   calling convention.  */
+#if !(defined _WIN32 && !defined __CYGWIN__)
+SIGNATURE_CHECK (freeaddrinfo, void, (struct addrinfo *));
+SIGNATURE_CHECK (getaddrinfo, int, (char const *, char const *,
+                                    struct addrinfo const *,
+                                    struct addrinfo **));
+#endif
+
+#include <arpa/inet.h>
+#include <errno.h>
+#include <netinet/in.h>
+#include <stdio.h>
+#include <string.h>
+
+#include "sockets.h"
+
+/* Whether to print debugging messages.  */
+#define ENABLE_DEBUGGING 0
+
+#if ENABLE_DEBUGGING
+# define dbgprintf printf
+#else
+# define dbgprintf if (0) printf
+#endif
+
+/* BeOS does not have AF_UNSPEC.  */
+#ifndef AF_UNSPEC
+# define AF_UNSPEC 0
+#endif
+
+#ifndef EAI_SERVICE
+# define EAI_SERVICE 0
+#endif
+
+static int
+simple (char const *host, char const *service)
+{
+  char buf[BUFSIZ];
+  static int skip = 0;
+  struct addrinfo hints;
+  struct addrinfo *ai0, *ai;
+  int res;
+  int err;
+
+  /* Once we skipped the test, do not try anything else */
+  if (skip)
+    return 0;
+
+  dbgprintf ("Finding %s service %s...\n", host, service);
+
+  /* This initializes "hints" but does not use it.  Is there a reason
+     for this?  If so, please fix this comment.  */
+  memset (&hints, 0, sizeof (hints));
+  hints.ai_flags = AI_CANONNAME;
+  hints.ai_family = AF_UNSPEC;
+  hints.ai_socktype = SOCK_STREAM;
+
+  res = getaddrinfo (host, service, 0, &ai0);
+  err = WSAGetLastError();  // 변경된 부분
+
+  dbgprintf ("res %d: %s\n", res, gai_strerror (res));
+
+  if (res != 0)
+    {
+      /* EAI_AGAIN is returned if no network is available. Don't fail
+         the test merely because someone is down the country on their
+         in-law's farm. */
+      if (res == EAI_AGAIN)
+        {
+          skip++;
+          fprintf (stderr, "skipping getaddrinfo test: no network?\n");
+          return 77;
+        }
+      /* IRIX reports EAI_NONAME for "https".  Don't fail the test
+         merely because of this.  */
+      if (res == EAI_NONAME)
+        return 0;
+      /* Solaris reports EAI_SERVICE for "http" and "https".  Don't
+         fail the test merely because of this.  */
+      if (res == EAI_SERVICE)
+        return 0;
+#ifdef EAI_NODATA
+      /* AIX reports EAI_NODATA for "https".  Don't fail the test
+         merely because of this.  */
+      if (res == EAI_NODATA)
+        return 0;
+#endif
+      /* Provide details if errno was set.  */
+      if (res == EAI_SYSTEM)
+        fprintf (stderr, "system error: %s\n", strerror (err));
+
+      return 1;
+    }
+
+  for (ai = ai0; ai; ai = ai->ai_next)
+    {
+      void *ai_addr = ai->ai_addr;
+      struct sockaddr_in *sock_addr = ai_addr;
+      dbgprintf ("\tflags %x\n", ai->ai_flags + 0u);
+      dbgprintf ("\tfamily %x\n", ai->ai_family + 0u);
+      dbgprintf ("\tsocktype %x\n", ai->ai_socktype + 0u);
+      dbgprintf ("\tprotocol %x\n", ai->ai_protocol + 0u);
+      dbgprintf ("\taddrlen %lu: ", (unsigned long) ai->ai_addrlen);
+      dbgprintf ("\tFound %s\n",
+                 inet_ntop (ai->ai_family,
+                            &sock_addr->sin_addr,
+                            buf, sizeof (buf) - 1));
+      if (ai->ai_canonname)
+        dbgprintf ("\tFound %s...\n", ai->ai_canonname);
+
+      {
+        char ipbuf[BUFSIZ];
+        char portbuf[BUFSIZ];
+
+        res = getnameinfo (ai->ai_addr, ai->ai_addrlen,
+                           ipbuf, sizeof (ipbuf) - 1,
+                           portbuf, sizeof (portbuf) - 1,
+                           NI_NUMERICHOST|NI_NUMERICSERV);
+        dbgprintf ("\t\tgetnameinfo %d: %s\n", res, gai_strerror (res));
+        if (res == 0)
+          {
+            dbgprintf ("\t\tip %s\n", ipbuf);
+            dbgprintf ("\t\tport %s\n", portbuf);
+          }
+      }
+
+    }
+
+  freeaddrinfo (ai0);
+
+  return 0;
+}
+
+#define HOST1 "www.gnu.org"
+#define SERV1 "http"
+#define HOST2 "www.ibm.com"
+#define SERV2 "https"
+#define HOST3 "microsoft.com"
+#define SERV3 "http"
+#define HOST4 "google.org"
+#define SERV4 "ldap"
+
+int main (void)
+{
+  (void) gl_sockets_startup (SOCKETS_1_1);
+
+  return simple (HOST1, SERV1)
+    + simple (HOST2, SERV2)
+    + simple (HOST3, SERV3)
+    + simple (HOST4, SERV4);
+}
+
+getaddrinfo.m4 수정
+# getaddrinfo.m4
+# serial 35
+dnl Copyright (C) 2004-2024 Free Software Foundation, Inc.
+dnl This file is free software; the Free Software Foundation
+dnl gives unlimited permission to copy and/or distribute it,
+dnl with or without modifications, as long as this notice is preserved.
+
+AC_DEFUN([gl_GETADDRINFO],
+[
+  AC_REQUIRE([gl_SYS_SOCKET_H])dnl for HAVE_SYS_SOCKET_H, HAVE_WINSOCK2_H
+  AC_REQUIRE([gl_NETDB_H])dnl for HAVE_NETDB_H
+  GETADDRINFO_LIB=
+  gai_saved_LIBS="$LIBS"
+
+  dnl Where is getaddrinfo()?
+  dnl - On Solaris, it is in libsocket.
+  dnl - On Haiku, it is in libnetwork.
+  dnl - On BeOS, it is in libnet.
+  dnl - On native Windows, it is in ws2_32.dll.
+  dnl - Otherwise it is in libc.
+  AC_SEARCH_LIBS([getaddrinfo], [socket network net],
+    [if test "$ac_cv_search_getaddrinfo" != "none required"; then
+       GETADDRINFO_LIB="$ac_cv_search_getaddrinfo"
+     fi])
+  LIBS="$gai_saved_LIBS $GETADDRINFO_LIB"
+
+  HAVE_GETADDRINFO=1
+  AC_CACHE_CHECK([for getaddrinfo], [gl_cv_func_getaddrinfo], [
+    AC_LINK_IFELSE([AC_LANG_PROGRAM([[
+#include <sys/types.h>
+#ifdef HAVE_SYS_SOCKET_H
+#include <sys/socket.h>
+#endif
+#ifdef _WIN32
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#else
+#include <netdb.h>  # 이 부분을 수정
+#endif
+#include <stddef.h>
+]], [[getaddrinfo("", "", NULL, NULL);]])],
+      [gl_cv_func_getaddrinfo=yes],
+      [gl_cv_func_getaddrinfo=no])])
+  if test $gl_cv_func_getaddrinfo = no; then
+    AC_CACHE_CHECK([for getaddrinfo in ws2tcpip.h and -lws2_32],
+                   gl_cv_w32_getaddrinfo, [
+      gl_cv_w32_getaddrinfo=no
+      gl_saved_LIBS="$LIBS"
+      LIBS="$LIBS -lws2_32"
+      AC_LINK_IFELSE([AC_LANG_PROGRAM([[ 
+#ifdef HAVE_WS2TCPIP_H 
+#include <ws2tcpip.h> 
+#endif 
+#include <stddef.h> 
+]], [[getaddrinfo(NULL, NULL, NULL, NULL);]])], [gl_cv_w32_getaddrinfo=yes])
+      LIBS="$gl_saved_LIBS"
+    ])
+    if test "$gl_cv_w32_getaddrinfo" = "yes"; then
+      GETADDRINFO_LIB="-lws2_32"
+      LIBS="$gai_saved_LIBS $GETADDRINFO_LIB"
+      dnl Check for correct signature, in particular for a cdecl-compatible
+      dnl calling convention.
+      AC_CACHE_CHECK([for getaddrinfo with POSIX signature],
+        [gl_cv_func_getaddrinfo_posix_signature],
+        [AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
+#include <sys/types.h>
+#ifdef HAVE_SYS_SOCKET_H
+#include <sys/socket.h>
+#endif
+#ifdef _WIN32
+#include <winsock2.h> # 이 부분 수정
+#include <ws2tcpip.h> # 이 부분 수정
+#else
+#include <netdb.h>  # 이 부분을 수정
+#endif
+#include <stddef.h>
+extern
+#ifdef __cplusplus
+"C"
+#endif
+int getaddrinfo (const char *, const char *, const struct addrinfo *, struct addrinfo **);
+]])],
+           [gl_cv_func_getaddrinfo_posix_signature=yes],
+           [gl_cv_func_getaddrinfo_posix_signature=no])
+        ])
+      if test $gl_cv_func_getaddrinfo_posix_signature = no; then
+        REPLACE_GETADDRINFO=1
+      fi
+    else
+      HAVE_GETADDRINFO=0
+    fi
+  fi
+  AC_DEFINE_UNQUOTED([HAVE_GETADDRINFO], [$HAVE_GETADDRINFO],
+    [Define to 1 if getaddrinfo exists, or to 0 otherwise.])
+
+  # We can't use AC_REPLACE_FUNCS here because gai_strerror may be an
+  # inline function declared in ws2tcpip.h, so we need to get that
+  # header included somehow.
+  AC_CHECK_DECLS([gai_strerror], [], [], [[
+#include <sys/types.h>
+#ifdef HAVE_SYS_SOCKET_H
+#include <sys/socket.h>
+#endif
+#ifdef _WIN32
+#include <winsock2.h>  # 이 부분 수정
+#include <ws2tcpip.h>  # 이 부분 수정
+#else
+#include <netdb.h>  # 이 부분을 수정
+#endif
+#include <stddef.h>
+]])
+  if test $ac_cv_have_decl_gai_strerror = yes; then
+    AC_CHECK_DECLS([gai_strerrorA], [], [], [[
+#include <sys/types.h>
+#ifdef HAVE_SYS_SOCKET_H
+#include <sys/socket.h>
+#endif
+#ifdef _WIN32
+#include <winsock2.h>  # 이 부분 수정
+#include <ws2tcpip.h>  # 이 부분 수정
+#else
+#include <netdb.h>  # 이 부분을 수정
+#endif
+#include <stddef.h>
+]])
+    dnl check for correct signature
+    AC_CACHE_CHECK([for gai_strerror with POSIX signature],
+     [gl_cv_func_gai_strerror_posix_signature], [
+      AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
+#include <sys/types.h>
+#ifdef HAVE_SYS_SOCKET_H
+#include <sys/socket.h>
+#endif
+#ifdef _WIN32
+#include <winsock2.h>  # 이 부분 수정
+#include <ws2tcpip.h>  # 이 부분 수정
+#else
+#include <netdb.h>  # 이 부분을 수정
+#endif
+#include <stddef.h>
+extern
+#ifdef __cplusplus
+"C"
+#endif
+const char *gai_strerror(int);]])],
+        [gl_cv_func_gai_strerror_posix_signature=yes],
+        [gl_cv_func_gai_strerror_posix_signature=no])])
+    if test $gl_cv_func_gai_strerror_posix_signature = no; then
+      REPLACE_GAI_STRERROR=1
+    fi
+  fi
+
+  LIBS="$gai_saved_LIBS"
+
+  gl_PREREQ_GETADDRINFO
+
+  AC_SUBST([GETADDRINFO_LIB])
+])
+
+# Prerequisites of lib/netdb.in.h and lib/getaddrinfo.c.
+AC_DEFUN([gl_PREREQ_GETADDRINFO], [
+  AC_REQUIRE([gl_NETDB_H_DEFAULTS])
+  AC_REQUIRE([gl_SYS_SOCKET_H])dnl for HAVE_SYS_SOCKET_H, HAVE_WINSOCK2_H
+  AC_REQUIRE([gl_HOSTENT]) dnl for HOSTENT_LIB
+  AC_REQUIRE([gl_SERVENT]) dnl for SERVENT_LIB
+  AC_REQUIRE([gl_FUNC_INET_NTOP]) dnl for INET_NTOP_LIB
+  AC_REQUIRE([AC_C_RESTRICT])
+  AC_REQUIRE([gl_SOCKET_FAMILIES])
+  AC_REQUIRE([gl_SYS_SOCKET_H])
+  AC_REQUIRE([AC_USE_SYSTEM_EXTENSIONS])
+
+  dnl Including sys/socket.h is wrong for Windows, but Windows does not
+  dnl have sa_len so the result is correct anyway.
+  AC_CHECK_MEMBERS([struct sockaddr.sa_len], , , [
+#include <sys/types.h>
+#include <sys/socket.h>
+])
+
+  AC_CHECK_HEADERS_ONCE([netinet/in.h])
+
+  AC_CHECK_DECLS([getaddrinfo, freeaddrinfo, getnameinfo],,,[[ 
+  /* sys/types.h is not needed according to POSIX, but the 
+     sys/socket.h in i386-unknown-freebsd4.10 and 
+     powerpc-apple-darwin5.5 required it. */ 
+#include <sys/types.h>
+#ifdef HAVE_SYS_SOCKET_H
+#include <sys/socket.h>
+#endif
+#ifdef _WIN32
+#include <winsock2.h>  # 이 부분 수정
+#include <ws2tcpip.h>  # 이 부분 수정
+#else
+#include <netdb.h>  # 이 부분을 수정
+#endif
+]])
+  if test $ac_cv_have_decl_getaddrinfo = no; then
+    HAVE_DECL_GETADDRINFO=0
+  fi
+  if test $ac_cv_have_decl_freeaddrinfo = no; then
+    HAVE_DECL_FREEADDRINFO=0
+  fi
+  if test $ac_cv_have_decl_gai_strerror = no; then
+    HAVE_DECL_GAI_STRERROR=0
+  fi
+  if test $ac_cv_have_decl_getnameinfo = no; then
+    HAVE_DECL_GETNAMEINFO=0
+  fi
+
+  AC_CHECK_TYPES([struct addrinfo],,,[ 
+#include <sys/types.h>
+#ifdef HAVE_SYS_SOCKET_H
+#include <sys/socket.h>
+#endif
+#ifdef _WIN32
+#include <winsock2.h>  # 이 부분 수정
+#include <ws2tcpip.h>  # 이 부분 수정
+#else
+#include <netdb.h>  # 이 부분을 수정
+#endif
+])
+])
 
 
 
