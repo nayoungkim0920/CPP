@@ -19434,10 +19434,390 @@ AC_DEFUN([gl_NETDB_H_DEFAULTS],
   REPLACE_GETADDRINFO=0;    AC_SUBST([REPLACE_GETADDRINFO])
 ])
 
+(빌드)
+{ autopoint --force; } 2>&1 | tee ./log/autopoint.log && 
+{ rm -f po/Makefile.in.in; } && 
+{ rm -rf autom4te.cache; } && 
+{ aclocal -I m4 -I gnulib-m4 -I /usr/share/aclocal; } 2>&1 | tee ./log/aclocal.log && 
+{ libtoolize --copy --force --verbose; } 2>&1 | tee ./log/libtoolize.log && 
+{ autoconf --verbose; } 2>&1 | tee ./log/autoconf.log && 
+{ autoheader; } 2>&1 | tee ./log/autoheader.log && 
+{ automake --add-missing --force-missing; } 2>&1 | tee ./log/automake.log && 
+{ ./configure; } 2>&1 | tee ./log/configure.log
+
+(빌드결과) - yes 제외
+configure: loading site script /etc/config.site
+checking for gcc... /mingw64/bin/gcc
+checking for C compiler default output file name... a.exe
+checking for suffix of executables... .exe
+checking whether we are cross compiling... no
+checking for suffix of object files... o
+checking whether the compiler supports GNU C...
+checking whether /mingw64/bin/gcc accepts -g...
+checking for /mingw64/bin/gcc option to enable C23 features... unsupported
+checking for /mingw64/bin/gcc option to enable C11 features... none needed
+checking whether the compiler is clang... no
+checking for compiler option needed when checking for declarations... none
+checking for minix/config.h... no
+checking for netdb.h... no
+checking for sys/uio.h... no
+checking for features.h... no
+checking for crtdefs.h... yes
+checking whether it is safe to define __EXTENSIONS__... yes
+checking whether _XOPEN_SOURCE should be defined... no
+checking build system type... x86_64-w64-mingw32
+checking host system type... x86_64-w64-mingw32
+checking how to print strings... printf
+checking for a sed that does not truncate output... /usr/bin/sed
+checking for grep that handles long lines and -e... /usr/bin/grep
+checking for egrep... /usr/bin/grep -E
+checking for fgrep... /usr/bin/grep -F
+checking for ld used by /mingw64/bin/gcc... C:/msys64/mingw64/x86_64-w64-mingw32/bin/ld.exe
+checking if the linker (C:/msys64/mingw64/x86_64-w64-mingw32/bin/ld.exe) is GNU ld... yes
+checking for BSD- or MS-compatible name lister (nm)... /mingw64/bin/nm -B
+checking the name lister (/mingw64/bin/nm -B) interface... BSD nm
+checking whether ln -s works... no, using cp -pR
+checking the maximum length of command line arguments... 8192
+checking how to convert x86_64-w64-mingw32 file names to x86_64-w64-mingw32 format... func_convert_file_msys_to_w32
+checking how to convert x86_64-w64-mingw32 file names to toolchain format... func_convert_file_msys_to_w32
+
+(오류)
+checking whether we are cross compiling... no
+(수정)
+크로스 컴파일 설치 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# x86_64-w64-mingw32-gcc --version
+x86_64-w64-mingw32-gcc.exe (Rev1, Built by MSYS2 project) 14.2.0
+Copyright (C) 2024 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+환경 변수 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# echo $PKG_CONFIG_PATH
+/c/Program\ Files/GLib/lib/pkgconfig:
+/c/libidn2/gettext-0.22.5/gettext-runtime/intl:
+/mingw64/lib/pkgconfig:
+/usr/lib/pkgconfig
+
+configure.ac 수정
+# 크로스 컴파일 체크
+AC_CANONICAL_HOST
+
+# 크로스 컴파일을 위한 설정
+if test "$host" != "$build"; then
+    AC_MSG_NOTICE([Cross-compiling for $host])
+    CC=x86_64-w64-mingw32-gcc
+    CXX=x86_64-w64-mingw32-g++
+    # 필요에 따라 추가 설정
+else
+    AC_MSG_NOTICE([Not cross-compiling])
+fi
+
+# 필요한 라이브러리 및 헤더 체크 (예: stdlib.h, stdio.h 등)
+AC_CHECK_HEADERS([stdlib.h stdio.h])
+
+(빌드명령어 수정) => ./configure --host=x86_64-w64-mingw32;
+{ autopoint --force; } 2>&1 | tee ./log/autopoint.log &&  
+{ rm -f po/Makefile.in.in; } &&  
+{ rm -rf autom4te.cache; } &&  
+{ aclocal -I m4 -I gnulib-m4 -I /usr/share/aclocal; } 2>&1 | tee ./log/aclocal.log &&  
+{ libtoolize --copy --force --verbose; } 2>&1 | tee ./log/libtoolize.log &&  
+{ autoconf --verbose; } 2>&1 | tee ./log/autoconf.log &&  
+{ autoheader; } 2>&1 | tee ./log/autoheader.log && 
+{ automake --add-missing --force-missing; } 2>&1 | tee ./log/automake.log &&  
+{ ./configure --host=x86_64-w64-mingw32; } 2>&1 | tee ./log/configure.log
+
+패키지 설치 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# x86_64-w64-mingw32-gcc --version
+x86_64-w64-mingw32-g++ --version
+x86_64-w64-mingw32-gcc.exe (Rev1, Built by MSYS2 project) 14.2.0
+Copyright (C) 2024 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+x86_64-w64-mingw32-g++.exe (Rev1, Built by MSYS2 project) 14.2.0
+Copyright (C) 2024 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+mingw64 설치 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -Q
+mingw-w64-x86_64-binutils 2.43.1-1
+mingw-w64-x86_64-bzip2 1.0.8-3
+mingw-w64-x86_64-crt-git 12.0.0.r320.g335ffe5b7-1
+mingw-w64-x86_64-expat 2.6.2-1
+mingw-w64-x86_64-gcc 14.2.0-1
+mingw-w64-x86_64-gcc-libs 14.2.0-1
+mingw-w64-x86_64-gdb 15.2-1
+mingw-w64-x86_64-gdb-multiarch 15.2-1
+mingw-w64-x86_64-gettext-runtime 0.22.5-2
+mingw-w64-x86_64-gettext-tools 0.22.5-2
+mingw-w64-x86_64-glib2 2.82.1-1
+mingw-w64-x86_64-gmp 6.3.0-2
+mingw-w64-x86_64-headers-git 12.0.0.r320.g335ffe5b7-1
+mingw-w64-x86_64-isl 0.26-1
+mingw-w64-x86_64-libffi 3.4.6-1
+mingw-w64-x86_64-libiconv 1.17-4
+mingw-w64-x86_64-libltdl 2.4.7-2
+mingw-w64-x86_64-libmangle-git 12.0.0.r320.g335ffe5b7-1
+mingw-w64-x86_64-libsystre 1.0.1-5
+mingw-w64-x86_64-libtool 2.4.7-2
+mingw-w64-x86_64-libtre-git r177.07e66d0-2
+mingw-w64-x86_64-libwinpthread-git 12.0.0.r320.g335ffe5b7-1
+mingw-w64-x86_64-make 4.4.1-3
+mingw-w64-x86_64-mpc 1.3.1-2
+mingw-w64-x86_64-mpdecimal 4.0.0-1
+mingw-w64-x86_64-mpfr 4.2.1-2
+mingw-w64-x86_64-ncurses 6.4.20231217-1
+mingw-w64-x86_64-openssl 3.3.1-1
+mingw-w64-x86_64-pcre2 10.44-1
+mingw-w64-x86_64-pkgconf 1~2.3.0-1
+mingw-w64-x86_64-python 3.11.9-1
+mingw-w64-x86_64-python-packaging 24.1-1
+mingw-w64-x86_64-readline 8.2.013-1
+mingw-w64-x86_64-sqlite3 3.46.1-1
+mingw-w64-x86_64-tcl 8.6.13-1
+mingw-w64-x86_64-termcap 1.3.1-7
+mingw-w64-x86_64-tk 8.6.13-1
+mingw-w64-x86_64-tools-git 12.0.0.r320.g335ffe5b7-1
+mingw-w64-x86_64-tzdata 2024a-1
+mingw-w64-x86_64-windows-default-manifest 6.4-4
+mingw-w64-x86_64-wineditline 2.206-1
+mingw-w64-x86_64-winpthreads-git 12.0.0.r320.g335ffe5b7-1
+mingw-w64-x86_64-winstorecompat-git 12.0.0.r320.g335ffe5b7-1
+mingw-w64-x86_64-xxhash 0.8.2-2
+mingw-w64-x86_64-xz 5.6.2-2
+mingw-w64-x86_64-zlib 1.3.1-1
+mingw-w64-x86_64-zstd 1.5.6-2
+=>mingw-w64-x86_64-gettext-runtime 및 mingw-w64-x86_64-gettext-tools가 포함되어 있어 
+gettext 관련 도구와 라이브러리가 올바르게 설치되어 있는 것을 확인
+
+pkg-config 파일 위치 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# find /mingw64/lib/pkgconfig -name "*.pc"
+=>gettext 관련 .pc 파일이 없어서 ./configure를 실행할 때 
+"checking whether we are cross compiling... no" 오류가 발생
+
+gettext.pc 파일을 생성
+touch /mingw64/lib/pkgconfig/gettext.pc
+vim /mingw64/lib/pkgconfig/gettext.pc
+prefix=/mingw64
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: gettext
+Description: GNU internationalization library
+Version: 0.22.5
+Libs: -L${libdir} -lgettext -lgcc -lgcc_eh
+Cflags: -I${includedir}
+:wq
+
+환경변수확인(없으면 등록)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# echo $PKG_CONFIG_PATH
+/c/Program\ Files/GLib/lib/pkgconfig:
+/c/libidn2/gettext-0.22.5/gettext-runtime/intl:
+/mingw64/lib/pkgconfig: (확인)
+/usr/lib/pkgconfig
+
+~/.bashrc 수정
+#추가
+#cross compile
+#export CC=/mingw64/bin/gcc 			#C 컴파일러
+export CC=x86_64-w64-mingw32-gcc   		#C 컴파일러
+#export CXX=/mingw64/bin/g++			#C++ 컴파일러
+export CXX=x86_64-w64-mingw32-g++  	#C++ 컴파일러
+#export CPP=/mingw64/bin/cpp			#C++ 전처리기
+export CPP=x86_64-w64-mingw32-cpp		#C++ 전처리기
+
+크로스 컴파일 도구 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# which x86_64-w64-mingw32-gcc
+/mingw64/bin/x86_64-w64-mingw32-gcc
+
+config.log(해당 에러메시지 이후라인에서 이유를 찾을 수 있다.)
+configure:5241: checking whether we are cross compiling
+...
+configure:5471: checking for x86_64-w64-mingw32-gcc option to enable C23 features
+...
+configure:5241: checking whether we are cross compiling
+...
+
+컴파일러가 C23 기능을 지원하지 않는다는 오류
+x86_64-w64-mingw32-gcc가 C23 기능을 지원하지 않는다
+C23 지원 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# x86_64-w64-mingw32-gcc --version
+x86_64-w64-mingw32-gcc.exe (Rev1, Built by MSYS2 project) 14.2.0
+Copyright (C) 2024 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+C 표준 명시적 설정
+~/.bashrc 수정
+#cross compile
+#export CC=/mingw64/bin/gcc 						#C 컴파일러
+export CC=x86_64-w64-mingw32-gcc   		#C 컴파일러
+#export CXX=/mingw64/bin/g++						#C++ 컴파일러
+export CXX=x86_64-w64-mingw32-g++  	#C++ 컴파일러
+#export CPP=/mingw64/bin/cpp						#C++ 전처리기
+export CPP=x86_64-w64-mingw32-cpp		#C++ 전처리기
+#export CFLAGS="-I/mingw64/include -O2"
+export CFLAGS="-std=c23 -I/mingw64/include -O2"			#C 컴파일러 C23 기능 설정
+#export CPPFLAGS="-I/mingw64/include -O2"
+export CPPFLAGS="-std=c++23 -I/mingw64/include -O2"		#C++ 전처리 C23 기능 설정
+#export CXXFLAGS="-I/mingw64/include -O2"
+export CXXFLAGS="-std=c++23 -I/mingw64/include -O2"		#C++ 컴파일러 C++23 기능 설정 (C++17에서 C++23으로 변경, configure.ac에서 가져옴)
+
+(빌드명령어 수정) => ./configure --host=x86_64-w64-mingw32 --build=x86_64-w64-mingw32;
+{ autopoint --force; } 2>&1 | tee ./log/autopoint.log &&  
+{ rm -f po/Makefile.in.in; } &&  
+{ rm -rf autom4te.cache; } &&  
+{ aclocal -I m4 -I gnulib-m4 -I /usr/share/aclocal; } 2>&1 | tee ./log/aclocal.log &&  
+{ libtoolize --copy --force --verbose; } 2>&1 | tee ./log/libtoolize.log &&  
+{ autoconf --verbose; } 2>&1 | tee ./log/autoconf.log &&  
+{ autoheader; } 2>&1 | tee ./log/autoheader.log && 
+{ automake --add-missing --force-missing; } 2>&1 | tee ./log/automake.log &&  
+{ ./configure --host=x86_64-w64-mingw32; } 2>&1 | tee ./log/configure.log
+
+(오류)
+checking how to run the C preprocessor... x86_64-w64-mingw32-cpp
+configure: error: in '/c/libidn2/gettext-0.22.5/libtextstyle':
+configure: error: C preprocessor "x86_64-w64-mingw32-cpp" fails sanity check
+See 'config.log' for more details
+(수정)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# which x86_64-w64-mingw32-cpp
+which: no x86_64-w64-mingw32-cpp in (/mingw64/bin:/usr/bin:/bin:/usr/share/aclocal:/mingw64/share/aclocal:/c/libidn2/autoconf-2.72/bin:/c/libidn2/libtool-2.4.6:/c/Program Files/Java/jdk-21/bin:/usr/local/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/c/Users/nayou/AppData/Local/Programs/Python/Python312)
+x86_64-w64-mingw32-cpp 전처리기가 시스템에 설치되어 있지 않음
+
+MinGW-w64 Toolchain 설치
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -S mingw-w64-x86_64-toolchain
+:: 13 개의 구성원이 mingw-w64-x86_64-toolchain 모음에 있습니다:
+:: mingw64 저장소
+   1) mingw-w64-x86_64-binutils  2) mingw-w64-x86_64-crt-git
+   3) mingw-w64-x86_64-gcc  4) mingw-w64-x86_64-gdb
+   5) mingw-w64-x86_64-gdb-multiarch  6) mingw-w64-x86_64-headers-git
+   7) mingw-w64-x86_64-libmangle-git  8) mingw-w64-x86_64-libwinpthread-git
+   9) mingw-w64-x86_64-make  10) mingw-w64-x86_64-pkgconf
+   11) mingw-w64-x86_64-tools-git  12) mingw-w64-x86_64-winpthreads-git
+   13) mingw-w64-x86_64-winstorecompat-git
+
+선택을 입력하십시오. (기본값=all):
+경고: mingw-w64-x86_64-binutils-2.43.1-1는 최신 버전입니다. -- 재설치
+경고: mingw-w64-x86_64-crt-git-12.0.0.r320.g335ffe5b7-1는 최신 버전입니다. -- 재설치
+경고: mingw-w64-x86_64-gcc-14.2.0-1는 최신 버전입니다. -- 재설치
+경고: mingw-w64-x86_64-gdb-15.2-1는 최신 버전입니다. -- 재설치
+경고: mingw-w64-x86_64-gdb-multiarch-15.2-1는 최신 버전입니다. -- 재설치
+경고: mingw-w64-x86_64-headers-git-12.0.0.r320.g335ffe5b7-1는 최신 버전입니다. -- 재설치
+경고: mingw-w64-x86_64-libmangle-git-12.0.0.r320.g335ffe5b7-1는 최신 버전입니다. -- 재설치
+경고: mingw-w64-x86_64-libwinpthread-git-12.0.0.r320.g335ffe5b7-1는 최신 버전입니다. -- 재설치
+경고: mingw-w64-x86_64-make-4.4.1-3는 최신 버전입니다. -- 재설치
+경고: mingw-w64-x86_64-pkgconf-1~2.3.0-1는 최신 버전입니다. -- 재설치
+경고: mingw-w64-x86_64-tools-git-12.0.0.r320.g335ffe5b7-1는 최신 버전입니다. -- 재설치
+경고: mingw-w64-x86_64-winpthreads-git-12.0.0.r320.g335ffe5b7-1는 최신 버전입니다. -- 재설치
+경고: mingw-w64-x86_64-winstorecompat-git-12.0.0.r320.g335ffe5b7-1는 최신 버전입니다. -- 재설치
+의존성 해결 중...
+꾸러미 충돌을 찾는 중...
+
+꾸러미 (13) mingw-w64-x86_64-binutils-2.43.1-1
+            mingw-w64-x86_64-crt-git-12.0.0.r320.g335ffe5b7-1
+            mingw-w64-x86_64-gcc-14.2.0-1  mingw-w64-x86_64-gdb-15.2-1
+            mingw-w64-x86_64-gdb-multiarch-15.2-1
+            mingw-w64-x86_64-headers-git-12.0.0.r320.g335ffe5b7-1
+            mingw-w64-x86_64-libmangle-git-12.0.0.r320.g335ffe5b7-1
+            mingw-w64-x86_64-libwinpthread-git-12.0.0.r320.g335ffe5b7-1
+            mingw-w64-x86_64-make-4.4.1-3
+            mingw-w64-x86_64-pkgconf-1~2.3.0-1
+            mingw-w64-x86_64-tools-git-12.0.0.r320.g335ffe5b7-1
+            mingw-w64-x86_64-winpthreads-git-12.0.0.r320.g335ffe5b7-1
+            mingw-w64-x86_64-winstorecompat-git-12.0.0.r320.g335ffe5b7-1
+
+총 설치 크기:          528.75 MiB
+알짜 업그레이드 크기:    0.00 MiB
+
+:: 설치를 진행하시겠습니까? [Y/n] y
+(13/13) 키링의 키를 검사 중                        [#################] 100%
+(13/13) 꾸러미 무결성 검사 중                      [#################] 100%
+(13/13) 꾸러미 파일 불러오는 중                    [#################] 100%
+(13/13) 파일 충돌 검사 중                          [#################] 100%
+(13/13) 사용 가능한 디스크 공간 검사 중            [#################] 100%
+:: 꾸러미 변경사항을 처리 중...
+( 1/13) 재설치 중 mingw-w64-x86_64-libwinpthre...  [#################] 100%
+( 2/13) 재설치 중 mingw-w64-x86_64-binutils        [#################] 100%
+( 3/13) 재설치 중 mingw-w64-x86_64-headers-git     [#################] 100%
+( 4/13) 재설치 중 mingw-w64-x86_64-crt-git         [#################] 100%
+( 5/13) 재설치 중 mingw-w64-x86_64-winpthreads-git [#################] 100%
+( 6/13) 재설치 중 mingw-w64-x86_64-gcc             [#################] 100%
+( 7/13) 재설치 중 mingw-w64-x86_64-gdb             [#################] 100%
+( 8/13) 재설치 중 mingw-w64-x86_64-gdb-multiarch   [#################] 100%
+( 9/13) 재설치 중 mingw-w64-x86_64-libmangle-git   [#################] 100%
+(10/13) 재설치 중 mingw-w64-x86_64-make            [#################] 100%
+(11/13) 재설치 중 mingw-w64-x86_64-pkgconf         [#################] 100%
+(12/13) 재설치 중 mingw-w64-x86_64-tools-git       [#################] 100%
+(13/13) 재설치 중 mingw-w64-x86_64-winstorecom...  [#################] 100%
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# which x86_64-w64-mingw32-cpp
+which: no x86_64-w64-mingw32-cpp in (/mingw64/bin:/usr/bin:/bin:/usr/share/aclocal:/mingw64/share/aclocal:/c/libidn2/autoconf-2.72/bin:/c/libidn2/libtool-2.4.6:/c/Program Files/Java/jdk-21/bin:/usr/local/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/c/Users/nayou/AppData/Local/Programs/Python/Python312)
+못찾음
+
+명칭이 다를 수 있어 다른명칭으로 검색
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# which gcc
+/mingw64/bin/gcc
+
+테스트
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# gcc -E -x c - < /dev/null
+# 0 "<stdin>"
+# 0 "<built-in>"
+# 0 "<command-line>"
+# 1 "<stdin>"
+
+패키지 업데이트
+pacman -Syu
+
+환경변수 확인(/mingw64/bin）
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# echo $PATH
+/mingw64/bin:/usr/bin:/bin:/usr/share/aclocal:/mingw64/share/aclocal:/c/libidn2/autoconf-2.72/bin:/c/libidn2/libtool-2.4.6:/c/Program Files/Java/jdk-21/bin:/usr/local/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/c/Users/nayou/AppData/Local/Programs/Python/Python312
+
+특정 전처리기 설치（확인）
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -S mingw-w64-x86_64-gcc
 
 
+(오류)
+checking for netdb.h... no
+(수정)
+C:/밑에서 netdb.h 검색
+"C:\Users\nayou\vcpkg\downloads\tools\perl\5.38.0.1\c\include\postgresql\server\port\win32\netdb.h"
+"C:\Users\nayou\vcpkg\downloads\tools\perl\5.38.0.1\perl\lib\CORE\netdb.h"
+"C:\Users\nayou\AppData\Local\Arduino15\packages\arduino\hardware\avr\1.8.6\firmwares\wifishield\wifiHD\src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include\lwip\netdb.h"
+"C:\Users\nayou\anaconda3\Library\include\server\port\win32\netdb.h"
+"C:\Users\nayou\anaconda3\pkgs\libpq-12.17-h906ac69_0\Library\include\server\port\win32\netdb.h"
 
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l /c/Users/nayou/vcpkg/downloads/tools/perl/5.38.0.1/perl/lib/CORE/netdb.h
+-rw-r--r-- 1 nayou nayou 150  6월 17  2017 /c/Users/nayou/vcpkg/downloads/tools/perl/5.38.0.1/perl/lib/CORE/netdb.h
 
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# notepad ~/.bashrc
 
+환경변수설정
+# 기존의 환경 변수에 추가
+export CXX_INCLUDE_PATH=/mingw64/include:/c/Users/nayou/vcpkg/downloads/tools/perl/5.38.0.1/perl/lib/CORE
+export C_INCLUDE_PATH=/mingw64/include:/c/Users/nayou/vcpkg/downloads/tools/perl/5.38.0.1/perl/lib/CORE
+export CPLUS_INCLUDE_PATH=/mingw64/include:/c/Users/nayou/vcpkg/downloads/tools/perl/5.38.0.1/perl/lib/CORE
 
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# source ~/.bashrc
 
+(결과)
+checking for netdb.h... yes
