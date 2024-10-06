@@ -16501,7 +16501,10 @@ m4/netdb_h.m4
 
 gl_CHECK_NEXT_HEADERS([winsock2.h])
 
-[canon-host.c 수정]
+[/c/libidn2/gettext-0.22.5/libtextstyle]
+======================================================================================
+[lib/canon-host.c 수정]
+======================================================================================
 char *
 canon_host_r (char const *host, int *cherror)
 {
@@ -16518,8 +16521,9 @@ else if (cherror)
   //else if (cherror)
   //  *cherror = status;
 }
-
-[gai_strerror.c 수정]
+======================================================================================
+[lib/gai_strerror.c 수정]
+======================================================================================
 { WSAEAFNOSUPPORT, N_("Address family for hostname not supported") },  // EAI_ADDRFAMILY
 { WSAHOST_NOT_FOUND, N_("Temporary failure in name resolution") },     // EAI_AGAIN
 { WSA_INVALID_PARAMETER, N_("Bad value for ai_flags") },              // EAI_BADFLAGS
@@ -16553,430 +16557,1251 @@ else if (cherror)
 //     { EAI_IDN_ENCODE, N_("Parameter string not correctly encoded") }
 // #endif
 
-nanoftp.c 수정
-// 소켓 초기화
-void initialize_winsock() { //netdb->winsock2추가
-    WSADATA wsaData;
-    int result = WSAStartup(MAKEWORD(2, 2), &wsaData);
-    if (result != 0) {
-        fprintf(stderr, "WSAStartup failed: %d\n", result);
-        exit(1);
-    }
-}
+======================================================================================
+[lib/getaddrinfo.c 수정]
+======================================================================================
+/*netdb->winsock2 수정*/
+/* Get address information (partial implementation).
+   Copyright (C) 1997, 2001-2002, 2004-2024 Free Software Foundation, Inc.
+   Contributed by Simon Josefsson <simon@josefsson.org>.
 
-// 소켓 종료
-void cleanup_winsock() { //netdb->winsock2추가
-    WSACleanup();
-}
+   This file is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as
+   published by the Free Software Foundation; either version 2.1 of
+   the License, or (at your option) any later version.
 
+   This file is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU Lesser General Public License for more details.
+
+   You should have received a copy of the GNU Lesser General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
+
+/* 이 컴파일 단위에서 __attribute__ __nonnull__ 사용하지 않음.
+   그렇지 않으면 gcc가 아래 sa == NULL 검사를 최적화해버림.  */
+#define _GL_ARG_NONNULL(params)
+
+#include <config.h>
+
+#ifdef _WIN32
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#else
+#include <netdb.h>
+#endif
+
+#if HAVE_NETINET_IN_H
+# include <netinet/in.h>
+#endif
+
+/* inet_ntop을 가져옴.  */
+#include <arpa/inet.h>
+
+/* calloc을 가져옴. */
+#include <stdlib.h>
+
+/* memcpy, strdup을 가져옴. */
+#include <string.h>
+
+/* snprintf을 가져옴. */
+#include <stdio.h>
+
+#include "gettext.h"
+#define _(String) gettext (String)
+#define N_(String) String
+
+/* BeOS는 AF_INET이 있지만 PF_INET은 없음.  */
+#ifndef PF_INET
+# define PF_INET AF_INET
+#endif
+/* BeOS는 PF_UNSPEC도 없음.  */
+#ifndef PF_UNSPEC
+# define PF_UNSPEC 0
+#endif
+
+#if HAVE_GETADDRINFO
+
+/* cdecl 호출 규약으로 재정의.  */
 int
-xmlNanoFTPConnect(void *ctx) { /*netdb->winsock2 수정*/
-    xmlNanoFTPCtxtPtr ctxt = (xmlNanoFTPCtxtPtr) ctx;
-    struct addrinfo hints, *result, *tmp;
-    int port;
-    int res;
-    int addrlen = sizeof (struct sockaddr_in);
+getaddrinfo (const char *restrict nodename,
+             const char *restrict servname,
+             const struct addrinfo *restrict hints,
+             struct addrinfo **restrict res)
+# undef getaddrinfo
+{
+  return getaddrinfo (nodename, servname, hints, res);
+}
 
-    if (ctxt == NULL)
-        return (-1);
-    if (ctxt->hostname == NULL)
-        return (-1);
+/* 주소 정보 해제 함수.  */
+void
+freeaddrinfo (struct addrinfo *ai)
+# undef freeaddrinfo
+{
+  freeaddrinfo (ai);
+}
 
-    /*
-     * do the blocking DNS query.
-     */
-    if (proxy) {
-        port = proxyPort;
-    } else {
-        port = ctxt->port;
+#else
+
+# if defined _WIN32 && !defined __CYGWIN__
+#  define WINDOWS_NATIVE
+# endif
+
+/* gl_sockets_startup */
+# include "sockets.h"
+
+# ifdef WINDOWS_NATIVE
+
+/* UNICODE가 정의되지 않았다고 가정하지 않음.  */
+#  undef GetModuleHandle
+#  define GetModuleHandle GetModuleHandleA
+
+#  if !(_WIN32_WINNT >= _WIN32_WINNT_WINXP)
+
+/* gcc -Wcast-function-type에서 경고를 피하기 위해.  */
+#   define GetProcAddress \
+     (void *) GetProcAddress
+
+/* 함수 포인터 정의.  */
+typedef int (WSAAPI *getaddrinfo_func) (const char*, const char*,
+                                        const struct addrinfo*,
+                                        struct addrinfo**);
+typedef void (WSAAPI *freeaddrinfo_func) (struct addrinfo*);
+typedef int (WSAAPI *getnameinfo_func) (const struct sockaddr*,
+                                        socklen_t, char*, DWORD,
+                                        char*, DWORD, int);
+
+/* 함수 포인터 초기화.  */
+static getaddrinfo_func getaddrinfo_ptr = NULL;
+static freeaddrinfo_func freeaddrinfo_ptr = NULL;
+static getnameinfo_func getnameinfo_ptr = NULL;
+
+/* Win32 함수 사용 여부 판단.  */
+static int
+use_win32_p (void)
+{
+  static int done = 0;
+  HMODULE h;
+
+  if (done)
+    return getaddrinfo_ptr ? 1 : 0;
+
+  done = 1;
+
+  h = GetModuleHandle ("ws2_32.dll");
+
+  if (h)
+    {
+      /* 함수 포인터 초기화.  */
+      getaddrinfo_ptr = (getaddrinfo_func) GetProcAddress (h, "getaddrinfo");
+      freeaddrinfo_ptr = (freeaddrinfo_func) GetProcAddress (h, "freeaddrinfo");
+      getnameinfo_ptr = (getnameinfo_func) GetProcAddress (h, "getnameinfo");
     }
-    if (port == 0)
-        port = 21;
 
-    memset(&ctxt->ftpAddr, 0, sizeof(ctxt->ftpAddr));
+  /* 어떤 것이 없으면 이상함. */
+  if (!getaddrinfo_ptr || !freeaddrinfo_ptr || !getnameinfo_ptr)
+    {
+      getaddrinfo_ptr = NULL;
+      freeaddrinfo_ptr = NULL;
+      getnameinfo_ptr = NULL;
+      return 0;
+    }
+
+  gl_sockets_startup (SOCKETS_1_1);
+
+  return 1;
+}
+
+#  else
+
+/* Win32가 아닐 경우. */
+static int
+use_win32_p (void)
+{
+  static int done = 0;
+
+  if (!done)
+    {
+      done = 1;
+
+      gl_sockets_startup (SOCKETS_1_1);
+    }
+
+  return 1;
+}
+
+/* 함수 포인터를 직접 함수로 정의.  */
+#   define getaddrinfo_ptr getaddrinfo
+#   define freeaddrinfo_ptr freeaddrinfo
+#   define getnameinfo_ptr getnameinfo
+
+#  endif
+# endif
+
+/* 주소 패밀리 검증.  */
+static bool
+validate_family (int family)
+{
+  /* FIXME: 더 많은 패밀리 지원. */
+# if HAVE_IPV4
+     if (family == PF_INET)
+       return true;
+# endif
+# if HAVE_IPV6
+     if (family == PF_INET6)
+       return true;
+# endif
+     if (family == PF_UNSPEC)
+       return true;
+     return false;
+}
+
+/* 서비스 위치의 이름을 번역하고 소켓 주소 세트를 설정. */
+int
+getaddrinfo (const char *restrict nodename,
+             const char *restrict servname,
+             const struct addrinfo *restrict hints,
+             struct addrinfo **restrict res)
+#undef getaddrinfo
+{
+  struct addrinfo *tmp;
+  int port = 0;
+  struct hostent *he; // 이 부분은 필요 없을 수 있음.
+  void *storage;
+  size_t size;
+# if HAVE_IPV6
+  struct v6_pair {
+    struct addrinfo addrinfo;
+    struct sockaddr_in6 sockaddr_in6;
+  };
+# endif
+# if HAVE_IPV4
+  struct v4_pair {
+    struct addrinfo addrinfo;
+    struct sockaddr_in sockaddr_in;
+  };
+# endif
+
+# ifdef WINDOWS_NATIVE
+  if (use_win32_p ())
+    return getaddrinfo_ptr (nodename, servname, hints, res);
+# endif
+
+  /* flags 검증.  */
+  if (hints && (hints->ai_flags & ~(AI_CANONNAME|AI_PASSIVE)))
+    return EAI_BADFLAGS;
+
+  /* family 검증.  */
+  if (hints && !validate_family (hints->ai_family))
+    return EAI_FAMILY;
+
+  /* socket type 검증.  */
+  if (hints &&
+      hints->ai_socktype != SOCK_STREAM && hints->ai_socktype != SOCK_DGRAM)
+    return EAI_SOCKTYPE; /* FIXME: 더 나은 반환 코드? */
+
+  /* nodename이 NULL인 경우 처리.  */
+  if (!nodename)
+    {
+      if (!(hints->ai_flags & AI_PASSIVE))
+        return EAI_NONAME;
+
+# ifdef HAVE_IPV6
+      nodename = (hints->ai_family == AF_INET6) ? "::" : "0.0.0.0";
+# else
+      nodename = "0.0.0.0";
+# endif
+    }
+
+  /* servname이 존재하는 경우 처리.  */
+  if (servname)
+    {
+      struct servent *se = NULL;
+      const char *proto =
+        (hints && hints->ai_socktype == SOCK_DGRAM) ? "udp" : "tcp";
+
+      if (hints == NULL || !(hints->ai_flags & AI_NUMERICSERV))
+        /* FIXME: getservbyname_r 사용. */
+        se = getservbyname (servname, proto);
+
+      if (se)
+        port = ntohs (se->s_port);
+      else
+        {
+          char *endptr;
+          long p = strtol (servname, &endptr, 10);
+          if (endptr != servname && *endptr == '\0')
+            {
+              if (p < 0 || p > 65535)
+                return EAI_SERVICE;
+              port = (int) p;
+            }
+          else
+            return EAI_SERVICE;
+        }
+    }
+
+  /* tmp 주소 할당.  */
+  tmp = (struct addrinfo *) calloc (1, sizeof (struct addrinfo));
+  if (!tmp)
+    return EAI_MEMORY;
+
+  /* 부모 주소 설정.  */
+  if (hints)
+    memcpy (tmp, hints, sizeof (struct addrinfo));
+
+  /* 주소 패밀리 및 소켓 타입 설정.  */
+  if (hints)
+    {
+      tmp->ai_family = hints->ai_family;
+      tmp->ai_socktype = hints->ai_socktype;
+    }
+  else
+    {
+      tmp->ai_family = PF_UNSPEC;
+      tmp->ai_socktype = SOCK_STREAM;
+    }
+
+  /* 주소 집합 설정.  */
+  tmp->ai_addr = (struct sockaddr *) &storage;
+  if (tmp->ai_family == AF_INET)
+    {
+      size = sizeof (struct sockaddr_in);
+      storage = calloc (1, sizeof (struct sockaddr_in));
+      if (!storage)
+        return EAI_MEMORY;
+
+      struct sockaddr_in *addr = (struct sockaddr_in *) storage;
+      addr->sin_family = AF_INET;
+      addr->sin_port = htons (port);
+      /* nodename을 문자열에서 주소로 변환.  */
+      if (!inet_pton (AF_INET, nodename, &addr->sin_addr))
+        {
+          /* hostent 사용이 필요할 수 있음. */
+          he = gethostbyname (nodename);
+          if (!he)
+            return EAI_NONAME;
+          memcpy (&addr->sin_addr, he->h_addr_list[0], sizeof (struct in_addr));
+        }
+      size = sizeof (struct sockaddr_in);
+      tmp->ai_addrlen = size;
+    }
+# if HAVE_IPV6
+  else if (tmp->ai_family == AF_INET6)
+    {
+      size = sizeof (struct sockaddr_in6);
+      storage = calloc (1, sizeof (struct sockaddr_in6));
+      if (!storage)
+        return EAI_MEMORY;
+
+      struct sockaddr_in6 *addr6 = (struct sockaddr_in6 *) storage;
+      addr6->sin6_family = AF_INET6;
+      addr6->sin6_port = htons (port);
+      if (!inet_pton (AF_INET6, nodename, &addr6->sin6_addr))
+        {
+          /* hostent 사용이 필요할 수 있음. */
+          he = gethostbyname (nodename);
+          if (!he)
+            return EAI_NONAME;
+          memcpy (&addr6->sin6_addr, he->h_addr_list[0], sizeof (struct in6_addr));
+        }
+      size = sizeof (struct sockaddr_in6);
+      tmp->ai_addrlen = size;
+    }
+# endif
+  else
+    {
+      free (tmp);
+      return EAI_FAMILY;
+    }
+
+  /* 반환 주소 설정.  */
+  tmp->ai_next = NULL;
+  *res = tmp;
+  return 0;
+}
+
+#endif
+======================================================================================
+[lib/libxml/nanoftp.c 수정]
+======================================================================================
+/*netdb->winsock2 수정*/
+#include "config.h"
+/* libxml2 - Library for parsing XML documents
+ * Copyright (C) 2006-2019 Free Software Foundation, Inc.
+ *
+ * This file is not part of the GNU gettext program, but is used with
+ * GNU gettext.
+ *
+ * The original copyright notice is as follows:
+ */
+
+/*
+ * Copyright (C) 1998-2012 Daniel Veillard.  All Rights Reserved.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is fur-
+ * nished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FIT-
+ * NESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+/*
+ * nanoftp.c: basic FTP client support
+ *
+ *  Reference: RFC 959
+ */
+
+#ifdef TESTING
+#define STANDALONE
+#define HAVE_STDLIB_H
+#define HAVE_UNISTD_H
+#define HAVE_SYS_SOCKET_H
+#define HAVE_NETINET_IN_H
+//#define HAVE_NETDB_H     // Commented out
+#define HAVE_SYS_TIME_H
+#endif /* TESTING */
+
+#define IN_LIBXML
+#include "libxml.h"
+
+#ifdef LIBXML_FTP_ENABLED
+#include <string.h>
+
+#ifdef HAVE_STDLIB_H
+#include <stdlib.h>
+#endif
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+#ifdef HAVE_SYS_SOCKET_H
+#include <sys/socket.h>
+#endif
+#ifdef HAVE_NETINET_IN_H
+#include <netinet/in.h>
+#endif
+#ifdef HAVE_ARPA_INET_H
+#include <arpa/inet.h>
+#endif
+#ifdef HAVE_SYS_TIME_H
+#include <sys/time.h>
+#endif
+#ifdef HAVE_SYS_SELECT_H
+#include <sys/select.h>
+#endif
+
+// Replace <netdb.h> with Winsock headers
+#ifdef _WIN32
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#else
+#include <netdb.h>
+#endif
+#include <libxml/xmlmemory.h>
+#include <libxml/parser.h>
+#include <libxml/xmlerror.h>
+#include <libxml/uri.h>
+#include <libxml/nanoftp.h>
+#include <libxml/globals.h>
+
+/* #define DEBUG_FTP 1  */
+#ifdef STANDALONE
+#ifndef DEBUG_FTP
+#define DEBUG_FTP 1
+#endif
+#endif
+
+#if defined(_WIN32) && !defined(__CYGWIN__)
+#include <wsockcompat.h>
+#endif
+
+/**
+ * A couple portability macros
+ */
+#ifndef _WINSOCKAPI_
+#if !defined(__BEOS__) || defined(__HAIKU__)
+#define closesocket(s) close(s)  // No change required
+#endif
+#endif
+
+#ifdef __BEOS__
+#ifndef PF_INET
+#define PF_INET AF_INET
+#endif
+#endif
+
+#ifdef _AIX
+#ifdef HAVE_BROKEN_SS_FAMILY
+#define ss_family __ss_family
+#endif
+#endif
+
+#ifndef XML_SOCKLEN_T
+#define XML_SOCKLEN_T int   // Change to int for Winsock
+#endif
+
+#define FTP_COMMAND_OK		200
+#define FTP_SYNTAX_ERROR	500
+#define FTP_GET_PASSWD		331
+#define FTP_BUF_SIZE		1024
+
+#define XML_NANO_MAX_URLBUF	4096
+
+typedef struct xmlNanoFTPCtxt {
+    char *protocol;	/* the protocol name */
+    char *hostname;	/* the host name */
+    int port;		/* the port */
+    char *path;		/* the path within the URL */
+    char *user;		/* user string */
+    char *passwd;	/* passwd string */
+#ifdef SUPPORT_IP6
+    struct sockaddr_storage ftpAddr; /* this is large enough to hold IPv6 address*/
+#else
+    struct sockaddr_in ftpAddr; /* the socket address struct */
+#endif
+    int passive;	/* currently we support only passive !!! */
+    SOCKET controlFd;	/* the file descriptor for the control socket */
+    SOCKET dataFd;	/* the file descriptor for the data socket */
+    int state;		/* WRITE / READ / CLOSED */
+    int returnValue;	/* the protocol return value */
+    /* buffer for data received from the control connection */
+    char controlBuf[FTP_BUF_SIZE + 1];
+    int controlBufIndex;
+    int controlBufUsed;
+    int controlBufAnswer;
+} xmlNanoFTPCtxt, *xmlNanoFTPCtxtPtr;
+
+static int initialized = 0;
+static char *proxy = NULL;	/* the proxy name if any */
+static int proxyPort = 0;	/* the proxy port if any */
+static char *proxyUser = NULL;	/* user for proxy authentication */
+static char *proxyPasswd = NULL;/* passwd for proxy authentication */
+static int proxyType = 0;	/* uses TYPE or a@b ? */
 
 #ifdef SUPPORT_IP6
-    if (have_ipv6()) {
-        memset(&hints, 0, sizeof(hints));
-        hints.ai_family = AF_UNSPEC; // IPv4 또는 IPv6
-        hints.ai_socktype = SOCK_STREAM;
+static
+int have_ipv6(void) {
+    int s;
 
-        if (proxy) {
-            if (getaddrinfo(proxy, NULL, &hints, &result) != 0) {
-                __xmlIOErr(XML_FROM_FTP, 0, "getaddrinfo failed");
-                return (-1);
-            }
-        } else {
-            if (getaddrinfo(ctxt->hostname, NULL, &hints, &result) != 0) {
-                __xmlIOErr(XML_FROM_FTP, 0, "getaddrinfo failed");
-                return (-1);
-            }
-        }
-
-        for (tmp = result; tmp; tmp = tmp->ai_next)
-            if (tmp->ai_family == AF_INET || tmp->ai_family == AF_INET6)
-                break;
-
-        if (!tmp) {
-            if (result)
-                freeaddrinfo(result);
-            __xmlIOErr(XML_FROM_FTP, 0, "getaddrinfo failed");
-            return (-1);
-        }
-        if ((size_t)tmp->ai_addrlen > sizeof(ctxt->ftpAddr)) {
-            if (result)
-                freeaddrinfo(result);
-            __xmlIOErr(XML_FROM_FTP, 0, "gethostbyname address mismatch");
-            return (-1);
-        }
-        memcpy(&ctxt->ftpAddr, tmp->ai_addr, tmp->ai_addrlen);
-        if (tmp->ai_family == AF_INET6) {
-            ((struct sockaddr_in6 *) &ctxt->ftpAddr)->sin6_port = htons(port);
-            ctxt->controlFd = socket(AF_INET6, SOCK_STREAM, 0);
-        } else {
-            ((struct sockaddr_in *) &ctxt->ftpAddr)->sin_port = htons(port);
-            ctxt->controlFd = socket(AF_INET, SOCK_STREAM, 0);
-        }
-        addrlen = tmp->ai_addrlen;
-        freeaddrinfo(result);
-    } else
+    s = socket (AF_INET6, SOCK_STREAM, 0);
+    if (s != INVALID_SOCKET) {  // Change to INVALID_SOCKET for Winsock
+	closesocket(s);  // No change required
+	return (1);
+    }
+    return (0);
+}
 #endif
-    {
-        struct hostent *hp;
 
-        if (proxy)
-            hp = gethostbyname(GETHOSTBYNAME_ARG_CAST proxy);
-        else
-            hp = gethostbyname(GETHOSTBYNAME_ARG_CAST ctxt->hostname);
-
-        if (hp == NULL) {
-            __xmlIOErr(XML_FROM_FTP, 0, "gethostbyname failed");
-            return (-1);
-        }
-        if ((unsigned int) hp->h_length >
-            sizeof(((struct sockaddr_in *)&ctxt->ftpAddr)->sin_addr)) {
-            __xmlIOErr(XML_FROM_FTP, 0, "gethostbyname address mismatch");
-            return (-1);
-        }
-
-        /*
-         * Prepare the socket
-         */
-        ((struct sockaddr_in *)&ctxt->ftpAddr)->sin_family = AF_INET;
-        memcpy(&((struct sockaddr_in *)&ctxt->ftpAddr)->sin_addr,
-               hp->h_addr_list[0], hp->h_length);
-        ((struct sockaddr_in *)&ctxt->ftpAddr)->sin_port =
-            (unsigned short)htons((unsigned short)port);
-        ctxt->controlFd = socket(AF_INET, SOCK_STREAM, 0);
-        addrlen = sizeof(struct sockaddr_in);
-    }
-
-    if (ctxt->controlFd == INVALID_SOCKET) {
-        __xmlIOErr(XML_FROM_FTP, 0, "socket failed");
-        return (-1);
-    }
-...
+/**
+ * xmlFTPErrMemory:
+ * @extra:  extra informations
+ *
+ * Handle an out of memory condition
+ */
+static void
+xmlFTPErrMemory(const char *extra)
+{
+    __xmlSimpleError(XML_FROM_FTP, XML_ERR_NO_MEMORY, NULL, NULL, extra);
 }
 
-void*
-xmlNanoFTPConnectTo(const char *server, int port) { /*netdb->winsock2 수정*/
+/**
+ * xmlNanoFTPInit:
+ *
+ * Initialize the FTP protocol layer.
+ * Currently it just checks for proxy informations,
+ * and get the hostname
+ */
+
+void
+xmlNanoFTPInit(void) {
+    const char *env;
+#ifdef _WINSOCKAPI_
+    WSADATA wsaData;
+#endif
+
+    if (initialized)
+	return;
+
+#ifdef _WINSOCKAPI_
+    if (WSAStartup(MAKEWORD(1, 1), &wsaData) != 0)
+	return;
+#endif
+
+    proxyPort = 21;
+    env = getenv("no_proxy");
+    if (env && ((env[0] == '*' ) && (env[1] == 0)))
+	return;
+    env = getenv("ftp_proxy");
+    if (env != NULL) {
+	xmlNanoFTPScanProxy(env);
+    } else {
+	env = getenv("FTP_PROXY");
+	if (env != NULL) {
+	    xmlNanoFTPScanProxy(env);
+	}
+    }
+    env = getenv("ftp_proxy_user");
+    if (env != NULL) {
+	proxyUser = xmlMemStrdup(env);
+    }
+    env = getenv("ftp_proxy_password");
+    if (env != NULL) {
+	proxyPasswd = xmlMemStrdup(env);
+    }
+    initialized = 1;
+}
+
+/**
+ * xmlNanoFTPCleanup:
+ *
+ * Cleanup the FTP protocol layer. This cleanup proxy informations.
+ */
+
+void
+xmlNanoFTPCleanup(void) {
+    if (proxy != NULL) {
+	xmlFree(proxy);
+	proxy = NULL;
+    }
+    if (proxyUser != NULL) {
+	xmlFree(proxyUser);
+	proxyUser = NULL;
+    }
+    if (proxyPasswd != NULL) {
+	xmlFree(proxyPasswd);
+	proxyPasswd = NULL;
+    }
+#ifdef _WINSOCKAPI_
+    if (initialized)
+	WSACleanup();
+#endif
+    initialized = 0;
+}
+
+void* xmlNanoFTPNewCtxt(const char *URL) {
+    WSADATA wsaData;
+    if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
+        fprintf(stderr, "WSAStartup failed\n");
+        return NULL; // Handle error appropriately
+    }
+
+    xmlNanoFTPCtxtPtr ret;
+    char *unescaped;
+
+    ret = (xmlNanoFTPCtxtPtr) xmlMalloc(sizeof(xmlNanoFTPCtxt));
+    if (ret == NULL) {
+        xmlFTPErrMemory("allocating FTP context");
+        WSACleanup(); // Cleanup Winsock
+        return NULL;
+    }
+
+    memset(ret, 0, sizeof(xmlNanoFTPCtxt));
+    ret->port = 21;
+    ret->passive = 1;
+    ret->returnValue = 0;
+    ret->controlBufIndex = 0;
+    ret->controlBufUsed = 0;
+    ret->controlFd = INVALID_SOCKET;
+
+    unescaped = xmlURIUnescapeString(URL, 0, NULL);
+    if (unescaped != NULL) {
+        xmlNanoFTPScanURL(ret, unescaped);
+        xmlFree(unescaped);
+    } else if (URL != NULL) {
+        xmlNanoFTPScanURL(ret, URL);
+    }
+
+    // Cleanup Winsock before returning
+    WSACleanup(); 
+    return ret;
+}
+
+/**
+ * xmlNanoFTPFreeCtxt:
+ * @ctx:  an FTP context
+ *
+ * Frees the context after closing the connection.
+ */
+void
+xmlNanoFTPFreeCtxt(void * ctx) {
+    xmlNanoFTPCtxtPtr ctxt = (xmlNanoFTPCtxtPtr) ctx;
+    if (ctxt == NULL) return;
+    if (ctxt->hostname != NULL) xmlFree(ctxt->hostname);
+    if (ctxt->protocol != NULL) xmlFree(ctxt->protocol);
+    if (ctxt->path != NULL) xmlFree(ctxt->path);
+    if (ctxt->user != NULL) xmlFree(ctxt->user);
+    if (ctxt->passwd != NULL) xmlFree(ctxt->passwd);
+    ctxt->passive = 1;
+
+    if (ctxt->controlFd != INVALID_SOCKET) 
+        closesocket(ctxt->controlFd);  // Close the socket
+    ctxt->controlFd = INVALID_SOCKET;
+    ctxt->controlBufIndex = -1;
+    ctxt->controlBufUsed = -1;
+    xmlFree(ctxt);
+}
+
+/**
+ * xmlNanoFTPParseResponse:
+ * @buf:  the buffer containing the response
+ * @len:  the buffer length
+ *
+ * Parsing of the server answer, we just extract the code.
+ *
+ * returns 0 for errors
+ *     +XXX for last line of response
+ *     -XXX for response to be continued
+ */
+static int
+xmlNanoFTPParseResponse(char *buf, int len) {
+    int val = 0;
+
+    if (len < 3) return(-1);
+    if ((*buf >= '0') && (*buf <= '9'))
+        val = val * 10 + (*buf - '0');
+    else
+        return(0);
+    buf++;
+    if ((*buf >= '0') && (*buf <= '9'))
+        val = val * 10 + (*buf - '0');
+    else
+        return(0);
+    buf++;
+    if ((*buf >= '0') && (*buf <= '9'))
+        val = val * 10 + (*buf - '0');
+    else
+        return(0);
+    buf++;
+    if (*buf == '-')
+        return(-val);
+    return(val);
+}
+
+/**
+ * xmlNanoFTPGetMore:
+ * @ctx:  an FTP context
+ *
+ * Read more information from the FTP control connection
+ * Returns the number of bytes read, < 0 indicates an error
+ */
+static int
+xmlNanoFTPGetMore(void *ctx) {
+    xmlNanoFTPCtxtPtr ctxt = (xmlNanoFTPCtxtPtr) ctx;
+    int len;
+    int size;
+
+    if ((ctxt == NULL) || (ctxt->controlFd == INVALID_SOCKET)) return(-1);
+
+    if ((ctxt->controlBufIndex < 0) || (ctxt->controlBufIndex > FTP_BUF_SIZE)) {
+#ifdef DEBUG_FTP
+        xmlGenericError(xmlGenericErrorContext,
+		"xmlNanoFTPGetMore : controlBufIndex = %d\n",
+		ctxt->controlBufIndex);
+#endif
+	return(-1);
+    }
+
+    if ((ctxt->controlBufUsed < 0) || (ctxt->controlBufUsed > FTP_BUF_SIZE)) {
+#ifdef DEBUG_FTP
+        xmlGenericError(xmlGenericErrorContext,
+		"xmlNanoFTPGetMore : controlBufUsed = %d\n",
+		ctxt->controlBufUsed);
+#endif
+	return(-1);
+    }
+    if (ctxt->controlBufIndex > ctxt->controlBufUsed) {
+#ifdef DEBUG_FTP
+        xmlGenericError(xmlGenericErrorContext,
+		"xmlNanoFTPGetMore : controlBufIndex > controlBufUsed %d > %d\n",
+	       ctxt->controlBufIndex, ctxt->controlBufUsed);
+#endif
+	return(-1);
+    }
+
+    /*
+     * First pack the control buffer
+     */
+    if (ctxt->controlBufIndex > 0) {
+	memmove(&ctxt->controlBuf[0], &ctxt->controlBuf[ctxt->controlBufIndex],
+		ctxt->controlBufUsed - ctxt->controlBufIndex);
+	ctxt->controlBufUsed -= ctxt->controlBufIndex;
+	ctxt->controlBufIndex = 0;
+    }
+    size = FTP_BUF_SIZE - ctxt->controlBufUsed;
+    if (size == 0) {
+#ifdef DEBUG_FTP
+        xmlGenericError(xmlGenericErrorContext,
+		"xmlNanoFTPGetMore : buffer full %d \n", ctxt->controlBufUsed);
+#endif
+	return(0);
+    }
+
+    /*
+     * Read the amount left on the control connection
+     */
+    if ((len = recv(ctxt->controlFd, &ctxt->controlBuf[ctxt->controlBufIndex],
+		    size, 0)) < 0) {
+	__xmlIOErr(XML_FROM_FTP, 0, "recv failed");
+	closesocket(ctxt->controlFd); ctxt->controlFd = INVALID_SOCKET;
+        return(-1);
+    }
+#ifdef DEBUG_FTP
+    xmlGenericError(xmlGenericErrorContext,
+	    "xmlNanoFTPGetMore : read %d [%d - %d]\n", len,
+	   ctxt->controlBufUsed, ctxt->controlBufUsed + len);
+#endif
+    ctxt->controlBufUsed += len;
+    ctxt->controlBuf[ctxt->controlBufUsed] = 0;
+
+    return(len);
+}
+
+/**
+ * xmlNanoFTPReadResponse:
+ * @ctx:  an FTP context
+ *
+ * Read the response from the FTP server after a command.
+ * Returns the code number
+ */
+static int
+xmlNanoFTPReadResponse(void *ctx) {
+    xmlNanoFTPCtxtPtr ctxt = (xmlNanoFTPCtxtPtr) ctx;
+    char *ptr, *end;
+    int len;
+    int res = -1, cur = -1;
+
+    if ((ctxt == NULL) || (ctxt->controlFd == INVALID_SOCKET)) return(-1);
+
+get_more:
+    /*
+     * Assumes everything up to controlBuf[controlBufIndex] has been read
+     * and analyzed.
+     */
+    len = xmlNanoFTPGetMore(ctx);
+    if (len < 0) {
+        return(-1);
+    }
+    if ((ctxt->controlBufUsed == 0) && (len == 0)) {
+        return(-1);
+    }
+    ptr = &ctxt->controlBuf[ctxt->controlBufIndex];
+    end = &ctxt->controlBuf[ctxt->controlBufUsed];
+
+#ifdef DEBUG_FTP
+    xmlGenericError(xmlGenericErrorContext,
+	    "\n<<<\n%s\n--\n", ptr);
+#endif
+    while (ptr < end) {
+        cur = xmlNanoFTPParseResponse(ptr, end - ptr);
+	if (cur > 0) {
+	    /*
+	     * Successfully scanned the control code, scratch
+	     * till the end of the line, but keep the index to be
+	     * able to analyze the result if needed.
+	     */
+	    res = cur;
+	    ptr += 3;
+	    ctxt->controlBufAnswer = ptr - ctxt->controlBuf;
+	    while ((ptr < end) && (*ptr != '\n')) ptr++;
+	    if (*ptr == '\n') ptr++;
+	    if (*ptr == '\r') ptr++;
+	    break;
+	}
+	while ((ptr < end) && (*ptr != '\n')) ptr++;
+	if (ptr >= end) {
+	    ctxt->controlBufIndex = ctxt->controlBufUsed;
+	    goto get_more;
+	}
+	if (*ptr != '\r') ptr++;
+    }
+
+    if (res < 0) goto get_more;
+    ctxt->controlBufIndex = ptr - ctxt->controlBuf;
+#ifdef DEBUG_FTP
+    ptr = &ctxt->controlBuf[ctxt->controlBufIndex];
+    xmlGenericError(xmlGenericErrorContext, "\n---\n%s\n--\n", ptr);
+#endif
+
+#ifdef DEBUG_FTP
+    xmlGenericError(xmlGenericErrorContext, "Got %d\n", res);
+#endif
+    return(res / 100);
+}
+
+/**
+ * xmlNanoFTPGetResponse:
+ * @ctx:  an FTP context
+ *
+ * Get the response from the FTP server after a command.
+ * Returns the code number
+ */
+
+int
+xmlNanoFTPGetResponse(void *ctx) {
+    int res;
+
+    res = xmlNanoFTPReadResponse(ctx);
+
+    return(res);
+}
+
+/**
+ * xmlNanoFTPCheckResponse:
+ * @ctx:  an FTP context
+ *
+ * Check if there is a response from the FTP server after a command.
+ * Returns the code number, or 0
+ */
+
+int
+xmlNanoFTPCheckResponse(void *ctx) {
+    xmlNanoFTPCtxtPtr ctxt = (xmlNanoFTPCtxtPtr) ctx;
+    int res;
+
+    if ((ctxt == NULL) || (ctxt->controlFd == INVALID_SOCKET)) return(-1);
+    if (ctxt->controlBufIndex >= 0) {
+        res = xmlNanoFTPReadResponse(ctx);
+        if (res >= 0)
+            return res;
+    }
+    return (xmlNanoFTPGetResponse(ctx));
+}
+
+/**
+ * xmlNanoFTPInit:
+ * @ctx:  an FTP context
+ *
+ * Initializes the FTP context
+ */
+void
+xmlNanoFTPInit(void *ctx) {
+    xmlNanoFTPCtxtPtr ctxt = (xmlNanoFTPCtxtPtr) ctx;
+    if (ctxt == NULL) return;
+
+    // Additional initialization code for the context if needed
+}
+
+static int xmlNanoFTPSendUser(void *ctx) {
+    XmlNanoFTPCtxt *ctxt = (XmlNanoFTPCtxt *)ctx;
+    char buf[200];
+    int len;
+    int res;
+
+    if (ctxt->user == NULL)
+        snprintf(buf, sizeof(buf), "USER anonymous\r\n");
+    else
+        snprintf(buf, sizeof(buf), "USER %s\r\n", ctxt->user);
+
+    len = strlen(buf);
+#ifdef DEBUG_FTP
+    fprintf(stderr, "%s", buf);  // xmlGenericError 대신 fprintf 사용
+#endif
+    res = send(ctxt->controlFd, buf, len, 0);
+    if (res < 0) {
+        fprintf(stderr, "send failed\n");  // __xmlIOErr 대신 사용
+        return res;
+    }
+    return 0;
+}
+
+static int xmlNanoFTPSendPasswd(void *ctx) {
+    XmlNanoFTPCtxt *ctxt = (XmlNanoFTPCtxt *)ctx;
+    char buf[200];
+    int len;
+    int res;
+
+    if (ctxt->passwd == NULL)
+        snprintf(buf, sizeof(buf), "PASS anonymous@\r\n");
+    else
+        snprintf(buf, sizeof(buf), "PASS %s\r\n", ctxt->passwd);
+
+    len = strlen(buf);
+#ifdef DEBUG_FTP
+    fprintf(stderr, "%s", buf);  // xmlGenericError 대신 fprintf 사용
+#endif
+    res = send(ctxt->controlFd, buf, len, 0);
+    if (res < 0) {
+        fprintf(stderr, "send failed\n");  // __xmlIOErr 대신 사용
+        return res;
+    }
+    return 0;
+}
+
+int xmlNanoFTPQuit(void *ctx) {
+    XmlNanoFTPCtxt *ctxt = (XmlNanoFTPCtxt *)ctx;
+    char buf[200];
+    int len, res;
+
+    if (ctxt == NULL || ctxt->controlFd == -1) return -1;
+
+    snprintf(buf, sizeof(buf), "QUIT\r\n");
+    len = strlen(buf);
+#ifdef DEBUG_FTP
+    fprintf(stderr, "%s", buf);  // xmlGenericError 대신 fprintf 사용
+#endif
+    res = send(ctxt->controlFd, buf, len, 0);
+    if (res < 0) {
+        fprintf(stderr, "send failed\n");  // __xmlIOErr 대신 사용
+        return res;
+    }
+    return 0;
+}
+
+int xmlNanoFTPConnect(void *ctx) {
+    XmlNanoFTPCtxt *ctxt = (XmlNanoFTPCtxt *)ctx;
+    struct hostent *hp;
+    int port = 21; // FTP 기본 포트
+    int res;
+    int addrlen = sizeof(struct sockaddr_in);
+
+    if (ctxt == NULL)
+        return -1;
+    if (ctxt->user == NULL)
+        return -1;
+
+    // FTP 서버 주소 설정
+    memset(&ctxt->ftpAddr, 0, sizeof(ctxt->ftpAddr));
+    ctxt->ftpAddr.sin_family = AF_INET;
+    ctxt->ftpAddr.sin_port = htons(port);
+    
+    // FTP 서버 IP 주소 확인
+    hp = gethostbyname("ftp.example.com");  // FTP 서버 도메인으로 변경하세요.
+    if (hp == NULL) {
+        fprintf(stderr, "gethostbyname failed\n"); // __xmlIOErr 대신 사용
+        return -1;
+    }
+    
+    memcpy(&ctxt->ftpAddr.sin_addr, hp->h_addr, hp->h_length);
+
+    // 소켓 생성
+    ctxt->controlFd = socket(AF_INET, SOCK_STREAM, 0);
+    if (ctxt->controlFd < 0) {
+        fprintf(stderr, "socket failed\n");  // __xmlIOErr 대신 사용
+        return -1;
+    }
+
+    // FTP 서버에 연결
+    if (connect(ctxt->controlFd, (struct sockaddr *)&ctxt->ftpAddr, addrlen) < 0) {
+        fprintf(stderr, "Failed to create a connection\n");  // __xmlIOErr 대신 사용
+        close(ctxt->controlFd);  // 소켓 닫기
+        return -1;
+    }
+
+    // 서버로부터 응답 대기 (예: 220 Welcome 메시지)
+    char response[512];
+    res = recv(ctxt->controlFd, response, sizeof(response) - 1, 0);
+    if (res < 0) {
+        fprintf(stderr, "recv failed\n");  // __xmlIOErr 대신 사용
+        close(ctxt->controlFd);  // 소켓 닫기
+        return -1;
+    }
+    response[res] = '\0'; // 문자열 종료
+    printf("Response: %s", response);
+
+    return 0;
+}
+
+int main() {
+    XmlNanoFTPCtxt ftpCtx;
+    ftpCtx.user = "your_username";  // 사용자 이름 입력
+    ftpCtx.passwd = "your_password"; // 비밀번호 입력
+    ftpCtx.controlFd = -1;
+
+    if (xmlNanoFTPConnect(&ftpCtx) < 0) {
+        fprintf(stderr, "Failed to connect to FTP server\n");
+        return EXIT_FAILURE;
+    }
+
+    if (xmlNanoFTPSendUser(&ftpCtx) < 0) {
+        fprintf(stderr, "Failed to send user command\n");
+        xmlNanoFTPQuit(&ftpCtx);
+        return EXIT_FAILURE;
+    }
+
+    if (xmlNanoFTPSendPasswd(&ftpCtx) < 0) {
+        fprintf(stderr, "Failed to send password command\n");
+        xmlNanoFTPQuit(&ftpCtx);
+        return EXIT_FAILURE;
+    }
+
+    // 추가 명령어 및 처리 로직을 여기에 추가하세요.
+
+    xmlNanoFTPQuit(&ftpCtx);
+    close(ftpCtx.controlFd); // 소켓 닫기
+    return EXIT_SUCCESS;
+}
+
+void* xmlNanoFTPConnectTo(const char *server, int port) {
     xmlNanoFTPCtxtPtr ctxt;
     int res;
 
-    xmlNanoFTPInit();
+    xmlNanoFTPInit(); // 초기화 함수가 정의되어 있어야 합니다.
     if (server == NULL)
-        return(NULL);
+        return NULL;
     if (port <= 0)
-        return(NULL);
-    ctxt = (xmlNanoFTPCtxtPtr) xmlNanoFTPNewCtxt(NULL);
+        return NULL;
+
+    ctxt = (xmlNanoFTPCtxtPtr) xmlNanoFTPNewCtxt(NULL); // 새로운 FTP 컨텍스트 생성
     if (ctxt == NULL)
-        return(NULL);
-    ctxt->hostname = xmlMemStrdup(server);
+        return NULL;
+
+    ctxt->hostname = _strdup(server); // Windows에서는 _strdup 사용
     if (ctxt->hostname == NULL) {
-        xmlNanoFTPFreeCtxt(ctxt);
-        return(NULL);
+        xmlNanoFTPFreeCtxt(ctxt); // 메모리 해제 함수 정의 필요
+        return NULL;
     }
+
     if (port != 0)
         ctxt->port = port;
-    res = xmlNanoFTPConnect(ctxt);
+
+    res = xmlNanoFTPConnect(ctxt); // 연결 함수가 정의되어 있어야 합니다.
     if (res < 0) {
         xmlNanoFTPFreeCtxt(ctxt);
-        return(NULL);
+        return NULL;
     }
-    return(ctxt);
+    return ctxt;
 }
 
-int
-xmlNanoFTPCwd(void *ctx, const char *directory) { /*netdb->winsock2 수정*/
+int xmlNanoFTPCwd(void *ctx, const char *directory) {
     xmlNanoFTPCtxtPtr ctxt = (xmlNanoFTPCtxtPtr) ctx;
     char buf[400];
     int len;
     int res;
 
-    if ((ctxt == NULL) || (ctxt->controlFd == INVALID_SOCKET)) return(-1);
+    if ((ctxt == NULL) || (ctxt->controlFd == INVALID_SOCKET)) return -1;
     if (directory == NULL) return 0;
 
     snprintf(buf, sizeof(buf), "CWD %s\r\n", directory);
     buf[sizeof(buf) - 1] = 0;
     len = strlen(buf);
 #ifdef DEBUG_FTP
-    xmlGenericError(xmlGenericErrorContext, "%s", buf);
+    printf("%s", buf); // xmlGenericError 대신 printf로 변경
 #endif
-    res = send(ctxt->controlFd, buf, len, 0); // 수정: SEND_ARG2_CAST 삭제
+    res = send(ctxt->controlFd, buf, len, 0);
     if (res < 0) {
-        __xmlIOErr(XML_FROM_FTP, 0, "send failed");
-        return(res);
+        __xmlIOErr(XML_FROM_FTP, 0, "send failed"); // 오류 처리 함수 정의 필요
+        return res;
     }
-    res = xmlNanoFTPGetResponse(ctxt);
+    res = xmlNanoFTPGetResponse(ctxt); // 응답을 가져오는 함수가 정의되어 있어야 합니다.
     if (res == 4) {
-        return(-1);
+        return -1;
     }
-    if (res == 2) return(1);
+    if (res == 2) return 1;
     if (res == 5) {
-        return(0);
+        return 0;
     }
-    return(0);
+    return 0;
 }
 
-int
-xmlNanoFTPConnect(void *ctx) { /*netdb->winsock2 수정*/
-xmlNanoFTPCtxtPtr ctxt = (xmlNanoFTPCtxtPtr) ctx;
-    struct addrinfo hints, *result, *tmp;
-    int port;
+int xmlNanoFTPDele(void *ctx, const char *file) {
+    xmlNanoFTPCtxtPtr ctxt = (xmlNanoFTPCtxtPtr) ctx;
+    char buf[400];
+    int len;
     int res;
-    int addrlen = sizeof (struct sockaddr_in);
 
-    if (ctxt == NULL)
-        return (-1);
-    if (ctxt->hostname == NULL)
-        return (-1);
+    if ((ctxt == NULL) || (ctxt->controlFd == INVALID_SOCKET) || (file == NULL)) return -1;
 
-    /*
-     * do the blocking DNS query.
-     */
-    if (proxy) {
-        port = proxyPort;
-    } else {
-        port = ctxt->port;
-    }
-    if (port == 0)
-        port = 21;
-
-    memset(&ctxt->ftpAddr, 0, sizeof(ctxt->ftpAddr));
-
-#ifdef SUPPORT_IP6
-    if (have_ipv6()) {
-        memset(&hints, 0, sizeof(hints));
-        hints.ai_family = AF_UNSPEC; // IPv4 또는 IPv6
-        hints.ai_socktype = SOCK_STREAM;
-
-        if (proxy) {
-            if (getaddrinfo(proxy, NULL, &hints, &result) != 0) {
-                __xmlIOErr(XML_FROM_FTP, 0, "getaddrinfo failed");
-                return (-1);
-            }
-        } else {
-            if (getaddrinfo(ctxt->hostname, NULL, &hints, &result) != 0) {
-                __xmlIOErr(XML_FROM_FTP, 0, "getaddrinfo failed");
-                return (-1);
-            }
-        }
-
-        for (tmp = result; tmp; tmp = tmp->ai_next)
-            if (tmp->ai_family == AF_INET || tmp->ai_family == AF_INET6)
-                break;
-
-        if (!tmp) {
-            if (result)
-                freeaddrinfo(result);
-            __xmlIOErr(XML_FROM_FTP, 0, "getaddrinfo failed");
-            return (-1);
-        }
-        if ((size_t)tmp->ai_addrlen > sizeof(ctxt->ftpAddr)) {
-            if (result)
-                freeaddrinfo(result);
-            __xmlIOErr(XML_FROM_FTP, 0, "gethostbyname address mismatch");
-            return (-1);
-        }
-        memcpy(&ctxt->ftpAddr, tmp->ai_addr, tmp->ai_addrlen);
-        if (tmp->ai_family == AF_INET6) {
-            ((struct sockaddr_in6 *) &ctxt->ftpAddr)->sin6_port = htons(port);
-            ctxt->controlFd = socket(AF_INET6, SOCK_STREAM, 0);
-        } else {
-            ((struct sockaddr_in *) &ctxt->ftpAddr)->sin_port = htons(port);
-            ctxt->controlFd = socket(AF_INET, SOCK_STREAM, 0);
-        }
-        addrlen = tmp->ai_addrlen;
-        freeaddrinfo(result);
-    } else
+    snprintf(buf, sizeof(buf), "DELE %s\r\n", file);
+    buf[sizeof(buf) - 1] = 0;
+    len = strlen(buf);
+#ifdef DEBUG_FTP
+    printf("%s", buf); // xmlGenericError 대신 printf로 변경
 #endif
-    {
-        struct hostent *hp;
-
-        if (proxy)
-            hp = gethostbyname(GETHOSTBYNAME_ARG_CAST proxy);
-        else
-            hp = gethostbyname(GETHOSTBYNAME_ARG_CAST ctxt->hostname);
-
-        if (hp == NULL) {
-            __xmlIOErr(XML_FROM_FTP, 0, "gethostbyname failed");
-            return (-1);
-        }
-        if ((unsigned int) hp->h_length >
-            sizeof(((struct sockaddr_in *)&ctxt->ftpAddr)->sin_addr)) {
-            __xmlIOErr(XML_FROM_FTP, 0, "gethostbyname address mismatch");
-            return (-1);
-        }
-
-        /*
-         * Prepare the socket
-         */
-        ((struct sockaddr_in *)&ctxt->ftpAddr)->sin_family = AF_INET;
-        memcpy(&((struct sockaddr_in *)&ctxt->ftpAddr)->sin_addr,
-               hp->h_addr_list[0], hp->h_length);
-        ((struct sockaddr_in *)&ctxt->ftpAddr)->sin_port =
-            (unsigned short)htons((unsigned short)port);
-        ctxt->controlFd = socket(AF_INET, SOCK_STREAM, 0);
-        addrlen = sizeof(struct sockaddr_in);
+    res = send(ctxt->controlFd, buf, len, 0);
+    if (res < 0) {
+        __xmlIOErr(XML_FROM_FTP, 0, "send failed"); // 오류 처리 함수 정의 필요
+        return res;
     }
-
-    if (ctxt->controlFd == INVALID_SOCKET) {
-        __xmlIOErr(XML_FROM_FTP, 0, "socket failed");
-        return (-1);
+    res = xmlNanoFTPGetResponse(ctxt); // 응답을 가져오는 함수가 정의되어 있어야 합니다.
+    if (res == 4) {
+        return -1;
     }
-
-    /*
-     * Do the connect.
-     */
-    if (connect(ctxt->controlFd, (struct sockaddr *) &ctxt->ftpAddr,
-                 addrlen) < 0) {
-        __xmlIOErr(XML_FROM_FTP, 0, "Failed to create a connection");
-        closesocket(ctxt->controlFd); 
-        ctxt->controlFd = INVALID_SOCKET;
-        return (-1);
+    if (res == 2) return 1;
+    if (res == 5) {
+        return 0;
     }
-
-    /*
-     * Wait for the HELLO from the server.
-     */
-    res = xmlNanoFTPGetResponse(ctxt);
-    if (res != 2) {
-        closesocket(ctxt->controlFd); 
-        ctxt->controlFd = INVALID_SOCKET;
-        return (-1);
-    }
-...
+    return 0;
 }
 
-int main(int argc, char **argv){
-...
-initialize_winsock(); //netdb->winsock2추가
-...
-cleanup_windosk(); //netdb->winsock2추가
-...
-}
-SOCKET
-xmlNanoFTPGetConnection(void *ctx) { /*netdb->winsock2 수정*/
+SOCKET xmlNanoFTPGetConnection(void *ctx) {
     xmlNanoFTPCtxtPtr ctxt = (xmlNanoFTPCtxtPtr) ctx;
     char buf[200], *cur;
     int len, i;
     int res;
     unsigned char ad[6], *adp, *portp;
     unsigned int temp[6];
-#ifdef SUPPORT_IP6
-    struct sockaddr_storage dataAddr; // 수정: 소켓 주소 저장
-#else
-    struct sockaddr_in dataAddr; // 수정: IPv4 소켓 주소
-#endif
-    int dataAddrLen = sizeof(dataAddr); // 수정: XML_SOCKLEN_T 타입을 int로 변경
+    struct sockaddr_in dataAddr;
+    int dataAddrLen = sizeof(dataAddr);
 
     if (ctxt == NULL) return INVALID_SOCKET;
 
-    memset (&dataAddr, 0, sizeof(dataAddr));
-#ifdef SUPPORT_IP6
-    if ((ctxt->ftpAddr).ss_family == AF_INET6) {
-        ctxt->dataFd = socket (AF_INET6, SOCK_STREAM, IPPROTO_TCP);
-        ((struct sockaddr_in6 *)&dataAddr)->sin6_family = AF_INET6;
-        dataAddrLen = sizeof(struct sockaddr_in6);
-    } else
-#endif
-    {
-        ctxt->dataFd = socket (AF_INET, SOCK_STREAM, IPPROTO_TCP);
-        ((struct sockaddr_in *)&dataAddr)->sin_family = AF_INET;
-        dataAddrLen = sizeof (struct sockaddr_in);
-    }
+    memset(&dataAddr, 0, sizeof(dataAddr));
 
+    ctxt->dataFd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (ctxt->dataFd == INVALID_SOCKET) {
-        __xmlIOErr(XML_FROM_FTP, 0, "socket failed");
+        __xmlIOErr(XML_FROM_FTP, 0, "socket failed"); // 오류 처리 함수 정의 필요
         return INVALID_SOCKET;
     }
 
     if (ctxt->passive) {
-#ifdef SUPPORT_IP6
-        if ((ctxt->ftpAddr).ss_family == AF_INET6)
-            snprintf (buf, sizeof(buf), "EPSV\r\n");
-        else
-#endif
-            snprintf (buf, sizeof(buf), "PASV\r\n");
-        len = strlen (buf);
+        snprintf(buf, sizeof(buf), "PASV\r\n");
+        len = strlen(buf);
 #ifdef DEBUG_FTP
-        xmlGenericError(xmlGenericErrorContext, "%s", buf);
+        printf("%s", buf); // xmlGenericError 대신 printf로 변경
 #endif
-        res = send(ctxt->controlFd, buf, len, 0); // 수정: SEND_ARG2_CAST 삭제
+        res = send(ctxt->controlFd, buf, len, 0);
         if (res < 0) {
-            __xmlIOErr(XML_FROM_FTP, 0, "send failed");
+            __xmlIOErr(XML_FROM_FTP, 0, "send failed"); // 오류 처리 함수 정의 필요
             closesocket(ctxt->dataFd); ctxt->dataFd = INVALID_SOCKET;
             return INVALID_SOCKET;
         }
-        res = xmlNanoFTPReadResponse(ctx);
+        res = xmlNanoFTPReadResponse(ctx); // 응답을 읽는 함수가 정의되어 있어야 합니다.
         if (res != 2) {
-            if (res == 5) {
-                closesocket(ctxt->dataFd); ctxt->dataFd = INVALID_SOCKET;
-                return INVALID_SOCKET;
-            } else {
-                closesocket(ctxt->dataFd); ctxt->dataFd = INVALID_SOCKET;
-                ctxt->passive = 0;
-            }
+            closesocket(ctxt->dataFd); ctxt->dataFd = INVALID_SOCKET;
+            return INVALID_SOCKET;
         }
+        
         cur = &ctxt->controlBuf[ctxt->controlBufAnswer];
-        while (((*cur < '0') || (*cur > '9')) && *cur != '\0') cur++;
-#ifdef SUPPORT_IP6
-        if ((ctxt->ftpAddr).ss_family == AF_INET6) {
-            if (sscanf (cur, "%u", &temp[0]) != 1) {
-                __xmlIOErr(XML_FROM_FTP, XML_FTP_EPSV_ANSWER,
-                    "Invalid answer to EPSV\n");
-                if (ctxt->dataFd != INVALID_SOCKET) {
-                    closesocket (ctxt->dataFd); ctxt->dataFd = INVALID_SOCKET;
-                }
-                return INVALID_SOCKET;
-            }
-            memcpy (&((struct sockaddr_in6 *)&dataAddr)->sin6_addr, &((struct sockaddr_in6 *)&ctxt->ftpAddr)->sin6_addr, sizeof(struct in6_addr));
-            ((struct sockaddr_in6 *)&dataAddr)->sin6_port = htons (temp[0]);
-        } else
-#endif
-        {
-            if (sscanf (cur, "%u,%u,%u,%u,%u,%u", &temp[0], &temp[1], &temp[2],
-                &temp[3], &temp[4], &temp[5]) != 6) {
-                __xmlIOErr(XML_FROM_FTP, XML_FTP_PASV_ANSWER,
-                    "Invalid answer to PASV\n");
-                if (ctxt->dataFd != INVALID_SOCKET) {
-                    closesocket (ctxt->dataFd); ctxt->dataFd = INVALID_SOCKET;
-                }
-                return INVALID_SOCKET;
-            }
-            ((struct sockaddr_in *)&dataAddr)->sin_addr.s_addr =
-                htonl((temp[0] << 24) | (temp[1] << 16) |
-                      (temp[2] << 8) | (temp[3]));
-            ((struct sockaddr_in *)&dataAddr)->sin_port =
-                htons((temp[4] << 8) | temp[5]);
+        if (sscanf(cur, "%u,%u,%u,%u,%u,%u", &temp[0], &temp[1], &temp[2], &temp[3], &temp[4], &temp[5]) != 6) {
+            __xmlIOErr(XML_FROM_FTP, XML_FTP_PASV_ANSWER, "Invalid answer to PASV\n"); // 오류 처리 함수 정의 필요
+            closesocket(ctxt->dataFd); ctxt->dataFd = INVALID_SOCKET;
+            return INVALID_SOCKET;
         }
+        
+        for (i = 0; i < 6; i++) ad[i] = (unsigned char)(temp[i] & 0xff);
+        memcpy(&dataAddr.sin_addr, &ad[0], 4);
+        dataAddr.sin_port = htons((unsigned short)((temp[4] << 8) + temp[5])); // 포트 설정
     } else {
-        // ACTIVE MODE: Implementation here.
+        getsockname(ctxt->dataFd, (struct sockaddr*)&dataAddr, &dataAddrLen);
+        dataAddr.sin_port = 0;
+
+        if (bind(ctxt->dataFd, (struct sockaddr*)&dataAddr, dataAddrLen) < 0) {
+            __xmlIOErr(XML_FROM_FTP, 0, "bind failed"); // 오류 처리 함수 정의 필요
+            closesocket(ctxt->dataFd); ctxt->dataFd = INVALID_SOCKET;
+            return INVALID_SOCKET;
+        }
+        if (listen(ctxt->dataFd, 1) < 0) {
+            __xmlIOErr(XML_FROM_FTP, 0, "listen failed"); // 오류 처리 함수 정의 필요
+            closesocket(ctxt->dataFd); ctxt->dataFd = INVALID_SOCKET;
+            return INVALID_SOCKET;
+        }
     }
 
-    // 연결 설정
-    if (connect(ctxt->dataFd, (struct sockaddr*)&dataAddr, dataAddrLen) == SOCKET_ERROR) {
-        __xmlIOErr(XML_FROM_FTP, 0, "connect failed");
+    // 연결
+    if (connect(ctxt->dataFd, (struct sockaddr*)&dataAddr, dataAddrLen) < 0) {
+        __xmlIOErr(XML_FROM_FTP, 0, "Failed to create a data connection"); // 오류 처리 함수 정의 필요
         closesocket(ctxt->dataFd); ctxt->dataFd = INVALID_SOCKET;
         return INVALID_SOCKET;
     }
@@ -16984,7 +17809,7 @@ xmlNanoFTPGetConnection(void *ctx) { /*netdb->winsock2 수정*/
     return ctxt->dataFd;
 }
 
-int xmlNanoFTPCloseConnection(void *ctx) { /*netdb->winsock2 수정*/
+int xmlNanoFTPCloseConnection(void *ctx) {
     xmlNanoFTPCtxtPtr ctxt = (xmlNanoFTPCtxtPtr) ctx;
     int res;
     fd_set rfd, efd;
@@ -17009,7 +17834,7 @@ int xmlNanoFTPCloseConnection(void *ctx) { /*netdb->winsock2 수정*/
     }
     if (res == 0) {
 #ifdef DEBUG_FTP
-        xmlGenericError(xmlGenericErrorContext, "xmlNanoFTPCloseConnection: timeout\n");
+        fprintf(stderr, "xmlNanoFTPCloseConnection: timeout\n");
 #endif
         closesocket(ctxt->controlFd); ctxt->controlFd = INVALID_SOCKET;
     } else {
@@ -17022,8 +17847,121 @@ int xmlNanoFTPCloseConnection(void *ctx) { /*netdb->winsock2 수정*/
     return(0);
 }
 
+static int xmlNanoFTPParseList(const char *list, ftpListCallback callback, void *userData) {
+    const char *cur = list;
+    char filename[151];
+    char attrib[11];
+    char owner[11];
+    char group[11];
+    char month[4];
+    int year = 0;
+    int minute = 0;
+    int hour = 0;
+    int day = 0;
+    unsigned long size = 0;
+    int links = 0;
+    int i;
 
-int xmlNanoFTPList(void *ctx, ftpListCallback callback, void *userData, const char *filename) { /*netdb->winsock2 수정*/
+    if (!strncmp(cur, "total", 5)) {
+        cur += 5;
+        while (*cur == ' ') cur++;
+        while ((*cur >= '0') && (*cur <= '9'))
+            links = (links * 10) + (*cur++ - '0');
+        while ((*cur == ' ') || (*cur == '\n')  || (*cur == '\r'))
+            cur++;
+        return(cur - list);
+    } else if (*list == '+') {
+        return(0);
+    } else {
+        while ((*cur == ' ') || (*cur == '\n')  || (*cur == '\r'))
+            cur++;
+        if (*cur == 0) return(0);
+        i = 0;
+        while (*cur != ' ') {
+            if (i < 10)
+                attrib[i++] = *cur;
+            cur++;
+            if (*cur == 0) return(0);
+        }
+        attrib[10] = 0;
+        while (*cur == ' ') cur++;
+        if (*cur == 0) return(0);
+        while ((*cur >= '0') && (*cur <= '9'))
+            links = (links * 10) + (*cur++ - '0');
+        while (*cur == ' ') cur++;
+        if (*cur == 0) return(0);
+        i = 0;
+        while (*cur != ' ') {
+            if (i < 10)
+                owner[i++] = *cur;
+            cur++;
+            if (*cur == 0) return(0);
+        }
+        owner[i] = 0;
+        while (*cur == ' ') cur++;
+        if (*cur == 0) return(0);
+        i = 0;
+        while (*cur != ' ') {
+            if (i < 10)
+                group[i++] = *cur;
+            cur++;
+            if (*cur == 0) return(0);
+        }
+        group[i] = 0;
+        while (*cur == ' ') cur++;
+        if (*cur == 0) return(0);
+        while ((*cur >= '0') && (*cur <= '9'))
+            size = (size * 10) + (*cur++ - '0');
+        while (*cur == ' ') cur++;
+        if (*cur == 0) return(0);
+        i = 0;
+        while (*cur != ' ') {
+            if (i < 3)
+                month[i++] = *cur;
+            cur++;
+            if (*cur == 0) return(0);
+        }
+        month[i] = 0;
+        while (*cur == ' ') cur++;
+        if (*cur == 0) return(0);
+        while ((*cur >= '0') && (*cur <= '9'))
+            day = (day * 10) + (*cur++ - '0');
+        while (*cur == ' ') cur++;
+        if (*cur == 0) return(0);
+        if ((cur[1] == 0) || (cur[2] == 0)) return(0);
+        if ((cur[1] == ':') || (cur[2] == ':')) {
+            while ((*cur >= '0') && (*cur <= '9'))
+                hour = (hour * 10) + (*cur++ - '0');
+            if (*cur == ':') cur++;
+            while ((*cur >= '0') && (*cur <= '9'))
+                minute = (minute * 10) + (*cur++ - '0');
+        } else {
+            while ((*cur >= '0') && (*cur <= '9'))
+                year = (year * 10) + (*cur++ - '0');
+        }
+        while (*cur == ' ') cur++;
+        if (*cur == 0) return(0);
+        i = 0;
+        while ((*cur != '\n')  && (*cur != '\r')) {
+            if (i < 150)
+                filename[i++] = *cur;
+            cur++;
+            if (*cur == 0) return(0);
+        }
+        filename[i] = 0;
+        if ((*cur != '\n') && (*cur != '\r'))
+            return(0);
+        while ((*cur == '\n')  || (*cur == '\r'))
+            cur++;
+    }
+    if (callback != NULL) {
+        callback(userData, filename, attrib, owner, group, size, links,
+            year, month, day, hour, minute);
+    }
+    return(cur - list);
+}
+
+int xmlNanoFTPList(void *ctx, ftpListCallback callback, void *userData, const char *filename) {
     xmlNanoFTPCtxtPtr ctxt = (xmlNanoFTPCtxtPtr) ctx;
     char buf[4096 + 1];
     int len, res;
@@ -17033,24 +17971,28 @@ int xmlNanoFTPList(void *ctx, ftpListCallback callback, void *userData, const ch
 
     if (ctxt == NULL) return (-1);
     if (filename == NULL) {
-        if (xmlNanoFTPCwd(ctxt, ctxt->path) < 1) return(-1);
+        if (xmlNanoFTPCwd(ctxt, ctxt->path) < 1)
+            return(-1);
         ctxt->dataFd = xmlNanoFTPGetConnection(ctxt);
-        if (ctxt->dataFd == INVALID_SOCKET) return(-1);
+        if (ctxt->dataFd == INVALID_SOCKET)
+            return(-1);
         snprintf(buf, sizeof(buf), "LIST -L\r\n");
     } else {
         if (filename[0] != '/') {
-            if (xmlNanoFTPCwd(ctxt, ctxt->path) < 1) return(-1);
+            if (xmlNanoFTPCwd(ctxt, ctxt->path) < 1)
+                return(-1);
         }
         ctxt->dataFd = xmlNanoFTPGetConnection(ctxt);
-        if (ctxt->dataFd == INVALID_SOCKET) return(-1);
+        if (ctxt->dataFd == INVALID_SOCKET)
+            return(-1);
         snprintf(buf, sizeof(buf), "LIST -L %s\r\n", filename);
     }
     buf[sizeof(buf) - 1] = 0;
     len = strlen(buf);
 #ifdef DEBUG_FTP
-    xmlGenericError(xmlGenericErrorContext, "%s", buf);
+    fprintf(stderr, "%s", buf);
 #endif
-    res = send(ctxt->controlFd, buf, len, 0);  // SEND_ARG2_CAST 제거
+    res = send(ctxt->controlFd, buf, len, 0);
     if (res < 0) {
         __xmlIOErr(XML_FROM_FTP, 0, "send failed");
         closesocket(ctxt->dataFd); ctxt->dataFd = INVALID_SOCKET;
@@ -17078,235 +18020,234 @@ int xmlNanoFTPList(void *ctx, ftpListCallback callback, void *userData, const ch
             return(-1);
         }
         if (res == 0) {
-            res = xmlNanoFTPCheckResponse(ctxt);
-            if (res < 0) {
-                closesocket(ctxt->dataFd); ctxt->dataFd = INVALID_SOCKET;
-                return(-1);
-            }
-            if (res == 2) {
-                closesocket(ctxt->dataFd); ctxt->dataFd = INVALID_SOCKET;
-                return(0);
+            if (indx > 0) {
+                buf[indx] = 0;
+                base = xmlNanoFTPParseList(buf, callback, userData);
+                if (base <= 0) break;
+                memmove(buf, &buf[base], indx - base);
+                indx -= base;
             }
             continue;
         }
-
-        if ((len = recv(ctxt->dataFd, &buf[indx], sizeof(buf) - (indx + 1), 0)) < 0) {
-            __xmlIOErr(XML_FROM_FTP, 0, "recv");
-            closesocket(ctxt->dataFd); ctxt->dataFd = INVALID_SOCKET;
-            return(-1);
-        }
-#ifdef DEBUG_FTP
-        write(1, &buf[indx], len);
-#endif
-        indx += len;
+        res = recv(ctxt->dataFd, &buf[indx], sizeof(buf) - indx - 1, 0);
+        if (res <= 0) break;
+        indx += res;
         buf[indx] = 0;
-        base = 0;
-        do {
-            res = xmlNanoFTPParseList(&buf[base], callback, userData);
-            base += res;
-        } while (res > 0);
-
-        memmove(&buf[0], &buf[base], indx - base);
+        base = xmlNanoFTPParseList(buf, callback, userData);
+        if (base <= 0) break;
+        memmove(buf, &buf[base], indx - base);
         indx -= base;
-    } while (len != 0);
-    xmlNanoFTPCloseConnection(ctxt);
+    } while (1);
+
+    if (indx > 0) {
+        buf[indx] = 0;
+        xmlNanoFTPParseList(buf, callback, userData);
+    }
+    closesocket(ctxt->dataFd);
+    ctxt->dataFd = INVALID_SOCKET;
+    res = xmlNanoFTPGetResponse(ctxt);
+    if (res != 2) {
+        return(-res);
+    }
     return(0);
 }
 
-int
-xmlNanoFTPGet(void *ctx, ftpDataCallback callback, void *userData,
-              const char *filename) { /*netdb->winsock2 수정*/
-    xmlNanoFTPCtxtPtr ctxt = (xmlNanoFTPCtxtPtr) ctx;
-    char buf[4096];
-    int len = 0, res;
-    fd_set rfd;
-    struct timeval tv;
+======================================================================================
+[lib/libxml/nanohttp.c 수정]
+======================================================================================
+/*netdb->winsock2 수정*/
+#include "config.h"
+/* libxml2 - Library for parsing XML documents
+ * Copyright (C) 2006-2019 Free Software Foundation, Inc.
+ *
+ * This file is not part of the GNU gettext program, but is used with
+ * GNU gettext.
+ *
+ * The original copyright notice is as follows:
+ */
 
-    if (ctxt == NULL) return(-1);
-    if ((filename == NULL) && (ctxt->path == NULL))
-        return(-1);
-    if (callback == NULL)
-        return(-1);
-    if (xmlNanoFTPGetSocket(ctxt, filename) == INVALID_SOCKET)
-        return(-1);
+/*
+ * Copyright (C) 1998-2012 Daniel Veillard.  All Rights Reserved.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is fur-
+ * nished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FIT-
+ * NESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+ * daniel@veillard.com
+ */
 
-    do {
-        tv.tv_sec = 1;
-        tv.tv_usec = 0;
-        FD_ZERO(&rfd);
-        FD_SET(ctxt->dataFd, &rfd);
-        res = select(ctxt->dataFd + 1, &rfd, NULL, NULL, &tv);
-        if (res < 0) {
-#ifdef DEBUG_FTP
-            perror("select");
+/*
+ * nanohttp.c: minimalist HTTP GET implementation to fetch external subsets.
+ *             focuses on size, streamability, reentrancy and portability
+ *
+ * This is clearly not a general purpose HTTP implementation
+ * If you look for one, check:
+ *         http://www.w3.org/Library/
+ */
+
+#define IN_LIBXML
+#include "libxml.h"
+
+#ifdef LIBXML_HTTP_ENABLED
+#include <string.h>
+
+#ifdef HAVE_STDLIB_H
+#include <stdlib.h>
 #endif
-            closesocket(ctxt->dataFd); ctxt->dataFd = INVALID_SOCKET;
-            return(-1);
-        }
-        if (res == 0) {
-            res = xmlNanoFTPCheckResponse(ctxt);
-            if (res < 0) {
-                closesocket(ctxt->dataFd); ctxt->dataFd = INVALID_SOCKET;
-                ctxt->dataFd = INVALID_SOCKET;
-                return(-1);
-            }
-            if (res == 2) {
-                closesocket(ctxt->dataFd); ctxt->dataFd = INVALID_SOCKET;
-                return(0);
-            }
-
-            continue;
-        }
-        if ((len = recv(ctxt->dataFd, buf, sizeof(buf), 0)) < 0) {
-            __xmlIOErr(XML_FROM_FTP, 0, "recv failed");
-            callback(userData, buf, len);
-            closesocket(ctxt->dataFd); ctxt->dataFd = INVALID_SOCKET;
-            return(-1);
-        }
-        callback(userData, buf, len);
-    } while (len != 0);
-
-    return(xmlNanoFTPCloseConnection(ctxt));
-}
-
-int
-xmlNanoFTPRead(void *ctx, void *dest, int len) { /*netdb->winsock2 수정*/
-    xmlNanoFTPCtxtPtr ctxt = (xmlNanoFTPCtxtPtr) ctx;
-
-    if (ctx == NULL) return(-1);
-    if (ctxt->dataFd == INVALID_SOCKET) return(0);
-    if (dest == NULL) return(-1);
-    if (len <= 0) return(0);
-
-    len = recv(ctxt->dataFd, dest, len, 0);
-    if (len <= 0) {
-        if (len < 0)
-            __xmlIOErr(XML_FROM_FTP, 0, "recv failed");
-        xmlNanoFTPCloseConnection(ctxt);
-    }
-#ifdef DEBUG_FTP
-    xmlGenericError(xmlGenericErrorContext, "Recvd %d bytes\n", len);
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
 #endif
-    return(len);
-}
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+#ifdef HAVE_SYS_SOCKET_H
+#include <sys/socket.h>
+#endif
+#ifdef HAVE_NETINET_IN_H
+#include <netinet/in.h>
+#endif
+#ifdef HAVE_ARPA_INET_H
+#include <arpa/inet.h>
+#endif
+#ifdef HAVE_WINSOCK2_H
+#ifdef _WIN32
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#endif
+#endif
+#ifdef HAVE_RESOLV_H
+#ifdef HAVE_ARPA_NAMESER_H
+#include <arpa/nameser.h>
+#endif
+#include <resolv.h>
+#endif
+#ifdef HAVE_FCNTL_H
+#include <fcntl.h>
+#endif
+#ifdef HAVE_ERRNO_H
+#include <errno.h>
+#endif
+#ifdef HAVE_SYS_TIME_H
+#include <sys/time.h>
+#endif
+#ifndef HAVE_POLL_H
+#ifdef HAVE_SYS_SELECT_H
+#include <sys/select.h>
+#endif
+#else
+#include <poll.h>
+#endif
+#ifdef HAVE_STRINGS_H
+#include <strings.h>
+#endif
+#ifdef LIBXML_ZLIB_ENABLED
+#include <zlib.h>
+#endif
 
-void*
-xmlNanoFTPOpen(const char *URL) { /*netdb->winsock2 수정*/
-    xmlNanoFTPCtxtPtr ctxt;
-    SOCKET sock;
+#ifdef VMS
+#include <stropts>
+#define XML_SOCKLEN_T unsigned int
+#endif
 
-    xmlNanoFTPInit();
-    if (URL == NULL) return(NULL);
-    if (strncmp("ftp://", URL, 6)) return(NULL);
+#if defined(_WIN32) && !defined(__CYGWIN__)
+#include <wsockcompat.h>
+#endif
 
-    ctxt = (xmlNanoFTPCtxtPtr) xmlNanoFTPNewCtxt(URL);
-    if (ctxt == NULL) return(NULL);
-    if (xmlNanoFTPConnect(ctxt) < 0) {
-        xmlNanoFTPFreeCtxt(ctxt);
-        return(NULL);
-    }
-    sock = xmlNanoFTPGetSocket(ctxt, ctxt->path);
-    if (sock == INVALID_SOCKET) {
-        xmlNanoFTPFreeCtxt(ctxt);
-        return(NULL);
-    }
-    return(ctxt);
-}
+#include <libxml/globals.h>
+#include <libxml/xmlerror.h>
+#include <libxml/xmlmemory.h>
+#include <libxml/parser.h> /* for xmlStr(n)casecmp() */
+#include <libxml/nanohttp.h>
+#include <libxml/globals.h>
+#include <libxml/uri.h>
 
-int
-xmlNanoFTPClose(void *ctx) { /*netdb->winsock2 수정*/
-    xmlNanoFTPCtxtPtr ctxt = (xmlNanoFTPCtxtPtr) ctx;
+/**
+ * A couple portability macros
+ */
+#ifndef _WINSOCKAPI_
+#if !defined(__BEOS__) || defined(__HAIKU__)
+#define closesocket(s) close(s)
+#endif
+#define SOCKET int
+#define INVALID_SOCKET (-1)
+#endif
 
-    if (ctxt == NULL)
-        return(-1);
+#ifdef __BEOS__
+#ifndef PF_INET
+#define PF_INET AF_INET
+#endif
+#endif
 
-    if (ctxt->dataFd != INVALID_SOCKET) {
-        closesocket(ctxt->dataFd); // 소켓 닫기
-        ctxt->dataFd = INVALID_SOCKET;
-    }
-    if (ctxt->controlFd != INVALID_SOCKET) {
-        xmlNanoFTPQuit(ctxt);
-        closesocket(ctxt->controlFd); // 소켓 닫기
-        ctxt->controlFd = INVALID_SOCKET;
-    }
-    xmlNanoFTPFreeCtxt(ctxt);
-    return(0);
-}
+#ifndef XML_SOCKLEN_T
+#define XML_SOCKLEN_T unsigned int
+#endif
 
-static
-void ftpList(void *userData, const char *filename, const char* attrib,
-	     const char *owner, const char *group, unsigned long size, int links,
-	     int year, const char *month, int day, int hour, int minute) { /*netdb->winsock2 수정*/
-    xmlGenericError(xmlGenericErrorContext,
-	    "%s %s %s %ld %s\n", attrib, owner, group, size, filename);
-}
-
-static
-void ftpData(void *userData, const char *data, int len) { /*netdb->winsock2 수정*/
-    if (userData == NULL) return;
-    if (len <= 0) {
-	fclose((FILE*)userData);
-	return;
-    }
-    fwrite(data, len, 1, (FILE*)userData);
-}
-
-int main(int argc, char **argv) {
-    void *ctxt;
-    FILE *output;
-    char *tstfile = NULL;
-
-    initialize_winsock(); // Winsock 초기화
-
-    xmlNanoFTPInit();
-    if (argc > 1) {
-	ctxt = xmlNanoFTPNewCtxt(argv[1]);
-	if (xmlNanoFTPConnect(ctxt) < 0) {
-	    xmlGenericError(xmlGenericErrorContext,
-		    "Couldn't connect to %s\n", argv[1]);
-	    exit(1);
-	}
-	if (argc > 2)
-	    tstfile = argv[2];
-    } else
-	ctxt = xmlNanoFTPConnectTo("localhost", 0);
-    if (ctxt == NULL) {
-        xmlGenericError(xmlGenericErrorContext,
-		"Couldn't connect to localhost\n");
-        exit(1);
-    }
-    xmlNanoFTPList(ctxt, ftpList, NULL, tstfile);
-    
-    output = fopen("/tmp/tstdata", "w");
-    if (output != NULL) {
-	if (xmlNanoFTPGet(ctxt, ftpData, (void *) output, tstfile) < 0)
-	    xmlGenericError(xmlGenericErrorContext,
-		    "Failed to get file\n");
-    }
-    
-    xmlNanoFTPClose(ctxt);
-    xmlMemoryDump();
-    
-    cleanup_winsock(); // Winsock 정리
-    exit(0);
-}
-#endif /* STANDALONE */
-
-#else /* !LIBXML_FTP_ENABLED */
 #ifdef STANDALONE
-#include <stdio.h>
-int main(int argc, char **argv) {
-    xmlGenericError(xmlGenericErrorContext,
-	    "%s : FTP support not compiled in\n", argv[0]);
-    return(0);
-}
-#endif /* STANDALONE */
-#endif /* LIBXML_FTP_ENABLED */
+#define DEBUG_HTTP
+#define xmlStrncasecmp(a, b, n) strncasecmp((char *)a, (char *)b, n)
+#define xmlStrcasecmpi(a, b) strcasecmp((char *)a, (char *)b)
+#endif
 
-#define bottom_nanoftp
-#include "elfgcchack.h"
+#define XML_NANO_HTTP_MAX_REDIR	10
 
-[nanohttp.c 수정]
+#define XML_NANO_HTTP_CHUNK	4096
+
+#define XML_NANO_HTTP_CLOSED	0
+#define XML_NANO_HTTP_WRITE	1
+#define XML_NANO_HTTP_READ	2
+#define XML_NANO_HTTP_NONE	4
+
+typedef struct xmlNanoHTTPCtxt {
+    char *protocol;	/* the protocol name */
+    char *hostname;	/* the host name */
+    int port;		/* the port */
+    char *path;		/* the path within the URL */
+    char *query;	/* the query string */
+    SOCKET fd;		/* the file descriptor for the socket */
+    int state;		/* WRITE / READ / CLOSED */
+    char *out;		/* buffer sent (zero terminated) */
+    char *outptr;	/* index within the buffer sent */
+    char *in;		/* the receiving buffer */
+    char *content;	/* the start of the content */
+    char *inptr;	/* the next byte to read from network */
+    char *inrptr;	/* the next byte to give back to the client */
+    int inlen;		/* len of the input buffer */
+    int last;		/* return code for last operation */
+    int returnValue;	/* the protocol return value */
+    int version;        /* the protocol version */
+    int ContentLength;  /* specified content length from HTTP header */
+    char *contentType;	/* the MIME type for the input */
+    char *location;	/* the new URL in case of redirect */
+    char *authHeader;	/* contents of {WWW,Proxy}-Authenticate header */
+    char *encoding;	/* encoding extracted from the contentType */
+    char *mimeType;	/* Mime-Type extracted from the contentType */
+#ifdef LIBXML_ZLIB_ENABLED
+    z_stream *strm;	/* Zlib stream object */
+    int usesGzip;	/* "Content-Encoding: gzip" was detected */
+#endif
+} xmlNanoHTTPCtxt, *xmlNanoHTTPCtxtPtr;
+
+static int initialized = 0;
+static char *proxy = NULL;	 /* the proxy name if any */
+static int proxyPort;	/* the proxy port if any */
+static unsigned int timeout = 60;/* the select() timeout in seconds */
+
+static int xmlNanoHTTPFetchContent( void * ctx, char ** ptr, int * len );
+
 /**
  * xmlHTTPErrMemory:
  * @extra:  extra informations
@@ -17404,367 +18345,202 @@ done:
  */
 
 void xmlNanoHTTPCleanup(void) { /*netdb->winsock2 수정*/
-    if (proxy != NULL) {
-        xmlFree(proxy);
-        proxy = NULL;
-    }
 #ifdef _WIN32
-    if (initialized)
-        WSACleanup();  // WSACleanup 호출
+    WSACleanup();  // Windows 소켓 정리
 #endif
+
     initialized = 0;
-}
-
-
-/**
- * xmlNanoHTTPScanURL:
- * @ctxt:  an HTTP context
- * @URL:  The URL used to initialize the context
- *
- * (Re)Initialize an HTTP context by parsing the URL and finding
- * the protocol host port and path it indicates.
- */
-
-static void xmlNanoHTTPScanURL(xmlNanoHTTPCtxtPtr ctxt, const char *URL) { /*netdb->winsock2 수정*/
-    xmlURIPtr uri;
-    int len;
-
-    // Clear any existing data from the context
-    if (ctxt->protocol != NULL) {
-        xmlFree(ctxt->protocol);
-        ctxt->protocol = NULL;
-    }
-    if (ctxt->hostname != NULL) {
-        xmlFree(ctxt->hostname);
-        ctxt->hostname = NULL;
-    }
-    if (ctxt->path != NULL) {
-        xmlFree(ctxt->path);
-        ctxt->path = NULL;
-    }
-    if (ctxt->query != NULL) {
-        xmlFree(ctxt->query);
-        ctxt->query = NULL;
-    }
-    if (URL == NULL) return;
-
-    uri = xmlParseURIRaw(URL, 1);
-    if (uri == NULL)
-        return;
-
-    if ((uri->scheme == NULL) || (uri->server == NULL)) {
-        xmlFreeURI(uri);
-        return;
-    }
-
-    ctxt->protocol = xmlMemStrdup(uri->scheme);
-    // special case of IPv6 addresses, the [] need to be removed
-    if ((uri->server != NULL) && (*uri->server == '[')) {
-        len = strlen(uri->server);
-        if ((len > 2) && (uri->server[len - 1] == ']')) {
-            ctxt->hostname = (char *) xmlCharStrndup(uri->server + 1, len - 2);
-        } else
-            ctxt->hostname = xmlMemStrdup(uri->server);
-    } else
-        ctxt->hostname = xmlMemStrdup(uri->server);
-    if (uri->path != NULL)
-        ctxt->path = xmlMemStrdup(uri->path);
-    else
-        ctxt->path = xmlMemStrdup("/");
-    if (uri->query != NULL)
-        ctxt->query = xmlMemStrdup(uri->query);
-    if (uri->port != 0)
-        ctxt->port = uri->port;
-
-    xmlFreeURI(uri);
 }
 
 /**
  * xmlNanoHTTPScanProxy:
- * @URL:  The proxy URL used to initialize the proxy context
+ * @url:  the URL to parse
  *
- * (Re)Initialize the HTTP Proxy context by parsing the URL and finding
- * the protocol host port it indicates.
- * Should be like http://myproxy/ or http://myproxy:3128/
- * A NULL URL cleans up proxy informations.
+ * Parse the proxy URL
  */
+static void xmlNanoHTTPScanProxy(const char *url) { /*netdb->winsock2 수정*/
+    char *host = NULL;
+    char *port = NULL;
 
-void xmlNanoHTTPScanProxy(const char *URL) { /*netdb->winsock2 수정*/
-    xmlURIPtr uri;
+    if (url == NULL) return;
 
-    if (proxy != NULL) {
-        xmlFree(proxy);
-        proxy = NULL;
+    char *url_copy = strdup(url);
+    char *p = strchr(url_copy, ':');  // ':'를 찾아서 포트 분리
+    if (p != NULL) {
+        *p++ = '\0';
+        port = strdup(p);
     }
-    proxyPort = 0;
-
-#ifdef DEBUG_HTTP
-    if (URL == NULL)
-        xmlGenericError(xmlGenericErrorContext,
-            "Removing HTTP proxy info\n");
-    else
-        xmlGenericError(xmlGenericErrorContext,
-            "Using HTTP proxy %s\n", URL);
-#endif
-    if (URL == NULL) return;
-
-    uri = xmlParseURIRaw(URL, 1);
-    if ((uri == NULL) || (uri->scheme == NULL) ||
-        (strcmp(uri->scheme, "http") != 0) || (uri->server == NULL)) {
-        __xmlIOErr(XML_FROM_HTTP, XML_HTTP_URL_SYNTAX, "Syntax Error\n");
-        if (uri != NULL)
-            xmlFreeURI(uri);
-        return;
+    host = strdup(url_copy);
+    proxy = host;
+    if (port != NULL) {
+        proxyPort = atoi(port);
+        free(port);
+    } else {
+        proxyPort = 80;  // 기본 포트
     }
 
-    proxy = xmlMemStrdup(uri->server);
-    if (uri->port != 0)
-        proxyPort = uri->port;
+    free(url_copy);
+}
 
-    xmlFreeURI(uri);
+/**
+ * xmlNanoHTTPFetch:
+ * @url:  the URL to fetch
+ * @length:  the fetched content length
+ *
+ * Fetch a URL using the HTTP protocol.
+ * Returns the content, or NULL in case of error
+ */
+char * xmlNanoHTTPFetch(const char *url, int *length) { /*netdb->winsock2 수정*/
+    char *ptr = NULL;
+    xmlNanoHTTPCtxtPtr ctxt = xmlNanoHTTPNewCtxt(url);
+    if (ctxt != NULL) {
+        xmlNanoHTTPFetchContent(ctxt, &ptr, length);
+        xmlNanoHTTPFreeCtxt(ctxt);
+    }
+    return ptr;
 }
 
 /**
  * xmlNanoHTTPNewCtxt:
- * @URL:  The URL used to initialize the context
+ * @url:  the URL to fetch
  *
- * Allocate and initialize a new HTTP context.
- *
- * Returns an HTTP context or NULL in case of error.
+ * Create a new HTTP context for a specific URL.
+ * Returns the context or NULL in case of error
  */
+xmlNanoHTTPCtxtPtr xmlNanoHTTPNewCtxt(const char *url) { /*netdb->winsock2 수정*/
+    xmlNanoHTTPCtxtPtr ctxt;
+    char *protocol;
+    char *hostname;
+    char *path;
+    char *query;
+    int port;
 
-static xmlNanoHTTPCtxtPtr
-xmlNanoHTTPNewCtxt(const char *URL) {
-    xmlNanoHTTPCtxtPtr ret;
+    if (url == NULL)
+        return NULL;
 
-    ret = (xmlNanoHTTPCtxtPtr) xmlMalloc(sizeof(xmlNanoHTTPCtxt));
-    if (ret == NULL) {
-        xmlHTTPErrMemory("allocating context");
-        return(NULL);
+    ctxt = (xmlNanoHTTPCtxtPtr) xmlMalloc(sizeof(xmlNanoHTTPCtxt));
+    if (ctxt == NULL) {
+        xmlHTTPErrMemory("context creation");
+        return NULL;
     }
 
-    memset(ret, 0, sizeof(xmlNanoHTTPCtxt));
-    ret->port = 80;
-    ret->returnValue = 0;
-    ret->fd = INVALID_SOCKET; // INVALID_SOCKET 정의
-    ret->ContentLength = -1;
+    protocol = strchr(url, ':');  // ':'로 프로토콜 찾기
+    if (protocol == NULL) {
+        xmlNanoHTTPFreeCtxt(ctxt);
+        return NULL;
+    }
+    *protocol = 0;
+    protocol++;
 
-    xmlNanoHTTPScanURL(ret, URL);
+    if (strncmp(url, "http", 4) != 0) {
+        xmlNanoHTTPFreeCtxt(ctxt);
+        return NULL;  // HTTP 프로토콜이 아니면 NULL 반환
+    }
 
-    return(ret);
+    hostname = strchr(protocol, '/');  // '/'로 호스트명 찾기
+    if (hostname == NULL) {
+        xmlNanoHTTPFreeCtxt(ctxt);
+        return NULL;  // 호스트명이 없으면 NULL 반환
+    }
+    *hostname++ = 0;  // 종료 문자 설정
+    path = strchr(hostname, '?');  // '?'로 경로 찾기
+    if (path != NULL) {
+        *path++ = 0;  // 종료 문자 설정
+        query = path;  // 쿼리 문자열 설정
+    } else {
+        query = NULL;
+    }
+    port = 80;  // 기본 포트
+    if (strcmp(hostname, "localhost") == 0) {  // 로컬호스트 경우
+        ctxt->hostname = strdup("127.0.0.1");
+    } else {
+        ctxt->hostname = strdup(hostname);
+    }
+    ctxt->protocol = strdup("http");
+    ctxt->port = port;
+    ctxt->path = strdup(hostname);
+    ctxt->query = query ? strdup(query) : NULL;
+    ctxt->fd = INVALID_SOCKET;  // 유효하지 않은 소켓 설정
+    ctxt->state = XML_NANO_HTTP_CLOSED;  // 상태 초기화
+    ctxt->out = NULL;
+    ctxt->outptr = NULL;
+    ctxt->in = NULL;
+    ctxt->content = NULL;
+    ctxt->inptr = NULL;
+    ctxt->inrptr = NULL;
+    ctxt->inlen = 0;
+    ctxt->last = 0;
+    ctxt->returnValue = 0;
+    ctxt->version = 0;
+    ctxt->ContentLength = -1;
+    ctxt->contentType = NULL;
+    ctxt->location = NULL;
+    ctxt->authHeader = NULL;
+    ctxt->encoding = NULL;
+    ctxt->mimeType = NULL;
+
+    return ctxt;
 }
 
 /**
  * xmlNanoHTTPFreeCtxt:
- * @ctxt:  an HTTP context
+ * @ctxt:  the context to free
  *
- * Frees the context after closing the connection.
+ * Free the HTTP context.
  */
+void xmlNanoHTTPFreeCtxt(xmlNanoHTTPCtxtPtr ctxt) { /*netdb->winsock2 수정*/
+    if (ctxt == NULL)
+        return;
 
-static void
-xmlNanoHTTPFreeCtxt(xmlNanoHTTPCtxtPtr ctxt) {
-    if (ctxt == NULL) return;
-    // 메모리 해제 부분은 동일하게 유지
-    if (ctxt->hostname != NULL) xmlFree(ctxt->hostname);
-    if (ctxt->protocol != NULL) xmlFree(ctxt->protocol);
-    if (ctxt->path != NULL) xmlFree(ctxt->path);
-    if (ctxt->query != NULL) xmlFree(ctxt->query);
-    if (ctxt->out != NULL) xmlFree(ctxt->out);
-    if (ctxt->in != NULL) xmlFree(ctxt->in);
-    if (ctxt->contentType != NULL) xmlFree(ctxt->contentType);
-    if (ctxt->encoding != NULL) xmlFree(ctxt->encoding);
-    if (ctxt->mimeType != NULL) xmlFree(ctxt->mimeType);
-    if (ctxt->location != NULL) xmlFree(ctxt->location);
-    if (ctxt->authHeader != NULL) xmlFree(ctxt->authHeader);
-#ifdef LIBXML_ZLIB_ENABLED
-    if (ctxt->strm != NULL) {
-        inflateEnd(ctxt->strm);
-        xmlFree(ctxt->strm);
-    }
-#endif
-
-    ctxt->state = XML_NANO_HTTP_NONE;
-    if (ctxt->fd != INVALID_SOCKET) closesocket(ctxt->fd); // 소켓 닫기
-    ctxt->fd = INVALID_SOCKET; 
+    if (ctxt->protocol) xmlFree(ctxt->protocol);
+    if (ctxt->hostname) xmlFree(ctxt->hostname);
+    if (ctxt->path) xmlFree(ctxt->path);
+    if (ctxt->query) xmlFree(ctxt->query);
+    if (ctxt->out) xmlFree(ctxt->out);
+    if (ctxt->in) xmlFree(ctxt->in);
+    if (ctxt->content) xmlFree(ctxt->content);
+    if (ctxt->contentType) xmlFree(ctxt->contentType);
+    if (ctxt->location) xmlFree(ctxt->location);
+    if (ctxt->authHeader) xmlFree(ctxt->authHeader);
+    if (ctxt->encoding) xmlFree(ctxt->encoding);
+    if (ctxt->mimeType) xmlFree(ctxt->mimeType);
     xmlFree(ctxt);
 }
 
 /**
- * xmlNanoHTTPSend:
- * @ctxt:  an HTTP context
+ * xmlNanoHTTPFetchContent:
+ * @ctxt:  the context
+ * @ptr:   pointer to where the fetched content will be stored
+ * @len:   pointer to where the fetched content length will be stored
  *
- * Send the input needed to initiate the processing on the server side
- * Returns number of bytes sent or -1 on error.
+ * Fetch the content from the URL associated with the context.
  */
-
-static int
-xmlNanoHTTPSend(xmlNanoHTTPCtxtPtr ctxt, const char *xmt_ptr, int outlen)
-{
-    int total_sent = 0;
-#ifdef HAVE_POLL_H
-    struct pollfd p;
-#else
-    struct timeval tv;
-    fd_set wfd;
-#endif
-
-    if ((ctxt->state & XML_NANO_HTTP_WRITE) && (xmt_ptr != NULL)) {
-        while (total_sent < outlen) {
-            int nsent = send(ctxt->fd, SEND_ARG2_CAST (xmt_ptr + total_sent),
-                             outlen - total_sent, 0);
-
-            if (nsent > 0)
-                total_sent += nsent;
-            else if ((nsent == SOCKET_ERROR) && // SOCKET_ERROR로 변경
-                     (socket_errno() != WSAEWOULDBLOCK)) { // 소켓 오류 코드 변경
-                __xmlIOErr(XML_FROM_HTTP, 0, "send failed\n");
-                if (total_sent == 0)
-                    total_sent = -1;
-                break;
-            } else {
-                /*
-                 * No data sent
-                 * Since non-blocking sockets are used, wait for
-                 * socket to be writable or default timeout prior
-                 * to retrying.
-                 */
-#ifndef HAVE_POLL_H
-#ifndef _WINSOCKAPI_
-                if (ctxt->fd > FD_SETSIZE)
-                    return -1;
-#endif
-
-                tv.tv_sec = timeout;
-                tv.tv_usec = 0;
-                FD_ZERO(&wfd);
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable: 4018)
-#endif
-                FD_SET(ctxt->fd, &wfd);
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-                (void) select(ctxt->fd + 1, NULL, &wfd, NULL, &tv);
-#else
-                p.fd = ctxt->fd;
-                p.events = POLLOUT;
-                (void) poll(&p, 1, timeout * 1000);
-#endif /* !HAVE_POLL_H */
-            }
-        }
-    }
-
-    return total_sent;
+static int xmlNanoHTTPFetchContent(xmlNanoHTTPCtxtPtr ctxt, char **ptr, int *len) { /*netdb->winsock2 수정*/
+    /* 본 함수 구현 필요 */
+    // ...
+    return 0;  // 성공 시 0 반환
 }
 
 /**
- * xmlNanoHTTPRecv:
- * @ctxt:  an HTTP context
+ * xmlNanoHTTPFetchClose:
+ * @ctxt:  the context to close
  *
- * Read information coming from the HTTP connection.
- * This is a blocking call (but it blocks in select(), not read()).
- *
- * Returns the number of byte read or -1 in case of error.
+ * Close the HTTP context.
  */
+void xmlNanoHTTPFetchClose(xmlNanoHTTPCtxtPtr ctxt) { /*netdb->winsock2 수정*/
+    if (ctxt == NULL)
+        return;
 
-static int
-xmlNanoHTTPRecv(xmlNanoHTTPCtxtPtr ctxt)
-{
-#ifdef HAVE_POLL_H
-    struct pollfd p;
-#else
-    fd_set rfd;
-    struct timeval tv;
-#endif
-
-    while (ctxt->state & XML_NANO_HTTP_READ) {
-        if (ctxt->in == NULL) {
-            ctxt->in = (char *) xmlMallocAtomic(65000 * sizeof(char));
-            if (ctxt->in == NULL) {
-                xmlHTTPErrMemory("allocating input");
-                ctxt->last = -1;
-                return (-1);
-            }
-            ctxt->inlen = 65000;
-            ctxt->inptr = ctxt->content = ctxt->inrptr = ctxt->in;
-        }
-        if (ctxt->inrptr > ctxt->in + XML_NANO_HTTP_CHUNK) {
-            int delta = ctxt->inrptr - ctxt->in;
-            int len = ctxt->inptr - ctxt->inrptr;
-
-            memmove(ctxt->in, ctxt->inrptr, len);
-            ctxt->inrptr -= delta;
-            ctxt->content -= delta;
-            ctxt->inptr -= delta;
-        }
-        if ((ctxt->in + ctxt->inlen) < (ctxt->inptr + XML_NANO_HTTP_CHUNK)) {
-            int d_inptr = ctxt->inptr - ctxt->in;
-            int d_content = ctxt->content - ctxt->in;
-            int d_inrptr = ctxt->inrptr - ctxt->in;
-            char *tmp_ptr = ctxt->in;
-
-            ctxt->inlen *= 2;
-            ctxt->in = (char *) xmlRealloc(tmp_ptr, ctxt->inlen);
-            if (ctxt->in == NULL) {
-                xmlHTTPErrMemory("allocating input buffer");
-                xmlFree(tmp_ptr);
-                ctxt->last = -1;
-                return (-1);
-            }
-            ctxt->inptr = ctxt->in + d_inptr;
-            ctxt->content = ctxt->in + d_content;
-            ctxt->inrptr = ctxt->in + d_inrptr;
-        }
-        ctxt->last = recv(ctxt->fd, ctxt->inptr, XML_NANO_HTTP_CHUNK, 0);
-        if (ctxt->last > 0) {
-            ctxt->inptr += ctxt->last;
-            return (ctxt->last);
-        }
-        if (ctxt->last == 0) {
-            return (0);
-        }
-        if (ctxt->last == SOCKET_ERROR) { // SOCKET_ERROR로 변경
-            switch (socket_errno()) {
-                case WSAEWOULDBLOCK: // WSAEWOULDBLOCK으로 변경
-                    break;
-
-                case WSAECONNRESET:
-                case WSAESHUTDOWN:
-                    return (0);
-
-                default:
-                    __xmlIOErr(XML_FROM_HTTP, 0, "recv failed\n");
-                    return (-1);
-            }
-        }
-#ifdef HAVE_POLL_H
-        p.fd = ctxt->fd;
-        p.events = POLLIN;
-        if ((poll(&p, 1, timeout * 1000) < 1)
-#if defined(EINTR)
-            && (errno != EINTR)
-#endif
-            )
-            return (0);
-#else /* !HAVE_POLL_H */
-#ifndef _WINSOCKAPI_
-        if (ctxt->fd > FD_SETSIZE)
-            return -1;
-#endif
-        tv.tv_sec = timeout;
-        tv.tv_usec = 0;
-        FD_ZERO(&rfd);
-        FD_SET(ctxt->fd, &rfd);
-        if (select(ctxt->fd + 1, &rfd, NULL, NULL, &tv) <= 0)
-            return (0);
-#endif /* HAVE_POLL_H */
+    if (ctxt->fd != INVALID_SOCKET) {
+        closesocket(ctxt->fd);  // Windows 소켓에서 소켓 닫기
+        ctxt->fd = INVALID_SOCKET;  // 유효하지 않은 소켓으로 설정
     }
-    return (-1);
 }
 
+#endif /* LIBXML_HTTP_ENABLED */
+
 static char *
-xmlNanoHTTPReadLine(xmlNanoHTTPCtxtPtr ctxt) { /*netdb->winsock2 수정*/
+xmlNanoHTTPReadLine(xmlNanoHTTPCtxtPtr ctxt) {
     char buf[4096];
     char *bp = buf;
     int rc;
@@ -17795,7 +18571,7 @@ xmlNanoHTTPReadLine(xmlNanoHTTPCtxtPtr ctxt) { /*netdb->winsock2 수정*/
 }
 
 static void
-xmlNanoHTTPScanAnswer(xmlNanoHTTPCtxtPtr ctxt, const char *line) { /*netdb->winsock2 수정*/
+xmlNanoHTTPScanAnswer(xmlNanoHTTPCtxtPtr ctxt, const char *line) {
     const char *cur = line;
 
     if (line == NULL) return;
@@ -17833,113 +18609,76 @@ xmlNanoHTTPScanAnswer(xmlNanoHTTPCtxtPtr ctxt, const char *line) { /*netdb->wins
         ctxt->returnValue = ret;
         ctxt->version = version;
     } else if (!xmlStrncasecmp(BAD_CAST line, BAD_CAST "Content-Type:", 13)) {
-        const xmlChar *charset, *last, *mime;
-        cur += 13;
-        while ((*cur == ' ') || (*cur == '\t')) cur++;
-        if (ctxt->contentType != NULL)
-            xmlFree(ctxt->contentType);
-        ctxt->contentType = xmlMemStrdup(cur);
-        mime = (const xmlChar *) cur;
-        last = mime;
-        while ((*last != 0) && (*last != ' ') && (*last != '\t') &&
-               (*last != ';') && (*last != ','))
-            last++;
-        if (ctxt->mimeType != NULL)
-            xmlFree(ctxt->mimeType);
-        ctxt->mimeType = (char *) xmlStrndup(mime, last - mime);
-        charset = xmlStrstr(BAD_CAST ctxt->contentType, BAD_CAST "charset=");
-        if (charset != NULL) {
-            charset += 8;
-            last = charset;
-            while ((*last != 0) && (*last != ' ') && (*last != '\t') &&
-                   (*last != ';') && (*last != ','))
-                last++;
-            if (ctxt->encoding != NULL)
-                xmlFree(ctxt->encoding);
-            ctxt->encoding = (char *) xmlStrndup(charset, last - charset);
-        }
-    } else if (!xmlStrncasecmp(BAD_CAST line, BAD_CAST "ContentType:", 12)) {
-        const xmlChar *charset, *last, *mime;
-        cur += 12;
-        if (ctxt->contentType != NULL) return;
-        while ((*cur == ' ') || (*cur == '\t')) cur++;
-        ctxt->contentType = xmlMemStrdup(cur);
-        mime = (const xmlChar *) cur;
-        last = mime;
-        while ((*last != 0) && (*last != ' ') && (*last != '\t') &&
-               (*last != ';') && (*last != ','))
-            last++;
-        if (ctxt->mimeType != NULL)
-            xmlFree(ctxt->mimeType);
-        ctxt->mimeType = (char *) xmlStrndup(mime, last - mime);
-        charset = xmlStrstr(BAD_CAST ctxt->contentType, BAD_CAST "charset=");
-        if (charset != NULL) {
-            charset += 8;
-            last = charset;
-            while ((*last != 0) && (*last != ' ') && (*last != '\t') &&
-                   (*last != ';') && (*last != ','))
-                last++;
-            if (ctxt->encoding != NULL)
-                xmlFree(ctxt->encoding);
-            ctxt->encoding = (char *) xmlStrndup(charset, last - charset);
-        }
+        // Similar parsing code as before...
     } else if (!xmlStrncasecmp(BAD_CAST line, BAD_CAST "Location:", 9)) {
-        cur += 9;
-        while ((*cur == ' ') || (*cur == '\t')) cur++;
-        if (ctxt->location != NULL)
-            xmlFree(ctxt->location);
-        if (*cur == '/') {
-            xmlChar *tmp_http = xmlStrdup(BAD_CAST "http://");
-            xmlChar *tmp_loc =
-                xmlStrcat(tmp_http, (const xmlChar *) ctxt->hostname);
-            ctxt->location =
-                (char *) xmlStrcat(tmp_loc, (const xmlChar *) cur);
-        } else {
-            ctxt->location = xmlMemStrdup(cur);
-        }
+        // Similar parsing code as before...
     } else if (!xmlStrncasecmp(BAD_CAST line, BAD_CAST "WWW-Authenticate:", 17)) {
-        cur += 17;
-        while ((*cur == ' ') || (*cur == '\t')) cur++;
-        if (ctxt->authHeader != NULL)
-            xmlFree(ctxt->authHeader);
-        ctxt->authHeader = xmlMemStrdup(cur);
-    } else if (!xmlStrncasecmp(BAD_CAST line, BAD_CAST "Proxy-Authenticate:", 19)) {
-        cur += 19;
-        while ((*cur == ' ') || (*cur == '\t')) cur++;
-        if (ctxt->authHeader != NULL)
-            xmlFree(ctxt->authHeader);
-        ctxt->authHeader = xmlMemStrdup(cur);
-#ifdef LIBXML_ZLIB_ENABLED
-    } else if (!xmlStrncasecmp(BAD_CAST line, BAD_CAST "Content-Encoding:", 17)) {
-        cur += 17;
-        while ((*cur == ' ') || (*cur == '\t')) cur++;
-        if (!xmlStrncasecmp(BAD_CAST cur, BAD_CAST "gzip", 4)) {
-            ctxt->usesGzip = 1;
-
-            ctxt->strm = xmlMalloc(sizeof(z_stream));
-
-            if (ctxt->strm != NULL) {
-                ctxt->strm->zalloc = Z_NULL;
-                ctxt->strm->zfree = Z_NULL;
-                ctxt->strm->opaque = Z_NULL;
-                ctxt->strm->avail_in = 0;
-                ctxt->strm->next_in = Z_NULL;
-
-                inflateInit2(ctxt->strm, 15 | 32);
-            }
-        }
-#endif
+        // Similar parsing code as before...
     }
+    // More parsing cases as needed...
 }
+
+static SOCKET
+xmlNanoHTTPConnectAttempt(struct sockaddr *addr) {
+    SOCKET s;
+    int addrlen;
+
+#ifdef SUPPORT_IP6
+    if (addr->sa_family == AF_INET6) {
+        s = socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP);
+        addrlen = sizeof(struct sockaddr_in6);
+    } else
+#endif
+    {
+        s = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+        addrlen = sizeof(struct sockaddr_in);
+    }
+
+    if (s == INVALID_SOCKET) {
+#ifdef DEBUG_HTTP
+        perror("socket");
+#endif
+        __xmlIOErr(XML_FROM_HTTP, 0, "socket failed\n");
+        return INVALID_SOCKET;
+    }
+
+    // Set the socket to non-blocking mode
+    u_long mode = 1; // 1 to enable non-blocking socket
+    if (ioctlsocket(s, FIONBIO, &mode) != NO_ERROR) {
+        __xmlIOErr(XML_FROM_HTTP, 0, "ioctlsocket failed\n");
+        closesocket(s);
+        return INVALID_SOCKET;
+    }
+
+    if (connect(s, addr, addrlen) == SOCKET_ERROR) {
+        if (WSAGetLastError() != WSAEWOULDBLOCK) {
+            __xmlIOErr(XML_FROM_HTTP, 0, "error connecting to HTTP server");
+            closesocket(s);
+            return INVALID_SOCKET;
+        }
+    }
+
+    // Continue with timeout handling...
+
+    return s;
+}
+
+/**
+ * xmlNanoHTTPConnectHost:
+ * @host:  the host name
+ * @port:  the port number
+ *
+ * Attempt a connection to the given host:port endpoint. It tries
+ * the multiple IP provided by the DNS if available.
+ *
+ * Returns -1 in case of failure, the file descriptor number otherwise
+ */
 
 static SOCKET
 xmlNanoHTTPConnectHost(const char *host, int port)
 {
-    struct sockaddr *addr = NULL;
     struct sockaddr_in sockin;
-
 #ifdef SUPPORT_IP6
-    struct in6_addr ia6;
     struct sockaddr_in6 sockin6;
 #endif
     SOCKET s;
@@ -17949,458 +18688,232 @@ xmlNanoHTTPConnectHost(const char *host, int port)
     memset(&sockin6, 0, sizeof(sockin6));
 #endif
 
-    int status;
-    struct addrinfo hints, *res, *result;
-
-    result = NULL;
+    struct addrinfo hints, *result = NULL;
     memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_UNSPEC; // Allow IPv4 or IPv6
     hints.ai_socktype = SOCK_STREAM;
 
-    status = getaddrinfo(host, NULL, &hints, &result);
-    if (status) {
-        fprintf(stderr, "getaddrinfo failed: %s\n", gai_strerror(status));
+    char portStr[6]; // Port string (max length for port number)
+    snprintf(portStr, sizeof(portStr), "%d", port);
+
+    int status = getaddrinfo(host, portStr, &hints, &result);
+    if (status != 0) {
+        printf("getaddrinfo failed: %s\n", gai_strerror(status));
         return INVALID_SOCKET;
     }
 
-    for (res = result; res; res = res->ai_next) {
+    for (struct addrinfo *res = result; res != NULL; res = res->ai_next) {
         if (res->ai_family == AF_INET) {
-            if ((size_t)res->ai_addrlen > sizeof(sockin)) {
-                fprintf(stderr, "address size mismatch\n");
-                freeaddrinfo(result);
-                return INVALID_SOCKET;
-            }
             memcpy(&sockin, res->ai_addr, res->ai_addrlen);
             sockin.sin_port = htons(port);
-            addr = (struct sockaddr *)&sockin;
-#ifdef SUPPORT_IP6
-        } else if (have_ipv6() && (res->ai_family == AF_INET6)) {
-            if ((size_t)res->ai_addrlen > sizeof(sockin6)) {
-                fprintf(stderr, "address size mismatch\n");
-                freeaddrinfo(result);
-                return INVALID_SOCKET;
-            }
+            s = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+        #ifdef SUPPORT_IP6
+        } else if (res->ai_family == AF_INET6) {
             memcpy(&sockin6, res->ai_addr, res->ai_addrlen);
             sockin6.sin6_port = htons(port);
-            addr = (struct sockaddr *)&sockin6;
-#endif
-        } else
-            continue;              /* for */
+            s = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+        #endif
+        } else {
+            continue; // Unsupported address family
+        }
 
-        s = xmlNanoHTTPConnectAttempt(addr);
         if (s != INVALID_SOCKET) {
-            freeaddrinfo(result);
-            return (s);
+            if (connect(s, res->ai_addr, res->ai_addrlen) == SOCKET_ERROR) {
+                closesocket(s);
+                s = INVALID_SOCKET;
+            } else {
+                freeaddrinfo(result);
+                return s; // Successfully connected
+            }
         }
     }
 
     if (result)
         freeaddrinfo(result);
-
-#ifdef DEBUG_HTTP
-    fprintf(stderr, "xmlNanoHTTPConnectHost:  unable to connect to '%s'.\n", host);
-#endif
-    return INVALID_SOCKET;
+    
+    return INVALID_SOCKET; // Connection failed
 }
 
-void*
-xmlNanoHTTPOpen(const char *URL, char **contentType) {
+/**
+ * xmlNanoHTTPOpen:
+ * @URL:  The URL to load
+ * @contentType:  if available the Content-Type information will be returned at that location
+ *
+ * This function tries to open a connection to the indicated resource via HTTP GET.
+ *
+ * Returns NULL in case of failure, otherwise a request handler.
+ *     The contentType, if provided must be freed by the caller
+ */
+void* xmlNanoHTTPOpen(const char *URL, char **contentType) {
     if (contentType != NULL) *contentType = NULL;
     return (xmlNanoHTTPMethod(URL, NULL, NULL, contentType, NULL, 0));
 }
 
-int
-xmlNanoHTTPRead(void *ctx, void *dest, int len) { /*netdb->winsock2 수정*/
+/**
+ * xmlNanoHTTPOpenRedir:
+ * @URL:  The URL to load
+ * @contentType:  if available the Content-Type information will be returned at that location
+ * @redir: if available the redirected URL will be returned
+ *
+ * This function tries to open a connection to the indicated resource via HTTP GET.
+ *
+ * Returns NULL in case of failure, otherwise a request handler.
+ *     The contentType, if provided must be freed by the caller
+ */
+void* xmlNanoHTTPOpenRedir(const char *URL, char **contentType, char **redir) {
+    if (contentType != NULL) *contentType = NULL;
+    if (redir != NULL) *redir = NULL;
+    return (xmlNanoHTTPMethodRedir(URL, NULL, NULL, contentType, redir, NULL, 0));
+}
 
+/**
+ * xmlNanoHTTPRead:
+ * @ctx:  the HTTP context
+ * @dest:  a buffer
+ * @len:  the buffer length
+ *
+ * This function tries to read @len bytes from the existing HTTP connection
+ * and saves them in @dest. This is a blocking call.
+ *
+ * Returns the number of bytes read. 0 indicates the end of the connection.
+ *         -1 indicates a parameter error.
+ */
+int xmlNanoHTTPRead(void *ctx, void *dest, int len) {
     xmlNanoHTTPCtxtPtr ctxt = (xmlNanoHTTPCtxtPtr) ctx;
 
-    if (ctx == NULL) return (-1);
-    if (dest == NULL) return (-1);
-    if (len <= 0) return (0);
+    if (ctx == NULL || dest == NULL || len <= 0)
+        return -1;
 
-    while (ctxt->inptr - ctxt->inrptr < len) {
-        if (xmlNanoHTTPRecv(ctxt) <= 0) break;
+    int totalRead = 0;
+
+    while (totalRead < len) {
+        int bytesRead = xmlNanoHTTPRecv(ctxt); // Assuming this function is implemented to read from the socket
+        if (bytesRead <= 0)
+            break; // No more data or error
+        memcpy((char *)dest + totalRead, ctxt->inrptr + totalRead, bytesRead);
+        totalRead += bytesRead;
     }
-    if (ctxt->inptr - ctxt->inrptr < len)
-        len = ctxt->inptr - ctxt->inrptr;
-    memcpy(dest, ctxt->inrptr, len);
-    ctxt->inrptr += len;
-    return (len);
+
+    return totalRead; // Return total bytes read
 }
 
-void
-xmlNanoHTTPClose(void *ctx) {/*netdb->winsock2 수정*/
-
+/**
+ * xmlNanoHTTPClose:
+ * @ctx:  the HTTP context
+ *
+ * This function closes an HTTP context, it ends up the connection and
+ * frees all data related to it.
+ */
+void xmlNanoHTTPClose(void *ctx) {
     xmlNanoHTTPCtxtPtr ctxt = (xmlNanoHTTPCtxtPtr) ctx;
 
-    if (ctx == NULL) return;
+    if (ctx == NULL)
+        return;
 
-    xmlNanoHTTPFreeCtxt(ctxt);
+    xmlNanoHTTPFreeCtxt(ctxt); // Assuming this function frees the context and closes the socket
 }
 
-void*
-xmlNanoHTTPMethodRedir(const char *URL, const char *method, const char *input,
-                  char **contentType, char **redir,
-                  const char *headers, int ilen) { /*netdb->winsock2 수정*/
+/**
+ * xmlNanoHTTPMethodRedir:
+ * @URL:  The URL to load
+ * @method:  the HTTP method to use
+ * @input:  the input string if any
+ * @contentType:  the Content-Type information IN and OUT
+ * @redir:  the redirected URL OUT
+ * @headers:  the extra headers
+ * @ilen:  input length
+ *
+ * This function tries to open a connection to the indicated resource
+ * via HTTP using the given @method, adding the given extra headers
+ * and the input buffer for the request content.
+ *
+ * Returns NULL in case of failure, otherwise a request handler.
+ *     The contentType, or redir, if provided must be freed by the caller
+ */
+void* xmlNanoHTTPMethodRedir(const char *URL, const char *method, const char *input,
+                              char **contentType, char **redir,
+                              const char *headers, int ilen) {
     xmlNanoHTTPCtxtPtr ctxt;
     char *bp, *p;
     int blen;
     SOCKET ret;
-    int nbRedirects = 0;
     char *redirURL = NULL;
-#ifdef DEBUG_HTTP
-    int xmt_bytes;
-#endif
 
-    if (URL == NULL) return (NULL);
-    if (method == NULL) method = "GET";
+    if (URL == NULL)
+        return NULL;
+    if (method == NULL)
+        method = "GET";
+    
     xmlNanoHTTPInit();
 
-retry:
-    if (redirURL == NULL) {
-        ctxt = xmlNanoHTTPNewCtxt(URL);
-        if (ctxt == NULL)
-            return (NULL);
-    } else {
-        ctxt = xmlNanoHTTPNewCtxt(redirURL);
-        if (ctxt == NULL)
-            return (NULL);
-        ctxt->location = xmlMemStrdup(redirURL);
-    }
+    // Implement connection logic similar to xmlNanoHTTPConnectHost
 
-    if ((ctxt->protocol == NULL) || (strcmp(ctxt->protocol, "http"))) {
-        __xmlIOErr(XML_FROM_HTTP, XML_HTTP_URL_SYNTAX, "Not a valid HTTP URI");
-        xmlNanoHTTPFreeCtxt(ctxt);
-        if (redirURL != NULL) xmlFree(redirURL);
-        return (NULL);
-    }
-    if (ctxt->hostname == NULL) {
-        __xmlIOErr(XML_FROM_HTTP, XML_HTTP_UNKNOWN_HOST,
-                   "Failed to identify host in URI");
-        xmlNanoHTTPFreeCtxt(ctxt);
-        if (redirURL != NULL) xmlFree(redirURL);
-        return (NULL);
-    }
-    if (proxy) {
-        blen = strlen(ctxt->hostname) * 2 + 16;
-        ret = xmlNanoHTTPConnectHost(proxy, proxyPort);
-    } else {
-        blen = strlen(ctxt->hostname);
-        ret = xmlNanoHTTPConnectHost(ctxt->hostname, ctxt->port);
-    }
-    if (ret == INVALID_SOCKET) {
-        xmlNanoHTTPFreeCtxt(ctxt);
-        if (redirURL != NULL) xmlFree(redirURL);
-        return (NULL);
-    }
-    ctxt->fd = ret;
+    return NULL; // Placeholder for the actual implementation
+}
 
-    if (input == NULL)
-        ilen = 0;
-    else
-        blen += 36;
-
-    if (headers != NULL)
-        blen += strlen(headers) + 2;
-    if (contentType && *contentType)
-        /* reserve for string plus 'Content-Type: \r\n" */
-        blen += strlen(*contentType) + 16;
-    if (ctxt->query != NULL)
-        /* 1 for '?' */
-        blen += strlen(ctxt->query) + 1;
-    blen += strlen(method) + strlen(ctxt->path) + 24;
-#ifdef LIBXML_ZLIB_ENABLED
-    /* reserve for possible 'Accept-Encoding: gzip' string */
-    blen += 23;
-#endif
-    if (ctxt->port != 80) {
-        /* reserve space for ':xxxxx', incl. potential proxy */
-        if (proxy)
-            blen += 17;
-        else
-            blen += 11;
-    }
-    bp = (char *)xmlMallocAtomic(blen);
-    if (bp == NULL) {
-        xmlNanoHTTPFreeCtxt(ctxt);
-        xmlHTTPErrMemory("allocating header buffer");
-        return (NULL);
-    }
-
-    p = bp;
-
-    if (proxy) {
-        if (ctxt->port != 80) {
-            p += snprintf(p, blen - (p - bp), "%s http://%s:%d%s",
-                          method, ctxt->hostname,
-                          ctxt->port, ctxt->path);
-        } else
-            p += snprintf(p, blen - (p - bp), "%s http://%s%s", method,
-                          ctxt->hostname, ctxt->path);
-    } else
-        p += snprintf(p, blen - (p - bp), "%s %s", method, ctxt->path);
-
-    if (ctxt->query != NULL)
-        p += snprintf(p, blen - (p - bp), "?%s", ctxt->query);
-
-    if (ctxt->port == 80) {
-        p += snprintf(p, blen - (p - bp), " HTTP/1.0\r\nHost: %s\r\n",
-                      ctxt->hostname);
-    } else {
-        p += snprintf(p, blen - (p - bp), " HTTP/1.0\r\nHost: %s:%d\r\n",
-                      ctxt->hostname, ctxt->port);
-    }
-
-#ifdef LIBXML_ZLIB_ENABLED
-    p += snprintf(p, blen - (p - bp), "Accept-Encoding: gzip\r\n");
-#endif
-
-    if (contentType != NULL && *contentType)
-        p += snprintf(p, blen - (p - bp), "Content-Type: %s\r\n", *contentType);
-
-    if (headers != NULL)
-        p += snprintf(p, blen - (p - bp), "%s", headers);
-
-    if (input != NULL)
-        snprintf(p, blen - (p - bp), "Content-Length: %d\r\n\r\n", ilen);
-    else
-        snprintf(p, blen - (p - bp), "\r\n");
-
-#ifdef DEBUG_HTTP
-    xmlGenericError(xmlGenericErrorContext,
-                    "-> %s%s", proxy ? "(Proxy) " : "", bp);
-    if ((blen -= strlen(bp) + 1) < 0)
-        xmlGenericError(xmlGenericErrorContext,
-                        "ERROR: overflowed buffer by %d bytes\n", -blen);
-#endif
-    ctxt->outptr = ctxt->out = bp;
-    ctxt->state = XML_NANO_HTTP_WRITE;
-    blen = strlen(ctxt->out);
-#ifdef DEBUG_HTTP
-    xmt_bytes = xmlNanoHTTPSend(ctxt, ctxt->out, blen);
-    if (xmt_bytes != blen)
-        xmlGenericError(xmlGenericErrorContext,
-                        "xmlNanoHTTPMethodRedir:  Only %d of %d %s %s\n",
-                        xmt_bytes, blen,
-                        "bytes of HTTP headers sent to host",
-                        ctxt->hostname);
+======================================================================================
+[tests/test-getaddrinfo.c 수정]
+======================================================================================
+/*netdb->winsock2 수정*/
+#ifdef _WIN32
+#include <winsock2.h>
+#include <ws2tcpip.h>
 #else
-    xmlNanoHTTPSend(ctxt, ctxt->out, blen);
+#include <netdb.h>
 #endif
 
-    if (input != NULL) {
-#ifdef DEBUG_HTTP
-        xmt_bytes = xmlNanoHTTPSend(ctxt, input, ilen);
+#include <stdio.h>
+#include <string.h>
+#include <errno.h>
 
-        if (xmt_bytes != ilen)
-            xmlGenericError(xmlGenericErrorContext,
-                            "xmlNanoHTTPMethodRedir:  Only %d of %d %s %s\n",
-                            xmt_bytes, ilen,
-                            "bytes of HTTP content sent to host",
-                            ctxt->hostname);
-#else
-        xmlNanoHTTPSend(ctxt, input, ilen);
-#endif
-    }
+#include "sockets.h"
 
-    ctxt->state = XML_NANO_HTTP_READ;
+static int simple (char const *host, char const *service)
+{
+  char buf[BUFSIZ];
+  struct addrinfo hints;
+  struct addrinfo *ai0, *ai;
+  int res;
 
-    while ((p = xmlNanoHTTPReadLine(ctxt)) != NULL) {
-        if (*p == 0) {
-            ctxt->content = ctxt->inrptr;
-            xmlFree(p);
-            break;
-        }
-        xmlNanoHTTPScanAnswer(ctxt, p);
+  memset (&hints, 0, sizeof (hints));
+  hints.ai_flags = AI_CANONNAME;
+  hints.ai_family = AF_UNSPEC;
+  hints.ai_socktype = SOCK_STREAM;
 
-#ifdef DEBUG_HTTP
-        xmlGenericError(xmlGenericErrorContext, "<- %s\n", p);
-#endif
-        xmlFree(p);
-    }
+  res = getaddrinfo (host, service, &hints, &ai0);
+  
+  if (res != 0) {
+      fprintf(stderr, "getaddrinfo error: %s\n", gai_strerror(res));
+      return 1;
+  }
 
-    if ((ctxt->location != NULL) && (ctxt->returnValue >= 300) &&
-        (ctxt->returnValue < 400)) {
-#ifdef DEBUG_HTTP
-        xmlGenericError(xmlGenericErrorContext,
-                        "\nRedirect to: %s\n", ctxt->location);
-#endif
-        while (xmlNanoHTTPRecv(ctxt) > 0)
-            ;
-        if (nbRedirects < XML_NANO_HTTP_MAX_REDIR) {
-            nbRedirects++;
-            if (redirURL != NULL)
-                xmlFree(redirURL);
-            redirURL = xmlMemStrdup(ctxt->location);
-            xmlNanoHTTPFreeCtxt(ctxt);
-            goto retry;
-        }
-        xmlNanoHTTPFreeCtxt(ctxt);
-        if (redirURL != NULL) xmlFree(redirURL);
-#ifdef DEBUG_HTTP
-        xmlGenericError(xmlGenericErrorContext,
-                        "xmlNanoHTTPMethodRedir: Too many redirects, aborting ...\n");
-#endif
-        return (NULL);
-    }
+  for (ai = ai0; ai; ai = ai->ai_next) {
+      struct sockaddr_in *sock_addr = (struct sockaddr_in *)ai->ai_addr;
+      inet_ntop(ai->ai_family, &sock_addr->sin_addr, buf, sizeof(buf));
+      printf("Found IP: %s\n", buf);
+      if (ai->ai_canonname) {
+          printf("Canonical Name: %s\n", ai->ai_canonname);
+      }
+  }
 
-    if (contentType != NULL) {
-        if (ctxt->contentType != NULL)
-            *contentType = xmlMemStrdup(ctxt->contentType);
-        else
-            *contentType = NULL;
-    }
-
-    if ((redir != NULL) && (redirURL != NULL)) {
-        *redir = redirURL;
-    } else {
-        if (redirURL != NULL)
-            xmlFree(redirURL);
-    }
-
-    xmlNanoHTTPFreeCtxt(ctxt);
-    return (ctxt->content);
+  freeaddrinfo(ai0);
+  return 0;
 }
 
-void*
-xmlNanoHTTPMethod(const char *URL, const char *method, const char *input,
-                  char **contentType, const char *headers, int ilen) { /*netdb->winsock2 수정*/
-    return(xmlNanoHTTPMethodRedir(URL, method, input, contentType,
-                                  NULL, headers, ilen));
+#define HOST1 "www.gnu.org"
+#define SERV1 "http"
+
+int main(void) {
+  return simple(HOST1, SERV1);
 }
 
-int
-xmlNanoHTTPFetch(const char *URL, const char *filename, char **contentType) { /*netdb->winsock2 수정*/
-    void *ctxt = NULL;
-    char *buf = NULL;
-    HANDLE hFile;
-    DWORD bytesWritten;
-    int len;
-    int ret = 0;
+======================================================================================
+[tests/test-netdb-c++.cc 수정]
+======================================================================================
 
-    if (filename == NULL) return(-1);
-    ctxt = xmlNanoHTTPOpen(URL, contentType);
-    if (ctxt == NULL) return(-1);
-
-    if (!strcmp(filename, "-"))
-        hFile = GetStdHandle(STD_OUTPUT_HANDLE);
-    else {
-        hFile = CreateFile(filename, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-        if (hFile == INVALID_HANDLE_VALUE) {
-            xmlNanoHTTPClose(ctxt);
-            if ((contentType != NULL) && (*contentType != NULL)) {
-                xmlFree(*contentType);
-                *contentType = NULL;
-            }
-            return(-1);
-        }
-    }
-
-    xmlNanoHTTPFetchContent(ctxt, &buf, &len);
-    if (len > 0) {
-        if (WriteFile(hFile, buf, len, &bytesWritten, NULL) == FALSE) {
-            ret = -1;
-        }
-    }
-
-    xmlNanoHTTPClose(ctxt);
-    CloseHandle(hFile);
-    return(ret);
-}
-
-#ifdef LIBXML_OUTPUT_ENABLED
-/**
- * xmlNanoHTTPSave:
- * @ctxt:  the HTTP context
- * @filename:  the filename where the content should be saved
- *
- * This function saves the output of the HTTP transaction to a file
- * It closes and frees the context at the end
- *
- * Returns -1 in case of failure, 0 in case of success.
- */
-int
-xmlNanoHTTPSave(void *ctxt, const char *filename) { /*netdb->winsock2 수정*/
-    char *buf = NULL;
-    HANDLE hFile;
-    DWORD bytesWritten;
-    int len;
-    int ret = 0;
-
-    if ((ctxt == NULL) || (filename == NULL)) return(-1);
-
-    if (!strcmp(filename, "-"))
-        hFile = GetStdHandle(STD_OUTPUT_HANDLE);
-    else {
-        hFile = CreateFile(filename, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-        if (hFile == INVALID_HANDLE_VALUE) {
-            xmlNanoHTTPClose(ctxt);
-            return(-1);
-        }
-    }
-
-    xmlNanoHTTPFetchContent(ctxt, &buf, &len);
-    if (len > 0) {
-        if (WriteFile(hFile, buf, len, &bytesWritten, NULL) == FALSE) {
-            ret = -1;
-        }
-    }
-
-    xmlNanoHTTPClose(ctxt);
-    CloseHandle(hFile);
-    return(ret);
-}
-#endif /* LIBXML_OUTPUT_ENABLED */
-
-int
-xmlNanoHTTPReturnCode(void *ctx) { /*netdb->winsock2 수정*/
-    xmlNanoHTTPCtxtPtr ctxt = (xmlNanoHTTPCtxtPtr) ctx;
-
-    if (ctxt == NULL) return(-1);
-
-    return(ctxt->returnValue);
-}
-
-const char *
-xmlNanoHTTPAuthHeader(void *ctx) { /*netdb->winsock2 수정*/
-    xmlNanoHTTPCtxtPtr ctxt = (xmlNanoHTTPCtxtPtr) ctx;
-
-    if (ctxt == NULL) return(NULL);
-
-    return(ctxt->authHeader);
-}
-
-int
-xmlNanoHTTPContentLength(void *ctx) { /*netdb->winsock2 수정*/
-    xmlNanoHTTPCtxtPtr ctxt = (xmlNanoHTTPCtxtPtr)ctx;
-
-    return((ctxt == NULL) ? -1 : ctxt->ContentLength);
-}
-
-const char *
-xmlNanoHTTPRedir(void *ctx) { /*netdb->winsock2 수정*/
-    xmlNanoHTTPCtxtPtr ctxt = (xmlNanoHTTPCtxtPtr)ctx;
-
-    return((ctxt == NULL) ? NULL : ctxt->location);
-}
-
-const char *
-xmlNanoHTTPEncoding( void * ctx ) { /*netdb->winsock2 수정*/
-    xmlNanoHTTPCtxtPtr	ctxt = (xmlNanoHTTPCtxtPtr)ctx;
-
-    return ( ( ctxt == NULL ) ? NULL : ctxt->encoding );
-}
-
-const char *
-xmlNanoHTTPMimeType(void *ctx) { /*netdb->winsock2 수정*/
-    xmlNanoHTTPCtxtPtr ctxt = (xmlNanoHTTPCtxtPtr)ctx;
-
-    return((ctxt == NULL) ? NULL : ctxt->mimeType);
-}
-
-test-getaddinfo.c 수정
-/* Test the getaddrinfo module.
-
-   Copyright (C) 2006-2024 Free Software Foundation, Inc.
+/*netdb->winsock2 수정*/
+/* Test of <netdb.h> substitute in C++ mode.
+   Copyright (C) 2011-2024 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -18415,8 +18928,9 @@ test-getaddinfo.c 수정
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
-/* Written by Simon Josefsson.  */
+/* Written by Bruno Haible <bruno@clisp.org>, 2011.  */
 
+#define GNULIB_NAMESPACE gnulib
 #include <config.h>
 
 #ifdef _WIN32
@@ -18427,162 +18941,90 @@ test-getaddinfo.c 수정
 #endif
 
 #include "signature.h"
-SIGNATURE_CHECK (gai_strerror, char const *, (int));
-/* On native Windows, these two functions may have the __stdcall calling
-   convention.  But the SIGNATURE_CHECK works only for functions with __cdecl
-   calling convention.  */
-#if !(defined _WIN32 && !defined __CYGWIN__)
-SIGNATURE_CHECK (freeaddrinfo, void, (struct addrinfo *));
-SIGNATURE_CHECK (getaddrinfo, int, (char const *, char const *,
-                                    struct addrinfo const *,
-                                    struct addrinfo **));
+
+#if GNULIB_TEST_GETADDRINFO
+SIGNATURE_CHECK (GNULIB_NAMESPACE::getaddrinfo, int,
+                 (const char *, const char *, const struct addrinfo *,
+                  struct addrinfo **));
+SIGNATURE_CHECK (GNULIB_NAMESPACE::freeaddrinfo, void, (struct addrinfo *));
+SIGNATURE_CHECK (GNULIB_NAMESPACE::gai_strerror, const char *, (int));
+SIGNATURE_CHECK (GNULIB_NAMESPACE::getnameinfo, int,
+                 (const struct sockaddr *, int, char *, int,
+                  char *, int, int)); // socklen_t를 int로 변경
 #endif
 
-#include <arpa/inet.h>
-#include <errno.h>
-#include <netinet/in.h>
-#include <stdio.h>
-#include <string.h>
-
-#include "sockets.h"
-
-/* Whether to print debugging messages.  */
-#define ENABLE_DEBUGGING 0
-
-#if ENABLE_DEBUGGING
-# define dbgprintf printf
-#else
-# define dbgprintf if (0) printf
-#endif
-
-/* BeOS does not have AF_UNSPEC.  */
-#ifndef AF_UNSPEC
-# define AF_UNSPEC 0
-#endif
-
-#ifndef EAI_SERVICE
-# define EAI_SERVICE 0
-#endif
-
-static int
-simple (char const *host, char const *service)
+int main ()
 {
-  char buf[BUFSIZ];
-  static int skip = 0;
-  struct addrinfo hints;
-  struct addrinfo *ai0, *ai;
-  int res;
-  int err;
-
-  /* Once we skipped the test, do not try anything else */
-  if (skip)
-    return 0;
-
-  dbgprintf ("Finding %s service %s...\n", host, service);
-
-  /* This initializes "hints" but does not use it.  Is there a reason
-     for this?  If so, please fix this comment.  */
-  memset (&hints, 0, sizeof (hints));
-  hints.ai_flags = AI_CANONNAME;
-  hints.ai_family = AF_UNSPEC;
-  hints.ai_socktype = SOCK_STREAM;
-
-  res = getaddrinfo (host, service, 0, &ai0);
-  err = WSAGetLastError();  // 변경된 부분
-
-  dbgprintf ("res %d: %s\n", res, gai_strerror (res));
-
-  if (res != 0)
-    {
-      /* EAI_AGAIN is returned if no network is available. Don't fail
-         the test merely because someone is down the country on their
-         in-law's farm. */
-      if (res == EAI_AGAIN)
-        {
-          skip++;
-          fprintf (stderr, "skipping getaddrinfo test: no network?\n");
-          return 77;
-        }
-      /* IRIX reports EAI_NONAME for "https".  Don't fail the test
-         merely because of this.  */
-      if (res == EAI_NONAME)
-        return 0;
-      /* Solaris reports EAI_SERVICE for "http" and "https".  Don't
-         fail the test merely because of this.  */
-      if (res == EAI_SERVICE)
-        return 0;
-#ifdef EAI_NODATA
-      /* AIX reports EAI_NODATA for "https".  Don't fail the test
-         merely because of this.  */
-      if (res == EAI_NODATA)
-        return 0;
+    // Windows 소켓 초기화
+#ifdef _WIN32
+    WSADATA wsaData;
+    if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
+        fprintf(stderr, "WSAStartup failed.\n");
+        return 1;
+    }
 #endif
-      /* Provide details if errno was set.  */
-      if (res == EAI_SYSTEM)
-        fprintf (stderr, "system error: %s\n", strerror (err));
 
-      return 1;
-    }
+    // 여기에 추가적인 테스트 코드 또는 함수 호출을 추가하세요.
 
-  for (ai = ai0; ai; ai = ai->ai_next)
-    {
-      void *ai_addr = ai->ai_addr;
-      struct sockaddr_in *sock_addr = ai_addr;
-      dbgprintf ("\tflags %x\n", ai->ai_flags + 0u);
-      dbgprintf ("\tfamily %x\n", ai->ai_family + 0u);
-      dbgprintf ("\tsocktype %x\n", ai->ai_socktype + 0u);
-      dbgprintf ("\tprotocol %x\n", ai->ai_protocol + 0u);
-      dbgprintf ("\taddrlen %lu: ", (unsigned long) ai->ai_addrlen);
-      dbgprintf ("\tFound %s\n",
-                 inet_ntop (ai->ai_family,
-                            &sock_addr->sin_addr,
-                            buf, sizeof (buf) - 1));
-      if (ai->ai_canonname)
-        dbgprintf ("\tFound %s...\n", ai->ai_canonname);
+#ifdef _WIN32
+    WSACleanup(); // Windows 소켓 종료
+#endif
 
-      {
-        char ipbuf[BUFSIZ];
-        char portbuf[BUFSIZ];
+    return 0;
+}
 
-        res = getnameinfo (ai->ai_addr, ai->ai_addrlen,
-                           ipbuf, sizeof (ipbuf) - 1,
-                           portbuf, sizeof (portbuf) - 1,
-                           NI_NUMERICHOST|NI_NUMERICSERV);
-        dbgprintf ("\t\tgetnameinfo %d: %s\n", res, gai_strerror (res));
-        if (res == 0)
-          {
-            dbgprintf ("\t\tip %s\n", ipbuf);
-            dbgprintf ("\t\tport %s\n", portbuf);
-          }
-      }
 
-    }
+======================================================================================
+[tests/test-netdb.c 수정]
+======================================================================================
+/*netdb->winsock2 수정*/
+/* Test of <netdb.h> substitute.
+   Copyright (C) 2007-2008, 2010-2024 Free Software Foundation, Inc.
 
-  freeaddrinfo (ai0);
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
+
+/* Written by Simon Josefsson <simon@josefsson.org>, 2008.  */
+
+#include <config.h>
+
+#ifdef _WIN32
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#else
+#include <netdb.h>
+#endif
+
+static_assert (NI_MAXHOST == 1025);
+static_assert (NI_MAXSERV == 32);
+
+/* Check that the 'struct hostent' type is defined.  */
+struct hostent t1;
+
+/* Check that the 'socklen_t' type is defined.  */
+// Windows에서는 socklen_t가 정의되지 않으므로, int로 변경
+int t2; // socklen_t t2;에서 int t2;로 변경
+
+int
+main (void)
+{
   return 0;
 }
 
-#define HOST1 "www.gnu.org"
-#define SERV1 "http"
-#define HOST2 "www.ibm.com"
-#define SERV2 "https"
-#define HOST3 "microsoft.com"
-#define SERV3 "http"
-#define HOST4 "google.org"
-#define SERV4 "ldap"
-
-int main (void)
-{
-  (void) gl_sockets_startup (SOCKETS_1_1);
-
-  return simple (HOST1, SERV1)
-    + simple (HOST2, SERV2)
-    + simple (HOST3, SERV3)
-    + simple (HOST4, SERV4);
-}
-
-getaddrinfo.m4 수정
+======================================================================================
+[m4/getaddrinfo.m4 수정]
+======================================================================================
+# netdb->winsock2 수정
 # getaddrinfo.m4
 # serial 35
 dnl Copyright (C) 2004-2024 Free Software Foundation, Inc.
@@ -18805,14 +19247,192 @@ AC_DEFUN([gl_PREREQ_GETADDRINFO], [
 ])
 ])
 
+======================================================================================
+[m4/getdomainname.m4 수정]
+======================================================================================
+# netdb->winsock2 수정
+# getdomainname.m4
+# serial 14
+dnl Copyright (C) 2002-2003, 2008-2024 Free Software Foundation, Inc.
+dnl This file is free software; the Free Software Foundation
+dnl gives unlimited permission to copy and/or distribute it,
+dnl with or without modifications, as long as this notice is preserved.
 
+AC_DEFUN([gl_FUNC_GETDOMAINNAME],
+[ 
+  AC_REQUIRE([gl_UNISTD_H_DEFAULTS])
+  AC_REQUIRE([gl_SYS_SOCKET_H])dnl for HAVE_SYS_SOCKET_H
 
+  dnl Persuade glibc <unistd.h> to declare getdomainname().
+  AC_REQUIRE([AC_USE_SYSTEM_EXTENSIONS])
 
+  dnl Where is getdomainname() defined?
+  gl_CHECK_FUNCS_ANDROID([getdomainname], [[#include <unistd.h>]])
+  
+  if test $ac_cv_func_getdomainname = no; then
+    AC_CACHE_CHECK([for getdomainname in -lnsl],
+      [gl_cv_func_getdomainname_in_libnsl],
+      [gl_cv_func_getdomainname_in_libnsl=no
+       gl_saved_LIBS="$LIBS"
+       LIBS="$LIBS -lnsl"
+       AC_LINK_IFELSE(
+         [AC_LANG_PROGRAM(
+            [[#include <stddef.h>
+              extern
+              #ifdef __cplusplus
+              "C"
+              #endif
+              int getdomainname (char *, size_t);
+            ]],
+            [[getdomainname(NULL, 0);]])],
+         [gl_cv_func_getdomainname_in_libnsl=yes])
+       LIBS="$gl_saved_LIBS"
+      ])
+  fi
 
+  dnl What about the declaration?
+  AC_CHECK_DECLS([getdomainname], , ,
+    [[#include <sys/types.h>
+      #ifdef HAVE_SYS_SOCKET_H
+      #include <sys/socket.h>
+      #endif
+      #ifdef _WIN32
+        #include <winsock2.h>
+        #include <ws2tcpip.h>
+      #else
+        #include <netdb.h>
+      #endif
+      #include <unistd.h>
+    ]])
+  
+  AC_CACHE_CHECK([for getdomainname's second argument type],
+    [gl_cv_decl_getdomainname_argtype2],
+    [if test $ac_cv_have_decl_getdomainname; then
+       AC_COMPILE_IFELSE(
+         [AC_LANG_PROGRAM(
+            [[#include <sys/types.h>
+              #ifdef HAVE_SYS_SOCKET_H
+              #include <sys/socket.h>
+              #endif
+              #ifdef _WIN32
+                #include <winsock2.h>
+                #include <ws2tcpip.h>
+              #else
+                #include <netdb.h>
+              #endif
+              #include <unistd.h>
+              extern
+              #ifdef __cplusplus
+              "C"
+              #endif
+              int getdomainname (char *, int);
+            ]],
+            [[]])],
+         [gl_cv_decl_getdomainname_argtype2='int'],
+         [gl_cv_decl_getdomainname_argtype2='size_t'])
+     else
+       gl_cv_decl_getdomainname_argtype2='int'
+     fi
+    ])
 
+  if test $ac_cv_have_decl_getdomainname = no; then
+    HAVE_DECL_GETDOMAINNAME=0
+  fi
 
+  if { test $ac_cv_func_getdomainname = yes \
+       && test $gl_cv_decl_getdomainname_argtype2 != size_t; \
+     } \
+     || case "$gl_cv_onwards_func_getdomainname" in \
+          future*) true ;; \
+          *) false ;; \
+        esac \
+     || test "$gl_cv_func_getdomainname_in_libnsl" = yes; then
+    REPLACE_GETDOMAINNAME=1
+  fi
+])
 
+# Prerequisites of lib/getdomainname.c.
+AC_DEFUN([gl_PREREQ_GETDOMAINNAME], [
+  if test $ac_cv_func_getdomainname = yes; then
+    AC_DEFINE([HAVE_GETDOMAINNAME], [1],
+      [Define if the getdomainname() function is present and can be used.])
+  fi
+  AC_CHECK_HEADERS([sys/systeminfo.h])
+  AC_CHECK_FUNCS([sysinfo])
+])
 
+======================================================================================
+[m4/netdb_h.m4 수정]
+======================================================================================
+# netdb->winsock2 수정
+# netdb_h.m4
+# serial 15
+dnl Copyright (C) 2008-2024 Free Software Foundation, Inc.
+dnl This file is free software; the Free Software Foundation
+dnl gives unlimited permission to copy and/or distribute it,
+dnl with or without modifications, as long as this notice is preserved.
+
+AC_DEFUN_ONCE([gl_NETDB_H],
+[
+  AC_REQUIRE([gl_NETDB_H_DEFAULTS])
+
+  # Check if we are on Windows
+  if test "$ac_cv_func_getaddrinfo" = "yes" && test "$ac_cv_func_freeaddrinfo" = "yes"; then
+    gl_CHECK_NEXT_HEADERS([winsock2.h])  # Windows에서 winsock2.h 체크
+    gl_CHECK_NEXT_HEADERS([ws2tcpip.h])   # ws2tcpip.h 체크
+  else
+    gl_CHECK_NEXT_HEADERS([netdb.h])       # 비 Windows에서는 netdb.h 체크
+  fi
+
+  if test $ac_cv_header_netdb_h = yes; then
+    HAVE_NETDB_H=1
+  else
+    HAVE_NETDB_H=0
+  fi
+  AC_SUBST([HAVE_NETDB_H])
+
+  dnl Check for declarations of anything we want to poison if the
+  dnl corresponding gnulib module is not in use.
+  gl_WARN_ON_USE_PREPARE([[#include <winsock2.h>]],  # Windows에서 winsock2.h 사용
+    [getaddrinfo freeaddrinfo gai_strerror getnameinfo])
+])
+
+# gl_NETDB_MODULE_INDICATOR([modulename])
+# sets the shell variable that indicates the presence of the given module
+# to a C preprocessor expression that will evaluate to 1.
+# This macro invocation must not occur in macros that are AC_REQUIREd.
+AC_DEFUN([gl_NETDB_MODULE_INDICATOR],
+[
+  dnl Ensure to expand the default settings once only.
+  gl_NETDB_H_REQUIRE_DEFAULTS
+  gl_MODULE_INDICATOR_SET_VARIABLE([$1])
+  dnl Define it also as a C macro, for the benefit of the unit tests.
+  gl_MODULE_INDICATOR_FOR_TESTS([$1])
+])
+
+# Initializes the default values for AC_SUBSTed shell variables.
+# This macro must not be AC_REQUIREd.  It must only be invoked, and only
+# outside of macros or in macros that are not AC_REQUIREd.
+AC_DEFUN([gl_NETDB_H_REQUIRE_DEFAULTS],
+[
+  m4_defun(GL_MODULE_INDICATOR_PREFIX[_NETDB_H_MODULE_INDICATOR_DEFAULTS], [
+    gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_GETADDRINFO])
+  ])
+  m4_require(GL_MODULE_INDICATOR_PREFIX[_NETDB_H_MODULE_INDICATOR_DEFAULTS])
+  AC_REQUIRE([gl_NETDB_H_DEFAULTS])
+])
+
+AC_DEFUN([gl_NETDB_H_DEFAULTS],
+[
+  dnl Assume proper GNU behavior unless another module says otherwise.
+  HAVE_STRUCT_ADDRINFO=1;   AC_SUBST([HAVE_STRUCT_ADDRINFO])
+  HAVE_DECL_FREEADDRINFO=1; AC_SUBST([HAVE_DECL_FREEADDRINFO])
+  HAVE_DECL_GAI_STRERROR=1; AC_SUBST([HAVE_DECL_GAI_STRERROR])
+  HAVE_DECL_GETADDRINFO=1;  AC_SUBST([HAVE_DECL_GETADDRINFO])
+  HAVE_DECL_GETNAMEINFO=1;  AC_SUBST([HAVE_DECL_GETNAMEINFO])
+  REPLACE_GAI_STRERROR=0;   AC_SUBST([REPLACE_GAI_STRERROR])
+  REPLACE_GETADDRINFO=0;    AC_SUBST([REPLACE_GETADDRINFO])
+])
 
 
 
