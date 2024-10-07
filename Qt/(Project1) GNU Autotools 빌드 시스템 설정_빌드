@@ -20663,6 +20663,146 @@ C++17 is supported!
 
 => c++17 지원 됨.
 
+(빌드)
+{ autopoint --force; } 2>&1 | tee ./log/autopoint.log &&  
+{ rm -f po/Makefile.in.in; } &&  
+{ rm -rf autom4te.cache; } &&  
+{ aclocal -I m4 -I gnulib-m4 -I /usr/share/aclocal; } 2>&1 | tee ./log/aclocal.log &&  
+{ libtoolize --copy --force --verbose; } 2>&1 | tee ./log/libtoolize.log &&  
+{ autoconf --verbose; } 2>&1 | tee ./log/autoconf.log &&  
+{ autoheader; } 2>&1 | tee ./log/autoheader.log && 
+{ automake --add-missing --force-missing; } 2>&1 | tee ./log/automake.log &&  
+{ ./configure --host=x86_64-w64-mingw32; } 2>&1 | tee ./log/configure.log
+
+
+(오류)
+checking pkg-config is at least version 0.9.0... ./configure: line 19905: /mingw64/bin/pkg-config: No such file or directory
+no
+configure: error: pkg-config not found
+(수정)
+pkg-config 설치 확인
+pkg-config를 설치하려고 할 때 mingw-w64-x86_64-pkgconf 패키지와 충돌이 발생
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -S mingw-w64-x86_64-pkg-config
+(1/1) 삭제 중 mingw-w64-x86_64-pkgconf                [###########################] 100%
+(1/1) 설치 중 mingw-w64-x86_64-pkg-config             [###########################] 100%
+
+pkg-config가 제대로 설치되었는지 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pkg-config --version
+0.29.2
+
+configure.ac에서 C23 체크 제거
+configure.ac 수정
+# C 컴파일러 확인 및 C23 설정
+#AC_PROG_CC
+#AC_SUBST([CFLAGS], ["-std=c23 -I/mingw64/include -O2"])
+#AC_LANG([C])
+#AC_COMPILE_IFELSE(
+#  [AC_LANG_PROGRAM([], [[#if __STDC_VERSION__ >= 202300L
+#                         #else
+#                         # error "C23 not supported"
+#                         #endif]])],
+#  [
+#    AC_DEFINE([HAVE_C23], [1], [Define if the C compiler supports C23.])
+#    CFLAGS="$CFLAGS -std=c23 -fno-inline -UNDEFINED_MACRO"
+#  ],
+#  [AC_MSG_ERROR([C23 support is required but not available.])]
+#)
+
+~/.bashrc 수정
+#export CFLAGS="-std=c23 -I/mingw64/include -O2" # C 컴파일러 C23 기능 설정
+export CFLAGS="-I/mingw64/include -O2"		 # C 컴파일러 (gcc 14.2 c23 지원안함)
+
+configure.ac 수정
+AC_SUBST([CFLAGS], ["-I/mingw64/include -O2"]) #-std=c23 제거. 지원안함 gcc 14.2
+AC_SUBST([CPPFLAGS], ["-I/mingw64/include -O2"])
+AC_SUBST([CXXFLAGS], ["-std=c++17 -I/mingw64/include -O2 -DDEBUG -DVERSION=\"1.0.0\""])
+
+(오류)
+checking for xmalloc... no
+configure: Defining xmalloc as a placeholder
+checking for xrealloc... no
+configure: Defining xrealloc as a placeholder
+checking for rpl_stpcpy... no
+configure: Defining rpl_stpcpy as a placeholder
+checking for xalloc_die... no
+configure: Defining xalloc_die as a placeholder
+configure: error: Failed to define xalloc_die
+(수정)
+xmalloc, xrealloc, rpl_stpcpy, 및 xalloc_die와 같은 함수들은 Gnulib에서 제공하는 함수
+configure.ac 수정
+# 메모리 할당 함수 체크
+AC_CHECK_FUNCS([xmalloc xrealloc rpl_stpcpy xalloc_die], [], [
+    AC_MSG_ERROR([Failed to define necessary memory allocation functions.])
+])
+
+# GNULIB 모듈 정의
+GNULIB_MODULES="
+ncurses \
+terminfo \
+rpl_stpcpy \
+xalloc \
+xalloc_die \
+xmalloc \
+xrealloc \
+xgethostname \
+_gl_nothrow_get_osfhandle \
+fsync \
+getprogname \
+_get_osfhandle  
+"
+
+AC_GNU_LIB_TOOL
+
+Gnulib 업그레이드
+Gnulib를 사용하기 위해, 필요한 파일들을 생성하고, Gnulib에 포함된 파일을 프로젝트에 추가
+nayou@kimnayooung MINGW64 /c/gnulib
+# git pull origin master
+nayou@kimnayooung MINGW64 /c/gnulib
+
+환경변수에 /c/gnulib 추가
+export PATH="/c/msys64/mingw64/bin:/mingw64/bin:/usr/bin:/bin:/usr/share/aclocal:/mingw64/share/aclocal:/c/libidn2/autoconf-2.72/bin:/c/libidn2/libtool-2.4.6:/c/Program Files/Java/jdk-21/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/c/Users/nayou/AppData/Local/Programs/Python/Python312:/c/gnulib"
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# gnulib-tool --import xmalloc xrealloc xalloc-die
+
+(오류)
+checking whether we are cross compiling... no
+checking for suffix of object files... o
+checking whether the compiler supports GNU C... yes
+checking whether x86_64-w64-mingw32-gcc accepts -g... yes
+checking for x86_64-w64-mingw32-gcc option to enable C23 features... unsupported
+checking for x86_64-w64-mingw32-gcc option to enable C11 features... none needed
+checking whether the compiler is clang... no
+checking for compiler option needed when checking for declarations... none
+(수정)
+configure.ac 수정
+AC_PROG_CC
+AC_SUBST([CC_STANDARD], [11])
+AC_SUBST([CFLAGS], ["-std=c11 -I/mingw64/include -O2"]) #-std=c23 제거 지원안함 gcc 14.2
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# cd /c/
+
+/c/gnulib, /c/libidn2/gettext-0.22.5/libtextstyle 에서 xalloc_die 파일을 찾을 수 없음
+/c/gnulib 폴더 삭제 후 재설치 
+nayou@kimnayooung MINGW64 /c
+# git clone https://git.savannah.gnu.org/git/gnulib.git
+=> "C:\gnulib\lib\xalloc-die.c"
+
+export CPPFLAGS="-I/mingw64/include -I/c/gnulib/lib -O2"			# C++ 전처리 설정
+export LDFLAGS="-L/c/gnulib/lib -L/c/libidn2/gettext-0.22.5/libtextstyle/lib -L/mingw64/lib -L/usr/lib -Wl,-rpath,/mingw64/bin"
+export LIBRARY_PATH=/mingw64/lib:/c/gnulib/lib
+export PATH="/c/msys64/mingw64/bin:/mingw64/bin:/usr/bin:/bin:/usr/share/aclocal:/mingw64/share/aclocal:/c/libidn2/autoconf-2.72/bin:/c/libidn2/libtool-2.4.6:/c/Program Files/Java/jdk-21/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/c/Users/nayou/AppData/Local/Programs/Python/Python312:/c/gnulib:/c/gnulib"
+
+(오류)
+configure.ac:6: error: AC_GNU_LIB_TOOL: macro not found in directory /usr/share/aclocal
+(수정)
+configure.ac 수정
+AC_GNU_LIB_TOOL
+m4_ifdef([GNULIB_INIT], [GNULIB_INIT])
+m4_pattern_allow([^AC_GNU_LIB_TOOL$])
 
 
 
@@ -20672,8 +20812,9 @@ C++17 is supported!
 
 
 
-
-
+(오류)
+checking whether we are cross compiling... no
+(수정)
 
 
 
