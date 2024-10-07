@@ -19669,9 +19669,9 @@ export CPP=x86_64-w64-mingw32-cpp		#C++ 전처리기
 #export CFLAGS="-I/mingw64/include -O2"
 export CFLAGS="-std=c23 -I/mingw64/include -O2"			#C 컴파일러 C23 기능 설정
 #export CPPFLAGS="-I/mingw64/include -O2"
-export CPPFLAGS="-std=c++23 -I/mingw64/include -O2"		#C++ 전처리 C23 기능 설정
+export CPPFLAGS="-std=c++17 -I/mingw64/include -O2"		#C++ 전처리 C17 기능 설정
 #export CXXFLAGS="-I/mingw64/include -O2"
-export CXXFLAGS="-std=c++23 -I/mingw64/include -O2"		#C++ 컴파일러 C++23 기능 설정 (C++17에서 C++23으로 변경, configure.ac에서 가져옴)
+export CXXFLAGS="-std=c++17 -I/mingw64/include -O2"		#C++ 컴파일러 C++17 기능 설정 (C++17에서 C++23으로 변경, configure.ac에서 가져옴)
 
 (빌드명령어 수정) => ./configure --host=x86_64-w64-mingw32 --build=x86_64-w64-mingw32;
 { autopoint --force; } 2>&1 | tee ./log/autopoint.log &&  
@@ -19791,6 +19791,510 @@ nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
 특정 전처리기 설치（확인）
 nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
 # pacman -S mingw-w64-x86_64-gcc
+
+MinGW 툴체인 설치: x86_64-w64-mingw32-ld, x86_64-w64-mingw32-ar
+패키지설치
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -Syu
+
+MinGW 툴체인 설치: x86_64-w64-mingw32-ld, x86_64-w64-mingw32-ar
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -S mingw-w64-x86_64-binutils
+경고: mingw-w64-x86_64-binutils-2.43.1-1는 최신 버전입니다. -- 재설치
+의존성 해결 중...
+꾸러미 충돌을 찾는 중...
+꾸러미 (1) mingw-w64-x86_64-binutils-2.43.1-1
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -Qs binutils
+local/binutils 2.43.1-1
+    A set of programs to assemble and manipulate binary and object files
+local/mingw-w64-x86_64-binutils 2.43.1-1 (mingw-w64-x86_64-toolchain)
+    A set of programs to assemble and manipulate binary and object files (mingw-w64)
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# find /mingw64/bin -name "*ld*"
+find /mingw64/bin -name "*ar*"
+/mingw64/bin/ld.bfd.exe
+/mingw64/bin/ld.exe
+/mingw64/bin/sqldiff.exe
+/mingw64/bin/ar.exe
+/mingw64/bin/gcc-ar.exe
+/mingw64/bin/gdb-multiarch.exe
+/mingw64/bin/gdbserver-multiarch.exe
+/mingw64/bin/glib-genmarshal-script.py
+/mingw64/bin/glib-genmarshal.exe
+/mingw64/bin/libcharset-1.dll
+/mingw64/bin/x86_64-w64-mingw32-clear.exe
+/mingw64/bin/x86_64-w64-mingw32-gcc-ar.exe
+=>ld와 ar는 ld.exe, ar.exe로 설치되어있음
+/mingw64/bin/ld.exe --version
+/mingw64/bin/ar.exe --version
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -Si mingw-w64-x86_64-binutils
+저장소             : mingw64
+이름               : mingw-w64-x86_64-binutils
+버전               : 2.43.1-1
+설명               : A set of programs to assemble and manipulate binary and object files
+                     (mingw-w64)
+아키텍처           : any
+URL                : https://www.gnu.org/software/binutils/
+라이선스           : spdx:GPL-3.0-or-later AND GPL-2.0-or-later AND LGPL-3.0-or-later AND LGPL-2.0-or-later
+모음들             : mingw-w64-x86_64-toolchain
+다음을 제공        : 없음
+다음에 의존        : mingw-w64-x86_64-gettext-runtime  mingw-w64-x86_64-libwinpthread
+                     mingw-w64-x86_64-zlib  mingw-w64-x86_64-zstd
+선택 의존성        : 없음
+다음과 충돌        : 없음
+다음을 대체        : 없음
+다운로드 크기      : 5.96 MiB
+설치된 크기        : 41.09 MiB
+꾸러미 만든이      : CI (msys2/msys2-autobuild/22f1e5ad/10644654067)
+빌드 날짜          : 2024년 08월 31일 토 오후 7:50:56
+유효검사자         : SHA-256 합
+
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# /mingw64/bin/ld.exe --version
+/mingw64/bin/ar.exe --version
+GNU ld (GNU Binutils) 2.43.1
+Copyright (C) 2024 Free Software Foundation, Inc.
+This program is free software; you may redistribute it under the terms of
+the GNU General Public License version 3 or (at your option) a later version.
+This program has absolutely no warranty.
+GNU ar (GNU Binutils) 2.43.1
+Copyright (C) 2024 Free Software Foundation, Inc.
+This program is free software; you may redistribute it under the terms of
+the GNU General Public License version 3 or (at your option) any later version.
+This program has absolutely no warranty.
+
+환경변수추가
+export LD=/mingw64/bin/ld.exe
+export AR=/mingw64/bin/ar.exe
+
+configure.ac 수정
+# C99->C11
+#AC_PROG_CC # 필수 패키지 검사
+#AC_SUBST([CFLAGS], ["-std=c23 -O2"])
+#AC_LANG([C])
+#AC_COMPILE_IFELSE(
+#  [AC_LANG_PROGRAM([], [[#if __STDC_VERSION__ >= 201112L
+#                         #else
+#                         # error "C11 not supported"
+#                         #endif]])],
+#  [
+#    AC_DEFINE([HAVE_C11], [1], [Define if the C compiler supports C11.])
+#    CFLAGS="$CFLAGS -std=c11 -fno-inline -UNDEFINED_MACRO"
+#  ],
+#  [AC_MSG_ERROR([C11 support is required but not available.])]
+#)
+
+# C 컴파일러 확인 및 C23 설정
+AC_PROG_CC
+AC_SUBST([CFLAGS], ["-std=c23 -O2"])
+AC_LANG([C])
+AC_COMPILE_IFELSE(
+  [AC_LANG_PROGRAM([], [[#if __STDC_VERSION__ >= 202300L
+                         #else
+                         # error "C23 not supported"
+                         #endif]])],
+  [
+    AC_DEFINE([HAVE_C23], [1], [Define if the C compiler supports C23.])
+    CFLAGS="$CFLAGS -std=c23 -fno-inline -UNDEFINED_MACRO"
+  ],
+  [AC_MSG_ERROR([C23 support is required but not available.])]
+)
+
+# C++ 컴파일러 확인 및 C++17 설정
+AC_PROG_CXX
+AC_SUBST([CXXFLAGS], ["-std=c++17 -O2"])
+AC_LANG([C++])
+AC_COMPILE_IFELSE(
+  [AC_LANG_PROGRAM([], [[#if __cplusplus >= 201703L
+                         #else
+                         # error "C++17 not supported"
+                         #endif]])],
+  [
+    AC_DEFINE([HAVE_CXX17], [1], [Define if the C++ compiler supports C++17.])
+    CXXFLAGS="$CXXFLAGS -std=c++17 -fno-inline -UNDEFINED_MACRO"
+  ],
+  [AC_MSG_ERROR([C++17 support is required but not available.])]
+)
+
+(오류)
+checking how to run the C preprocessor... x86_64-w64-mingw32-cpp
+configure: error: in '/c/libidn2/gettext-0.22.5/libtextstyle':
+configure: error: C preprocessor "x86_64-w64-mingw32-cpp" fails sanity check
+See 'config.log' for more details
+(수정)
+전처리기 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# /mingw64/bin/g++ --version
+g++.exe (Rev1, Built by MSYS2 project) 14.2.0
+Copyright (C) 2024 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+~/.bashrc 수정
+#cross compile
+#export CC=/mingw64/bin/gcc 			#C 컴파일러
+export CC=x86_64-w64-mingw32-gcc   		#C 컴파일러
+#export CXX=/mingw64/bin/g++			#C++ 컴파일러
+export CXX=x86_64-w64-mingw32-g++  	#C++ 컴파일러
+#export CPP=/mingw64/bin/cpp			#C++ 전처리기
+#export CPP=x86_64-w64-mingw32-cpp		#C++ 전처리기
+export CPP=/mingw64/bin/cpp			#C++ 전처리기
+#export CFLAGS="-I/mingw64/include -O2"
+export CFLAGS="-std=c23 -I/mingw64/include -O2"			#C 컴파일러 C23 기능 설정
+#export CPPFLAGS="-I/mingw64/include -O2"
+export CPPFLAGS="-std=c++17 -I/mingw64/include -O2"		#C++ 전처리 C17 기능 설정
+#export CXXFLAGS="-I/mingw64/include -O2"
+export CXXFLAGS="-std=c++17 -I/mingw64/include -O2"		#C++ 컴파일러 C++17 기능 설정 
+export LD=/mingw64/bin/ld.exe
+export AR=/mingw64/bin/ar.exe
+
+nayou@kimnayooung MINGW64 ~
+# x86_64-w64-mingw32-gcc  --version
+x86_64-w64-mingw32-gcc.exe (Rev1, Built by MSYS2 project) 14.2.0
+Copyright (C) 2024 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+
+nayou@kimnayooung MINGW64 ~
+# x86_64-w64-mingw32-g++ --version
+x86_64-w64-mingw32-g++.exe (Rev1, Built by MSYS2 project) 14.2.0
+Copyright (C) 2024 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+
+nayou@kimnayooung MINGW64 ~
+# /mingw64/bin/cpp --version
+cpp.exe (Rev1, Built by MSYS2 project) 14.2.0
+Copyright (C) 2024 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+nayou@kimnayooung MINGW64 ~
+# /mingw64/bin/ld.exe --version
+GNU ld (GNU Binutils) 2.43.1
+Copyright (C) 2024 Free Software Foundation, Inc.
+This program is free software; you may redistribute it under the terms of
+the GNU General Public License version 3 or (at your option) a later version.
+This program has absolutely no warranty.
+
+nayou@kimnayooung MINGW64 ~
+# /mingw64/bin/ar.exe --version
+GNU ar (GNU Binutils) 2.43.1
+Copyright (C) 2024 Free Software Foundation, Inc.
+This program is free software; you may redistribute it under the terms of
+the GNU General Public License version 3 or (at your option) any later version.
+This program has absolutely no warranty.
+
+(오류)
+configure.ac:160: error: possibly undefined macro: AC_CROSS_COMPILER
+      If this token and others are legitimate, please use m4_pattern_allow.
+      See the Autoconf documentation.
+(수정)
+AC_CROSS_COMPILER 매크로가 정의되지 않았다는 오류
+configure.ac 수정
+m4_pattern_allow([AC_CROSS_COMPILER])
+
+(오류)
+./configure: line 20358: GL_REQUIRE_VERSION(2.0): command not found
+(수정)
+configure.ac 수정
+# Gnulib에서 최소 요구 버전을 설정
+m4_ifdef([GL_REQUIRE_VERSION], [GL_REQUIRE_VERSION([2.0])])
+
+" C 코드 컴파일"
+(오류)
+configure: error: C23 support is required but not available.
+(수정)
+사용 중인 컴파일러가 C23 표준을 지원하지 않음
+x86_64-w64-mingw32-gcc가 C23 표준을 지원하는지 확인
+GCC 14 버전 이상은 C23을 지원해야 
+C23 지원 여부를 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# x86_64-w64-mingw32-gcc -std=c23 -E - < /dev/null
+# 0 "<stdin>"
+# 0 "<built-in>"
+# 0 "<command-line>"
+# 1 "<stdin>"
+
+CFLAGS 확인
+~/.bashrc 수정
+export CXXFLAGS="-std=c++17 -I/mingw64/include -O2 -DDEBUG  -DVERSION=\"1.0.0\""	#C++ 컴파일러 C++17 기능 설정 
+configure.ac 수정
+# C++ 전처리기 플래그 설정
+AC_SUBST([CPPFLAGS], ["-std=c++17 -I/mingw64/include -O2 -DDEBUG  -DVERSION=\"1.0.0\""])
+
+(오류)
+checking dynamic linker characteristics... Win32 ld.exe
+checking how to hardcode library paths into programs... immediate
+checking for x86_64-w64-mingw32-windres... no
+checking for windres... windres
+checking for x86_64-w64-mingw32-gcc... (cached) x86_64-w64-mingw32-gcc
+checking whether the compiler supports GNU C... (cached) yes
+checking whether x86_64-w64-mingw32-gcc accepts -g... (cached) yes
+checking for x86_64-w64-mingw32-gcc option to enable C23 features... (cached) unsupported
+checking for x86_64-w64-mingw32-gcc option to enable C11 features... (cached) none needed
+checking whether the compiler is clang... (cached) no
+checking for compiler option needed when checking for declarations... (cached) none
+configure: error: C23 support is required but not available.
+(수정)
+MSYS2: Windows에서 Unix-like 환경을 제공하는 시스템으로, 
+패키지 관리 시스템과 함께 다양한 도구를 설치할 수 있도록 지원합니다.
+MinGW: Windows에서 C/C++ 컴파일러를 제공하는 도구로, 
+MSYS2 내에서 사용할 수 있습니다. 
+MSYS2의 패키지 관리기를 통해 MinGW 패키지를 설치할 수 있습니다.
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -Q mingw-w64-x86_64-gcc
+mingw-w64-x86_64-gcc 14.2.0-1
+
+최신버전설치
+pacman -Syu mingw-w64-x86_64-gcc
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -Q mingw-w64-x86_64-gcc
+mingw-w64-x86_64-gcc 14.2.0-1
+
+C23을 지원하는 대체컴파일러 설치
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -S mingw-w64-x86_64-clang
+
+설치확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# clang --version
+clang version 18.1.8
+Target: x86_64-w64-windows-gnu
+Thread model: posix
+InstalledDir: C:/msys64/mingw64/bin
+
+환경변수설정
+~/.bashrc 수정
+#cross compile
+#export CC=/mingw64/bin/gcc 			#C 컴파일러
+#export CC=x86_64-w64-mingw32-gcc   		#C 컴파일러
+export CC=clang   					#C 컴파일러
+#export CXX=/mingw64/bin/g++			#C++ 컴파일러
+#export CXX=x86_64-w64-mingw32-g++  	#C++ 컴파일러
+export CXX=clang++  					#C++ 컴파일러
+#export CPP=/mingw64/bin/cpp			#C++ 전처리기
+#export CPP=x86_64-w64-mingw32-cpp		#C++ 전처리기
+export CPP=/mingw64/bin/cpp			#C++ 전처리기
+#export CFLAGS="-I/mingw64/include -O2"
+export CFLAGS="-std=c23 -I/mingw64/include -O2"			#C 컴파일러 C23 기능 설정
+#export CPPFLAGS="-I/mingw64/include -O2"
+export CPPFLAGS="-std=c++17 -I/mingw64/include -O2"		#C++ 전처리 C17 기능 설정
+#export CXXFLAGS="-I/mingw64/include -O2"
+export CXXFLAGS="-std=c++17 -I/mingw64/include -O2 -DDEBUG  -DVERSION=\"1.0.0\""		#C++ 컴파일러 C++17 기능 설정 
+export LD=/mingw64/bin/ld.exe
+export AR=/mingw64/bin/ar.exe 	
+
+C 컴파일러가 C23 기능을 사용할 수 있는지 확인
+//c_test.c 생성
+#include <stdio.h>
+
+int main() {
+    #if __STDC_VERSION__ < 202300L
+    printf("C23 is not supported.\n");
+    return 1; // 에러 코드 반환
+    #else
+    printf("C23 is supported!\n");
+    return 0; // 성공 코드 반환
+    #endif
+}
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# notepad ~/.bashrc
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# source ~/.bashrc
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# $CC ./c_test.c -o c_test -std=c23 (꼭 -std=c23 이 옵션을 넣어줘야 함)
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ./c_test
+C23 is supported!
+
+"C++ 코드 컴파일"
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# vim cpp_test.cpp
+#include <iostream>
+int main() {
+    std::cout << "C++17 is supported!" << std::endl;
+    return 0;
+}
+
+(오류)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# $CXX ./cpp_test.cpp -o cpp_test -std=c++17
+C:/msys64/mingw64/include/c++/14.2.0/cstdlib:79:15: fatal error: 'stdlib.h' file not
+      found
+   79 | #include_next <stdlib.h>
+      |               ^~~~~~~~~~
+1 error generated.
+(수정)
+C++ 코드가 필요한 헤더 파일을 찾지 못할 때 발생
+stdlib.h 파일은 MinGW 설치의 일부로 포함
+
+설치확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -Qs mingw-w64
+local/mingw-w64-x86_64-binutils 2.43.1-1 (mingw-w64-x86_64-toolchain)
+    A set of programs to assemble and manipulate binary and object files (mingw-w64)
+local/mingw-w64-x86_64-bzip2 1.0.8-3
+    A high-quality data compression program (mingw-w64)
+local/mingw-w64-x86_64-clang 18.1.8-1
+    C language family frontend for LLVM (mingw-w64)
+local/mingw-w64-x86_64-clang-libs 18.1.8-1
+    Clang runtime libraries (mingw-w64)
+local/mingw-w64-x86_64-crt-git 12.0.0.r329.g8f7b5ce36-1 (mingw-w64-x86_64-toolchain)
+    MinGW-w64 CRT for Windows (mingw-w64)
+local/mingw-w64-x86_64-expat 2.6.3-1
+    An XML parser library (mingw-w64)
+local/mingw-w64-x86_64-gcc 14.2.0-1 (mingw-w64-x86_64-toolchain)
+    GNU Compiler Collection (C,C++,OpenMP) for MinGW-w64
+local/mingw-w64-x86_64-gcc-libs 14.2.0-1
+    GNU Compiler Collection (libraries) for MinGW-w64
+local/mingw-w64-x86_64-gdb 15.2-1 (mingw-w64-x86_64-toolchain)
+    GNU Debugger (mingw-w64)
+local/mingw-w64-x86_64-gdb-multiarch 15.2-1 (mingw-w64-x86_64-toolchain)
+    GNU Debugger (supports all targets)
+local/mingw-w64-x86_64-gettext-runtime 0.22.5-2
+    GNU internationalization runtime library (mingw-w64)
+local/mingw-w64-x86_64-gettext-tools 0.22.5-2
+    GNU internationalization tools (mingw-w64)
+local/mingw-w64-x86_64-glib2 2.82.1-1
+    Common C routines used by GTK+ 3 and other libs (mingw-w64)
+local/mingw-w64-x86_64-gmp 6.3.0-2
+    A free library for arbitrary precision arithmetic (mingw-w64)
+local/mingw-w64-x86_64-headers-git 12.0.0.r329.g8f7b5ce36-1 (mingw-w64-x86_64-toolchain)
+    MinGW-w64 headers for Windows (mingw-w64)
+local/mingw-w64-x86_64-isl 0.27-1
+    Library for manipulating sets and relations of integer points bounded by linear
+    constraints (mingw-w64)
+local/mingw-w64-x86_64-libffi 3.4.6-1
+    A portable, high level programming interface to various calling conventions
+    (mingw-w64)
+local/mingw-w64-x86_64-libiconv 1.17-4
+    Character encoding conversion library (mingw-w64)
+local/mingw-w64-x86_64-libltdl 2.4.7-2
+    A system independent dlopen wrapper for GNU libtool
+local/mingw-w64-x86_64-libmangle-git 12.0.0.r329.g8f7b5ce36-1 (mingw-w64-x86_64-toolchain)
+    MinGW-w64 libmangle (mingw-w64)
+local/mingw-w64-x86_64-libsystre 1.0.1-5
+    Wrapper library around TRE that provides POSIX API (mingw-w64)
+local/mingw-w64-x86_64-libtool 2.4.7-2
+    A generic library support script (mingw-w64)
+local/mingw-w64-x86_64-libtre-git r177.07e66d0-2
+    The approximate regex matching library and agrep command line tool (mingw-w64)
+local/mingw-w64-x86_64-libwinpthread-git 12.0.0.r329.g8f7b5ce36-1 (mingw-w64-x86_64-toolchain)
+    MinGW-w64 winpthreads library (mingw-w64)
+local/mingw-w64-x86_64-libxml2 2.12.9-1
+    XML parsing library, version 2 (mingw-w64)
+local/mingw-w64-x86_64-llvm 18.1.8-1
+    Low Level Virtual Machine (mingw-w64)
+local/mingw-w64-x86_64-llvm-libs 18.1.8-1
+    Low Level Virtual Machine Runtime Libraries (mingw-w64)
+local/mingw-w64-x86_64-make 4.4.1-3 (mingw-w64-x86_64-toolchain)
+    GNU make utility to maintain groups of programs (mingw-w64)
+local/mingw-w64-x86_64-mpc 1.3.1-2
+    Multiple precision complex arithmetic library (mingw-w64)
+local/mingw-w64-x86_64-mpdecimal 4.0.0-1
+    Package for correctly-rounded arbitrary precision decimal floating point
+    arithmetic (mingw-w64)
+local/mingw-w64-x86_64-mpfr 4.2.1-2
+    Multiple-precision floating-point library (mingw-w64)
+local/mingw-w64-x86_64-ncurses 6.5.20240831-1
+    System V Release 4.0 curses emulation library (mingw-w64)
+local/mingw-w64-x86_64-openssl 3.3.2-1
+    The Open Source toolkit for Secure Sockets Layer and Transport Layer Security
+    (mingw-w64)
+local/mingw-w64-x86_64-pcre2 10.44-1
+    A library that implements Perl 5-style regular expressions (mingw-w64)
+local/mingw-w64-x86_64-pkgconf 1~2.3.0-1 (mingw-w64-x86_64-toolchain)
+    pkg-config compatible utility which does not depend on glib
+local/mingw-w64-x86_64-python 3.11.10-1
+    A high-level scripting language (mingw-w64)
+local/mingw-w64-x86_64-python-packaging 24.1-1
+    Core utilities for Python packages (mingw-w64)
+local/mingw-w64-x86_64-readline 8.2.013-1
+    MinGW port of readline for editing typed command lines (mingw-w64)
+local/mingw-w64-x86_64-sqlite3 3.46.1-1
+    A C library that implements an SQL database engine (mingw-w64)
+local/mingw-w64-x86_64-tcl 8.6.13-1
+    The Tcl scripting language (mingw-w64)
+local/mingw-w64-x86_64-termcap 1.3.1-7
+    Terminal feature database (mingw-w64)
+local/mingw-w64-x86_64-tk 8.6.13-1
+    A windowing toolkit for use with tcl (mingw-w64)
+local/mingw-w64-x86_64-tools-git 12.0.0.r329.g8f7b5ce36-1 (mingw-w64-x86_64-toolchain)
+    MinGW-w64 tools (mingw-w64)
+local/mingw-w64-x86_64-tzdata 2024b-1
+    Sources for time zone and daylight saving time data (mingw-w64)
+local/mingw-w64-x86_64-windows-default-manifest 6.4-4
+    Default Windows application manifest (mingw-w64)
+local/mingw-w64-x86_64-wineditline 2.206-1
+    port of the NetBSD Editline library (mingw-w64)
+local/mingw-w64-x86_64-winpthreads-git 12.0.0.r329.g8f7b5ce36-1 (mingw-w64-x86_64-toolchain)
+    MinGW-w64 winpthreads library (mingw-w64)
+local/mingw-w64-x86_64-winstorecompat-git 12.0.0.r329.g8f7b5ce36-1 (mingw-w64-x86_64-toolchain)
+    MinGW-w64 winRT compat library (mingw-w64)
+local/mingw-w64-x86_64-xxhash 0.8.2-2
+    Extremely fast non-cryptographic hash algorithm (mingw-w64)
+local/mingw-w64-x86_64-xz 5.6.3-1
+    Library and command line tools for XZ and LZMA compressed files (mingw-w64)
+local/mingw-w64-x86_64-zlib 1.3.1-1
+    Compression library implementing the deflate compression method found in gzip and
+    PKZIP (mingw-w64)
+local/mingw-w64-x86_64-zstd 1.5.6-2
+    Zstandard - Fast real-time compression algorithm (mingw-w64)
+
+stdlib.h 검색
+nayou@kimnayooung MINGW64 ~
+# ls -l /c/Qt/Tools/mingw1120_64/x86_64-w64-mingw32/include/stdlib.h
+-rw-r--r-- 1 nayou nayou 28604  3월 21  2022 /c/Qt/Tools/mingw1120_64/x86_64-w64-mingw32/include/stdlib.h
+
+nayou@kimnayooung MINGW64 ~
+# ls -l /c/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/stdlib.h
+-rw-r--r-- 1 nayou nayou 2248  3월 21  2022 /c/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/stdlib.h
+
+nayou@kimnayooung MINGW64 ~
+# which g++
+/mingw64/bin/g++
+
+MinGW의 Include 경로 설정
+~/.bashrc 수정
+export CXX_INCLUDE_PATH=/mingw64/include:/c/Users/nayou/vcpkg/downloads/tools/perl/5.38.0.1/perl/lib/CORE
+export C_INCLUDE_PATH=/c/Qt/Tools/mingw1120_64/x86_64-w64-mingw32/include:/mingw64/include:/c/Users/nayou/vcpkg/downloads/tools/perl/5.38.0.1/perl/lib/CORE
+#export PATH="/mingw64/bin:/usr/bin:/bin:/usr/share/aclocal:/mingw64/share/aclocal:/c/libidn2/autoconf-2.72/bin:/c/libidn2/libtool-2.4.6:/c/Program Files/Java/jdk-21/bin:/usr/local/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/c/Users/nayou/AppData/Local/Programs/Python/Python312"
+export PATH="/c/Qt/Tools/mingw1120_64/bin:/usr/bin:/bin:/usr/share/aclocal:/mingw64/share/aclocal:/c/libidn2/autoconf-2.72/bin:/c/libidn2/libtool-2.4.6:/c/Program Files/Java/jdk-21/bin:/usr/local/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/c/Users/nayou/AppData/Local/Programs/Python/Python312"
+
+컴파일러확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# which g++
+/c/Qt/Tools/mingw1120_64/bin/g++
+
+위에서 작성한 코드를 컴파일
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# g++ -o cpp_test cpp_test.cpp
+(g++ -o cpp_test cpp_test.cpp -std=c++17 -I/c/Qt/Tools/mingw1120_64/x86_64-w64-mingw32/include
+, 최적화가 필요하다면 -O2 또는 -O3 플래그를 추가하여 컴파일할 수 있다.)
+위에서 작성한 코드를 실행
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ./cpp_test
+C++17 is supported!
+
+(빌드)
+{ autopoint --force; } 2>&1 | tee ./log/autopoint.log &&   { rm -f po/Makefile.in.in; } &&   { rm -rf autom4te.cache; } &&   { aclocal -I m4 -I gnulib-m4 -I /usr/share/aclocal; } 2>&1 | tee ./log/aclocal.log &&   { libtoolize --copy --force --verbose; } 2>&1 | tee ./log/libtoolize.log &&   { autoconf --verbose; } 2>&1 | tee ./log/autoconf.log &&   { autoheader; } 2>&1 | tee ./log/autoheader.log &&  { automake --add-missing --force-missing; } 2>&1 | tee ./log/automake.log &&   { ./configure --host=x86_64-w64-mingw32; } 2>&1 | tee ./log/configure.log
+
+
 
 
 (오류)
