@@ -20530,27 +20530,125 @@ x86_64-14.2.0-release-win32-seh-msvcrt-rt_v12-rev0.7z    80.1 MB    Sep 5  (다�
 압축을 해제하고 C:\msys64\mingw64 => "C:\msys64\mingw64-backup-11.2.0" 백업 후
 C:\Users\nayou\Downloads\x86_64-14.2.0-release-win32-seh-msvcrt-rt_v12-rev0\mingw64" => C:\msys64\mingw64" 이동
 
+/c/Qt/Tools/mingw1120_64/bin => /c/msys64/mingw64/bin
+/c/Qt/Tools/mingw1120_64/x86_64-w64-mingw32/include => /c/msys64/mingw64/x86_64-w64-mingw32/include
+/c/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++ => /c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++
+~/.bashrc 수정
+export C_INCLUDE_PATH="/mingw64/include:/c/msys64/mingw64/x86_64-w64-mingw32/include:/c/Users/nayou/vcpkg/downloads/tools/perl/5.38.0.1/perl/lib/CORE"
+export CPLUS_INCLUDE_PATH="/mingw64/include:/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++:/c/Users/nayou/vcpkg/downloads/tools/perl/5.38.0.1/perl/lib/CORE"
+export PATH="/c/msys64/mingw64/bin:/mingw64/bin:/usr/bin:/bin:/usr/share/aclocal:/mingw64/share/aclocal:/c/libidn2/autoconf-2.72/bin:/c/libidn2/libtool-2.4.6:/c/Program Files/Java/jdk-21/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/c/Users/nayou/AppData/Local/Programs/Python/Python312"
 
-
-"C 컴파일" - 명시적으로 -std=c23 옵션을 넣어줘야함
 nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
-# x86_64-w64-mingw32-gcc c_test.c -o c_test -std=c23
+# which gcc
+/c/msys64/mingw64/bin/gcc
 
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# which x86_64-w64-mingw32-gcc
+/c/msys64/mingw64/bin/x86_64-w64-mingw32-gcc
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# echo | /c/msys64/mingw64/bin/gcc -E -dM -std=c23 - | grep __STDC_VERSION__
+#define __STDC_VERSION__ 202000L
+=>GCC 14.2.0은 C23 대신 C2x(2020) 표준을 사용하고 있습니다. 이는 C23 표준이 아직 완전히 지원되지 않았을 가능성을 의미
+GCC에서 -std=c23 옵션을 사용했지만, 내부적으로 C2x로 처리되는 것으로 보
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# gcc --version
+gcc.exe (x86_64-win32-seh-rev0, Built by MinGW-Builds project) 14.2.0
+Copyright (C) 2024 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+"C 컴파일"
+c_test.c
+#include <stdio.h>
+
+int main(void) {
+    printf("Current C standard version: %ld\n", __STDC_VERSION__);
+
+    #if __STDC_VERSION__ >= 202300L
+        printf("C23 is supported!\n");
+    #elif __STDC_VERSION__ >= 201112L
+        printf("C11 is supported.\n");
+    #elif __STDC_VERSION__ >= 199901L
+        printf("C99 is supported.\n");
+    #elif __STDC_VERSION__ >= 199409L
+        printf("C94 is supported.\n");
+    #elif __STDC_VERSION__ >= 198900L
+        printf("C89 is supported.\n");
+    #else
+        printf("Older C standard is in use.\n");
+    #endif
+
+    return 0;
+}
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# x86_64-w64-mingw32-gcc c_test.c -o c_test
 nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
 # ./c_test
-C23 is not supported.
+Current C standard version: 201710
+C11 is supported.
 
 nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
 # $CC c_test.c -o c_test
-
 nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
 # ./c_test
-C23 is not supported.
+Current C standard version: 201710
+C11 is supported.
 
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# gcc c_test.c -o c_test
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ./c_test
+Current C standard version: 201710
+C11 is supported.
+
+(명시적)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# x86_64-w64-mingw32-gcc -std=c23 c_test.c -o c_test
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ./c_test
+Current C standard version: 202000
+C11 is supported.
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# $CC -std=c23 c_test.c -o c_test
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ./c_test
+Current C standard version: 202000
+C11 is supported.
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# gcc -std=c23 c_test.c -o c_test
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ./c_test
+Current C standard version: 202000
+C11 is supported.
+
+=> gcc 11.2.0 -> gcc 14.2.0 업그레이드 해도 c23 지원 안됨 
 
 "C++ 컴파일"
+cpp_test.cpp
+#include <iostream>
+#include <optional>
+
+static_assert(__cplusplus >= 201703L, "C++17 is not supported");
+
+int main() {
+    std::cout << "C++17 is supported!" << std::endl;
+    return 0;
+}
+
 nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
 # x86_64-w64-mingw32-g++ cpp_test.cpp -o cpp_test
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ./cpp_test
+C++17 is supported!
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# g++ cpp_test.cpp -o cpp_test
 
 nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
 # ./cpp_test
@@ -20562,6 +20660,9 @@ nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
 nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
 # ./cpp_test
 C++17 is supported!
+
+=> c++17 지원 됨.
+
 
 
 
