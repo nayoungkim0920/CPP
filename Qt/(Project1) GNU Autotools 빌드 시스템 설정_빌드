@@ -20273,8 +20273,7 @@ MinGW의 Include 경로 설정
 ~/.bashrc 수정
 export CXX_INCLUDE_PATH=/mingw64/include:/c/Users/nayou/vcpkg/downloads/tools/perl/5.38.0.1/perl/lib/CORE
 export C_INCLUDE_PATH=/c/Qt/Tools/mingw1120_64/x86_64-w64-mingw32/include:/mingw64/include:/c/Users/nayou/vcpkg/downloads/tools/perl/5.38.0.1/perl/lib/CORE
-#export PATH="/mingw64/bin:/usr/bin:/bin:/usr/share/aclocal:/mingw64/share/aclocal:/c/libidn2/autoconf-2.72/bin:/c/libidn2/libtool-2.4.6:/c/Program Files/Java/jdk-21/bin:/usr/local/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/c/Users/nayou/AppData/Local/Programs/Python/Python312"
-export PATH="/c/Qt/Tools/mingw1120_64/bin:/usr/bin:/bin:/usr/share/aclocal:/mingw64/share/aclocal:/c/libidn2/autoconf-2.72/bin:/c/libidn2/libtool-2.4.6:/c/Program Files/Java/jdk-21/bin:/usr/local/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/c/Users/nayou/AppData/Local/Programs/Python/Python312"
+export PATH="/c/Qt/Tools/mingw1120_64/bin:/mingw64/bin:/usr/bin:/bin:/usr/share/aclocal:/mingw64/share/aclocal:/c/libidn2/autoconf-2.72/bin:/c/libidn2/libtool-2.4.6:/c/Program Files/Java/jdk-21/bin:/usr/local/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/c/Users/nayou/AppData/Local/Programs/Python/Python312"
 
 컴파일러확인
 nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
@@ -20291,8 +20290,290 @@ nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
 # ./cpp_test
 C++17 is supported!
 
-(빌드)
-{ autopoint --force; } 2>&1 | tee ./log/autopoint.log &&   { rm -f po/Makefile.in.in; } &&   { rm -rf autom4te.cache; } &&   { aclocal -I m4 -I gnulib-m4 -I /usr/share/aclocal; } 2>&1 | tee ./log/aclocal.log &&   { libtoolize --copy --force --verbose; } 2>&1 | tee ./log/libtoolize.log &&   { autoconf --verbose; } 2>&1 | tee ./log/autoconf.log &&   { autoheader; } 2>&1 | tee ./log/autoheader.log &&  { automake --add-missing --force-missing; } 2>&1 | tee ./log/automake.log &&   { ./configure --host=x86_64-w64-mingw32; } 2>&1 | tee ./log/configure.log
+{clang} - C23 is supported!
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ./c_test
+C23 is not supported.
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# $CC ./c_test.c -o c_test -std=c23
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ./c_test
+C23 is supported!
+
+{x86_64-w64-mingw32-gcc} -  C23 is not supported.
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# x86_64-w64-mingw32-gcc c_test.c -o c_test
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ./c_test
+C23 is not supported.
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# x86_64-w64-mingw32-gcc c_test.c -o c_test -std=c32
+x86_64-w64-mingw32-gcc.exe: error: unrecognized command-line option '-std=c32'; did you mean '-std=c11'?
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# x86_64-w64-mingw32-gcc c_test.c -o c_test -std=c11
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ./c_test
+C23 is not supported.
+
+clang, clang++ version
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# clang --version
+clang++ --version
+clang version 18.1.8
+Target: x86_64-w64-windows-gnu
+Thread model: posix
+InstalledDir: C:/msys64/mingw64/bin
+clang version 18.1.8
+Target: x86_64-w64-windows-gnu
+Thread model: posix
+InstalledDir: C:/msys64/mingw64/bin
+
+cpp_test.cpp
+#include <iostream>
+
+int main() {
+    std::cout << "C++17이 지원됩니다!" << std::endl;
+    return 0;
+}
+
+clang++가 현재 설정된 MinGW GCC 라이브러리와 충돌하고 있는 것으로 추측
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# clang++ cpp_test.cpp -o cpp_test -std=c++17
+In file included from cpp_test.cpp:1:
+In file included from C:\Qt\Tools\mingw1120_64\lib\gcc\x86_64-w64-mingw32\11.2.0\include\c++/iostream:39:
+In file included from C:\Qt\Tools\mingw1120_64\lib\gcc\x86_64-w64-mingw32\11.2.0\include\c++/ostream:38:
+In file included from C:\Qt\Tools\mingw1120_64\lib\gcc\x86_64-w64-mingw32\11.2.0\include\c++/ios:39:
+In file included from C:\Qt\Tools\mingw1120_64\lib\gcc\x86_64-w64-mingw32\11.2.0\include\c++/exception:148:
+In file included from C:\Qt\Tools\mingw1120_64\lib\gcc\x86_64-w64-mingw32\11.2.0\include\c++/bits/nested_exception.h:40:
+In file included from C:\Qt\Tools\mingw1120_64\lib\gcc\x86_64-w64-mingw32\11.2.0\include\c++/bits/move.h:57:
+C:\Qt\Tools\mingw1120_64\lib\gcc\x86_64-w64-mingw32\11.2.0\include\c++/type_traits:698:5: error:
+      declaration of anonymous struct must be a definition
+  698 |     struct
+      |     ^
+C:\Qt\Tools\mingw1120_64\lib\gcc\x86_64-w64-mingw32\11.2.0\include\c++/type_traits:701:38: error:
+      expected unqualified-id
+  701 |     : public integral_constant<bool, __is_pod(_Tp)>
+      |                                      ^
+C:\Qt\Tools\mingw1120_64\lib\gcc\x86_64-w64-mingw32\11.2.0\include\c++/type_traits:3081:25: error:
+      expected unqualified-id
+ 3081 |   _GLIBCXX20_DEPRECATED("use is_standard_layout_v && is_trivial_v instead")
+      |                         ^
+C:\Qt\Tools\mingw1120_64\lib\gcc\x86_64-w64-mingw32\11.2.0\include\c++/type_traits:3081:25: error:
+      expected ')'
+C:\Qt\Tools\mingw1120_64\lib\gcc\x86_64-w64-mingw32\11.2.0\include\c++/type_traits:3081:24: note:
+      to match this '('
+ 3081 |   _GLIBCXX20_DEPRECATED("use is_standard_layout_v && is_trivial_v instead")
+      |                        ^
+4 errors generated.
+
+환경변수수정
+nayou@kimnayooung MINGW64 ~
+# ls -l /mingw64/bin/clang
+-rwxr-xr-x 1 nayou nayou 156418  6월 29 22:45 /mingw64/bin/clang
+~/.bashrc 수정
+#export CPP=/mingw64/bin/cpp			#C++ 전처리기
+export CPP="/mingw64/bin/clang -E"		#C++ 전처리기
+export PATH="/c/Qt/Tools/mingw1120_64/bin:/mingw64/bin:/usr/bin:/bin:/usr/share/aclocal:/mingw64/share/aclocal:/c/libidn2/autoconf-2.72/bin:/c/libidn2/libtool-2.4.6:/c/Program\ Files/Java/jdk-21/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/c/Users/nayou/AppData/Local/Programs/Python/Python312"
+
+clang 전용라이브러리 설치
+pacman -S mingw-w64-x86_64-libc++
+
+환경변수설정
+# C 컴파일러 설정
+export CC=clang
+
+# C++ 컴파일러 설정
+export CXX=clang++
+
+# C++ 전처리기 설정
+export CPP="clang -E"
+
+# CFLAGS 설정 (C 컴파일러 플래그)
+export CFLAGS="-std=c23 -I/C/Qt/Tools/mingw1120_64/x86_64-w64-mingw32/include -O2"
+
+# CPPFLAGS 설정 (C++ 전처리기 플래그)
+export CPPFLAGS="-std=c++17 -I/C/Qt/Tools/mingw1120_64/x86_64-w64-mingw32/include -O2"
+
+# CXXFLAGS 설정 (C++ 컴파일러 플래그)
+export CXXFLAGS="-std=c++17 -I/C/Qt/Tools/mingw1120_64/x86_64-w64-mingw32/include -O2 -DDEBUG -DVERSION=\"1.0.0\""
+
+# 링커와 관련된 설정
+export LD=C:/Qt/Tools/mingw1120_64/bin/ld.exe
+export AR=C:/Qt/Tools/mingw1120_64/bin/ar.exe
+
+# 패키지 설정
+export PKG_CONFIG=C:/Qt/Tools/mingw1120_64/bin/pkg-config
+export PKG_CONFIG_PATH="/c/Program Files/GLib/lib/pkgconfig:/c/libidn2/gettext-0.22.5/gettext-runtime/intl:/C/Qt/Tools/mingw1120_64/lib/pkgconfig:/usr/lib/pkgconfig"
+
+# 라이브러리 경로 설정
+export LD_LIBRARY_PATH="/C/Qt/Tools/mingw1120_64/lib:/usr/lib"
+export LDFLAGS="-L/c/libidn2/gettext-0.22.5/libtextstyle/lib -L/C/Qt/Tools/mingw1120_64/lib -L/usr/lib -Wl,-rpath,/C/Qt/Tools/mingw1120_64/bin"
+export LIBRARY_PATH=/C/Qt/Tools/mingw1120_64/lib
+
+# 포함 경로 설정
+export CXX_INCLUDE_PATH=/C/Qt/Tools/mingw1120_64/include:/c/Users/nayou/vcpkg/downloads/tools/perl/5.38.0.1/perl/lib/CORE
+export C_INCLUDE_PATH=/C/Qt/Tools/mingw1120_64/x86_64-w64-mingw32/include:/C/Qt/Tools/mingw1120_64/include:/c/Users/nayou/vcpkg/downloads/tools/perl/5.38.0.1/perl/lib/CORE
+export CPLUS_INCLUDE_PATH=/C/Qt/Tools/mingw1120_64/include/c++/v1:/C/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++:/C/Qt/Tools/mingw1120_64/include:/c/Users/nayou/vcpkg/downloads/tools/perl/5.38.0.1/perl/lib/CORE
+
+# 기타 도구 설정
+export ANT_HOME=/c/apache-ant-1.10.15
+export PATH="$ANT_HOME/bin:$PATH"
+export JAVA_HOME="/c/Program Files/Java/jdk-21"
+export PATH="$JAVA_HOME/bin:$PATH"
+
+# GNULIB 경로 추가
+export PATH="$PATH:/c/gnulib"
+
+# 설정 관련 경로
+export M4=/usr/bin/m4
+export ACLOCAL_PATH="/c/libidn2/gettext-0.22.5/libtextstyle/lib/ltdl:/c/libidn2/gettext-0.22.5/libtextstyle/lib/ltdl/m4:/c/msys64/usr/share/aclocal:/usr/share/aclocal:/C/Qt/Tools/mingw1120_64/share/aclocal:/c/libidn2/m4"
+export AUTOCONF_PATH="/c/libidn2/m4:/usr/share/aclocal:/C/Qt/Tools/mingw1120_64/share/aclocal"
+
+# 최종 PATH 설정
+export PATH="/C/Qt/Tools/mingw1120_64/bin:/usr/bin:/bin:/usr/share/aclocal:/C/Qt/Tools/mingw1120_64/share/aclocal:/c/libidn2/autoconf-2.72/bin:/c/libidn2/libtool-2.4.6:/c/Program Files/Java/jdk-21/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/c/Users/nayou/AppData/Local/Programs/Python/Python312"
+
+(컴파일)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# gcc -std=c++17 cpp_test.cpp -o cpp_test -lstdc++
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ./cpp_test
+C++17 is supported!
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# g++ -std=c++17 cpp_test.cpp -o cpp_test
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ./cpp_test
+C++17 is supported!
+
+clang, clang++ 인식이안돼서 환경변수에 경로 잡아주기위해 검색함
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l /mingw64/bin/clang*
+-rwxr-xr-x 1 nayou nayou  156418  6월 29 22:45 /mingw64/bin/clang.exe
+-rwxr-xr-x 1 nayou nayou  156418  6월 29 22:45 /mingw64/bin/clang++.exe
+-rwxr-xr-x 1 nayou nayou   60536  6월 29 22:45 /mingw64/bin/clang-check.exe
+-rwxr-xr-x 1 nayou nayou  156418  6월 29 22:45 /mingw64/bin/clang-cl.exe
+-rwxr-xr-x 1 nayou nayou  156418  6월 29 22:45 /mingw64/bin/clang-cpp.exe
+-rwxr-xr-x 1 nayou nayou   48168  6월 29 22:45 /mingw64/bin/clang-extdef-mapping.exe
+-rwxr-xr-x 1 nayou nayou  105347  6월 29 22:45 /mingw64/bin/clang-format.exe
+-rwxr-xr-x 1 nayou nayou  224440  6월 29 22:45 /mingw64/bin/clang-linker-wrapper.exe
+-rwxr-xr-x 1 nayou nayou   63000  6월 29 22:45 /mingw64/bin/clang-offload-bundler.exe
+-rwxr-xr-x 1 nayou nayou   55284  6월 29 22:45 /mingw64/bin/clang-offload-packager.exe
+-rwxr-xr-x 1 nayou nayou  100565  6월 29 22:45 /mingw64/bin/clang-refactor.exe
+-rwxr-xr-x 1 nayou nayou   74799  6월 29 22:45 /mingw64/bin/clang-rename.exe
+-rwxr-xr-x 1 nayou nayou   60201  6월 29 22:45 /mingw64/bin/clang-repl.exe
+-rwxr-xr-x 1 nayou nayou  218979  6월 29 22:45 /mingw64/bin/clang-scan-deps.exe
+-rwxr-xr-x 1 nayou nayou 2448795  6월 29 22:45 /mingw64/bin/clang-tblgen.exe
+
+환경변수설정(stdlib.h를 찾아서 include 경로수정)
+~/.bashrc 수정
+export CC=x86_64-w64-mingw32-gcc		# C 컴파일러 
+export CXX=x86_64-w64-mingw32-g++		# C++ 컴파일러
+export CPP=/mingw64/bin/cpp			# C++ 전처리기
+
+export CFLAGS="-std=c23 -I/mingw64/include -O2"		# C 컴파일러 C23 기능 설정
+export CPPFLAGS="-I/mingw64/include -O2"			# C++ 전처리 설정
+export CXXFLAGS="-std=c++17 -I/mingw64/include -O2 -DDEBUG -DVERSION=\"1.0.0\""  # C++ 컴파일러 C++17 기능 설정
+
+export LD=/mingw64/bin/ld.exe
+export AR=/mingw64/bin/ar.exe
+export CXXDEPMODE=depmode=gcc
+
+export CXX_INCLUDE_PATH="/mingw64/include:/c/Users/nayou/vcpkg/downloads/tools/perl/5.38.0.1/perl/lib/CORE"
+export C_INCLUDE_PATH="/mingw64/include:/c/Qt/Tools/mingw1120_64/x86_64-w64-mingw32/include:/c/Users/nayou/vcpkg/downloads/tools/perl/5.38.0.1/perl/lib/CORE"
+export CPLUS_INCLUDE_PATH="/mingw64/include:/c/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++:/c/Users/nayou/vcpkg/downloads/tools/perl/5.38.0.1/perl/lib/CORE"
+
+(C23)
+현재 설치된 GCC의 버전을 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# x86_64-w64-mingw32-gcc --version
+x86_64-w64-mingw32-gcc.exe (x86_64-posix-seh-rev3, Built by MinGW-W64 project) 11.2.0
+Copyright (C) 2021 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+C 표준 지원 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# x86_64-w64-mingw32-gcc -dM -E - < /dev/null | grep __STDC_VERSION__
+#define __STDC_VERSION__ 201710L
+
+=>현재 설치된 GCC 버전은 11.2.0이며, 이 버전은 C11 표준(201710L)을 지원
+현재 사용 중인 GCC 11.2.0에서는 C23(202300L)을 지원하지 않으며, 
+__STDC_VERSION__ 매크로가 201710L로 정의되어있고 C11까지의 기능만 사용할 수 있다.
+
+C23을 사용방법
+-GCC를 최신 버전으로 업데이트
+pacman -Syu mingw-w64-x86_64-gcc
+업데이트 후 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# x86_64-w64-mingw32-gcc --version
+x86_64-w64-mingw32-gcc -dM -E - < /dev/null | grep __STDC_VERSION__
+x86_64-w64-mingw32-gcc.exe (x86_64-posix-seh-rev3, Built by MinGW-W64 project) 11.2.0
+Copyright (C) 2021 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+#define __STDC_VERSION__ 201710L
+=> 현재 C23을 사용 불가 지원안함
+
+x86_64-w64-mingw32-gcc.exe (x86_64-posix-seh-rev3, Built by MinGW-W64 project) 11.2.0
+=> C23을 지원하는 gcc 14.2버전으로 설치
+https://github.com/niXman/mingw-builds-binaries/releases
+x86_64-14.2.0-release-win32-seh-msvcrt-rt_v12-rev0.7z    80.1 MB    Sep 5  (다운로드)
+압축을 해제하고 C:\msys64\mingw64 => "C:\msys64\mingw64-backup-11.2.0" 백업 후
+C:\Users\nayou\Downloads\x86_64-14.2.0-release-win32-seh-msvcrt-rt_v12-rev0\mingw64" => C:\msys64\mingw64" 이동
+
+
+
+"C 컴파일" - 명시적으로 -std=c23 옵션을 넣어줘야함
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# x86_64-w64-mingw32-gcc c_test.c -o c_test -std=c23
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ./c_test
+C23 is not supported.
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# $CC c_test.c -o c_test
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ./c_test
+C23 is not supported.
+
+
+"C++ 컴파일"
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# x86_64-w64-mingw32-g++ cpp_test.cpp -o cpp_test
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ./cpp_test
+C++17 is supported!
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# $CXX cpp_test.cpp -o cpp_test
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ./cpp_test
+C++17 is supported!
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
