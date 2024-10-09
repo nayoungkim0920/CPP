@@ -23913,10 +23913,685 @@ GNULIB_MODULES="
 "
 
 (오류)
-checking for x86_64-w64-mingw32-gcc option to enable C23 features... unsupported
+checking whether x86_64-w64-mingw32-gcc supports C23 features with -std=gnu23... no
+checking whether x86_64-w64-mingw32-gcc supports C17 features with -std=gnu17... yes
+checking whether x86_64-w64-mingw32-gcc supports C11 features with -std=gnu11... yes
 (수정)
-gcc가 C23 기능을 지원하지 않음
-configure.ac 파일에서 C23 관련 옵션을 제거
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# gcc -dM -E - < /dev/null | grep __STDC_VERSION__
+#define __STDC_VERSION__ 201710L
+=> C17(또는 ISO C11) 표준을 지원
+=>c11->c17 변경
+configure.ac 수정
+# C17 표준을 컴파일러 플래그로 추가
+AX_CHECK_COMPILE_FLAG([-std=c17], [CFLAGS="$CFLAGS -std=c17"])
+# 필요시 C17을 나타내는 변수 설정
+AC_SUBST([CC_STANDARD], [17])
+
+AC_SUBST([CFLAGS], ["-std=c17 -I/mingw64/include -O2"])
+
+(오류)
+checking for dlopen in -ldl... no
+(수정 예시)
+#ifdef _WIN32
+#include <windows.h>
+#define LOAD_LIBRARY LoadLibrary
+#else
+#include <dlfcn.h>
+#define LOAD_LIBRARY dlopen
+#endif
+
+static void *
+xmlModulePlatformOpen(const char *name)
+{
+    return LOAD_LIBRARY(name);
+}
+
+static int
+xmlModulePlatformClose(void *handle)
+{
+    return CLOSE_LIBRARY(handle) ? 0 : -1; // 성공 시 0, 실패 시 -1
+}
+
+static int
+xmlModulePlatformSymbol(void *handle, const char *name, void **symbol)
+{
+    *symbol = GET_PROC_ADDRESS(handle, name);
+    return (*symbol == NULL) ? -1 : 0; // 성공 시 0, 실패 시 -1
+}
+=> 위에 있음(소스수정) line 20840
+
+(오류)
+Package glib-2.0 was not found in the pkg-config search path.
+Package gobject-2.0 was not found in the pkg-config search path.
+(수정)
+업데이트 
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -Syu
+
+glib 및 gobject 설치 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pkg-config --modversion glib-2.0
+pkg-config --modversion gobject-2.0
+Package glib-2.0 was not found in the pkg-config search path.
+Perhaps you should add the directory containing `glib-2.0.pc'
+to the PKG_CONFIG_PATH environment variable
+Package 'glib-2.0' not found
+Package gobject-2.0 was not found in the pkg-config search path.
+Perhaps you should add the directory containing `gobject-2.0.pc'
+to the PKG_CONFIG_PATH environment variable
+Package 'gobject-2.0' not found
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# echo $PKG_CONFIG_PATH
+/c/Program Files/GLib/lib/pkgconfig:/c/libidn2/gettext-0.22.5/gettext-runtime/intl:/mingw64/lib/pkgconfig:/usr/lib/pkgconfig
+(/mingw64/lib/pkgconfig 경로는 GLib와 GObject 패키지의 .pc 파일을 찾기에 중요한 경로)
+/c/Program Files/GLib/lib/pkgconfig: GLib의 패키지 구성 파일이 위치할 수 있는 경로입니다.
+/c/libidn2/gettext-0.22.5/gettext-runtime/intl: gettext와 관련된 패키지 구성 파일이 위치할 수 있는 경로입니다.
+/mingw64/lib/pkgconfig: MinGW64 환경에서 일반적으로 사용하는 경로입니다. 여기에는 GLib 및 GObject와 같은 여러 패키지의 .pc 파일이 있어야 합니다.
+/usr/lib/pkgconfig: Linux와 유사한 경로로, 일반적으로 시스템에 설치된 라이브러리의 .pc 파일이 위치하는 곳입니다.
+
+GLib 및 GObject 패키지를 설치
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -Syu mingw-w64-x86_64-glib2
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pkg-config --modversion glib-2.0
+pkg-config --modversion gobject-2.0
+2.82.1
+2.82.1
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l /mingw64/lib/pkgconfig/glib-2.0.pc
+-rw-r--r-- 1 nayou nayou 566  9월 20 15:04 /mingw64/lib/pkgconfig/glib-2.0.pc
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l /mingw64/lib/pkgconfig/gobject-2.0.pc
+-rw-r--r-- 1 nayou nayou 289  9월 20 15:04 /mingw64/lib/pkgconfig/gobject-2.0.pc
+
+환경변수 확인
+echo $PKG_CONFIG_PATH
+/mingw64/lib/pkgconfig (확인)
+
+configure.ac 파일에 GLib와 GObject를 추가
+configure.ac 수정
+#각각의 패키지에 대해 별도의 호출을 사용하는 것이 더 일반적
+#PKG_CHECK_MODULES 매크로가 각 패키지를 확인하고, 
+#패키지가 성공적으로 발견되면 have_libintl, have_ncurses, have_glib 변수가 각각 yes로 설정
+# 패키지 설정
+PKG_CHECK_MODULES(
+    [ITL], 
+    [libintl], 
+    [have_libintl=yes], 
+    [have_libintl=no]
+)
+
+AC_SUBST([ITL_CFLAGS])
+AC_SUBST([ITL_LIBS])
+
+PKG_CHECK_MODULES(
+    [NCURSES], 
+    [ncurses], 
+    [have_ncurses=yes], 
+    [have_ncurses=no]
+)
+
+AC_SUBST([NCURSES_CFLAGS])
+AC_SUBST([NCURSES_LIBS])
+
+PKG_CHECK_MODULES(
+    [GLIB], 
+    [glib-2.0 gobject-2.0], 
+    [have_glib=yes], 
+    [have_glib=no]
+)
+
+AC_SUBST([GLIB_CFLAGS])
+AC_SUBST([GLIB_LIBS])
+
+Makefile.am 수정
+# CFLAGS 설정
+#AM_CFLAGS = -Wall -Wextra -Wpedantic -fdiagnostics-show-option # 모든 경고와 추가적인 경고를 활성화
+AM_CFLAGS = -Wall -Wextra -Wpedantic -fdiagnostics-show-option \
+            $(ITL_CFLAGS) $(NCURSES_CFLAGS) $(GLIB_CFLAGS)
+
+# 링크 시 필요한 라이브러리 추가
+AM_LIBS = $(ITL_LIBS) $(NCURSES_LIBS) $(GLIB_LIBS)
+
+(오류)
+WARNING: `gtk-doc` not found.
+(수정)
+gtk-doc 설치
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -S gtk-doc
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# gtk-doc --version
+-bash: gtk-doc: 명령어를 찾을 수 없음
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -Ss gtk-doc
+clangarm64/mingw-w64-clang-aarch64-gtk-doc 1.34.0-2
+    Documentation tool for public library API (mingw-w64)
+mingw32/mingw-w64-i686-gtk-doc 1.34.0-2
+    Documentation tool for public library API (mingw-w64)
+mingw64/mingw-w64-x86_64-gtk-doc 1.34.0-2
+    Documentation tool for public library API (mingw-w64)
+ucrt64/mingw-w64-ucrt-x86_64-gtk-doc 1.34.0-2
+    Documentation tool for public library API (mingw-w64)
+clang32/mingw-w64-clang-i686-gtk-doc 1.34.0-2
+    Documentation tool for public library API (mingw-w64)
+clang64/mingw-w64-clang-x86_64-gtk-doc 1.34.0-2
+    Documentation tool for public library API (mingw-w64)
+msys/gtk-doc 1.34.0-1 [설치함]
+    Documentation tool for public library API
+
+gtk-doc의 실행 파일이 일반적으로 /mingw64/bin 또는 /usr/bin 디렉토리에 위치(확인)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls /mingw64/bin/gtk-doc*
+ls /usr/bin/gtk-doc*
+ls: cannot access '/mingw64/bin/gtk-doc*': No such file or directory
+ls: cannot access '/usr/bin/gtk-doc*': No such file or directory
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# find / -name "gtk-doc"
+/usr/share/gtk-doc
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l /usr/share/pkgconfig/gtk*
+-rw-r--r-- 1 nayou nayou 144  3월 10  2024 /usr/share/pkgconfig/gtk-doc.pc
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l /usr/share/aclocal/gtk*
+-rw-r--r-- 1 nayou nayou 4528  3월 10  2024 /usr/share/aclocal/gtk-doc.m4
+
+MSYS2 Packages
+https://packages.msys2.org/packages/mingw-w64-x86_64-gtk-doc
+pacman -S mingw-w64-x86_64-gtk-doc
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -S mingw-w64-x86_64-gtk-doc
+의존성 해결 중...
+꾸러미 충돌을 찾는 중...
+
+꾸러미 (5) mingw-w64-x86_64-docbook-xml-1~4.5-3
+           mingw-w64-x86_64-docbook-xsl-1.79.2-8
+           mingw-w64-x86_64-libxslt-1.1.42-1
+           mingw-w64-x86_64-python-pygments-2.18.0-1
+           mingw-w64-x86_64-gtk-doc-1.34.0-2
+
+총 다운로드 크기:   3.34 MiB
+총 설치 크기:      42.86 MiB
+
+:: 설치를 진행하시겠습니까? [Y/n] y
+:: 꾸러미 가져오는 중...
+ mingw-w64-x86_64...  1942.2 KiB   861 KiB/s 00:02 [########################] 100%
+ mingw-w64-x86_64...   366.4 KiB   143 KiB/s 00:03 [########################] 100%
+ mingw-w64-x86_64...    89.2 KiB  31.7 KiB/s 00:03 [########################] 100%
+ mingw-w64-x86_64...   131.8 KiB  46.4 KiB/s 00:03 [########################] 100%
+ mingw-w64-x86_64...   886.7 KiB   236 KiB/s 00:04 [########################] 100%
+ 총합 (5/5)              3.3 MiB   791 KiB/s 00:04 [########################] 100%
+(5/5) 키링의 키를 검사 중                          [########################] 100%
+(5/5) 꾸러미 무결성 검사 중                        [########################] 100%
+(5/5) 꾸러미 파일 불러오는 중                      [########################] 100%
+(5/5) 파일 충돌 검사 중                            [########################] 100%
+(5/5) 사용 가능한 디스크 공간 검사 중              [########################] 100%
+:: 꾸러미 변경사항을 처리 중...
+(1/5) 설치 중 mingw-w64-x86_64-libxslt             [########################] 100%
+(2/5) 설치 중 mingw-w64-x86_64-docbook-xml         [########################] 100%
+/tmp/alpm_eogODS/.INSTALL: 줄 10: mingw64/bin/xmlcatalog.exe: No such file or directory
+/tmp/alpm_eogODS/.INSTALL: 줄 12: mingw64/bin/xmlcatalog.exe: No such file or directory
+/tmp/alpm_eogODS/.INSTALL: 줄 16: mingw64/bin/xmlcatalog.exe: No such file or directory
+/tmp/alpm_eogODS/.INSTALL: 줄 20: mingw64/bin/xmlcatalog.exe: No such file or directory
+/tmp/alpm_eogODS/.INSTALL: 줄 24: mingw64/bin/xmlcatalog.exe: No such file or directory
+오류: 명령이 올바르게 실행되지 못하였습니다.
+(3/5) 설치 중 mingw-w64-x86_64-docbook-xsl         [########################] 100%
+/tmp/alpm_cFl47d/.INSTALL: 줄 5: /mingw64/bin/xmlcatalog.exe: No such file or directory
+/tmp/alpm_cFl47d/.INSTALL: 줄 5: /mingw64/bin/xmlcatalog.exe: No such file or directory
+/tmp/alpm_cFl47d/.INSTALL: 줄 5: /mingw64/bin/xmlcatalog.exe: No such file or directory
+/tmp/alpm_cFl47d/.INSTALL: 줄 5: /mingw64/bin/xmlcatalog.exe: No such file or directory
+/tmp/alpm_cFl47d/.INSTALL: 줄 5: /mingw64/bin/xmlcatalog.exe: No such file or directory
+/tmp/alpm_cFl47d/.INSTALL: 줄 5: /mingw64/bin/xmlcatalog.exe: No such file or directory
+/tmp/alpm_cFl47d/.INSTALL: 줄 5: /mingw64/bin/xmlcatalog.exe: No such file or directory
+/tmp/alpm_cFl47d/.INSTALL: 줄 5: /mingw64/bin/xmlcatalog.exe: No such file or directory
+/tmp/alpm_cFl47d/.INSTALL: 줄 5: /mingw64/bin/xmlcatalog.exe: No such file or directory
+오류: 명령이 올바르게 실행되지 못하였습니다.
+(4/5) 설치 중 mingw-w64-x86_64-python-pygments     [########################] 100%
+(5/5) 설치 중 mingw-w64-x86_64-gtk-doc             [########################] 100%
+
+(수정)
+XML Catalog 도구 설치
+xmlcatalog는 libxml2 패키지에 포함
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -S mingw-w64-x86_64-libxml2
+경고: mingw-w64-x86_64-libxml2-2.12.9-1는 최신 버전입니다. -- 재설치
+의존성 해결 중...
+꾸러미 충돌을 찾는 중...
+
+꾸러미 (1) mingw-w64-x86_64-libxml2-2.12.9-1
+
+총 설치 크기:          6.73 MiB
+알짜 업그레이드 크기:  0.00 MiB
+
+:: 설치를 진행하시겠습니까? [Y/n] y
+(1/1) 키링의 키를 검사 중                          [########################] 100%
+(1/1) 꾸러미 무결성 검사 중                        [########################] 100%
+(1/1) 꾸러미 파일 불러오는 중                      [########################] 100%
+(1/1) 파일 충돌 검사 중                            [########################] 100%
+(1/1) 사용 가능한 디스크 공간 검사 중              [########################] 100%
+경고: mingw64/bin/libxml2-2.dll의 파일 정보를 얻을 수 없습니다
+경고: mingw64/bin/xml2-config의 파일 정보를 얻을 수 없습니다
+경고: mingw64/bin/xmlcatalog.exe의 파일 정보를 얻을 수 없습니다
+경고: mingw64/bin/xmllint.exe의 파일 정보를 얻을 수 없습니다
+경고: mingw64/include/libxml2/의 파일 정보를 얻을 수 없습니다
+경고: mingw64/include/libxml2/libxml/의 파일 정보를 얻을 수 없습니다
+경고: mingw64/include/libxml2/libxml/c14n.h의 파일 정보를 얻을 수 없습니다
+경고: mingw64/include/libxml2/libxml/catalog.h의 파일 정보를 얻을 수 없습니다
+경고: mingw64/include/libxml2/libxml/chvalid.h의 파일 정보를 얻을 수 없습니다
+경고: mingw64/include/libxml2/libxml/debugXML.h의 파일 정보를 얻을 수 없습니다
+경고: mingw64/include/libxml2/libxml/dict.h의 파일 정보를 얻을 수 없습니다
+경고: mingw64/include/libxml2/libxml/encoding.h의 파일 정보를 얻을 수 없습니다
+경고: mingw64/include/libxml2/libxml/entities.h의 파일 정보를 얻을 수 없습니다
+경고: mingw64/include/libxml2/libxml/globals.h의 파일 정보를 얻을 수 없습니다
+경고: mingw64/include/libxml2/libxml/hash.h의 파일 정보를 얻을 수 없습니다
+경고: mingw64/include/libxml2/libxml/HTMLparser.h의 파일 정보를 얻을 수 없습니다
+경고: mingw64/include/libxml2/libxml/HTMLtree.h의 파일 정보를 얻을 수 없습니다
+경고: mingw64/include/libxml2/libxml/list.h의 파일 정보를 얻을 수 없습니다
+경고: mingw64/include/libxml2/libxml/nanoftp.h의 파일 정보를 얻을 수 없습니다
+경고: mingw64/include/libxml2/libxml/nanohttp.h의 파일 정보를 얻을 수 없습니다
+경고: mingw64/include/libxml2/libxml/parser.h의 파일 정보를 얻을 수 없습니다
+경고: mingw64/include/libxml2/libxml/parserInternals.h의 파일 정보를 얻을 수 없습니다
+경고: mingw64/include/libxml2/libxml/pattern.h의 파일 정보를 얻을 수 없습니다
+경고: mingw64/include/libxml2/libxml/relaxng.h의 파일 정보를 얻을 수 없습니다
+경고: mingw64/include/libxml2/libxml/SAX.h의 파일 정보를 얻을 수 없습니다
+경고: mingw64/include/libxml2/libxml/SAX2.h의 파일 정보를 얻을 수 없습니다
+경고: mingw64/include/libxml2/libxml/schemasInternals.h의 파일 정보를 얻을 수 없습니다
+경고: mingw64/include/libxml2/libxml/schematron.h의 파일 정보를 얻을 수 없습니다
+경고: mingw64/include/libxml2/libxml/threads.h의 파일 정보를 얻을 수 없습니다
+경고: mingw64/include/libxml2/libxml/tree.h의 파일 정보를 얻을 수 없습니다
+경고: mingw64/include/libxml2/libxml/uri.h의 파일 정보를 얻을 수 없습니다
+경고: mingw64/include/libxml2/libxml/valid.h의 파일 정보를 얻을 수 없습니다
+경고: mingw64/include/libxml2/libxml/xinclude.h의 파일 정보를 얻을 수 없습니다
+경고: mingw64/include/libxml2/libxml/xlink.h의 파일 정보를 얻을 수 없습니다
+경고: mingw64/include/libxml2/libxml/xmlautomata.h의 파일 정보를 얻을 수 없습니다
+경고: mingw64/include/libxml2/libxml/xmlerror.h의 파일 정보를 얻을 수 없습니다
+경고: mingw64/include/libxml2/libxml/xmlexports.h의 파일 정보를 얻을 수 없습니다
+경고: mingw64/include/libxml2/libxml/xmlIO.h의 파일 정보를 얻을 수 없습니다
+경고: mingw64/include/libxml2/libxml/xmlmemory.h의 파일 정보를 얻을 수 없습니다
+경고: mingw64/include/libxml2/libxml/xmlmodule.h의 파일 정보를 얻을 수 없습니다
+경고: mingw64/include/libxml2/libxml/xmlreader.h의 파일 정보를 얻을 수 없습니다
+경고: mingw64/include/libxml2/libxml/xmlregexp.h의 파일 정보를 얻을 수 없습니다
+경고: mingw64/include/libxml2/libxml/xmlsave.h의 파일 정보를 얻을 수 없습니다
+경고: mingw64/include/libxml2/libxml/xmlschemas.h의 파일 정보를 얻을 수 없습니다
+경고: mingw64/include/libxml2/libxml/xmlschemastypes.h의 파일 정보를 얻을 수 없습니다
+경고: mingw64/include/libxml2/libxml/xmlstring.h의 파일 정보를 얻을 수 없습니다
+경고: mingw64/include/libxml2/libxml/xmlunicode.h의 파일 정보를 얻을 수 없습니다
+경고: mingw64/include/libxml2/libxml/xmlversion.h의 파일 정보를 얻을 수 없습니다
+경고: mingw64/include/libxml2/libxml/xmlwriter.h의 파일 정보를 얻을 수 없습니다
+경고: mingw64/include/libxml2/libxml/xpath.h의 파일 정보를 얻을 수 없습니다
+경고: mingw64/include/libxml2/libxml/xpathInternals.h의 파일 정보를 얻을 수 없습니다
+경고: mingw64/include/libxml2/libxml/xpointer.h의 파일 정보를 얻을 수 없습니다
+경고: mingw64/lib/cmake/libxml2/의 파일 정보를 얻을 수 없습니다
+경고: mingw64/lib/cmake/libxml2/libxml2-config.cmake의 파일 정보를 얻을 수 없습니다
+경고: mingw64/lib/libxml2.a의 파일 정보를 얻을 수 없습니다
+경고: mingw64/lib/libxml2.dll.a의 파일 정보를 얻을 수 없습니다
+경고: mingw64/lib/pkgconfig/libxml-2.0.pc의 파일 정보를 얻을 수 없습니다
+경고: mingw64/lib/python3.11/site-packages/__pycache__/의 파일 정보를 얻을 수 없습니다
+경고: mingw64/lib/python3.11/site-packages/__pycache__/drv_libxml2.cpython-311.opt-1.pyc의 파일 정보를 얻을 수 없습니다
+경고: mingw64/lib/python3.11/site-packages/__pycache__/drv_libxml2.cpython-311.pyc의 파일 정보를 얻을 수 없습니다
+경고: mingw64/lib/python3.11/site-packages/__pycache__/libxml2.cpython-311.opt-1.pyc의 파일 정보를 얻을 수 없습니다
+경고: mingw64/lib/python3.11/site-packages/__pycache__/libxml2.cpython-311.pyc의 파일 정보를 얻을 수 없습니다
+경고: mingw64/lib/python3.11/site-packages/drv_libxml2.py의 파일 정보를 얻을 수 없습니다
+경고: mingw64/lib/python3.11/site-packages/libxml2.py의 파일 정보를 얻을 수 없습니다
+경고: mingw64/lib/python3.11/site-packages/libxml2mod.dll.a의 파일 정보를 얻을 수 없습니다
+경고: mingw64/lib/python3.11/site-packages/libxml2mod.pyd의 파일 정보를 얻을 수 없습니다
+경고: mingw64/share/aclocal/libxml.m4의 파일 정보를 얻을 수 없습니다
+경고: mingw64/share/licenses/libxml2/의 파일 정보를 얻을 수 없습니다
+경고: mingw64/share/licenses/libxml2/COPYING의 파일 정보를 얻을 수 없습니다
+경고: mingw64/share/man/man1/xml2-config.1.gz의 파일 정보를 얻을 수 없습니다
+경고: mingw64/share/man/man1/xmlcatalog.1.gz의 파일 정보를 얻을 수 없습니다
+경고: mingw64/share/man/man1/xmllint.1.gz의 파일 정보를 얻을 수 없습니다
+:: 꾸러미 변경사항을 처리 중...
+(1/1) 재설치 중 mingw-w64-x86_64-libxml2           [########################] 100%
+오류: 명령이 올바르게 실행되지 못하였습니다.
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -Sy
+:: 꾸러미 데이터베이스 동기화 중...
+ clangarm64는 최신입니다
+ mingw32는 최신입니다
+ mingw64는 최신입니다
+ ucrt64는 최신입니다
+ clang32는 최신입니다
+ clang64는 최신입니다
+ msys는 최신입니다
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -Scc
+
+캐시 디렉터리: /var/cache/pacman/pkg/
+:: 캐시에서 모든 파일을 제거하시겠습니까? [Y/n] y
+캐시에서 모든 파일 제거 중...
+
+데이터베이스 디렉터리: /var/lib/pacman/
+:: 사용하지 않는 저장소를 제거하시겠습니까? [Y/n] y
+사용하지 않는 동기화 저장소 제거 중...
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l /mingw64/bin/gtk*
+-rwxr-xr-x 1 nayou nayou 50777  9월 26 03:13 /mingw64/bin/gtkdoc-check.exe
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# gtkdocize --version
+gtkdocize (gtk-doc) 1.34.0
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# which gtkdocize
+/c/msys64/mingw64/bin/gtkdocize
+
+환경변수확인
+export PATH="/c/gnulib:/c/msys64/mingw64/bin:/mingw64/bin:/usr/bin:/bin:/usr/share/aclocal:/mingw64/share/aclocal:/c/libidn2/autoconf-2.72/bin:/c/libidn2/libtool-2.4.6:/c/Program Files/Java/jdk-21/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/c/Users/nayou/AppData/Local/Programs/Python/Python312:/c/msys64/bin:/c/gnulib/lib:/c/libidn2/gettext-0.22.5/libtextstyle/lib"
+/mingw64/bin(확인)
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -Q gtk-doc
+gtk-doc 1.34.0-1
+
+(빌드)
+{ autopoint --force; } 2>&1 | tee ./log/autopoint.log &&   { rm -f po/Makefile.in.in; } &&   { rm -rf autom4te.cache; } &&   { aclocal -I m4 -I gnulib-m4 -I /usr/share/aclocal; } 2>&1 | tee ./log/aclocal.log &&   { libtoolize --copy --force --verbose; } 2>&1 | tee ./log/libtoolize.log &&   { autoconf --verbose; } 2>&1 | tee ./log/autoconf.log &&   { autoheader; } 2>&1 | tee ./log/autoheader.log &&  { automake --add-missing --force-missing; } 2>&1 | tee ./log/automake.log &&   { ./configure --host=x86_64-w64-mingw32; } 2>&1 | tee ./log/configure.log
+
+(오류)
+./configure: line 25769: syntax error near unexpected token `-std=c17,'
+./configure: line 25769: `AX_CHECK_COMPILE_FLAG(-std=c17, CFLAGS="$CFLAGS -std=c17")'
+(수정)
+autoconf-archive 설치
+AX_CHECK_COMPILE_FLAG 매크로는 autoconf-archive 패키지의 일부
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -S autoconf-archive
+
+autoconf-archive 설치 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# autoreconf --version
+autoreconf (GNU Autoconf) 2.72
+Copyright (C) 2023 Free Software Foundation, Inc.
+License GPLv3+/Autoconf: GNU GPL version 3 or later
+<https://gnu.org/licenses/gpl.html>, <https://gnu.org/licenses/exceptions.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+Written by David J. MacKenzie and Akim Demaille.
+
+m4 파일 경로 확인
+AX_CHECK_COMPILE_FLAG 매크로를 포함하는 m4 파일이 m4 디렉토리에 있는지 확인
+m4/ax_check_compile_flag.m4 파일이 있어야 함
+업데이트
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# aclocal -I m4
+
+configure.ac 또는 configure.in 수정
+m4_ifdef([AX_PREFIX_CONFIG_H], [AX_PREFIX_CONFIG_H])
+
+(오류)
+configure: error: C++ 컴파일러가 -fno-rtti와 -fno-exceptions 플래그를 지원하지 않습니다.
+(수정)
+-fno-rtti: 이 플래그는 "Run-Time Type Information"을 비활성화합니다. RTTI는 프로그램 실행 중에 객체의 타입 정보를 얻을 수 있게 해주는 기능입니다. 이 기능을 사용하지 않으면 바이너리 크기를 줄일 수 있습니다.
+-fno-exceptions: 이 플래그는 C++의 예외 처리 기능을 비활성화합니다. 예외 처리를 사용하지 않는 경우도 바이너리 크기를 줄이는 데 도움이 됩니다.
+컴파일러 버전 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# x86_64-w64-mingw32-g++ --version
+x86_64-w64-mingw32-g++.exe (x86_64-win32-seh-rev0, Built by MinGW-Builds project) 14.2.0
+Copyright (C) 2024 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+환경변수확인
+# echo $PATH
+/c/gnulib:/c/msys64/mingw64/bin:/mingw64/bin:/usr/bin:/bin:/usr/share/aclocal:/mingw64/share/aclocal:/c/libidn2/autoconf-2.72/bin:/c/libidn2/libtool-2.4.6:/c/Program Files/Java/jdk-21/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/c/Users/nayou/AppData/Local/Programs/Python/Python312:/c/msys64/bin:/c/gnulib/lib:/c/libidn2/gettext-0.22.5/libtextstyle/lib
+=> /c/msys64/mingw64/bin: MinGW-w64 툴체인의 바이너리가 위치한 경로입니다. C++ 컴파일러를 찾는 데 중요한 역할
+
+configure.ac 수정
+# C++ 컴파일러가 -fno-rtti와 -fno-exceptions 플래그를 지원하는지 확인
+AC_COMPILE_IFELSE(
+    AC_LANG_PROGRAM([  # C++ 프로그램을 정의
+        #include <cstdlib>  // C++에서 사용하는 헤더
+        int main(void) { return 0; }  # 기본적인 main 함수
+    ], []),
+    [
+        CXXFLAGS="$CXXFLAGS -fno-rtti -fno-exceptions -std=c++17"  # C++17 및 플래그 추가
+    ],
+    [
+        AC_MSG_ERROR([C++ 컴파일러가 -fno-rtti와 -fno-exceptions 플래그를 지원하지 않습니다.])  # 오류 메시지 출력
+    ]
+)
+
+# C 컴파일러가 -std=c17 플래그를 지원하는지 확인
+AC_COMPILE_IFELSE(
+    AC_LANG_PROGRAM([  # C 프로그램을 정의
+        #include <stdlib.h>
+        int main(void) { return 0; }  # 기본적인 main 함수
+    ], []),
+    [
+        CFLAGS="$CFLAGS -std=c17"  # C17 플래그 추가
+    ],
+    [
+        AC_MSG_ERROR([C 컴파일러가 -std=c17 플래그를 지원하지 않습니다.])  # 오류 메시지 출력
+    ]
+)
+
+지원확인(https://gcc.gnu.org/gcc-14/)
+gcc와 g++는 GNU Compiler Collection(GCC)의 일부로, 
+C 및 C++ 프로그래밍 언어를 컴파일하는 데 사용
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# x86_64-w64-mingw32-g++ -dM -E - < /dev/null | grep -i __cpp_rtti
+=> __cpp_rtti가 정의되지 않았다면, 컴파일러가 RTTI를 지원하지 않는 것
+-fno-rtti 플래그를 사용해도 효과가 없으므로, 다른 접근 방법을 고려
+
+~/.bashrc 수정 : 전체에 적용 (export CXXFLAGS="$CXXFLAGS -fno-rtti -fno-exceptions -std=c++17")
+configure.ac 수정 : 해당 프로젝트에만 적용
+
+환경변수 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# echo $CXXFLAGS
+-std=c++17 -I/c/gnulib/lib -I/mingw64/include -O2 -DDEBUG -DVERSION="1.0.0"
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# echo $CFLAGS
+-I/c/gnulib/lib -I/mingw64/include -O2
+
+configure.ac 수정
+# C++ 컴파일러가 -fno-rtti와 -fno-exceptions 플래그를 지원하는지 확인
+# ~/.bashrc 로 옮김
+#AC_COMPILE_IFELSE(
+#    AC_LANG_PROGRAM([  # C++ 프로그램을 정의
+#        #include <cstdlib>  // C++에서 사용하는 헤더
+#        int main(void) { return 0; }  # 기본적인 main 함수
+#    ], []),
+#    [
+#        CXXFLAGS="$CXXFLAGS -fno-rtti -fno-exceptions -std=c++17"  # C++17 플래그와 추가 플래그
+#        AC_MSG_NOTICE([CXXFLAGS: $CXXFLAGS])  # 현재 CXXFLAGS 출력
+#    ],
+#    [
+#        AC_MSG_ERROR([C++ 컴파일러가 -fno-rtti와 -fno-exceptions 플래그를 지원하지 않습니다.])  # 오류 메시지 출력
+#		AC_MSG_NOTICE([CXXFLAGS: $CXXFLAGS])
+#	]
+#)
+# ~/.bashrc 로 옮김
+# C 컴파일러가 -std=c17 플래그를 지원하는지 확인
+#AC_COMPILE_IFELSE(
+#    AC_LANG_PROGRAM([  # C 프로그램을 정의
+#        #include <stdlib.h>
+#        int main(void) { return 0; }  # 기본적인 main 함수
+#    ], []),
+#    [
+#        CFLAGS="$CFLAGS -std=c17"  # C17 플래그 추가
+#        AC_MSG_NOTICE([CFLAGS: $CFLAGS])  # 현재 CFLAGS 출력
+#    ],
+#    [
+#        AC_MSG_ERROR([C 컴파일러가 -std=c17 플래그를 지원하지 않습니다.])  # 오류 메시지 출력
+#		AC_MSG_NOTICE([CXXFLAGS: $CXXFLAGS])
+#	]
+#)
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# echo | gcc -E -x c - -std=c17
+# 0 "<stdin>"
+# 0 "<built-in>"
+# 0 "<command-line>"
+# 1 "<stdin>"
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# echo | g++ -E -x c++ - -std=c++17
+# 0 "<stdin>"
+# 0 "<built-in>"
+# 0 "<command-line>"
+# 1 "<stdin>"
+
+~/.bashrc 수정
+# std 옵션 모두 제거 : configure.ac 에서 설정
+export CFLAGS="-I/c/gnulib/lib -I/mingw64/include -O2" # C 컴파일러 설정(gcc14.2 c23지원안함)
+export CPPFLAGS="-I/c/gnulib/lib -I/mingw64/include -O2" # C++ 전처리 설정
+export CXXFLAGS="-I/c/gnulib/lib -I/mingw64/include -O2 -DDEBUG -DVERSION=\"1.0.0\"" # C++ 컴파일러 C++17 기능 설정
+
+configure.ac 수정
+# C17 표준을 컴파일러 플래그로 추가
+#AX_CHECK_COMPILE_FLAG([-std=c17], [CFLAGS="$CFLAGS -std=c17"])
+# 필요시 C17을 나타내는 변수 설정
+#AC_SUBST([CC_STANDARD], [17])
+#AC_SUBST([CFLAGS], ["-std=c17 -I/mingw64/include -O2"]) #-std=c23 제거 지원안함 gcc 14.2
+#AC_SUBST([CPPFLAGS], ["-I/mingw64/include -O2"])
+#AC_SUBST([CXXFLAGS], ["-std=c++17 -I/mingw64/include -O2 -DDEBUG -DVERSION=\"1.0.0\""])
+
+"C11 지원 테스트"
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# gcc c11_test.c -o c11_test
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ./c11_test
+C11 is supported.
+
+c11_test.c
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdalign.h>
+
+int main(void) {
+    // C11에서 도입된 _Alignas를 사용하여 16바이트 정렬된 변수 선언
+    _Alignas(16) char buffer[32];  // 16바이트 정렬된 배열
+
+    // static_assert로 C11 지원 여부 확인
+    _Static_assert(sizeof(void*) == 4 || sizeof(void*) == 8, "C11 is supported.");
+
+    printf("C11 is supported.\n");  // 출력 메시지 영어로 변경
+    return 0; // 성공
+}
+
+"c++17 지원 테스트"
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# echo '#include <iostream>' > test.cpp
+echo 'int main() { std::cout << "C++17 is supported!" << std::endl; return 0; }' >> test.cpp
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# x86_64-w64-mingw32-g++ -std=c++17 test.cpp -o test.exe
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ./test.exe
+C++17 is supported!
+
+configure.ac 수정
+# C 컴파일러가 -std=c11 플래그를 지원하는지 확인
+AC_LANG(C)
+AC_COMPILE_IFELSE([  
+    AC_LANG_SOURCE([[  // C 프로그램을 정의
+        #include <stdio.h>
+        #include <stdlib.h>
+        #include <stdalign.h>
+
+        int main(void) {
+            // C11에서 도입된 _Alignas를 사용하여 16바이트 정렬된 변수 선언
+            _Alignas(16) char buffer[32];  // 16바이트 정렬된 배열
+
+            // static_assert로 C11 지원 여부 확인
+            _Static_assert(1, "C11 is supported.");  // 항상 참인 조건
+
+            printf("C11 is supported.\n");  // 출력 메시지
+            return 0; // 성공
+        }
+    ]])
+], [
+	CFLAGS="$CFLAGS -std=c11"  # C11 플래그 추가
+	AC_DEFINE([HAVE_C11], [1], [Define to 1 if C11 is supported.])
+    AC_MSG_NOTICE([C11 지원: CFLAGS: $CFLAGS])
+], [
+	AC_MSG_NOTICE([C11 지원안함: CFLAGS: $CFLAGS])
+    AC_MSG_ERROR([c11 지원 없습니다.])
+])
+
+# C++ 컴파일러가 -std=c++17 플래그를 지원하는지 확인
+AC_LANG(C++)
+AC_COMPILE_IFELSE([  
+    AC_LANG_SOURCE([[  // C++ 프로그램을 정의
+        #include <iostream>
+        int main() { return 0; }
+    ]])
+], [
+    CXXFLAGS="$CXXFLAGS -std=c++17"  # C++17 플래그 추가
+    AC_DEFINE([HAVE_CPP17], [1], [Define to 1 if C++17 is supported.])
+    AC_MSG_NOTICE([C++17 지원: CXXFLAGS: $CXXFLAGS])
+], [
+	AC_MSG_NOTICE([C++17 지원안함: CXXFLAGS: $CXXFLAGS])
+    AC_MSG_ERROR([C++17 지원이 없습니다.])
+])
+
+(빌드)
+configure: C11 지원: CFLAGS: -I/c/gnulib/lib -I/mingw64/include -O2 -std=c11
+configure: C++17 지원: CXXFLAGS: -I/c/gnulib/lib -I/mingw64/include -O2 -DDEBUG -DVERSION="1.0.0" -std=c++17
+
+config.h
+(C11만 확인됨)
+/* Define if the C compiler supports C11. */
+#define HAVE_C11 1
+(HAVE_CPP17 생성안됨)
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep 'HAVE_CPP17' config.log
+| #define HAVE_CPP17 1
+| #define HAVE_CPP17 1
+| #define HAVE_CPP17 1
+#define HAVE_CPP17 1
+=> config.log에 따르면 HAVE_CPP17 매크로가 올바르게 정의되었고, #define HAVE_CPP17 1이 여러 번 출력
+=> config.h파일을 삭제한후 재성성
+
+config.h 재생성
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# rm -f config.h config.log
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# make clean
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# autoreconf -i --force
+
+configure.ac 수정
+# config.h가 없으면 생성
+if test ! -f config.h; then
+    AC_MSG_NOTICE([config.h does not exist. Creating it...])
+fi
+
+AC_CONFIG_HEADERS([C:\libidn2\gettext-0.22.5\libtextstyle\config.h]) #config.h.in => config.h 생성, lib/argz.in.h => lib/argz.h 생성
+
+AC_PROG_CC
+AC_PROG_CPP
+AC_PROG_CXX
+
+Makefile.am 수정
+INCLUDES = -I$(top_srcdir)
+
+lib/xgethostname.h lib/xgetaname-impl.h 파일이 존재하지 않아 백업폴더에서 가져옴
+AC_CHECK_HEADERS([lib/xgethostname.h lib/xgetaname-impl.h])
+AC_CHECK_HEADERS([stdlib.h stdio.h xalloc.h string.h unistd.h stdint.h])
+
+
+
+
 
 
 
