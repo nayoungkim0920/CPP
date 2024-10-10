@@ -24614,6 +24614,70 @@ nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
 # ls -l config.h
 -rw-r--r-- 1 nayou nayou 70494 10월 10 20:37 config.h
 
+lib/argz.h
+#argz.c기반으로 생성
+#ifndef ARGZ_H
+#define ARGZ_H
+
+#include <stddef.h>
+#include <errno.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/* 함수 선언 */
+
+/* Add BUF, of length BUF_LEN to the argz vector in ARGZ & ARGZ_LEN. */
+error_t argz_append(char **argz, size_t *argz_len, const char *buf, size_t buf_len);
+
+/* Add STR to the argz vector in ARGZ & ARGZ_LEN. */
+error_t argz_add(char **argz, size_t *argz_len, const char *str);
+
+/* Add STRING, separated by DELIM, to the argz vector in ARGZ & ARGZ_LEN. */
+error_t argz_add_sep(char **argz, size_t *argz_len, const char *string, int delim);
+
+/* Create an argz vector from STRING, using DELIM to separate the entries. */
+error_t argz_create_sep(const char *string, int delim, char **argz, size_t *len);
+
+/* Insert ENTRY into ARGZ & ARGZ_LEN before BEFORE. */
+error_t argz_insert(char **argz, size_t *argz_len, char *before, const char *entry);
+
+/* Return the next entry in ARGZ after ENTRY, or the first if ENTRY is NULL. */
+char *argz_next(const char *argz, size_t argz_len, const char *entry);
+
+/* Make '\0' separated argz vector printable by converting all the '\0's except
+   the last into the character SEP. */
+void argz_stringify(char *argz, size_t len, int sep);
+
+/* Return the number of strings in ARGZ. */
+size_t argz_count(const char *argz, size_t len);
+
+/* Extract the ARGZ vector into ARGV. */
+void argz_extract(const char *argz, size_t len, char **argv);
+
+/* Create an argz vector from a unix argv vector. */
+error_t argz_create(char *const argv[], char **argz, size_t *len);
+
+/* Delete ENTRY from ARGZ & ARGZ_LEN. */
+void argz_delete(char **argz, size_t *argz_len, char *entry);
+
+/* Replace occurrences of STR in ARGZ with WITH, reallocating as necessary. */
+error_t argz_replace(char **argz, size_t *argz_len, const char *str, const char *with, unsigned *replace_count);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* ARGZ_H */
+
+
+
+
+
+
+
+
 
 
 
@@ -24989,7 +25053,20 @@ AC_CHECK_FUNC([get_fatal_signals], [], [
     AC_LANG_POP
 ])
 
+(빌드)
+{ autopoint --force; } 2>&1 | tee ./log/autopoint.log &&  
+{ rm -f po/Makefile.in.in; } &&  
+{ rm -rf autom4te.cache; } &&  
+{ aclocal -I m4 -I gnulib-m4 -I /usr/share/aclocal; } 2>&1 | tee ./log/aclocal.log &&  
+{ libtoolize --copy --force --verbose; } 2>&1 | tee ./log/libtoolize.log &&  
+{ autoconf --verbose; } 2>&1 | tee ./log/autoconf.log &&  
+{ autoheader; } 2>&1 | tee ./log/autoheader.log && 
+{ automake --add-missing --force-missing; } 2>&1 | tee ./log/automake.log &&  
+{ ./configure --host=x86_64-w64-mingw32; } 2>&1 | tee ./log/configure.log
 
+(오류)
+
+(수정)
 
 
 
