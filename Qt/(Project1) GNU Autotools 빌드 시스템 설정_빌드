@@ -24671,6 +24671,48 @@ error_t argz_replace(char **argz, size_t *argz_len, const char *str, const char 
 
 #endif /* ARGZ_H */
 
+(빌드)
+{ autopoint --force; } 2>&1 | tee ./log/autopoint.log &&  
+{ rm -f po/Makefile.in.in; } &&  
+{ rm -rf autom4te.cache; } &&  
+{ aclocal -I m4 -I gnulib-m4 -I /usr/share/aclocal; } 2>&1 | tee ./log/aclocal.log &&  
+{ libtoolize --copy --force --verbose; } 2>&1 | tee ./log/libtoolize.log &&  
+{ autoconf --verbose; } 2>&1 | tee ./log/autoconf.log &&  
+{ autoheader; } 2>&1 | tee ./log/autoheader.log && 
+{ automake --add-missing --force-missing; } 2>&1 | tee ./log/automake.log &&  
+{ ./configure --host=x86_64-w64-mingw32; } 2>&1 | tee ./log/configure.log
+
+(오류)
+
+(수정)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -25053,20 +25095,6 @@ AC_CHECK_FUNC([get_fatal_signals], [], [
     AC_LANG_POP
 ])
 
-(빌드)
-{ autopoint --force; } 2>&1 | tee ./log/autopoint.log &&  
-{ rm -f po/Makefile.in.in; } &&  
-{ rm -rf autom4te.cache; } &&  
-{ aclocal -I m4 -I gnulib-m4 -I /usr/share/aclocal; } 2>&1 | tee ./log/aclocal.log &&  
-{ libtoolize --copy --force --verbose; } 2>&1 | tee ./log/libtoolize.log &&  
-{ autoconf --verbose; } 2>&1 | tee ./log/autoconf.log &&  
-{ autoheader; } 2>&1 | tee ./log/autoheader.log && 
-{ automake --add-missing --force-missing; } 2>&1 | tee ./log/automake.log &&  
-{ ./configure --host=x86_64-w64-mingw32; } 2>&1 | tee ./log/configure.log
-
-(오류)
-
-(수정)
 
 
 
