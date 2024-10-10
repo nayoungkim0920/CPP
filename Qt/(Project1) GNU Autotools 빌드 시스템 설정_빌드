@@ -24589,6 +24589,35 @@ lib/xgethostname.h lib/xgetaname-impl.h 파일이 존재하지 않아 백업폴�
 AC_CHECK_HEADERS([lib/xgethostname.h lib/xgetaname-impl.h])
 AC_CHECK_HEADERS([stdlib.h stdio.h xalloc.h string.h unistd.h stdint.h])
 
+# 사용법
+nayou@kimnayooung MINGW64 ~
+# info autoconf
+
+(오류)
+autoheader-2.72: warning: cannot read "/c/libidn2/gettext-0.22.5/libtextstyle/lib/argz.h".in: No such file or directory
+autoheader-2.72: error: cannot rename /tmp/ar3X4v8a/ahu2w1eD/config.hin as "/c/libidn2/gettext-0.22.5/libtextstyle/config.h".in: No such file or directory
+(수정)
+configure.ac 수정
+AC_CONFIG_HEADERS([c:\libidn2\gettext-0.22.5\libtextstyle\config.h])
+
+(빌드)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# autoreconf -i --force && ./configure
+
+config.h 생성
+/usr/bin/autoheader-2.72 : rename /tmp/arEOARck/ahLccnMi/config.hin as c:\libidn2\gettext-0.22.5\libtextstyle\config.h
+
+configure 파일 확인
+ac_config_headers="$ac_config_headers c:\libidn2\gettext-0.22.5\libtextstyle\config.h"
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l config.h
+-rw-r--r-- 1 nayou nayou 70494 10월 10 20:37 config.h
+
+
+
+
+
 
 
 
