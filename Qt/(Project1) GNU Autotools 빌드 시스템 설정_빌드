@@ -24683,6 +24683,163 @@ error_t argz_replace(char **argz, size_t *argz_len, const char *str, const char 
 { ./configure --host=x86_64-w64-mingw32; } 2>&1 | tee ./log/configure.log
 
 (오류)
+config.log
+conftest.c:73:10: fatal error: argz.h: No such file or directory
+   73 | #include <argz.h>
+      |          ^~~~~~~~
+(수정)
+~/.bashrc 수정
+export CFLAGS="-I/c/gnulib/lib -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -O2"		# C 컴파일러 설정(gcc14.2 c23지원안함)
+
+lib/argz.h 파일 생성
+#ifndef _ARGZ_H
+#define _ARGZ_H 1
+
+#define __need_error_t
+#include <errno.h>
+#include <string.h>             /* Need size_t.  */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#ifndef __error_t_defined
+typedef int error_t;
+#endif
+
+/* Make a '\0' separated arg vector from a unix argv vector, returning it in
+   ARGZ, and the total length in LEN.  If a memory allocation error occurs,
+   ENOMEM is returned, otherwise 0.  The result can be destroyed using free.  */
+extern error_t argz_create (char *const /*argv*/[], char **restrict /*argz*/,
+                            size_t *restrict /*len*/);
+
+/* Make a '\0' separated arg vector from a SEP separated list in
+   STRING, returning it in ARGZ, and the total length in LEN.  If a
+   memory allocation error occurs, ENOMEM is returned, otherwise 0.
+   The result can be destroyed using free.  */
+extern error_t argz_create_sep (const char *restrict /*string*/,
+                                int /*sep*/, char **restrict /*argz*/,
+                                size_t *restrict /*len*/);
+
+/* Returns the number of strings in ARGZ.  */
+extern size_t argz_count (const char * /*argz*/, size_t /*len*/);
+
+/* Puts pointers to each string in ARGZ into ARGV, which must be large enough
+   to hold them all.  */
+extern void argz_extract (const char *restrict /*argz*/, size_t /*len*/,
+                          char **restrict /*argv*/);
+
+/* Make '\0' separated arg vector ARGZ printable by converting all the '\0's
+   except the last into the character SEP.  */
+extern void argz_stringify (char * /*argz*/, size_t /*len*/, int /*sep*/);
+
+/* Append BUF, of length BUF_LEN to the argz vector in ARGZ & ARGZ_LEN.  */
+extern error_t argz_append (char **restrict /*argz*/,
+                            size_t *restrict /*argz_len*/,
+                            const char *restrict /*buf*/, size_t /*buf_len*/);
+
+/* Append STR to the argz vector in ARGZ & ARGZ_LEN.  */
+extern error_t argz_add (char **restrict /*argz*/,
+                         size_t *restrict /*argz_len*/,
+                         const char *restrict str);
+
+/* Append SEP separated list in STRING to the argz vector in ARGZ &
+   ARGZ_LEN.  */
+extern error_t argz_add_sep (char **restrict /*argz*/,
+                             size_t *restrict /*argz_len*/,
+                             const char *restrict /*string*/, int /*delim*/);
+
+/* Delete ENTRY from ARGZ & ARGZ_LEN, if it appears there.  */
+extern void argz_delete (char **restrict /*argz*/,
+                         size_t *restrict /*argz_len*/,
+                         char *restrict /*entry*/);
+
+/* Insert ENTRY into ARGZ & ARGZ_LEN before BEFORE, which should be an
+   existing entry in ARGZ; if BEFORE is NULL, ENTRY is appended to the end.
+   Since ARGZ's first entry is the same as ARGZ, argz_insert (ARGZ, ARGZ_LEN,
+   ARGZ, ENTRY) will insert ENTRY at the beginning of ARGZ.  If BEFORE is not
+   in ARGZ, EINVAL is returned, else if memory can't be allocated for the new
+   ARGZ, ENOMEM is returned, else 0.  */
+extern error_t argz_insert (char **restrict /*argz*/,
+                            size_t *restrict /*argz_len*/,
+                            char *restrict /*before*/,
+                            const char *restrict /*entry*/);
+
+/* Replace any occurrences of the string STR in ARGZ with WITH, reallocating
+   ARGZ as necessary.  If REPLACE_COUNT is non-zero, *REPLACE_COUNT will be
+   incremented by number of replacements performed.  */
+extern error_t argz_replace (char **restrict /*argz*/,
+                             size_t *restrict /*argz_len*/,
+                             const char *restrict /*str*/,
+                             const char *restrict /*with*/,
+                             unsigned int *restrict /*replace_count*/);
+
+/* Returns the next entry in ARGZ & ARGZ_LEN after ENTRY, or NULL if there
+   are no more.  If entry is NULL, then the first entry is returned.  This
+   behavior allows two convenient iteration styles:
+
+    char *entry = 0;
+    while ((entry = argz_next (argz, argz_len, entry)))
+      ...;
+
+   or
+
+    char *entry;
+    for (entry = argz; entry; entry = argz_next (argz, argz_len, entry))
+      ...;
+*/
+extern char *argz_next (const char *restrict /*argz*/, size_t /*argz_len*/,
+                        const char *restrict /*entry*/);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* argz.h */
+
+configure.ac 수정
+#lib/argz.h 자동생성이안되서 수동으로 만듬
+AC_CONFIG_HEADERS([config.h.in:config.h lib/argz.h.in:lib/argz.h])
+
+(빌드) 생성된파일 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l config.h* 
+-rw-r--r-- 1 nayou nayou 70457 10월 11 14:00 config.h (자동생성)
+-rw-r--r-- 1 nayou nayou 70460 10월 11 13:11 config.h.in
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l lib/argz.h*
+-rw-r--r-- 1 nayou nayou  5294 10월 11 14:15 lib/argz.h (수동생성)
+-rw-r--r-- 1 nayou nayou  5190 10월 11 13:53 lib/argz.h.in
+
+(오류)
+configure: error: in '/c/libidn2/gettext-0.22.5/libtextstyle':
+configure: error: cannot make x86_64-w64-mingw32-gcc report undeclared builtins
+See 'config.log' for more details
+(수정)
+x86_64-w64-mingw32-gcc 크로스 컴파일러가 선언되지 않은 빌트인 함수들을 제대로 감지하지 못함
+~/.bashrc 수정
+export CC=x86_64-w64-mingw32-gcc  # C 컴파일러
+export CXX=x86_64-w64-mingw32-g++  # C++ 컴파일러
+export CPPFLAGS="-I/c/msys64/mingw64/x86_64-w64-mingw32/include -I/c/gnulib/lib -I/mingw64/include -O2"  # C++ 전처리기 설정
+export LDFLAGS="-L/c/gnulib/lib -L/c/libidn2/gettext-0.22.5/libtextstyle/lib -L/mingw64/lib -L/usr/lib -Wl,-rpath,/mingw64/bin"  # 링커 플래그
+MinGW 툴체인 설치 확인(gcc, g++, binutils 등의 기본 툴체인과 함께 필수 라이브러리들을 설치)
+pacman -S mingw-w64-x86_64-toolchain
+MSYS2 업데이트
+pacman -Syu
+헤더 파일 및 라이브러리 설치
+pacman -S mingw-w64-x86_64-headers
+pacman -S mingw-w64-x86_64-libraries
+필요한 추가 라이브러리 설치
+pacman -S mingw-w64-x86_64-libiconv
+pacman -S mingw-w64-x86_64-zlib
+pacman -S mingw-w64-x86_64-pcre
+pacman -S mingw-w64-x86_64-ncurses
+
+(빌드)
+{ autopoint --force; } 2>&1 | tee ./log/autopoint.log &&   { rm -f po/Makefile.in.in; } &&   { rm -rf autom4te.cache; } &&   { aclocal -I m4 -I gnulib-m4 -I /usr/share/aclocal; } 2>&1 | tee ./log/aclocal.log &&   { libtoolize --copy --force --verbose; } 2>&1 | tee ./log/libtoolize.log &&   { autoconf --verbose; } 2>&1 | tee ./log/autoconf.log &&   { autoheader; } 2>&1 | tee ./log/autoheader.log &&  { automake --add-missing --force-missing; } 2>&1 | tee ./log/automake.log &&   { ./configure --host=x86_64-w64-mingw32; } 2>&1 | tee ./log/configure.log; 
+
+(오류)
 
 (수정)
 
@@ -24692,8 +24849,43 @@ error_t argz_replace(char **argz, size_t *argz_len, const char *str, const char 
 
 
 
+(빌드)
+{ autopoint --force; } 2>&1 | tee ./log/autopoint.log &&  
+{ rm -f po/Makefile.in.in; } &&  
+{ rm -rf autom4te.cache; } &&  
+{ aclocal -I m4 -I gnulib-m4 -I /usr/share/aclocal; } 2>&1 | tee ./log/aclocal.log &&  
+{ libtoolize --copy --force --verbose; } 2>&1 | tee ./log/libtoolize.log &&  
+{ autoconf --verbose; } 2>&1 | tee ./log/autoconf.log &&  
+{ autoheader; } 2>&1 | tee ./log/autoheader.log && 
+{ automake --add-missing --force-missing; } 2>&1 | tee ./log/automake.log &&  
+{ ./configure --host=x86_64-w64-mingw32; } 2>&1 | tee ./log/configure.log
 
+(오류)
+checking for stdio.h... no
+checking for stdlib.h... no
+checking for string.h... no
+checking for inttypes.h... no
+checking for stdint.h... no
+checking for strings.h... no
+checking for sys/stat.h... no
+checking for sys/types.h... no
+checking for unistd.h... no
+checking for wchar.h... no
+checking for minix/config.h... no
+(수정)
+컴파일러가 기본 C 표준 라이브러리 헤더 파일을 찾을 수 없다는 것
 
+nayou@kimnayooung MINGW64 ~
+# find /c/msys64/mingw64/x86_64-w64-mingw32/include -name "stdio.h"
+/c/msys64/mingw64/x86_64-w64-mingw32/include/stdio.h
+
+~/.bashrc 수정
+export CXX_INCLUDE_PATH="/c/msys64/mingw64/x86_64-w64-mingw32/include:/c/gnulib/lib:/mingw64/include:/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++:/c/Users/nayou/vcpkg/downloads/tools/perl/5.38.0.1/perl/lib/CORE"  # C++ include 경로
+export C_INCLUDE_PATH="/c/msys64/mingw64/x86_64-w64-mingw32/include:/c/msys64/mingw64/include:/c/gnulib/lib:/mingw64/include:/c/Users/nayou/vcpkg/downloads/tools/perl/5.38.0.1/perl/lib/CORE"  # C include 경로
+export CPLUS_INCLUDE_PATH="/c/msys64/mingw64/x86_64-w64-mingw32/include:/c/gnulib/lib:/mingw64/include:/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++:/c/Users/nayou/vcpkg/downloads/tools/perl/5.38.0.1/perl/lib/CORE"  # C++ include 경로
+
+# PATH 설정
+export PATH = "/c/msys64/mingw64/x86_64-w64-mingw32/include:$PATH" #C Include 경로 추가
 
 
 
