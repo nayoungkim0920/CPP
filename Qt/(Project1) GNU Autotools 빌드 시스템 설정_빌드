@@ -24835,6 +24835,7 @@ pacman -S mingw-w64-x86_64-libiconv
 pacman -S mingw-w64-x86_64-zlib
 pacman -S mingw-w64-x86_64-pcre
 pacman -S mingw-w64-x86_64-ncurses
+pacman -S mingw-w64-x86_64-crt
 
 (빌드)
 { autopoint --force; } 2>&1 | tee ./log/autopoint.log &&   { rm -f po/Makefile.in.in; } &&   { rm -rf autom4te.cache; } &&   { aclocal -I m4 -I gnulib-m4 -I /usr/share/aclocal; } 2>&1 | tee ./log/aclocal.log &&   { libtoolize --copy --force --verbose; } 2>&1 | tee ./log/libtoolize.log &&   { autoconf --verbose; } 2>&1 | tee ./log/autoconf.log &&   { autoheader; } 2>&1 | tee ./log/autoheader.log &&  { automake --add-missing --force-missing; } 2>&1 | tee ./log/automake.log &&   { ./configure --host=x86_64-w64-mingw32; } 2>&1 | tee ./log/configure.log; 
@@ -24842,6 +24843,265 @@ pacman -S mingw-w64-x86_64-ncurses
 (오류)
 
 (수정)
+"C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\ucrt\stdio.h"
+"C:\msys64\mingw64\include\stdio.h" <= 이것으로 정함(MSYS2의 MinGW 환경에서 작업 중일경우 기본적인 폴더)
+"C:\msys64\mingw64-backup-11.2.0\include\stdio.h"
+"C:\msys64\mingw64\lib\gcc\x86_64-w64-mingw32\14.2.0\include\c++\tr1\stdio.h"
+"C:\msys64\mingw64\x86_64-w64-mingw32\include\stdio.h"
+"C:\libidn2\gettext-0.22.5\libtextstyle\lib\stdio.h"
+"C:\libidn2\gettext-0.22.5\gettext-runtime\gnulib-lib\stdio.h"
+"C:\libidn2\gettext-0.22.5\gettext-runtime\intl\gnulib-lib\stdio.h"
+"C:\libidn2\gettext-0.22.5\gettext-runtime\libasprintf\gnulib-lib\stdio.h"
+"C:\libidn2\gettext-0.19.8\gettext-0.22.5\libtextstyle\lib\stdio.h"
+"C:\libidn2\gettext-0.19.8\gettext-0.22.5\gettext-runtime\libasprintf\gnulib-lib\stdio.h"
+"C:\libidn2\gettext-0.19.8\gettext-0.22.5\gettext-runtime\gnulib-lib\stdio.h"
+"C:\libidn2\gettext-0.19.8\gettext-0.22.5\gettext-runtime\intl\gnulib-lib\stdio.h"
+"C:\Dart\runtime\bin\stdio.h"
+"C:\msys64\mingw64\include\c++\14.2.0\tr1\stdio.h"
+"C:\msys64\mingw64-backup-11.2.0\include\c++\14.2.0\tr1\stdio.h"
+"C:\msys64\mingw64-backup-11.2.0\lib\clang\18\include\llvm_libc_wrappers\stdio.h"
+"C:\Qt\6.7.1\Src\qtwebengine\src\3rdparty\chromium\third_party\libc++\src\include\stdio.h"
+"C:\Users\nayou\AppData\Local\Arduino15\packages\arduino\tools\avr-gcc\7.3.0-atmel3.6.1-arduino7\avr\include\stdio.h"
+"C:\Users\nayou\anaconda3\include\cuda\std\detail\libcxx\include\stdio.h"
+"C:\Users\nayou\anaconda3\pkgs\cuda-cccl-12.4.127-0\include\cuda\std\detail\libcxx\include\stdio.h"
+"C:\Qt\Tools\QtCreator\bin\clang\lib\clang\17\include\llvm_libc_wrappers\stdio.h"
+"C:\Users\nayou\anaconda3\pkgs\pyarrow-14.0.2-py311h847bd2a_0\Lib\site-packages\pyarrow\include\arrow\io\stdio.h"
+"C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\ucrt\stdio.h"
+"C:\Users\nayou\anaconda3\pkgs\arrow-cpp-14.0.2-ha81ea56_1\Library\include\arrow\io\stdio.h"
+"C:\Qt\Tools\llvm-mingw1706_64\include\stdio.h"
+"C:\Qt\Tools\llvm-mingw1706_64\include\c++\v1\stdio.h"
+"C:\Qt\Tools\llvm-mingw1706_64\lib\clang\17\include\llvm_libc_wrappers\stdio.h"
+"C:\Users\nayou\vcpkg\downloads\tools\perl\5.38.0.1\c\include\c++\13.1.0\tr1\stdio.h"
+"C:\Users\nayou\vcpkg\downloads\tools\perl\5.38.0.1\c\lib\gcc\x86_64-w64-mingw32\13.1.0\include\ssp\stdio.h"
+"C:\Users\nayou\vcpkg\downloads\tools\perl\5.38.0.1\c\x86_64-w64-mingw32\include\stdio.h"
+"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.1\include\cuda\std\detail\libcxx\include\stdio.h"
+"C:\Users\nayou\anaconda3\Lib\site-packages\pyarrow\include\arrow\io\stdio.h"
+"C:\Users\nayou\anaconda3\Library\include\arrow\io\stdio.h"
+"C:\Users\nayou\anaconda3\pkgs\libarrow-11.0.0-hbddb5ef_5_cpu\Library\include\arrow\io\stdio.h"
+"C:\Users\nayou\anaconda3\pkgs\pyarrow-11.0.0-py311h6a6099b_5_cpu\Lib\site-packages\pyarrow\include\arrow\io\stdio.h"
+"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8\include\cuda\std\detail\libcxx\include\stdio.h"
+"C:\Qt\Tools\mingw1120_64\lib\gcc\x86_64-w64-mingw32\11.2.0\include\ssp\stdio.h"
+"C:\Qt\Tools\mingw1120_64\lib\gcc\x86_64-w64-mingw32\11.2.0\include\c++\tr1\stdio.h"
+"C:\Qt\Tools\mingw1120_64\x86_64-w64-mingw32\include\stdio.h"
+"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.5\include\cuda\std\detail\libcxx\include\stdio.h"
+
+~/.bashrc 수정 (/c/msys64/mingw64/include 추가)
+# 시스템 언어 설정
+export LANG=ko_KR.UTF-8                     # 한국어 설정
+export LC_ALL=ko_KR.UTF-8                    # 모든 로케일 설정을 한국어로
+
+# C 컴파일러 설정
+export CC=x86_64-w64-mingw32-gcc             # C 컴파일러
+export CXX=x86_64-w64-mingw32-g++            # C++ 컴파일러
+export CPP=/mingw64/bin/cpp                   # C++ 전처리기
+
+# CFLAGS 초기화
+export CFLAGS=""                              # CFLAGS 초기화
+export CFLAGS="-I/c/msys64/mingw64/include"  # MSYS2 MinGW 64-bit 기본 include 디렉토리
+export CFLAGS="$CFLAGS -I/c/gnulib/lib"      # Gnulib 라이브러리 헤더 파일 디렉토리
+export CFLAGS="$CFLAGS -I/mingw64/include"   # MinGW 기본 include 디렉토리
+export CFLAGS="$CFLAGS -I/c/libidn2/gettext-0.22.5/libtextstyle/lib"  # libidn2의 gettext 라이브러리 헤더 파일 디렉토리
+export CFLAGS="$CFLAGS -O2"                   # 최적화 레벨 2 설정
+
+# CPPFLAGS 초기화
+export CPPFLAGS=""                            # CPPFLAGS 초기화
+export CPPFLAGS="-I/c/msys64/mingw64/include" # MSYS2 MinGW 64-bit 기본 include 디렉토리
+export CPPFLAGS="$CPPFLAGS -I/c/gnulib/lib"   # Gnulib 라이브러리 헤더 파일 디렉토리
+export CPPFLAGS="$CPPFLAGS -I/mingw64/include" # MinGW 기본 include 디렉토리
+export CPPFLAGS="$CPPFLAGS -O2"               # 최적화 레벨 2 설정
+
+# CXXFLAGS 초기화
+export CXXFLAGS=""                            # CXXFLAGS 초기화
+export CXXFLAGS="-I/c/gnulib/lib"            # Gnulib 라이브러리 헤더 파일 디렉토리
+export CXXFLAGS="$CXXFLAGS -I/mingw64/include" # MinGW 기본 include 디렉토리
+export CXXFLAGS="$CXXFLAGS -O2"               # 최적화 레벨 2 설정
+export CXXFLAGS="$CXXFLAGS -DDEBUG"           # 디버그 모드 활성화
+export CXXFLAGS="$CXXFLAGS -DVERSION=\"1.0.0\""  # 버전 정의
+
+# 링커 및 아카이버 설정
+export LD=/mingw64/bin/ld.exe                 # 링커
+export AR=/mingw64/bin/ar.exe                 # 아카이버
+export CXXDEPMODE=depmode=gcc                 # C++ 의존성 모드 설정
+export PKG_CONFIG=/mingw64/bin/pkg-config     # pkg-config 경로 설정
+
+# pkg-config 경로 설정
+export PKG_CONFIG_PATH="/c/Program Files/GLib/lib/pkgconfig:/c/libidn2/gettext-0.22.5/gettext-runtime/intl:/mingw64/lib/pkgconfig:/usr/lib/pkgconfig" # pkg-config 검색 경로
+
+# 기타 도구 경로 설정
+export SED=/usr/bin/sed                       # sed 경로
+export GREP=/usr/bin/grep                     # grep 경로
+export FGREP=/usr/bin/fgrep                   # fgrep 경로
+export EGREP=/usr/bin/egrep                   # egrep 경로
+
+# 라이브러리 경로 설정
+export LD_LIBRARY_PATH="/mingw64/lib:/usr/lib:/c/gnulib/lib" # 라이브러리 검색 경로
+export LDFLAGS="-L/c/gnulib/lib -L/c/libidn2/gettext-0.22.5/libtextstyle/lib -L/mingw64/lib -L/usr/lib -Wl,-rpath,/mingw64/bin" # 링커 플래그
+export LIBRARY_PATH="/c/gnulib/lib:/mingw64/lib" # 라이브러리 경로 설정
+
+# gettext 및 libiconv 설정
+export GETTEXT_PACKAGE=libidn2               # gettext 패키지 이름
+export LIBICONV_DIR=/mingw64                  # libiconv 디렉토리 설정
+
+# C++ 및 C 인클루드 경로 설정
+export CXX_INCLUDE_PATH="/c/msys64/mingw64/include:/c/gnulib/lib:/mingw64/include:/c/Users/nayou/vcpkg/downloads/tools/perl/5.38.0.1/perl/lib/CORE"  # C++ 인클루드 경로
+export C_INCLUDE_PATH="/c/msys64/mingw64/include:/c/gnulib/lib:/mingw64/include:/c/msys64/mingw64/x86_64-w64-mingw32/include:/c/Users/nayou/vcpkg/downloads/tools/perl/5.38.0.1/perl/lib/CORE" # C 인클루드 경로
+export CPLUS_INCLUDE_PATH="/c/msys64/mingw64/include:/c/gnulib/lib:/mingw64/include:/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++:/c/Users/nayou/vcpkg/downloads/tools/perl/5.38.0.1/perl/lib/CORE" # C++ 인클루드 경로
+
+# Ant 관련 설정
+export ANT_HOME="/c/apache-ant-1.10.15"      # Ant 홈 디렉토리
+export PATH="$ANT_HOME/bin:$PATH"             # Ant 바이너리 경로 추가
+
+# Java 관련 설정
+export JAVA_HOME="/c/Program Files/Java/jdk-21"  # Java 홈 디렉토리
+export PATH="$JAVA_HOME/bin:$PATH"                # Java 바이너리 경로 추가
+
+# Gnulib 경로 설정
+export PATH="$PATH:/c/gnulib"                     # Gnulib 경로 추가
+export GL_GNU_SOURCE=1                             # Gnulib 소스 버전 설정
+export GL_REQUIRE_VERSION=2.0                      # Gnulib 요구 버전 설정
+
+# M4 설정
+export M4=/usr/bin/m4                              # M4 경로 설정
+
+# ACLOCAL_PATH 설정
+export ACLOCAL_PATH="/c/gnulib/lib:/c/libidn2/gettext-0.22.5/libtextstyle/lib/ltdl:/c/libidn2/gettext-0.22.5/libtextstyle/lib/ltdl/m4:/c/msys64/usr/share/aclocal:/usr/share/aclocal:/mingw64/share/aclocal:/c/libidn2/m4" # aclocal 검색 경로
+
+# AUTOCONF_PATH 설정
+export AUTOCONF_PATH="/c/libidn2/m4:/usr/share/aclocal:/mingw64/share/aclocal" # autoconf 검색 경로
+
+# PATH 
+export PATH="/c/msys64/mingw64/include"  # MinGW의 include 디렉토리 추가
+export PATH="$PATH:/c/gnulib"  # Gnulib 디렉토리 추가
+export PATH="$PATH:/mingw64/bin" # MinGW-w64의 바이너리 디렉토리 추가
+export PATH="$PATH:/c/msys64/mingw64/bin"  # 64비트 MinGW 도구의 바이너리 디렉토리 추가
+export PATH="$PATH:/c/msys64/mingw32/bin"  # 32비트 MinGW 도구의 바이너리 디렉토리 추가 (필요한 경우)
+export PATH="$PATH:/usr/bin"  # 시스템 기본 UNIX 도구 디렉토리 추가
+export PATH="$PATH:/bin"  # 기본 UNIX 유틸리티 디렉토리 추가
+export PATH="$PATH:/usr/share/aclocal"  # aclocal 매크로를 위한 디렉토리 추가
+export PATH="$PATH:/mingw64/share/aclocal"  # MinGW 전용 aclocal 매크로 디렉토리 추가
+export PATH="$PATH:/c/libidn2/autoconf-2.72/bin"  # libidn2용 Autoconf 바이너리 디렉토리 추가
+export PATH="$PATH:/c/libidn2/libtool-2.4.6"  # libidn2용 Libtool 바이너리 디렉토리 추가
+export PATH="$PATH:/c/Program Files/Java/jdk-21/bin"  # Java JDK 바이너리 디렉토리 추가
+export PATH="$PATH:/c/Windows/System32"  # Windows System32 디렉토리 추가
+export PATH="$PATH:/c/Windows"  # Windows 디렉토리 추가
+export PATH="$PATH:/c/Windows/System32/Wbem"  # Windows WMI 디렉토리 추가
+export PATH="$PATH:/c/Windows/System32/WindowsPowerShell/v1.0"  # Windows PowerShell 디렉토리 추가
+export PATH="$PATH:/usr/bin/site_perl"  # Perl 사이트 디렉토리 추가
+export PATH="$PATH:/usr/bin/vendor_perl"  # Perl 공급자 디렉토리 추가
+export PATH="$PATH:/usr/bin/core_perl"  # Perl 기본 디렉토리 추가
+export PATH="$PATH:/c/Users/nayou/AppData/Local/Programs/Python/Python312"  # Python 디렉토리 추가
+export PATH="$PATH:/c/msys64/bin"  # MSYS2 바이너리 디렉토리 추가
+export PATH="$PATH:/c/gnulib/lib"  # Gnulib 라이브러리 디렉토리 추가
+export PATH="$PATH:/c/libidn2/gettext-0.22.5/libtextstyle/lib"  # libtextstyle을 위한 gettext 라이브러리 디렉토리 추가
+
+# 기존 환경 변수 설정 ...
+
+# C 컴파일러가 작동하지 않는 경우
+if ! command -v $CC &> /dev/null; then
+    echo "C 컴파일러가 설치되어 있지 않습니다."
+    exit 1
+fi
+
+$CC --version || {
+    echo "C 컴파일러 버전을 확인할 수 없습니다."
+    exit 1
+}
+
+# C++ 컴파일러가 작동하지 않는 경우
+if ! command -v $CXX &> /dev/null; then
+    echo "C++ 컴파일러가 설치되어 있지 않습니다."
+    exit 1
+fi
+
+$CXX --version || {
+    echo "C++ 컴파일러 버전을 확인할 수 없습니다."
+    exit 1
+}
+
+(오류)
+configure: loading site script /etc/config.site
+checking for x86_64-w64-mingw32-gcc... x86_64-w64-mingw32-gcc
+checking whether the C compiler works... no
+configure: error: in '/c/libidn2/gettext-0.22.5/libtextstyle':
+configure: error: C compiler cannot create executables
+See 'config.log' for more details
+(수정)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -Ss gcc
+mingw64/mingw-w64-x86_64-gcc 14.2.0-1 (mingw-w64-x86_64-toolchain) [설치함]
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -Ss binutils
+mingw64/mingw-w64-x86_64-binutils 2.43.1-1 (mingw-w64-x86_64-toolchain) [설치함]
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -Ss make
+mingw64/mingw-w64-x86_64-make 4.4.1-3 (mingw-w64-x86_64-toolchain) [설치함]
+(설치)
+pacman -S mingw64/mingw-w64-x86_64-gcc
+pacman -S mingw64/mingw-w64-x86_64-binutils
+pacman -S mingw64/mingw-w64-x86_64-make
+(환경변수확인)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# echo $PATH (/mingw64/bin 확인)
+/c/msys64/mingw64/include:/c/gnulib:/mingw64/bin:/c/msys64/mingw64/bin:/c/msys64/mingw32/bin:/usr/bin:/bin:/usr/share/aclocal:/mingw64/share/aclocal:/c/libidn2/autoconf-2.72/bin:/c/libidn2/libtool-2.4.6:/c/Program Files/Java/jdk-21/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/c/Users/nayou/AppData/Local/Programs/Python/Python312:/c/msys64/bin:/c/gnulib/lib:/c/libidn2/gettext-0.22.5/libtextstyle/lib
+(권한확인)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5
+# ls
+drwxr-xr-x 1 nayou nayou      0 10월 11 20:32 libtextstyle
+(설치위치확인)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5
+# echo $CC
+x86_64-w64-mingw32-gcc
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5
+# which $CC
+/mingw64/bin/x86_64-w64-mingw32-gcc
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5
+# echo $CXX
+x86_64-w64-mingw32-g++
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5
+# which $CXX
+/mingw64/bin/x86_64-w64-mingw32-g++
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5
+# echo $CPP
+/mingw64/bin/cpp
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5
+# which $CPP
+/mingw64/bin/cpp
+
+config.log 확인
+필수 개발 패키지가 설치
+pacman -S base-devel mingw-w64-x86_64-gcc
+pacman -S mingw-w64-x86_64-toolchain
+echo $PATH 명령어를 입력해 환경 변수에서 mingw64/bin 경로가 포함되어 있는지 확인
+pacman -S autoconf automake libtool
+./configure 명령어를 실행할 때, 컴파일러에 불필요한 옵션이 전달되지 않도록 CFLAGS 및 LDFLAGS 등의 환경 변수를 비워두고 실행
+./configure CFLAGS="" LDFLAGS="" 빌드
+
+config.log에서 /etc/config.site 스크립트가 로드되는 부분
+MinGW 환경과 충돌하거나 잘못된 설정을 할 가능성
+/etc/config.site 파일을 일시적으로 비활성화하고, 환경 변수로 직접 설정
+/etc/config.site 파일을 무시하고 configure 스크립트를 실행
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# CONFIG_SITE= ./configure
+configure: loading site script /usr/local/etc/config.site
+checking for gcc... x86_64-w64-mingw32-gcc
+checking whether the C compiler works... no
+configure: error: in '/c/libidn2/gettext-0.22.5/libtextstyle':
+configure: error: C compiler cannot create executables
+See 'config.log' for more details
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
