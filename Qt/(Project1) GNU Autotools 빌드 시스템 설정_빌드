@@ -25091,24 +25091,6 @@ configure: error: in '/c/libidn2/gettext-0.22.5/libtextstyle':
 configure: error: C compiler cannot create executables
 See 'config.log' for more details
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 (빌드)
 { autopoint --force; } 2>&1 | tee ./log/autopoint.log &&  
 { rm -f po/Makefile.in.in; } &&  
@@ -25134,26 +25116,216 @@ checking for wchar.h... no
 checking for minix/config.h... no
 (수정)
 컴파일러가 기본 C 표준 라이브러리 헤더 파일을 찾을 수 없다는 것
+환경변수 경로 확인 및 수정(~/.bashrc 수정)
+nayou@kimnayooung MINGW64 ~
+# ls -l /mingw64/bin/pkg-config
+-rwxr-xr-x 1 nayou nayou 77879  8월  9 09:07 /mingw64/bin/pkg-config
+export PKG_CONFIG=/mingw64/bin/pkg-config     # pkg-config 경로 설정
 
 nayou@kimnayooung MINGW64 ~
-# find /c/msys64/mingw64/x86_64-w64-mingw32/include -name "stdio.h"
-/c/msys64/mingw64/x86_64-w64-mingw32/include/stdio.h
+# ls -l /mingw64/lib/pkgconfig/glib-2.0.pc
+-rw-r--r-- 1 nayou nayou 566  9월 20 15:04 /mingw64/lib/pkgconfig/glib-2.0.pc
+nayou@kimnayooung MINGW64 ~
+# ls -l /usr/lib/pkgconfig
+-rw-r--r-- 1 nayou nayou 334  9월 18 17:07 libalpm.pc
+export PKG_CONFIG_PATH="/mingw64/lib/pkgconfig"
+export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:/usr/lib/pkgconfig"
+
+nayou@kimnayooung MINGW64 ~
+# ls -l /mingw64/bin/lib*dll
+export LD_LIBRARY_PATH="/mingw64/bin" # 라이브러리 검색 경로
+
+nayou@kimnayooung MINGW64 ~
+# ls -l /c/msys64/mingw64/x86_64-w64-mingw32/include/stdio.h
+-rw-r--r-- 1 nayou nayou 63230  9월  4 04:22 /c/msys64/mingw64/x86_64-w64-mingw32/include/stdio.h
+nayou@kimnayooung MINGW64 ~
+# ls -l /c/msys64/mingw64/include/stdio.h
+-rw-r--r-- 1 nayou nayou 59028 10월 10 21:04 /c/msys64/mingw64/include/stdio.h
+nayou@kimnayooung MINGW64 ~
+# ls -l /mingw64/include/stdio.h
+-rw-r--r-- 1 nayou nayou 59028 10월 10 21:04 /mingw64/include/stdio.h
+nayou@kimnayooung MINGW64 ~
+# ls -l /c/libidn2/gettext-0.22.5/libtextstyle/lib/stdio.h
+-rw-r--r-- 1 nayou nayou 89386  9월  3 20:51 /c/libidn2/gettext-0.22.5/libtextstyle/lib/stdio.h
+export C_INCLUDE_PATH="/c/msys64/mingw64/x86_64-w64-mingw32/include"
+export C_INCLUDE_PATH="$C_INCLUDE_PATH:/c/msys64/mingw64/include"
+export C_INCLUDE_PATH="$C_INCLUDE_PATH:/mingw64/include"
+nayou@kimnayooung MINGW64 ~
+# ls -l /c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++/iostream
+-rw-r--r-- 1 nayou nayou 3074  9월  4 06:37 /c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++/iostream
+export CXX_INCLUDE_PATH="/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++"  # C++ 인클루드 경로
+export CPLUS_INCLUDE_PATH="/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++"  # C++ 인클루드 경로
+
+nayou@kimnayooung MINGW64 ~
+# ls -l /usr/lib/*.a
+-rw-r--r-- 1 nayou nayou  352188  9월 18 17:07 /usr/lib/libalpm.a
+nayou@kimnayooung MINGW64 ~
+# ls -l /usr/lib/*.a
+-rw-r--r-- 1 nayou nayou  352188  9월 18 17:07 /usr/lib/libalpm.a
+export LDFLAGS="-L/mingw64/lib"
+export LDFLAGS="$LDFLAGS -L/usr/lib"
+export LDFLAGS="$LDFLAGS -Wl,-rpath,/mingw64/bin"
+
+nayou@kimnayooung MINGW64 ~
+# ls -l /mingw64/lib/*.a
+-rw-r--r-- 1 nayou nayou    6954 10월 10 15:14 /mingw64/lib/libacledit.a
+export LIBRARY_PATH="/mingw64/lib"
+
+nayou@kimnayooung MINGW64 ~
+# ls -l /c/libidn2/m4/*.m4
+-rw-r--r-- 1 nayou nayou    946  8월 25 05:52 /c/libidn2/m4/ax_ac_append_to_file.m4
+nayou@kimnayooung MINGW64 ~
+# ls -l /c/libidn2/gettext-0.22.5/libtextstyle/lib/ltdl/*.m4
+-rw-r--r-- 1 nayou nayou 42556 10월  4 08:29 /c/libidn2/gettext-0.22.5/libtextstyle/lib/ltdl/aclocal.m4
+nayou@kimnayooung MINGW64 ~
+# ls -l /c/libidn2/gettext-0.22.5/libtextstyle/lib/ltdl/m4/*.m4
+-rw-r--r-- 1 nayou nayou   1032 10월  2 09:36 /c/libidn2/gettext-0.22.5/libtextstyle/lib/ltdl/m4/autobuild.m4
+nayou@kimnayooung MINGW64 ~
+# ls -l /c/msys64/usr/share/aclocal/*.m4
+-rw-r--r-- 1 nayou nayou   2983  3월 21  2023 /c/msys64/usr/share/aclocal/ax_absolute_header.m4
+nayou@kimnayooung MINGW64 ~
+# ls -l /mingw64/share/aclocal/*.m4
+-rw-r--r-- 1 nayou nayou  8371  9월 20 15:04 /mingw64/share/aclocal/glib-2.0.m4
+nayou@kimnayooung MINGW64 ~
+# ls -l /c/libidn2/m4/*.m4
+-rw-r--r-- 1 nayou nayou    946  8월 25 05:52 /c/libidn2/m4/ax_ac_append_to_file.m4
+export ACLOCAL_PATH="/c/libidn2/gettext-0.22.5/libtextstyle/lib/ltdl"
+export ACLOCAL_PATH="$ACLOCAL_PATH:/c/libidn2/gettext-0.22.5/libtextstyle/lib/ltdl/m4"
+export ACLOCAL_PATH="$ACLOCAL_PATH:/c/msys64/usr/share/aclocal"
+export ACLOCAL_PATH="$ACLOCAL_PATH:/usr/share/aclocal"
+export ACLOCAL_PATH="$ACLOCAL_PATH:/mingw64/share/aclocal"
+export ACLOCAL_PATH="$ACLOCAL_PATH:/c/libidn2/m4"
+
+# PATH 
+export PATH="$PATH:/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++"
+export PATH="$PATH:/c/msys64/mingw64/include:/mingw64/include:/c/libidn2/gettext-0.22.5/libtextstyle/lib"
+export PATH="$PATH:/mingw64/bin" # MinGW-w64의 바이너리 디렉토리 추가
+export PATH="$PATH:/c/msys64/mingw64/include"  # MinGW의 include 디렉토리 추가
+export PATH="$PATH:/c/gnulib"  # Gnulib 디렉토리 추가
+export PATH="$PATH:/c/msys64/mingw64/bin"  # 64비트 MinGW 도구의 바이너리 디렉토리 추가
+export PATH="$PATH:/usr/bin"  # 시스템 기본 UNIX 도구 디렉토리 추가
+export PATH="$PATH:/bin"  # 기본 UNIX 유틸리티 디렉토리 추가
+export PATH="$PATH:/usr/share/aclocal"  # aclocal 매크로를 위한 디렉토리 추가
+export PATH="$PATH:/mingw64/share/aclocal"  # MinGW 전용 aclocal 매크로 디렉토리 추가
+export PATH="$PATH:/c/libidn2/autoconf-2.72/bin"  # libidn2용 Autoconf 바이너리 디렉토리 추가
+export PATH="$PATH:/c/libidn2/libtool-2.4.6"  # libidn2용 Libtool 바이너리 디렉토리 추가
+export PATH="$PATH:/c/Program Files/Java/jdk-21/bin"  # Java JDK 바이너리 디렉토리 추가
+export PATH="$PATH:/c/Windows/System32"  # Windows System32 디렉토리 추가
+export PATH="$PATH:/c/Windows"  # Windows 디렉토리 추가
+export PATH="$PATH:/c/Windows/System32/Wbem"  # Windows WMI 디렉토리 추가
+export PATH="$PATH:/c/Windows/System32/WindowsPowerShell/v1.0"  # Windows PowerShell 디렉토리 추가
+export PATH="$PATH:/usr/bin/vendor_perl"  # Perl 공급자 디렉토리 추가
+export PATH="$PATH:/usr/bin/core_perl"  # Perl 기본 디렉토리 추가
+export PATH="$PATH:/c/Users/nayou/AppData/Local/Programs/Python/Python312"  # Python 디렉토리 추가
+export PATH="$PATH:/c/gnulib/lib"  # Gnulib 라이브러리 디렉토리 추가
+export PATH="$PATH:/c/libidn2/gettext-0.22.5/libtextstyle/lib"  # libtextstyle을 위한 gettext 라이브러리 디렉토리 추가
+
+configure.ac 수정
+#LDFLAGS="$LDFLAGS"
+#AC_SUBST(LDFLAGS)
+#CPPFLAGS="$CPPFLAGS -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -DNEED_MACRO"
+#AC_SUBST([CPPFLAGS], ["$CPPFLAGS"])
+
+exist_file.sh 생성(CFLAGS, LDFLAGS에 설정된 각 경로에 필요한 파일들이 존재하는지 확인)
+# 필요한 헤더 파일 리스트 (CFLAGS와 관련된 include 경로에서 확인)
+HEADER_FILES=("stdio.h" "stdlib.h" "string.h" "unistd.h")
+
+# CFLAGS 경로에서 헤더 파일 확인
+for dir in /c/msys64/mingw64/include /mingw64/include /c/libidn2/gettext-0.22.5/libtextstyle/lib; do
+  echo "Checking directory: $dir"
+  for header in "${HEADER_FILES[@]}"; do
+    if [ -f "$dir/$header" ]; then
+      echo "  Found: $header"
+    else
+      echo "  Not found: $header"
+    fi
+  done
+done
+
+# 필요한 라이브러리 파일 리스트 (LDFLAGS와 관련된 lib 경로에서 확인)
+LIBRARY_FILES=("libc.a" "libm.a" "libgcc.a" "libpthread.a")
+
+# LDFLAGS 경로에서 라이브러리 파일 확인
+for dir in /mingw64/lib /usr/lib /mingw64/bin; do
+  echo "Checking directory: $dir"
+  for lib in "${LIBRARY_FILES[@]}"; do
+    if [ -f "$dir/$lib" ]; then
+      echo "  Found: $lib"
+    else
+      echo "  Not found: $lib"
+    fi
+  done
+done
+(결과)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ./exist_file.sh
+Checking directory: /c/msys64/mingw64/include
+  Found: stdio.h
+  Found: stdlib.h
+  Found: string.h
+  Found: unistd.h
+Checking directory: /mingw64/include
+  Found: stdio.h
+  Found: stdlib.h
+  Found: string.h
+  Found: unistd.h
+Checking directory: /c/libidn2/gettext-0.22.5/libtextstyle/lib
+  Found: stdio.h
+  Found: stdlib.h
+  Found: string.h
+  Found: unistd.h
+Checking directory: /mingw64/lib
+  Not found: libc.a
+  Found: libm.a
+  Not found: libgcc.a
+  Found: libpthread.a
+Checking directory: /usr/lib
+  Not found: libc.a
+  Not found: libm.a
+  Not found: libgcc.a
+  Not found: libpthread.a
+Checking directory: /mingw64/bin
+  Not found: libc.a
+  Not found: libm.a
+  Not found: libgcc.a
+  Not found: libpthread.a
+
+=>stdio.h, stdlib.h, string.h, unistd.h는 모든 CFLAGS 경로
+(/c/msys64/mingw64/include, /mingw64/include, /c/libidn2/gettext-0.22.5/libtextstyle/lib)에서 존재함
+=>라이브러리 파일 (일부 라이브러리가 없음):
+경로: /mingw64/lib
+
+libc.a: 없음
+libm.a: 있음
+libgcc.a: 없음
+libpthread.a: 있음
+경로: /usr/lib
+
+libc.a: 없음
+libm.a: 없음
+libgcc.a: 없음
+libpthread.a: 없음
+경로: /mingw64/bin
+
+libc.a: 없음
+libm.a: 없음
+libgcc.a: 없음
+libpthread.a: 없음
+
+libc.a, libgcc.a가 주요 라이브러리로서 누락된 상태
+libgcc.a**는 GCC와 관련된 중요한 라이브러리로, 컴파일 시 필수적
+libpthread.a도 쓰레드 관련 라이브러리로 필요
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# # libgcc.a 파일 검색
+find / -name "libgcc.a" 2>/dev/null
+/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/libgcc.a
 
 ~/.bashrc 수정
-export CXX_INCLUDE_PATH="/c/msys64/mingw64/x86_64-w64-mingw32/include:/c/gnulib/lib:/mingw64/include:/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++:/c/Users/nayou/vcpkg/downloads/tools/perl/5.38.0.1/perl/lib/CORE"  # C++ include 경로
-export C_INCLUDE_PATH="/c/msys64/mingw64/x86_64-w64-mingw32/include:/c/msys64/mingw64/include:/c/gnulib/lib:/mingw64/include:/c/Users/nayou/vcpkg/downloads/tools/perl/5.38.0.1/perl/lib/CORE"  # C include 경로
-export CPLUS_INCLUDE_PATH="/c/msys64/mingw64/x86_64-w64-mingw32/include:/c/gnulib/lib:/mingw64/include:/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++:/c/Users/nayou/vcpkg/downloads/tools/perl/5.38.0.1/perl/lib/CORE"  # C++ include 경로
-
-# PATH 설정
-export PATH = "/c/msys64/mingw64/x86_64-w64-mingw32/include:$PATH" #C Include 경로 추가
-
-
-
-
-
-
-
-
+export LDFLAGS="-L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0"
+export LDFLAGS="$LDFLAGS -L/mingw64/lib"
+export LDFLAGS="$LDFLAGS -L/usr/lib"
+export LDFLAGS="$LDFLAGS -Wl,-rpath,/mingw64/bin"
 
 
 
