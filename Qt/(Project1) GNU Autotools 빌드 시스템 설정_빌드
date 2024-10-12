@@ -25327,16 +25327,83 @@ export LDFLAGS="$LDFLAGS -L/mingw64/lib"
 export LDFLAGS="$LDFLAGS -L/usr/lib"
 export LDFLAGS="$LDFLAGS -Wl,-rpath,/mingw64/bin"
 
+configure.ac 디버깅
+configure: TOP START =======================================
+configure: C 컴파일러: x86_64-w64-mingw32-gcc
+configure: C++ 컴파일러: x86_64-w64-mingw32-g++
+configure: 링커: /mingw64/bin/ld.exe
+configure: AR: /mingw64/bin/ar.exe
+configure: CFLAGS: -I/c/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -O2
+configure: CXXFLAGS: -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -O2 -DDEBUG -DVERSION="1.0.0"
+configure: LDFLAGS: -L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0 -L/mingw64/lib -L/usr/lib -Wl,-rpath,/mingw64/bin
+configure: TOP END =======================================
+ 
+환경변수 LD_LIBRARY_PATH에 등록할 경로 검색(주요 파일: libc.so, libpthread.so, libdl.so, libstdc++.so...)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# find / -type f \( -name "libc.so" -o -name "libpthread.so" -o -name "libdl.so" -o -name "libstdc++.so" \) 2>/dev/null
+find /: 루트 디렉토리부터 검색을 시작합니다.
+-type f: 일반 파일만 검색합니다.
+\( ... \): 괄호는 여러 조건을 묶을 때 사용하며, 반드시 백슬래시로 이스케이프해야 합니다.
+-name "libc.so" -o -name "libpthread.so" ...: -o는 "OR"을 의미하며, 여러 파일 이름을 조건으로 추가합니다.
+2>/dev/null: 오류 메시지를 숨깁니다 (권한이 없는 디렉토리에 대한 오류를 숨기기 위함).
+-rw-r--r-- 1 nayou nayou 81440 10월 10 15:21 /mingw64/lib/libpthread.a
+-rw-r--r-- 1 nayou nayou 1664 10월 10 15:14 /mingw64/lib/libm.a
+-rw-r--r-- 1 nayou nayou 7692606  8월  2 14:20 /mingw64/lib/libstdc++.a
+=> /mingw64/lib
+~/.bashrc 수정
+#LD_LIBRARY_PATH vs LIBRARY_PATH
+#LD_LIBRARY_PATH: 런타임에 동적으로 라이브러리를 찾을 때 사용하는 경로.
+#LIBRARY_PATH: 컴파일할 때 라이브러리를 찾는 경로.
+# 라이브러리 경로 설정
+export LD_LIBRARY_PATH="/mingw64/lib"
+export LIBRARY_PATH="/mingw64/lib"
+export LDFLAGS="-L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0" # libgcc.a
+export LDFLAGS="$LDFLAGS -L/mingw64/lib"
+export LDFLAGS="$LDFLAGS -L/usr/lib"
+export LDFLAGS="$LDFLAGS -Wl,-rpath,/mingw64/bin"
 
+정확한 명칭 찾기
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -Ql mingw-w64-x86_64-binutils
+mingw-w64-x86_64-binutils /mingw64/x86_64-w64-mingw32/bin/ar.exe
+mingw-w64-x86_64-binutils /mingw64/x86_64-w64-mingw32/bin/ld.exe
 
+~/.bashrc 수정
+# 링커 및 아카이버 설정
+export LD=/mingw64/x86_64-w64-mingw32/bin/ld.exe                 # 링커
+export AR=/mingw64/x86_64-w64-mingw32/bin/ar.exe                 # 아카이버
+export PATH="/mingw64/x86_64-w64-mingw32/bin"(맨앞에위치로변경) 
+export PATH="$PATH:/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++"
+export PATH="$PATH:/c/msys64/mingw64/include"
+export PATH="$PATH:/mingw64/include"
+export PATH="$PATH:/c/libidn2/gettext-0.22.5/libtextstyle/lib"
+export PATH="$PATH:/mingw64/bin" # MinGW-w64의 바이너리 디렉토리 추가
+export PATH="$PATH:/c/gnulib"  # Gnulib 디렉토리 추가
+export PATH="$PATH:/c/msys64/mingw64/bin"  # 64비트 MinGW 도구의 바이너리 디렉토리 추가
+export PATH="$PATH:/usr/bin"  # 시스템 기본 UNIX 도구 디렉토리 추가
+export PATH="$PATH:/bin"  # 기본 UNIX 유틸리티 디렉토리 추가
+export PATH="$PATH:/usr/share/aclocal"  # aclocal 매크로를 위한 디렉토리 추가
+export PATH="$PATH:/mingw64/share/aclocal"  # MinGW 전용 aclocal 매크로 디렉토리 추가
+export PATH="$PATH:/c/libidn2/autoconf-2.72/bin"  # libidn2용 Autoconf 바이너리 디렉토리 추가
+export PATH="$PATH:/c/libidn2/libtool-2.4.6"  # libidn2용 Libtool 바이너리 디렉토리 추가
+export PATH="$PATH:/c/Program Files/Java/jdk-21/bin"  # Java JDK 바이너리 디렉토리 추가
+export PATH="$PATH:/c/Windows/System32"  # Windows System32 디렉토리 추가
+export PATH="$PATH:/c/Windows"  # Windows 디렉토리 추가
+export PATH="$PATH:/c/Windows/System32/Wbem"  # Windows WMI 디렉토리 추가
+export PATH="$PATH:/c/Windows/System32/WindowsPowerShell/v1.0"  # Windows PowerShell 디렉토리 추가
+export PATH="$PATH:/usr/bin/vendor_perl"  # Perl 공급자 디렉토리 추가
+export PATH="$PATH:/usr/bin/core_perl"  # Perl 기본 디렉토리 추가
+export PATH="$PATH:/c/Users/nayou/AppData/Local/Programs/Python/Python312"  # Python 디렉토리 추가
+export PATH="$PATH:$JAVA_HOME/bin"                # Java 바이너리 경로 추가
+export PATH="$PATH:$ANT_HOME/bin"             # Ant 바이너리 경로 추가
+ 
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# which ar
+/mingw64/x86_64-w64-mingw32/bin/ar
 
-
-
-
-
-
-
-
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# which ld
+/mingw64/x86_64-w64-mingw32/bin/ld
 
 
 
