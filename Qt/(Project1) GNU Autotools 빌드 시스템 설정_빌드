@@ -19639,6 +19639,35 @@ nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
 # which x86_64-w64-mingw32-gcc
 /mingw64/bin/x86_64-w64-mingw32-gcc
 
+(오류)
+checking for netdb.h... no
+(수정)
+C:/밑에서 netdb.h 검색
+"C:\Users\nayou\vcpkg\downloads\tools\perl\5.38.0.1\c\include\postgresql\server\port\win32\netdb.h"
+"C:\Users\nayou\vcpkg\downloads\tools\perl\5.38.0.1\perl\lib\CORE\netdb.h"
+"C:\Users\nayou\AppData\Local\Arduino15\packages\arduino\hardware\avr\1.8.6\firmwares\wifishield\wifiHD\src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include\lwip\netdb.h"
+"C:\Users\nayou\anaconda3\Library\include\server\port\win32\netdb.h"
+"C:\Users\nayou\anaconda3\pkgs\libpq-12.17-h906ac69_0\Library\include\server\port\win32\netdb.h"
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l /c/Users/nayou/vcpkg/downloads/tools/perl/5.38.0.1/perl/lib/CORE/netdb.h
+-rw-r--r-- 1 nayou nayou 150  6월 17  2017 /c/Users/nayou/vcpkg/downloads/tools/perl/5.38.0.1/perl/lib/CORE/netdb.h
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# notepad ~/.bashrc
+
+환경변수설정
+# 기존의 환경 변수에 추가
+export CXX_INCLUDE_PATH=/mingw64/include:/c/Users/nayou/vcpkg/downloads/tools/perl/5.38.0.1/perl/lib/CORE
+export C_INCLUDE_PATH=/mingw64/include:/c/Users/nayou/vcpkg/downloads/tools/perl/5.38.0.1/perl/lib/CORE
+export CPLUS_INCLUDE_PATH=/mingw64/include:/c/Users/nayou/vcpkg/downloads/tools/perl/5.38.0.1/perl/lib/CORE
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# source ~/.bashrc
+
+(결과)
+checking for netdb.h... yes
+
 config.log(해당 에러메시지 이후라인에서 이유를 찾을 수 있다.)
 configure:5241: checking whether we are cross compiling
 ...
@@ -20795,6 +20824,366 @@ export CPPFLAGS="-I/mingw64/include -I/c/gnulib/lib -O2"			# C++ 전처리 설�
 export LDFLAGS="-L/c/gnulib/lib -L/c/libidn2/gettext-0.22.5/libtextstyle/lib -L/mingw64/lib -L/usr/lib -Wl,-rpath,/mingw64/bin"
 export LIBRARY_PATH=/mingw64/lib:/c/gnulib/lib
 export PATH="/c/msys64/mingw64/bin:/mingw64/bin:/usr/bin:/bin:/usr/share/aclocal:/mingw64/share/aclocal:/c/libidn2/autoconf-2.72/bin:/c/libidn2/libtool-2.4.6:/c/Program Files/Java/jdk-21/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/c/Users/nayou/AppData/Local/Programs/Python/Python312:/c/gnulib:/c/gnulib"
+
+(오류)
+checking whether we are cross compiling... no 
+(수정)
+config.guess 파일 확인 및 업데이트
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# curl -O https://git.savannah.gnu.org/cgit/config.git/plain/config.guess
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100 50743  100 50743    0     0  26282      0  0:00:01  0:00:01 --:--:-- 26318
+=>"C:\libidn2\gettext-0.22.5\libtextstyle\config.guess"
+
+configure.ac 수정
+AC_CAN_COMPILE
+m4_pattern_allow([AC_CAN_COMPILE])
+
+#c23 -> c11 변경
+# C++ 컴파일러가 -fno-rtti와 -fno-exceptions 플래그를 지원하는지 확인
+AC_COMPILE_IFELSE(
+    AC_LANG_PROGRAM([
+        #include <stdlib.h>
+        int main(void) { return 0; }
+    ], []),
+    [
+        CXXFLAGS="$CXXFLAGS -fno-rtti -fno-exceptions"
+    ],
+    [
+        AC_MSG_ERROR([C++ 컴파일러가 -fno-rtti와 -fno-exceptions 플래그를 지원하지 않습니다.])
+    ]
+)
+
+# C++ 컴파일러 확인 및 C++11 설정
+AC_PROG_CXX
+AC_SUBST([CXXFLAGS], ["-std=c++11 -I/mingw64/include -O2"])
+AC_LANG([C++])
+AC_COMPILE_IFELSE(
+    [AC_LANG_PROGRAM([], [[#if __cplusplus >= 201103L
+                         #else
+                         # error "C++11 not supported"
+                         #endif]])],
+    [
+        AC_DEFINE([HAVE_CXX11], [1], [Define if the C++ compiler supports C++11.])
+        CXXFLAGS="$CXXFLAGS -std=c++11 -fno-inline -UNDEFINED_MACRO"
+    ],
+    [AC_MSG_ERROR([C++11 support is required but not available.])]
+)
+
+# _GL_ATTRIBUTE_ALLOC_SIZE
+# Check if the compiler supports the __attribute__((__alloc_size__)) attribute
+AC_MSG_CHECKING([whether the compiler supports __attribute__((__alloc_size__))])
+AC_COMPILE_IFELSE(
+    [AC_LANG_PROGRAM([[]], [[
+        void* xmalloc(size_t) __attribute__((__alloc_size__(1)));
+    ]])],
+    [AC_DEFINE([_GL_HAS_ATTRIBUTE_ALLOC_SIZE], [1], [Define if compiler supports __attribute__((__alloc_size__))])],
+    [AC_DEFINE([_GL_HAS_ATTRIBUTE_ALLOC_SIZE], [0], [Define if compiler does not support __attribute__((__alloc_size__))])]
+)
+AC_MSG_RESULT([done])
+
+# Check for fsync
+# fsync가 사용 가능한지 확인하고, 그렇지 않은 경우 FlushFileBuffers를 사용하도록 설정
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([#include <unistd.h>
+                                    int main() {
+                                        int fd = 0; 
+                                        fsync(fd);
+                                        return 0;
+                                    }])],
+[AC_DEFINE([HAVE_FSYNC], [1], [Define to 1 if you have the fsync' function.])],
+[AC_DEFINE([HAVE_FLUSH_FILE_BUFFERS], [1], [Define to 1 if using FlushFileBuffers on Windows.])])
+
+# Check for compiler attributes
+AC_DEFUN([CHECK_HAS_ATTRIBUTE], [
+    AC_COMPILE_IFELSE([
+        AC_LANG_PROGRAM([[#ifdef __cplusplus
+                         #define _GL_HAS_ATTRIBUTE(x) __has_attribute(x)
+                         #else
+                         #define _GL_HAS_ATTRIBUTE(x) 0
+                         #endif]], [])
+    ], [
+        AC_SUBST([_GL_HAS_ATTRIBUTE], [__has_attribute])
+    ], [
+        AC_SUBST([_GL_HAS_ATTRIBUTE], [0])
+    ])
+])
+# Call the macro to check for attributes
+CHECK_HAS_ATTRIBUTE
+
+# Check if the compiler supports the __attribute__((returns_nonnull)) attribute
+AC_MSG_CHECKING([whether the compiler supports __attribute__((returns_nonnull))])
+AC_COMPILE_IFELSE(
+    [AC_LANG_PROGRAM([[]], [[
+        #ifdef __cplusplus
+        void* test_returns_nonnull(void) __attribute__((returns_nonnull));
+        #else
+        void* test_returns_nonnull(void);
+        #endif
+    ]])],
+    [AC_DEFINE([_GL_HAS_ATTRIBUTE_RETURNS_NONNULL], [1], [Define if compiler supports __attribute__((returns_nonnull))])],
+    [AC_DEFINE([_GL_HAS_ATTRIBUTE_RETURNS_NONNULL], [0], [Define if compiler does not support __attribute__((returns_nonnull))])]
+)
+AC_MSG_RESULT([done])
+
+# __attribute__((__pure__)) 지원 여부 확인
+AC_MSG_CHECKING([for __attribute__((__pure__)) support])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[ 
+    void __attribute__((__pure__)) test_function(int* ptr) {
+        (void)ptr;
+    }
+    int main() {
+        int a = 0;
+        test_function(&a);
+        return 0;
+    }
+]])],
+[AC_MSG_RESULT([yes])
+ AC_DEFINE([HAVE_ATTRIBUTE_PURE], [1], [Define if compiler supports __attribute__((__pure__))])],
+[AC_MSG_RESULT([no])
+ AC_DEFINE([HAVE_ATTRIBUTE_PURE], [0], [Define if compiler does not support __attribute__((__pure__))])])
+
+# __attribute__((nonnull)) 지원 여부 확인
+AC_MSG_CHECKING([for __attribute__((nonnull)) support])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[ 
+    void __attribute__((nonnull(1))) test_function(int* ptr) {
+        (void)ptr;
+    }
+
+    int main() {
+        int a = 0;
+        test_function(&a);
+        return 0;
+    }
+]])],
+[AC_MSG_RESULT([yes])
+ AC_DEFINE([HAVE_ATTRIBUTE_NONNULL], [1], [Define if compiler supports __attribute__((nonnull))])],
+[AC_MSG_RESULT([no])
+ AC_DEFINE([HAVE_ATTRIBUTE_NONNULL], [0], [Define if compiler does not support __attribute__((nonnull))])])
+
+# __attribute__((__malloc__)) 지원 여부 확인
+AC_MSG_CHECKING([for __attribute__((__malloc__)) support])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[ 
+    void __attribute__((__malloc__)) test_function(int* ptr) {
+        (void)ptr;
+    }
+    int main() {
+        int a = 0;
+        test_function(&a);
+        return 0;
+    }
+]])],
+[AC_MSG_RESULT([yes])
+ AC_DEFINE([HAVE_ATTRIBUTE_MALLOC], [1], [Define if compiler supports __attribute__((__malloc__))])],
+[AC_MSG_RESULT([no])
+ AC_DEFINE([HAVE_ATTRIBUTE_MALLOC], [0], [Define if compiler does not support __attribute__((__malloc__))])])
+
+AC_MSG_CHECKING([whether the compiler supports __attribute__((noreturn))])
+AC_COMPILE_IFELSE(
+    [AC_LANG_PROGRAM([[]], [[__attribute__((noreturn)) void x();]])],
+    [AC_DEFINE_UNQUOTED([_GL_ATTRIBUTE_NORETURN], [__attribute__((noreturn))], [Define for attribute noreturn])],
+    [AC_DEFINE_UNQUOTED([_GL_ATTRIBUTE_NORETURN], [], [Define for attribute noreturn])]
+)
+AC_MSG_RESULT([done])
+
+AC_CHECK_FUNC([xmalloc], [], [
+    AC_MSG_NOTICE([Defining xmalloc as a placeholder])
+    AC_LANG_PUSH([C])
+    AC_COMPILE_IFELSE([ 
+        AC_LANG_PROGRAM([ 
+            #include <stdlib.h>
+            void *xmalloc(size_t size) {
+                void *ptr = malloc(size);
+                if (!ptr) {
+                    exit(EXIT_FAILURE);
+                }
+                return ptr;
+            }
+        ])
+    ], [], [
+        AC_MSG_ERROR([Failed to define xmalloc])
+    ])
+    AC_LANG_POP
+])
+
+AC_CHECK_FUNC([xrealloc], [], [
+    AC_MSG_NOTICE([Defining xrealloc as a placeholder])
+    AC_LANG_PUSH([C])
+    AC_COMPILE_IFELSE([ 
+        AC_LANG_PROGRAM([ 
+            #include <stdlib.h>
+            void *xrealloc(void *ptr, size_t size) {
+                void *new_ptr = realloc(ptr, size);
+                if (!new_ptr) {
+                    exit(EXIT_FAILURE);
+                }
+                return new_ptr;
+            }
+        ])
+    ], [], [
+        AC_MSG_ERROR([Failed to define xrealloc])
+    ])
+    AC_LANG_POP
+])
+
+AC_CHECK_FUNC([rpl_stpcpy], [], [
+    AC_MSG_NOTICE([Defining rpl_stpcpy as a placeholder])
+    AC_LANG_PUSH([C])
+    AC_COMPILE_IFELSE([ 
+        AC_LANG_PROGRAM([ 
+            #include <string.h>
+            char *rpl_stpcpy(char *dest, const char *src) {
+                return stpcpy(dest, src);
+            }
+        ])
+    ], [], [
+        AC_MSG_ERROR([Failed to define rpl_stpcpy])
+    ])
+    AC_LANG_POP
+])
+
+AC_CHECK_FUNC([xalloc_die], [], [
+    AC_MSG_NOTICE([Defining xalloc_die as a placeholder])
+    AC_LANG_PUSH([C])
+    AC_COMPILE_IFELSE([ 
+        AC_LANG_PROGRAM([ 
+            #include <stdio.h>
+            void xalloc_die(void) {
+                fprintf(stderr, "Memory allocation failed\n");
+                exit(EXIT_FAILURE);
+            }
+        ])
+    ], [], [
+        AC_MSG_ERROR([Failed to define xalloc_die])
+    ])
+    AC_LANG_POP
+])
+
+AC_CHECK_FUNC([safe_write], [], [
+    AC_MSG_NOTICE([Defining safe_write as a placeholder])
+    AC_LANG_PUSH([C])
+    AC_COMPILE_IFELSE([ 
+        AC_LANG_PROGRAM([ 
+            #include <unistd.h>
+            ssize_t safe_write(int fd, const void *buf, size_t count) {
+                ssize_t result = write(fd, buf, count);
+                if (result < 0) {
+                    // handle error
+                }
+                return result;
+            }
+        ])
+    ], [], [
+        AC_MSG_ERROR([Failed to define safe_write])
+    ])
+    AC_LANG_POP
+])
+
+AC_CHECK_FUNC([at_fatal_signal], [], [
+    AC_MSG_NOTICE([Defining at_fatal_signal as a placeholder])
+    AC_LANG_PUSH([C])
+    AC_COMPILE_IFELSE([ 
+        AC_LANG_PROGRAM([ 
+            #include <signal.h>
+            void at_fatal_signal(void (*handler)(int)) {
+                signal(SIGTERM, handler);
+            }
+        ])
+    ], [], [
+        AC_MSG_ERROR([Failed to define at_fatal_signal])
+    ])
+    AC_LANG_POP
+])
+
+AC_CHECK_FUNC([styled_ostream_create], [], [
+    AC_MSG_NOTICE([Defining styled_ostream_create as a placeholder])
+    AC_LANG_PUSH([C])
+    AC_COMPILE_IFELSE([ 
+        AC_LANG_PROGRAM([ 
+            void *styled_ostream_create(void) {
+                return NULL; // placeholder implementation
+            }
+        ])
+    ], [], [
+        AC_MSG_ERROR([Failed to define styled_ostream_create])
+    ])
+    AC_LANG_POP
+])
+
+AC_CHECK_FUNC([styled_ostream_begin_use_class], [], [
+    AC_MSG_NOTICE([Defining styled_ostream_begin_use_class as a placeholder])
+    AC_LANG_PUSH([C])
+    AC_COMPILE_IFELSE([ 
+        AC_LANG_PROGRAM([ 
+            void styled_ostream_begin_use_class(void) {
+                // placeholder implementation
+            }
+        ])
+    ], [], [
+        AC_MSG_ERROR([Failed to define styled_ostream_begin_use_class])
+    ])
+    AC_LANG_POP
+])
+
+AC_CHECK_FUNC([styled_ostream_set_hyperlink], [], [
+    AC_MSG_NOTICE([Defining styled_ostream_set_hyperlink as a placeholder])
+    AC_LANG_PUSH([C])
+    AC_COMPILE_IFELSE([ 
+        AC_LANG_PROGRAM([ 
+            void styled_ostream_set_hyperlink(void *stream, const char *url) {
+                // placeholder implementation
+            }
+        ])
+    ], [], [
+        AC_MSG_ERROR([Failed to define styled_ostream_set_hyperlink])
+    ])
+    AC_LANG_POP
+])
+
+AC_CHECK_FUNC([file_ostream_create], [], [
+    AC_MSG_NOTICE([Defining file_ostream_create as a placeholder])
+    AC_LANG_PUSH([C])
+    AC_COMPILE_IFELSE([ 
+        AC_LANG_PROGRAM([ 
+            void *file_ostream_create(const char *filename) {
+                return NULL; // placeholder implementation
+            }
+        ])
+    ], [], [
+        AC_MSG_ERROR([Failed to define file_ostream_create])
+    ])
+    AC_LANG_POP
+])
+
+AC_CHECK_FUNC([html_styled_ostream_create], [], [
+    AC_MSG_NOTICE([Defining html_styled_ostream_create as a placeholder])
+    AC_LANG_PUSH([C])
+    AC_COMPILE_IFELSE([ 
+        AC_LANG_PROGRAM([ 
+            void *html_styled_ostream_create(void) {
+                return NULL; // placeholder implementation
+            }
+        ])
+    ], [], [
+        AC_MSG_ERROR([Failed to define html_styled_ostream_create])
+    ])
+    AC_LANG_POP
+])
+
+AC_CHECK_FUNC([get_fatal_signals], [], [
+    AC_MSG_NOTICE([Defining get_fatal_signals as a placeholder])
+    AC_LANG_PUSH([C])
+    AC_COMPILE_IFELSE([ 
+        AC_LANG_PROGRAM([ 
+            void get_fatal_signals(void) {
+                // placeholder implementation
+            }
+        ])
+    ], [], [
+        AC_MSG_ERROR([Failed to define get_fatal_signals])
+    ])
+    AC_LANG_POP
+])
 
 (오류)
 configure.ac:6: error: AC_GNU_LIB_TOOL: macro not found in directory /usr/share/aclocal
@@ -25405,440 +25794,180 @@ nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
 # which ld
 /mingw64/x86_64-w64-mingw32/bin/ld
 
+테스트 프로그램을 컴파일하려다 실패
+x86_64-w64-mingw32-gcc를 사용하여 conftest.c라는 파일을 컴파일하려고 했지만, 컴파일이 실패하여 $? = 1을 반환
+config.log
+configure:XXXX: checking whether the C compiler works
+configure:XXXX: x86_64-w64-mingw32-gcc -o conftest conftest.c
+configure:XXXX: $? = 1
+configure: failed program was:
+| /* confdefs.h */
+| #define PACKAGE_NAME "example"
+| #define PACKAGE_TARNAME "example"
+| #define PACKAGE_VERSION "1.0"
+| #define PACKAGE_STRING "example 1.0"
+| #define PACKAGE_BUGREPORT "bugs@example.com"
+| #define PACKAGE_URL ""
+| #define PACKAGE "example"
+| #define VERSION "1.0"
+| /* end confdefs.h.  */
+| int main() { return 0; }
+configure:XXXX: error: in `/path/to/build/directory':
+configure:XXXX: error: C compiler cannot create executables
 
+컴파일러가 제대로 설치되어 있는지 확인(해당 디렉터리 안에 .a 파일이나 .dll 파일이 있는지 확인)
+MSYS2 환경에서 MinGW-w64 도구체인을 사용하여 프로그램을 빌드할 때, 기본적으로 참조되는 경로
+/mingw64/include:헤더 파일들이 위치
+/mingw64/lib:라이브러리 파일들이 위치
 
+gettext, glib, libiconv 등 필요한 라이브러리가 제대로 설치되어 있는지 확인
+pacman -S mingw-w64-x86_64-gettext mingw-w64-x86_64-libiconv mingw-w64-x86_64-glib2
+설치된 패키지 파일 목록을 출력
+pacman -Ql mingw-w64-x86_64-gettext
+pacman -Ql mingw-w64-x86_64-libiconv
+pacman -Ql mingw-w64-x86_64-glib2
 
+Linux에서 주로 사용되는 소 (.so) 라이브러리
+libc.so, libpthread.so, libdl.so, libstdc++.so 등 파일 설치 방법
+vcpkg 또는 MSYS2를 사용 MinGW-w64에서 C 라이브러리 설치
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-(오류)
-checking whether we are cross compiling... no 
-(수정)
-config.guess 파일 확인 및 업데이트
+MinGW-w64에서는 DLL (.dll) 형식으로 대응되는 라이브러리를 사용
+MinGW-w64 설치 패키지 확인
 nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
-# curl -O https://git.savannah.gnu.org/cgit/config.git/plain/config.guess
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-100 50743  100 50743    0     0  26282      0  0:00:01  0:00:01 --:--:-- 26318
-=>"C:\libidn2\gettext-0.22.5\libtextstyle\config.guess"
+# pacman -Ss mingw-w64-x86_64-gcc
+기본 패키지들:
+msys/ccache 4.10.2-1: MinGW-w64를 위한 컴파일러 캐시.
+msys/mingw-w64-cross-binutils 2.43.1-2: 이진 파일과 객체 파일을 조작하는 프로그램 모음.
+msys/mingw-w64-cross-clang 11.0.0-4: MinGW-w64를 위한 Clang 컴파일러.
+msys/mingw-w64-cross-clang-crt 9.0.0.6158.1c773877-2: Clang 컴파일러용 MinGW-w64 CRT.
+msys/mingw-w64-cross-clang-headers 9.0.0.6158.1c773877-2: Clang 컴파일러용 MinGW-w64 헤더 파일.
+msys/mingw-w64-cross-common-binutils 2.43.1-2: 모든 타겟을 위한 공통 이진 파일 조작 툴.
+msys/mingw-w64-cross-compiler-rt 11.0.0-6: Clang 컴파일러를 위한 런타임 라이브러리.
+msys/mingw-w64-cross-crt 12.0.0.r250.gc6bf4bdf6-1: MinGW-w64 CRT (호환성 유지용 메타 패키지).
+msys/mingw-w64-cross-gcc 14.2.0-3: MinGW-w64를 위한 GCC 컴파일러.
+msys/mingw-w64-cross-headers 12.0.0.r250.gc6bf4bdf6-1: MinGW-w64 헤더 파일들 (호환성 유지용 메타 패키지).
+타겟별 패키지:
+mingw32 (32비트 MinGW-w64 환경):
+msys/mingw-w64-cross-mingw32-binutils 2.43.1-2: 32비트 이진 파일 조작 툴.
+msys/mingw-w64-cross-mingw32-crt 12.0.0.r250.gc6bf4bdf6-1: 32비트 MinGW-w64 CRT.
+msys/mingw-w64-cross-mingw32-gcc 14.2.0-3: 32비트 MinGW-w64 GCC.
+mingw64 (64비트 MinGW-w64 환경):
+msys/mingw-w64-cross-mingw64-binutils 2.43.1-2: 64비트 이진 파일 조작 툴.
+msys/mingw-w64-cross-mingw64-crt 12.0.0.r250.gc6bf4bdf6-1: 64비트 MinGW-w64 CRT.
+msys/mingw-w64-cross-mingw64-gcc 14.2.0-3: 64비트 MinGW-w64 GCC.
+mingwarm64 (ARM 64비트 MinGW-w64 환경):
+msys/mingw-w64-cross-mingwarm64-binutils 2.43dev-1: ARM 64비트 이진 파일 조작 툴.
+msys/mingw-w64-cross-mingwarm64-crt 12.0.0dev-2: ARM 64비트 CRT.
+msys/mingw-w64-cross-mingwarm64-gcc 15.0.0dev-2: ARM 64비트 GCC.
+ucrt64 (UCRT 64비트 MinGW-w64 환경):
+msys/mingw-w64-cross-ucrt64-binutils 2.43.1-2: UCRT 64비트 이진 파일 조작 툴.
+msys/mingw-w64-cross-ucrt64-crt 12.0.0.r250.gc6bf4bdf6-1: UCRT 64비트 MinGW-w64 CRT.
+msys/mingw-w64-cross-ucrt64-gcc 14.2.0-3: UCRT 64비트 MinGW-w64 GCC.
+기타 필수 패키지들:
+msys/mingw-w64-cross-zlib 1.3.1-4: Gzip과 PKZIP에서 사용하는 deflate 압축 방법을 구현하는 압축 라이브러리.
+msys/mingw-w64-cross-winpthreads 12.0.0.r250.gc6bf4bdf6-1: MinGW-w64 winpthreads 라이브러리.
+msys/mingw-w64-cross-winstorecompat 12.0.0.r250.gc6bf4bdf6-1: MinGW-w64 WinRT 호환성 라이브러리.
 
-configure.ac 수정
-AC_CAN_COMPILE
-m4_pattern_allow([AC_CAN_COMPILE])
+GCC, Make, 그리고 libwinpthread와 같은 필수적인 패키지를 설치
+pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-make mingw-w64-x86_64-libwinpthread-git
 
-#c23 -> c11 변경
-# C++ 컴파일러가 -fno-rtti와 -fno-exceptions 플래그를 지원하는지 확인
-AC_COMPILE_IFELSE(
-    AC_LANG_PROGRAM([
-        #include <stdlib.h>
-        int main(void) { return 0; }
-    ], []),
-    [
-        CXXFLAGS="$CXXFLAGS -fno-rtti -fno-exceptions"
-    ],
-    [
-        AC_MSG_ERROR([C++ 컴파일러가 -fno-rtti와 -fno-exceptions 플래그를 지원하지 않습니다.])
-    ]
-)
+컴파일러 확인
+x86_64-w64-mingw32-gcc --version
 
-# C++ 컴파일러 확인 및 C++11 설정
-AC_PROG_CXX
-AC_SUBST([CXXFLAGS], ["-std=c++11 -I/mingw64/include -O2"])
-AC_LANG([C++])
-AC_COMPILE_IFELSE(
-    [AC_LANG_PROGRAM([], [[#if __cplusplus >= 201103L
-                         #else
-                         # error "C++11 not supported"
-                         #endif]])],
-    [
-        AC_DEFINE([HAVE_CXX11], [1], [Define if the C++ compiler supports C++11.])
-        CXXFLAGS="$CXXFLAGS -std=c++11 -fno-inline -UNDEFINED_MACRO"
-    ],
-    [AC_MSG_ERROR([C++11 support is required but not available.])]
-)
+MinGW-w64 패키지가 설치
+pacman -S mingw-w64-x86_64-gcc
 
-# _GL_ATTRIBUTE_ALLOC_SIZE
-# Check if the compiler supports the __attribute__((__alloc_size__)) attribute
-AC_MSG_CHECKING([whether the compiler supports __attribute__((__alloc_size__))])
-AC_COMPILE_IFELSE(
-    [AC_LANG_PROGRAM([[]], [[
-        void* xmalloc(size_t) __attribute__((__alloc_size__(1)));
-    ]])],
-    [AC_DEFINE([_GL_HAS_ATTRIBUTE_ALLOC_SIZE], [1], [Define if compiler supports __attribute__((__alloc_size__))])],
-    [AC_DEFINE([_GL_HAS_ATTRIBUTE_ALLOC_SIZE], [0], [Define if compiler does not support __attribute__((__alloc_size__))])]
-)
-AC_MSG_RESULT([done])
+컴파일 환경 확인
+ls /mingw64/include
+ls /mingw64/lib
 
-# Check for fsync
-# fsync가 사용 가능한지 확인하고, 그렇지 않은 경우 FlushFileBuffers를 사용하도록 설정
-AC_COMPILE_IFELSE([AC_LANG_SOURCE([#include <unistd.h>
-                                    int main() {
-                                        int fd = 0; 
-                                        fsync(fd);
-                                        return 0;
-                                    }])],
-[AC_DEFINE([HAVE_FSYNC], [1], [Define to 1 if you have the fsync' function.])],
-[AC_DEFINE([HAVE_FLUSH_FILE_BUFFERS], [1], [Define to 1 if using FlushFileBuffers on Windows.])])
+패키지 확인 및 설치
+gettext 패키지 확인
+pacman -S mingw-w64-x86_64-gettext
+pacman -Ql mingw-w64-x86_64-gettext
+libiconv 패키지 확인
+pacman -S mingw-w64-x86_64-libiconv
+pacman -Ql mingw-w64-x86_64-libiconv
+glib2 패키지 확인
+pacman -S mingw-w64-x86_64-glib2
+pacman -Ql mingw-w64-x86_64-glib2
 
-# Check for compiler attributes
-AC_DEFUN([CHECK_HAS_ATTRIBUTE], [
-    AC_COMPILE_IFELSE([
-        AC_LANG_PROGRAM([[#ifdef __cplusplus
-                         #define _GL_HAS_ATTRIBUTE(x) __has_attribute(x)
-                         #else
-                         #define _GL_HAS_ATTRIBUTE(x) 0
-                         #endif]], [])
-    ], [
-        AC_SUBST([_GL_HAS_ATTRIBUTE], [__has_attribute])
-    ], [
-        AC_SUBST([_GL_HAS_ATTRIBUTE], [0])
-    ])
-])
-# Call the macro to check for attributes
-CHECK_HAS_ATTRIBUTE
+테스트 프로그램 컴파일
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# x86_64-w64-mingw32-gcc -o conftest conftest.c
+컴파일이 성공하면 conftest.exe가 생성
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l conftest.exe
+ls: cannot access 'conftest.exe': No such file or directory
+디버깅
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# x86_64-w64-mingw32-gcc -v -o conftest conftest.c
+Using built-in specs.
+COLLECT_GCC=C:\msys64\mingw64\bin\x86_64-w64-mingw32-gcc.exe
+COLLECT_LTO_WRAPPER=C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/lto-wrapper.exe
+Target: x86_64-w64-mingw32
+Configured with: ../gcc-14.2.0/configure --prefix=/mingw64 --with-local-prefix=/mingw64/local --build=x86_64-w64-mingw32 --host=x86_64-w64-mingw32 --target=x86_64-w64-mingw32 --with-native-system-header-dir=/mingw64/include --libexecdir=/mingw64/lib --enable-bootstrap --enable-checking=release --with-arch=nocona --with-tune=generic --enable-languages=c,lto,c++,fortran,ada,objc,obj-c++,rust,jit --enable-shared --enable-static --enable-libatomic --enable-threads=posix --enable-graphite --enable-fully-dynamic-string --enable-libstdcxx-filesystem-ts --enable-libstdcxx-time --disable-libstdcxx-pch --enable-lto --enable-libgomp --disable-libssp --disable-multilib --disable-rpath --disable-win32-registry --disable-nls --disable-werror --disable-symvers --with-libiconv --with-system-zlib --with-gmp=/mingw64 --with-mpfr=/mingw64 --with-mpc=/mingw64 --with-isl=/mingw64 --with-pkgversion='Rev1, Built by MSYS2 project' --with-bugurl=https://github.com/msys2/MINGW-packages/issues --with-gnu-as --with-gnu-ld --disable-libstdcxx-debug --enable-plugin --with-boot-ldflags=-static-libstdc++ --with-stage1-ldflags=-static-libstdc++
+Thread model: posix
+Supported LTO compression algorithms: zlib zstd
+gcc version 14.2.0 (Rev1, Built by MSYS2 project)
+COLLECT_GCC_OPTIONS='-v' '-o' 'conftest.exe' '-mtune=generic' '-march=nocona'
+ C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/cc1.exe -quiet -v -iprefix C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/ -D_REENTRANT conftest.c -quiet -dumpbase conftest.c -dumpbase-ext .c -mtune=generic -march=nocona -version -o C:\msys64\tmp\ccoDaws9.s
 
-# Check if the compiler supports the __attribute__((returns_nonnull)) attribute
-AC_MSG_CHECKING([whether the compiler supports __attribute__((returns_nonnull))])
-AC_COMPILE_IFELSE(
-    [AC_LANG_PROGRAM([[]], [[
-        #ifdef __cplusplus
-        void* test_returns_nonnull(void) __attribute__((returns_nonnull));
-        #else
-        void* test_returns_nonnull(void);
-        #endif
-    ]])],
-    [AC_DEFINE([_GL_HAS_ATTRIBUTE_RETURNS_NONNULL], [1], [Define if compiler supports __attribute__((returns_nonnull))])],
-    [AC_DEFINE([_GL_HAS_ATTRIBUTE_RETURNS_NONNULL], [0], [Define if compiler does not support __attribute__((returns_nonnull))])]
-)
-AC_MSG_RESULT([done])
-
-# __attribute__((__pure__)) 지원 여부 확인
-AC_MSG_CHECKING([for __attribute__((__pure__)) support])
-AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[ 
-    void __attribute__((__pure__)) test_function(int* ptr) {
-        (void)ptr;
-    }
-    int main() {
-        int a = 0;
-        test_function(&a);
-        return 0;
-    }
-]])],
-[AC_MSG_RESULT([yes])
- AC_DEFINE([HAVE_ATTRIBUTE_PURE], [1], [Define if compiler supports __attribute__((__pure__))])],
-[AC_MSG_RESULT([no])
- AC_DEFINE([HAVE_ATTRIBUTE_PURE], [0], [Define if compiler does not support __attribute__((__pure__))])])
-
-# __attribute__((nonnull)) 지원 여부 확인
-AC_MSG_CHECKING([for __attribute__((nonnull)) support])
-AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[ 
-    void __attribute__((nonnull(1))) test_function(int* ptr) {
-        (void)ptr;
-    }
-
-    int main() {
-        int a = 0;
-        test_function(&a);
-        return 0;
-    }
-]])],
-[AC_MSG_RESULT([yes])
- AC_DEFINE([HAVE_ATTRIBUTE_NONNULL], [1], [Define if compiler supports __attribute__((nonnull))])],
-[AC_MSG_RESULT([no])
- AC_DEFINE([HAVE_ATTRIBUTE_NONNULL], [0], [Define if compiler does not support __attribute__((nonnull))])])
-
-# __attribute__((__malloc__)) 지원 여부 확인
-AC_MSG_CHECKING([for __attribute__((__malloc__)) support])
-AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[ 
-    void __attribute__((__malloc__)) test_function(int* ptr) {
-        (void)ptr;
-    }
-    int main() {
-        int a = 0;
-        test_function(&a);
-        return 0;
-    }
-]])],
-[AC_MSG_RESULT([yes])
- AC_DEFINE([HAVE_ATTRIBUTE_MALLOC], [1], [Define if compiler supports __attribute__((__malloc__))])],
-[AC_MSG_RESULT([no])
- AC_DEFINE([HAVE_ATTRIBUTE_MALLOC], [0], [Define if compiler does not support __attribute__((__malloc__))])])
-
-AC_MSG_CHECKING([whether the compiler supports __attribute__((noreturn))])
-AC_COMPILE_IFELSE(
-    [AC_LANG_PROGRAM([[]], [[__attribute__((noreturn)) void x();]])],
-    [AC_DEFINE_UNQUOTED([_GL_ATTRIBUTE_NORETURN], [__attribute__((noreturn))], [Define for attribute noreturn])],
-    [AC_DEFINE_UNQUOTED([_GL_ATTRIBUTE_NORETURN], [], [Define for attribute noreturn])]
-)
-AC_MSG_RESULT([done])
-
-AC_CHECK_FUNC([xmalloc], [], [
-    AC_MSG_NOTICE([Defining xmalloc as a placeholder])
-    AC_LANG_PUSH([C])
-    AC_COMPILE_IFELSE([ 
-        AC_LANG_PROGRAM([ 
-            #include <stdlib.h>
-            void *xmalloc(size_t size) {
-                void *ptr = malloc(size);
-                if (!ptr) {
-                    exit(EXIT_FAILURE);
-                }
-                return ptr;
-            }
-        ])
-    ], [], [
-        AC_MSG_ERROR([Failed to define xmalloc])
-    ])
-    AC_LANG_POP
-])
-
-AC_CHECK_FUNC([xrealloc], [], [
-    AC_MSG_NOTICE([Defining xrealloc as a placeholder])
-    AC_LANG_PUSH([C])
-    AC_COMPILE_IFELSE([ 
-        AC_LANG_PROGRAM([ 
-            #include <stdlib.h>
-            void *xrealloc(void *ptr, size_t size) {
-                void *new_ptr = realloc(ptr, size);
-                if (!new_ptr) {
-                    exit(EXIT_FAILURE);
-                }
-                return new_ptr;
-            }
-        ])
-    ], [], [
-        AC_MSG_ERROR([Failed to define xrealloc])
-    ])
-    AC_LANG_POP
-])
-
-AC_CHECK_FUNC([rpl_stpcpy], [], [
-    AC_MSG_NOTICE([Defining rpl_stpcpy as a placeholder])
-    AC_LANG_PUSH([C])
-    AC_COMPILE_IFELSE([ 
-        AC_LANG_PROGRAM([ 
-            #include <string.h>
-            char *rpl_stpcpy(char *dest, const char *src) {
-                return stpcpy(dest, src);
-            }
-        ])
-    ], [], [
-        AC_MSG_ERROR([Failed to define rpl_stpcpy])
-    ])
-    AC_LANG_POP
-])
-
-AC_CHECK_FUNC([xalloc_die], [], [
-    AC_MSG_NOTICE([Defining xalloc_die as a placeholder])
-    AC_LANG_PUSH([C])
-    AC_COMPILE_IFELSE([ 
-        AC_LANG_PROGRAM([ 
-            #include <stdio.h>
-            void xalloc_die(void) {
-                fprintf(stderr, "Memory allocation failed\n");
-                exit(EXIT_FAILURE);
-            }
-        ])
-    ], [], [
-        AC_MSG_ERROR([Failed to define xalloc_die])
-    ])
-    AC_LANG_POP
-])
-
-AC_CHECK_FUNC([safe_write], [], [
-    AC_MSG_NOTICE([Defining safe_write as a placeholder])
-    AC_LANG_PUSH([C])
-    AC_COMPILE_IFELSE([ 
-        AC_LANG_PROGRAM([ 
-            #include <unistd.h>
-            ssize_t safe_write(int fd, const void *buf, size_t count) {
-                ssize_t result = write(fd, buf, count);
-                if (result < 0) {
-                    // handle error
-                }
-                return result;
-            }
-        ])
-    ], [], [
-        AC_MSG_ERROR([Failed to define safe_write])
-    ])
-    AC_LANG_POP
-])
-
-AC_CHECK_FUNC([at_fatal_signal], [], [
-    AC_MSG_NOTICE([Defining at_fatal_signal as a placeholder])
-    AC_LANG_PUSH([C])
-    AC_COMPILE_IFELSE([ 
-        AC_LANG_PROGRAM([ 
-            #include <signal.h>
-            void at_fatal_signal(void (*handler)(int)) {
-                signal(SIGTERM, handler);
-            }
-        ])
-    ], [], [
-        AC_MSG_ERROR([Failed to define at_fatal_signal])
-    ])
-    AC_LANG_POP
-])
-
-AC_CHECK_FUNC([styled_ostream_create], [], [
-    AC_MSG_NOTICE([Defining styled_ostream_create as a placeholder])
-    AC_LANG_PUSH([C])
-    AC_COMPILE_IFELSE([ 
-        AC_LANG_PROGRAM([ 
-            void *styled_ostream_create(void) {
-                return NULL; // placeholder implementation
-            }
-        ])
-    ], [], [
-        AC_MSG_ERROR([Failed to define styled_ostream_create])
-    ])
-    AC_LANG_POP
-])
-
-AC_CHECK_FUNC([styled_ostream_begin_use_class], [], [
-    AC_MSG_NOTICE([Defining styled_ostream_begin_use_class as a placeholder])
-    AC_LANG_PUSH([C])
-    AC_COMPILE_IFELSE([ 
-        AC_LANG_PROGRAM([ 
-            void styled_ostream_begin_use_class(void) {
-                // placeholder implementation
-            }
-        ])
-    ], [], [
-        AC_MSG_ERROR([Failed to define styled_ostream_begin_use_class])
-    ])
-    AC_LANG_POP
-])
-
-AC_CHECK_FUNC([styled_ostream_set_hyperlink], [], [
-    AC_MSG_NOTICE([Defining styled_ostream_set_hyperlink as a placeholder])
-    AC_LANG_PUSH([C])
-    AC_COMPILE_IFELSE([ 
-        AC_LANG_PROGRAM([ 
-            void styled_ostream_set_hyperlink(void *stream, const char *url) {
-                // placeholder implementation
-            }
-        ])
-    ], [], [
-        AC_MSG_ERROR([Failed to define styled_ostream_set_hyperlink])
-    ])
-    AC_LANG_POP
-])
-
-AC_CHECK_FUNC([file_ostream_create], [], [
-    AC_MSG_NOTICE([Defining file_ostream_create as a placeholder])
-    AC_LANG_PUSH([C])
-    AC_COMPILE_IFELSE([ 
-        AC_LANG_PROGRAM([ 
-            void *file_ostream_create(const char *filename) {
-                return NULL; // placeholder implementation
-            }
-        ])
-    ], [], [
-        AC_MSG_ERROR([Failed to define file_ostream_create])
-    ])
-    AC_LANG_POP
-])
-
-AC_CHECK_FUNC([html_styled_ostream_create], [], [
-    AC_MSG_NOTICE([Defining html_styled_ostream_create as a placeholder])
-    AC_LANG_PUSH([C])
-    AC_COMPILE_IFELSE([ 
-        AC_LANG_PROGRAM([ 
-            void *html_styled_ostream_create(void) {
-                return NULL; // placeholder implementation
-            }
-        ])
-    ], [], [
-        AC_MSG_ERROR([Failed to define html_styled_ostream_create])
-    ])
-    AC_LANG_POP
-])
-
-AC_CHECK_FUNC([get_fatal_signals], [], [
-    AC_MSG_NOTICE([Defining get_fatal_signals as a placeholder])
-    AC_LANG_PUSH([C])
-    AC_COMPILE_IFELSE([ 
-        AC_LANG_PROGRAM([ 
-            void get_fatal_signals(void) {
-                // placeholder implementation
-            }
-        ])
-    ], [], [
-        AC_MSG_ERROR([Failed to define get_fatal_signals])
-    ])
-    AC_LANG_POP
-])
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-(오류)
-checking whether we are cross compiling... no
-(수정)
-
-
-
-
-
-(오류)
-checking for netdb.h... no
-(수정)
-C:/밑에서 netdb.h 검색
-"C:\Users\nayou\vcpkg\downloads\tools\perl\5.38.0.1\c\include\postgresql\server\port\win32\netdb.h"
-"C:\Users\nayou\vcpkg\downloads\tools\perl\5.38.0.1\perl\lib\CORE\netdb.h"
-"C:\Users\nayou\AppData\Local\Arduino15\packages\arduino\hardware\avr\1.8.6\firmwares\wifishield\wifiHD\src\SOFTWARE_FRAMEWORK\SERVICES\LWIP\lwip-1.3.2\src\include\lwip\netdb.h"
-"C:\Users\nayou\anaconda3\Library\include\server\port\win32\netdb.h"
-"C:\Users\nayou\anaconda3\pkgs\libpq-12.17-h906ac69_0\Library\include\server\port\win32\netdb.h"
+필수파일찾기(경로검색)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# /usr/share/gettext/gettext.h
 
 nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
-# ls -l /c/Users/nayou/vcpkg/downloads/tools/perl/5.38.0.1/perl/lib/CORE/netdb.h
--rw-r--r-- 1 nayou nayou 150  6월 17  2017 /c/Users/nayou/vcpkg/downloads/tools/perl/5.38.0.1/perl/lib/CORE/netdb.h
+# /mingw64/include/iconv.h
+/mingw64/x86_64-w64-mingw32/include/iconv.h
+/mingw64-backup-11.2.0/include/iconv.h
+/usr/include/iconv.h
 
 nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
-# notepad ~/.bashrc
-
-환경변수설정
-# 기존의 환경 변수에 추가
-export CXX_INCLUDE_PATH=/mingw64/include:/c/Users/nayou/vcpkg/downloads/tools/perl/5.38.0.1/perl/lib/CORE
-export C_INCLUDE_PATH=/mingw64/include:/c/Users/nayou/vcpkg/downloads/tools/perl/5.38.0.1/perl/lib/CORE
-export CPLUS_INCLUDE_PATH=/mingw64/include:/c/Users/nayou/vcpkg/downloads/tools/perl/5.38.0.1/perl/lib/CORE
+# find / -name glib.h 2>/dev/null
+/mingw64/include/glib-2.0/glib.h
+/mingw64-backup-11.2.0/include/glib-2.0/glib.h
 
 nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
-# source ~/.bashrc
+# find / -name lib*.a 2>/dev/null
+/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/libatomic.a
+/mingw64/lib/gcc/x86_64-w64-mingw32/lib/libgcc_s.a
+/mingw64/lib/libacledit.a
+/mingw64/lib/python3.11/site-packages/libxml2mod.dll.a
+/mingw64/libexec/gcc/x86_64-w64-mingw32/14.2.0/liblto_plugin.dll.a
+/mingw64/opt/lib/dde1.4/libtcldde14.dll.a
+/mingw64/opt/lib/itcl4.2.1/libitclstub421.a
+/mingw64/opt/lib/libbz2.dll.a
+/mingw64/x86_64-w64-mingw32/lib/libacledit.a
+/usr/lib/libalpm.a
+/usr/lib/perl5/core_perl/CORE/libperl.dll.a
+/usr/lib/python3.12/config-3.12-x86_64-cygwin/libpython3.12.dll.a
+/usr/lib/python3.12/site-packages/libxml2mod.a
 
-(결과)
-checking for netdb.h... yes
+환경변수에추가하기
+# C 인클루드 경로 설정
+export C_INCLUDE_PATH="$C_INCLUDE_PATH:/usr/share/gettext"
+export C_INCLUDE_PATH="$C_INCLUDE_PATH:/mingw64/include"
+export C_INCLUDE_PATH="$C_INCLUDE_PATH:/mingw64/include/glib-2.0"
+
+# CPPFLAGS 추가
+export CPPFLAGS="$CPPFLAGS -I/usr/share/gettext"
+export CPPFLAGS="$CPPFLAGS -I/mingw64/include"
+export CPPFLAGS="$CPPFLAGS -I/mingw64/include/glib-2.0"
+
+# 라이브러리 경로 설정
+export LIBRARY_PATH="$LIBRARY_PATH:/mingw64/lib"
+export LIBRARY_PATH="$LIBRARY_PATH:/usr/lib"
+export LIBRARY_PATH="$LIBRARY_PATH:/mingw64/x86_64-w64-mingw32/lib"
+
+# LDFLAGS 추가
+export LDFLAGS="$LDFLAGS -L/mingw64/lib"
+export LDFLAGS="$LDFLAGS -L/usr/lib"
+export LDFLAGS="$LDFLAGS -L/mingw64/x86_64-w64-mingw32/lib"
+
+(빌드)
+{ autopoint --force; } 2>&1 | tee ./log/autopoint.log &&   { rm -f po/Makefile.in.in; } &&   { rm -rf autom4te.cache; } &&   { aclocal -I m4 -I gnulib-m4 -I /usr/share/aclocal; } 2>&1 | tee ./log/aclocal.log &&   { libtoolize --copy --force --verbose; } 2>&1 | tee ./log/libtoolize.log &&   { autoconf --verbose; } 2>&1 | tee ./log/autoconf.log &&   { autoheader; } 2>&1 | tee ./log/autoheader.log &&  { automake --add-missing --force-missing; } 2>&1 | tee ./log/automake.log &&   { ./configure --verbose; } 2>&1 | tee ./log/configure.log
+
+
+
+
