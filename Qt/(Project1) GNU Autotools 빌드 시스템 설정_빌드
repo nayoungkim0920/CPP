@@ -25989,10 +25989,86 @@ configure.ac 수정
 AC_INIT([libtextstyle], [1.0], [bug-libtextstyle@example.com])
 AC_USE_SYSTEM_EXTENSIONS # AC_INIT 보다 먼저 호출하면 (AC_INIT 바로 밑으로 위치 이동)
 
+# 컴파일러 경로 출력
+AC_MSG_NOTICE([TOP START =======================================])
+AC_MSG_NOTICE([C 컴파일러: $CC])
+AC_MSG_NOTICE([C++ 컴파일러: $CXX])
+AC_MSG_NOTICE([링커: $LD])
+AC_MSG_NOTICE([AR: $AR])
+AC_MSG_NOTICE([CFLAGS: $CFLAGS])
+AC_MSG_NOTICE([CXXFLAGS: $CXXFLAGS])
+AC_MSG_NOTICE([LDFLAGS: $LDFLAGS])
+AC_MSG_NOTICE([TOP END =======================================])
 
+(오류)
+/usr/bin/m4:aclocal.m4:1930: cannot open `m4/ltdl.m4': No such file or directory
+autom4te-2.72: error: /usr/bin/m4 failed with exit status: 1
+/usr/bin/m4:aclocal.m4:1930: cannot open `m4/ltdl.m4': No such file or directory
+autom4te-2.72: error: /usr/bin/m4 failed with exit status: 1
+autoheader-2.72: error: '/usr/bin/autom4te-2.72' failed with exit status: 1
+/usr/bin/m4:aclocal.m4:1930: cannot open `m4/ltdl.m4': No such file or directory
+autom4te-2.72: error: /usr/bin/m4 failed with exit status: 1
+automake-1.16: error: autoconf failed with exit status: 1
+(수정)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l m4/ltdl.m4
+ls: cannot access 'm4/ltdl.m4': No such file or directory
 
+libtool 설치
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -S libtool
+경고: libtool-2.4.7-4는 최신 버전입니다-- 재설치
 
+libtoolize 명령어를 실행해 m4 디렉터리와 필요한 m4 파일들을 생성
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# libtoolize --force --copy
 
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l m4/ltdl.m4
+ls: cannot access 'm4/ltdl.m4': No such file or directory
+
+libltdl 설치
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -S libltdl
+경고: libltdl-2.4.7-4는 최신 버전입니다. -- 재설치
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l m4/ltdl.m4
+ls: cannot access 'm4/ltdl.m4': No such file or directory
+
+ltdl.m4를 찾음
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l /usr/share/aclocal/ltdl.m4
+-rw-r--r-- 1 nayou nayou 30069  7월  5 17:31 /usr/share/aclocal/ltdl.m4
+
+수동복사
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# cp /usr/share/aclocal/ltdl.m4 ./m4
+
+파일생성확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l m4/ltdl.m4
+-rw-r--r-- 1 nayou nayou 30069 10월 13 20:42 m4/ltdl.m4
+
+파일읽기권한부여
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# chmod 644 m4/ltdl.m4
+
+빌드시에 m4/ltdl.m4가 삭제됨
+libtoolize --copy --force --verbose; 
+=> libtoolize: rm -f 'm4/ltdl.m4'
+
+빌드명령어에 복사명령어 추가(cp /usr/share/aclocal/ltdl.m4 ./m4/;)
+{ autopoint --force; } 2>&1 | tee ./log/autopoint.log &&
+{ rm -f po/Makefile.in.in; } &&
+{ rm -rf autom4te.cache; } &&
+{ aclocal -I m4 -I gnulib-m4 -I /usr/share/aclocal; } 2>&1 | tee ./log/aclocal.log &&
+{ libtoolize --copy --force --verbose; } 2>&1 | tee ./log/libtoolize.log &&
+{ cp /usr/share/aclocal/ltdl.m4 ./m4/; } &&
+{ autoconf --verbose; } 2>&1 | tee ./log/autoconf.log &&
+{ autoheader; } 2>&1 | tee ./log/autoheader.log &&
+{ automake --add-missing --force-missing; } 2>&1 | tee ./log/automake.log &&
+{ ./configure --verbose; } 2>&1 | tee ./log/configure.log
 
 
 
