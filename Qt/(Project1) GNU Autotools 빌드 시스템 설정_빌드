@@ -25968,6 +25968,40 @@ export LDFLAGS="$LDFLAGS -L/mingw64/x86_64-w64-mingw32/lib"
 (빌드)
 { autopoint --force; } 2>&1 | tee ./log/autopoint.log &&   { rm -f po/Makefile.in.in; } &&   { rm -rf autom4te.cache; } &&   { aclocal -I m4 -I gnulib-m4 -I /usr/share/aclocal; } 2>&1 | tee ./log/aclocal.log &&   { libtoolize --copy --force --verbose; } 2>&1 | tee ./log/libtoolize.log &&   { autoconf --verbose; } 2>&1 | tee ./log/autoconf.log &&   { autoheader; } 2>&1 | tee ./log/autoheader.log &&  { automake --add-missing --force-missing; } 2>&1 | tee ./log/automake.log &&   { ./configure --verbose; } 2>&1 | tee ./log/configure.log
 
+(오류)
+AC_USE_SYSTEM_EXTENSIONS
+(수정)
+매크로는 POSIX, BSD, GNU 등에서 제공하는 시스템 확장 기능을 활성화하는데, 특정 시스템이나 설정에 따라 충돌이 생길 수 있다.
+Autoconf 버전을 확인(최소한 Autoconf 2.60 이상이 필요)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# autoconf --version
+autoconf (GNU Autoconf) 2.72
+Copyright (C) 2023 Free Software Foundation, Inc.
+License GPLv3+/Autoconf: GNU GPL version 3 or later
+<https://gnu.org/licenses/gpl.html>, <https://gnu.org/licenses/exceptions.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+Written by David J. MacKenzie and Akim Demaille.
+
+AC_USE_SYSTEM_EXTENSIONS는 적절한 위치에 삽입(초기 설정 블록 안에 위치)
+configure.ac 수정
+AC_INIT([libtextstyle], [1.0], [bug-libtextstyle@example.com])
+AC_USE_SYSTEM_EXTENSIONS # AC_INIT 보다 먼저 호출하면 (AC_INIT 바로 밑으로 위치 이동)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
