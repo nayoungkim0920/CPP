@@ -26068,9 +26068,12 @@ libtoolize --copy --force --verbose;
 { autoconf --verbose; } 2>&1 | tee ./log/autoconf.log &&
 { autoheader; } 2>&1 | tee ./log/autoheader.log &&
 { automake --add-missing --force-missing; } 2>&1 | tee ./log/automake.log &&
-{ ./configure --verbose; } 2>&1 | tee ./log/configure.log
+{ ./configure --verbose --host=x86_64-w64-mingw32; } 2>&1 | tee ./log/configure.log
 
 
+간단한 c, c++ 테스트
+폴더권한수정(읽기(r), 쓰기(w), 실행(x) 권한을 추가)
+chmod u+rwx /c/libidn2/gettext-0.22.5/libtextstyle
 
 
 
