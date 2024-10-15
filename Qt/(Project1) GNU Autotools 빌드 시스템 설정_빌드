@@ -26072,12 +26072,107 @@ libtoolize --copy --force --verbose;
 
 
 간단한 c, c++ 테스트
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# cd /c/tmp_test
+echo '#include <stdio.h>' > test.c
+gcc test.c -o test.exe -Wall -g
+ls -l test.exe
+ls: cannot access 'test.exe': No such file or directory
+
+exe 파일 생성이 안됨
 폴더권한수정(읽기(r), 쓰기(w), 실행(x) 권한을 추가)
 chmod u+rwx /c/libidn2/gettext-0.22.5/libtextstyle
 
+"C" 명령프롬프트에서 컴파일 시도
+//test.c
+#include <stdio.h>
 
+int main() {
+    printf("Hello, World!\n");
+    return 0;
+}
 
+컴파일
+C:\libidn2\gettext-0.22.5\libtextstyle>c:\msys64\mingw64\bin\gcc.exe test.c -o test
 
+경고창발생
+libmpc-3.dll libisl-23.dll libmpfr-6.dll이(가) 없어 코드 실행을 진행할 수 없습니다.
+프로그램을 다시 설치하면 이 문제가 해결될 수 있습니다.
+=>libmpc-3.dll, libisl-23.dll, libmpfr-6.dll와 같은 파일들은 GCC가 의존하는 수학 라이브러리들로, 
+컴파일러가 올바르게 동작하려면 이들 라이브러리가 필요함
+
+"C++" 명령프롬프트에서 컴파일 시도
+//test.cpp
+#include <iostream>
+
+int main() {
+    std::cout << "Hello, World!" << std::endl;
+    return 0;
+}
+
+캄파일
+C:\libidn2\gettext-0.22.5\libtextstyle>c:\msys64\mingw64\bin\g++.exe test.cpp -o test_cpp
+
+경고창발생
+libgmp-10.dll libisl-23.dll libmpc-3.dll libmpfr-6.dll이(가) 없어 코드 실행을 진행할 수 없습니다.
+프로그램을 다시 설치하면 이 문제가 해결될 수 있습니다.
+=>libgmp, libisl, libmpc, libmpfr 라이브러리들은 GCC 컴파일러의 빌드에 필수적인 라이브러리
+
+결과적으로  libgmp-10.dll libisl-23.dll libmpc-3.dll libmpfr-6.dll 가 설치되어있어야함
+MSYS2의 64비트 MINGW 패키지 관리자를 사용한 설치
+패키지 업데이트
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -Syu
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -S mingw-w64-x86_64-gmp mingw-w64-x86_64-isl mingw-w64-x86_64-mpc mingw-w64-x86_64-mpfr
+mingw-w64-x86_64-gmp: GMP (GNU Multiple Precision Arithmetic Library)
+mingw-w64-x86_64-isl: ISL (Integer Set Library)
+mingw-w64-x86_64-mpc: MPC (Multiple Precision Complex)
+mingw-w64-x86_64-mpfr: MPFR (Multiple Precision Floating-Point Reliable)
+
+설치확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls /mingw64/bin/libgmp-10.dll
+ls /mingw64/bin/libisl-23.dll
+ls /mingw64/bin/libmpc-3.dll
+ls /mingw64/bin/libmpfr-6.dll
+/mingw64/bin/libgmp-10.dll
+/mingw64/bin/libisl-23.dll
+/mingw64/bin/libmpc-3.dll
+/mingw64/bin/libmpfr-6.dll
+
+시스템환경변수 설정
+시작>시스템환경변수편집>고급>환경변수>시스템 변수>Path>
+MinGW와 관련된 라이브러리로, vcpkg나 MSYS2와 같은 툴체인에서 사용하는 라이브러리
+PERL_5.38.0.1_DLL
+C:\Users\nayou\vcpkg\downloads\tools\perl\5.38.0.1\c\libexec\gcc\x86_64-w64-mingw32\13.1.0
+C:\Users\nayou\vcpkg\downloads\tools\perl\5.38.0.1\c\bin
+GCC_compiler
+c:\msys64\mingw64\bin
+Path
+%PERL_5.38.0.1_DLL%
+%GCC_compiler%
+명령프롬프트재시작
+C 컴파일&실행 테스트(성공)
+//test.c
+#include <stdio.h>
+int main() {
+    printf("Hello, World!\n");
+    return 0;
+}
+C:\libidn2\gettext-0.22.5\libtextstyle>gcc test.c -o test
+C:\libidn2\gettext-0.22.5\libtextstyle>test
+Hello, World!
+C++ 컴파일&실행 테스트(성공)
+//test.cpp
+#include <iostream>
+int main() {
+    std::cout << "Hello, World!" << std::endl;
+    return 0;
+}
+C:\libidn2\gettext-0.22.5\libtextstyle>g++ test.cpp -o test_cpp
+C:\libidn2\gettext-0.22.5\libtextstyle>test_cpp
+Hello, World!
 
 
 
