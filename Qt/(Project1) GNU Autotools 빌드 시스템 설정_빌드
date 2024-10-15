@@ -26152,7 +26152,9 @@ c:\msys64\mingw64\bin
 Path
 %PERL_5.38.0.1_DLL%
 %GCC_compiler%
+
 명령프롬프트재시작
+
 C 컴파일&실행 테스트(성공)
 //test.c
 #include <stdio.h>
@@ -26163,6 +26165,7 @@ int main() {
 C:\libidn2\gettext-0.22.5\libtextstyle>gcc test.c -o test
 C:\libidn2\gettext-0.22.5\libtextstyle>test
 Hello, World!
+
 C++ 컴파일&실행 테스트(성공)
 //test.cpp
 #include <iostream>
@@ -26173,6 +26176,162 @@ int main() {
 C:\libidn2\gettext-0.22.5\libtextstyle>g++ test.cpp -o test_cpp
 C:\libidn2\gettext-0.22.5\libtextstyle>test_cpp
 Hello, World!
+
+Mingw64 실행
+환경변수수정
+#~/.bashrc
+export PATH="$PATH:/c/Users/nayou/vcpkg/downloads/tools/perl/5.38.0.1/c/libexec/gcc/x86_64-w64-mingw32/13.1.0" # GCC 필수 DLL libgmp-10.dll libisl-23.dll libmpc-3.dll libmpfr-6.dll 등
+export PATH="$PATH:/c/Users/nayou/vcpkg/downloads/tools/perl/5.38.0.1/c/bin" # GCC 필수 DLL libgmp-10.dll libisl-23.dll libmpc-3.dll libmpfr-6.dll 등
+
+백신에서 악성코드로 분류하여 생성된 exe파일을 삭제할경우
+백신>환경설정>시스템보안>검사예외설정>검사예외사용>검사예외대상>폴더추가>C:\libidn2\gettext-0.22.5\libtextstyle>확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# gcc test.c -o test
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ./test
+Hello, World!
+
+g++은 exe파일이 생성이 안됨 필수파일확인
+# 1. g++ 실행 파일 확인
+ls -l /mingw64/bin/g++ /mingw64/bin/g++.exe
+-rwxr-xr-x 4 nayou nayou 0 10월 15 11:33 /mingw64/bin/g++
+-rwxr-xr-x 4 nayou nayou 0 10월 15 11:33 /mingw64/bin/g++.exe
+
+# 2. C++ 표준 라이브러리 확인
+ls -l /mingw64/bin/libstdc++.dll /mingw64/lib/libstdc++.a
+ls: cannot access '/mingw64/bin/libstdc++.dll': No such file or directory
+-rw-r--r-- 1 nayou nayou 7692606  8월  2 14:20 /mingw64/lib/libstdc++.a
+
+# 3. GCC 런타임 라이브러리 확인
+ls -l /mingw64/bin/libgcc_s_dw2-1.dll
+ls: cannot access '/mingw64/bin/libgcc_s_dw2-1.dll': No such file or directory
+
+# 4. 헤더 파일들 확인
+ls -l /mingw64/include/c++/iostream /mingw64/include/c++/string /mingw64/include/c++/vector /mingw64/include/c++/algorithm
+ls: cannot access '/mingw64/include/c++/iostream': No such file or directory
+ls: cannot access '/mingw64/include/c++/string': No such file or directory
+ls: cannot access '/mingw64/include/c++/vector': No such file or directory
+ls: cannot access '/mingw64/include/c++/algorithm': No such file or directory
+
+# 5. GCC 런타임 객체 파일들 확인
+ls -l /mingw64/lib/crt1.o /mingw64/lib/crti.o /mingw64/lib/crtn.o
+ls: cannot access '/mingw64/lib/crti.o': No such file or directory
+ls: cannot access '/mingw64/lib/crtn.o': No such file or directory
+-rw-r--r-- 1 nayou nayou 26369 10월 14 15:07 /mingw64/lib/crt1.o
+
+# 6. MinGW 도구 파일들 확인
+ls -l /mingw64/bin/gcc.exe /mingw64/bin/ld.exe /mingw64/bin/as.exe /mingw64/bin/strip.exe /mingw64/bin/ar.exe
+-rwxr-xr-x 2 nayou nayou 1275895  8월 31 19:50 /mingw64/bin/ar.exe
+-rwxr-xr-x 2 nayou nayou 1922597  8월 31 19:50 /mingw64/bin/as.exe
+-rwxr-xr-x 3 nayou nayou 2912366  8월  2 14:20 /mingw64/bin/gcc.exe
+-rwxr-xr-x 4 nayou nayou 1885331  8월 31 19:50 /mingw64/bin/ld.exe
+-rwxr-xr-x 2 nayou nayou 1390638  8월 31 19:50 /mingw64/bin/strip.exe
+
+# 7. 추가 라이브러리들 확인 (선택적)
+ls -l /mingw64/bin/libgmp-10.dll /mingw64/bin/libisl-23.dll /mingw64/bin/libmpc-3.dllecho $CPLUS_INCLUDE_PATH2.0.dll
+ls: cannot access '/mingw64/bin/libmpc-3.dllecho': No such file or directory
+ls: cannot access '.0.dll': No such file or directory
+-rwxr-xr-x 1 nayou nayou  679747  9월 15  2023 /mingw64/bin/libgmp-10.dll
+-rwxr-xr-x 1 nayou nayou 2255044  9월  5 23:07 /mingw64/bin/libisl-23.dll
+
+# 9. 환경 변수 확인
+echo $PATH
+/mingw64/x86_64-w64-mingw32/bin:/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++:/c/msys64/mingw64/include:/mingw64/include:/c/libidn2/gettext-0.22.5/libtextstyle/lib:/mingw64/bin:/c/gnulib:/c/msys64/mingw64/bin:/usr/bin:/bin:/usr/share/aclocal:/mingw64/share/aclocal:/c/libidn2/autoconf-2.72/bin:/c/libidn2/libtool-2.4.6:/c/Program Files/Java/jdk-21/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0:/usr/bin/vendor_perl:/usr/bin/core_perl:/c/Users/nayou/AppData/Local/Programs/Python/Python312:/c/Program Files/Java/jdk-21/bin:/c/apache-ant-1.10.15/bin:/c/Users/nayou/vcpkg/downloads/tools/perl/5.38.0.1/c/libexec/gcc/x86_64-w64-mingw32/13.1.0:/c/Users/nayou/vcpkg/downloads/tools/perl/5.38.0.1/c/bin
+echo $LIBRARY_PATH
+/mingw64/lib:/usr/lib:/mingw64/x86_64-w64-mingw32/lib
+echo $CPLUS_INCLUDE_PATH
+/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++
+
+(결과)
+libstdc++.dll: C++ 표준 라이브러리 파일이 누락됨.
+libgcc_s_dw2-1.dll: GCC 런타임 라이브러리가 누락됨.
+헤더 파일들 (iostream, string, vector, algorithm): C++ 헤더 파일들이 누락됨.
+런타임 객체 파일들 (crti.o, crtn.o): 런타임 객체 파일들이 누락됨.
+msys-2.0.dll: MSYS2 라이브러리가 누락됨.
+
+(수정)
+누락된 파일들을 포함한 MinGW-w64 툴체인을 다시 설치
+
+패키지 데이터베이스를 최신 상태로 업데이트
+pacman -Sy
+
+GCC 및 관련 도구 설치
+pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-binutils
+
+libstdc++.dll 및 libgcc_s_dw2-1.dll 설치
+pacman -S mingw-w64-x86_64-gcc
+
+필요한 추가 라이브러리 설치
+pacman -S mingw-w64-x86_64-make
+
+MSYS2 런타임 재설치
+pacman -S msys2-runtime
+
+설치확인
+ls -l /mingw64/bin/g++ /mingw64/bin/g++.exe
+-rwxr-xr-x 4 nayou nayou 2914926  8월  2 14:20 /mingw64/bin/g++
+-rwxr-xr-x 4 nayou nayou 2914926  8월  2 14:20 /mingw64/bin/g++.exe
+
+ls -l /mingw64/bin/libstdc++.dll /mingw64/lib/libstdc++.a
+ls: cannot access '/mingw64/bin/libstdc++.dll': No such file or directory
+-rw-r--r-- 1 nayou nayou 7692606  8월  2 14:20 /mingw64/lib/libstdc++.a
+
+ls -l /mingw64/bin/libgcc_s_dw2-1.dll
+ls: cannot access '/mingw64/bin/libgcc_s_dw2-1.dll': No such file or directory
+
+ls -l /mingw64/include/c++/iostream /mingw64/include/c++/string /mingw64/include/c++/vector /mingw64/include/c++/algorithm
+ls: cannot access '/mingw64/include/c++/iostream': No such file or directory
+ls: cannot access '/mingw64/include/c++/string': No such file or directory
+ls: cannot access '/mingw64/include/c++/vector': No such file or directory
+ls: cannot access '/mingw64/include/c++/algorithm': No such file or directory
+
+ls -l /mingw64/lib/crt1.o /mingw64/lib/crti.o /mingw64/lib/crtn.o
+ls: cannot access '/mingw64/lib/crti.o': No such file or directory
+ls: cannot access '/mingw64/lib/crtn.o': No such file or directory
+-rw-r--r-- 1 nayou nayou 26369 10월 14 15:07 /mingw64/lib/crt1.o
+
+ls -l /mingw64/bin/msys-2.0.dll
+ls: cannot access '/mingw64/bin/msys-2.0.dll': No such file or directory
+
+gcc 관련 패키지 설치 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -Q | grep gcc
+gcc-libs 13.3.0-1
+mingw-w64-x86_64-gcc 14.2.0-1
+mingw-w64-x86_64-gcc-libs 14.2.0-1
+
+패키지 이름 변경 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# find / -name 'libstdc++*'
+/home/nayou/_bazel_nayou/4yp365mj/external/protobuf~/src/solaris/libstdc++.la
+/mingw64/bin/libstdc++-6.dll
+/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/libstdc++.a
+/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/libstdc++.dll.a
+/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/libstdc++.dll.a-gdb.py
+/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/libstdc++exp.a
+/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/libstdc++fs.a
+/mingw64/lib/libstdc++.a
+/mingw64/lib/libstdc++.dll.a
+/mingw64/lib/libstdc++.dll.a-gdb.py
+/mingw64/lib/libstdc++exp.a
+/mingw64/lib/libstdc++fs.a
+/mingw64/x86_64-w64-mingw32/lib/libstdc++-6.dll
+
+환경변수등록
+#~/.bashrc
+export PATH="$PATH:/mingw64/bin" # libstdc++*
+export PATH="$PATH:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0" # libstdc++*
+export PATH="$PATH:/mingw64/lib" # libstdc++*
+export PATH="$PATH:/mingw64/x86_64-w64-mingw32/lib" # libstdc++*
+
+C++ 컴파일
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# g++ test.cpp -o test_cpp
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ./test_cpp
+Hello, World!
+성공!!
 
 
 
