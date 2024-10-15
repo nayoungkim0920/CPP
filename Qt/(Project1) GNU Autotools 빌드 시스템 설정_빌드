@@ -26301,7 +26301,14 @@ gcc-libs 13.3.0-1
 mingw-w64-x86_64-gcc 14.2.0-1
 mingw-w64-x86_64-gcc-libs 14.2.0-1
 
-패키지 이름 변경 확인
+c++ 필수파일 위치 확인
+mingw-w64-x86_64-gcc 패키지가 설치되어 있으면 libstdc++ 라이브러리도 자동으로 설치
+설치
+pacman -S mingw-w64-x86_64-gcc
+
+설치확인
+pacman -Qi mingw-w64-x86_64-gcc
+
 nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
 # find / -name 'libstdc++*'
 /home/nayou/_bazel_nayou/4yp365mj/external/protobuf~/src/solaris/libstdc++.la
@@ -26332,6 +26339,294 @@ nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
 # ./test_cpp
 Hello, World!
 성공!!
+
+(빌드)
+{ autopoint --force; } 2>&1 | tee ./log/autopoint.log && { rm -f po/Makefile.in.in; } && { rm -rf autom4te.cache; } && { aclocal -I m4 -I gnulib-m4 -I /usr/share/aclocal; } 2>&1 | tee ./log/aclocal.log && { libtoolize --copy --force --verbose; } 2>&1 | tee ./log/libtoolize.log && { cp /usr/share/aclocal/ltdl.m4 ./m4/; } && { autoconf --verbose; } 2>&1 | tee ./log/autoconf.log && { autoheader; } 2>&1 | tee ./log/autoheader.log && { automake --add-missing --force-missing; } 2>&1 | tee ./log/automake.log && { ./configure --verbose --host=x86_64-w64-mingw32; } 2>&1 | tee ./log/configure.log
+
+(오류)
+lib/Makefile.am:82: error: GL_GENERATE_ALLOCA_H does not appear in AM_CONDITIONAL
+lib/Makefile.am:104: error: GL_GENERATE_ASSERT_H does not appear in AM_CONDITIONAL
+lib/Makefile.am:147: error: GL_COND_OBJ_CLOSE does not appear in AM_CONDITIONAL
+lib/Makefile.am:155: error: GL_COND_OBJ_DUP2 does not appear in AM_CONDITIONAL
+lib/Makefile.am:167: error: GL_GENERATE_ERRNO_H does not appear in AM_CONDITIONAL
+lib/Makefile.am:195: error: GL_COND_OBJ_ERROR does not appear in AM_CONDITIONAL
+lib/Makefile.am:235: error: GL_COND_OBJ_FCNTL does not appear in AM_CONDITIONAL
+lib/Makefile.am:295: error: GL_COND_OBJ_FSTAT does not appear in AM_CONDITIONAL
+lib/Makefile.am:327: error: GL_COND_OBJ_GETDTABLESIZE does not appear in AM_CONDITIONAL
+lib/Makefile.am:335: error: GL_COND_OBJ_GETPROGNAME does not appear in AM_CONDITIONAL
+lib/Makefile.am:368: error: GL_GENERATE_LIMITS_H does not appear in AM_CONDITIONAL
+lib/Makefile.am:398: error: GL_COND_OBJ_MSVC_INVAL does not appear in AM_CONDITIONAL
+lib/Makefile.am:408: error: GL_COND_OBJ_MSVC_NOTHROW does not appear in AM_CONDITIONAL
+lib/Makefile.am:418: error: GL_COND_OBJ_OPEN does not appear in AM_CONDITIONAL
+lib/Makefile.am:481: error: GL_COND_OBJ_STAT does not appear in AM_CONDITIONAL
+lib/Makefile.am:505: error: GL_GENERATE_STDCKDINT_H does not appear in AM_CONDITIONAL
+lib/Makefile.am:526: error: GL_GENERATE_STDDEF_H does not appear in AM_CONDITIONAL
+lib/Makefile.am:556: error: GL_GENERATE_STDINT_H does not appear in AM_CONDITIONAL
+lib/Makefile.am:748: error: GL_COND_OBJ_STDIO_READ does not appear in AM_CONDITIONAL
+lib/Makefile.am:751: error: GL_COND_OBJ_STDIO_WRITE does not appear in AM_CONDITIONAL
+lib/Makefile.am:936: error: GL_COND_OBJ_STRERROR does not appear in AM_CONDITIONAL
+lib/Makefile.am:944: error: GL_COND_OBJ_STRERROR_OVERRIDE does not appear in AM_CONDITIONAL
+(수정)
+lib/Makefile.am에서 사용하는 특정 조건이 AM_CONDITIONAL로 정의되지 않았기 때문에 발생
+WOE32DLL, WOE32, INCLUDED_LIBXML 조건만 정의되어 있어서 나머지 정의 추가
+GL_GENERATE_ALLOCA_H, GL_GENERATE_ASSERT_H, GL_COND_OBJ_CLOSE, GL_COND_OBJ_DUP2, GL_GENERATE_ERRNO_H, GL_COND_OBJ_ERROR, GL_COND_OBJ_FCNTL, GL_COND_OBJ_FSTAT, GL_COND_OBJ_GETDTABLESIZE, GL_COND_OBJ_GETPROGNAME, GL_GENERATE_LIMITS_H, GL_COND_OBJ_MSVC_INVAL, GL_COND_OBJ_MSVC_NOTHROW, GL_COND_OBJ_OPEN, GL_COND_OBJ_STAT, GL_GENERATE_STDCKDINT_H, GL_GENERATE_STDDEF_H, GL_GENERATE_STDINT_H, GL_COND_OBJ_STDIO_READ, GL_COND_OBJ_STDIO_WRITE, GL_COND_OBJ_STRERROR, GL_COND_OBJ_STRERROR_OVERRIDE
+configure.ac 수정
+if test "$host_os" = "mingw32"; then
+    AM_CONDITIONAL([WOE32DLL], true)
+    AM_CONDITIONAL([WOE32], true)
+    echo "WOE32DLL and WOE32 are enabled."
+    LDFLAGS="$LDFLAGS -no-undefined -export-dynamic"
+else
+    AM_CONDITIONAL([WOE32DLL], false)
+    AM_CONDITIONAL([WOE32], false)
+    echo "WOE32DLL and WOE32 are disabled."
+    LDFLAGS="$LDFLAGS -no-undefined"
+fi
+
+# Check for LIBXML inclusion
+AM_CONDITIONAL([INCLUDED_LIBXML], [test "x$have_libxml" = "xyes"])
+
+# Define missing GL_CONDITIONAL macros for automake
+AM_CONDITIONAL([GL_GENERATE_ALLOCA_H], true)
+AM_CONDITIONAL([GL_GENERATE_ASSERT_H], true)
+AM_CONDITIONAL([GL_COND_OBJ_CLOSE], true)
+AM_CONDITIONAL([GL_COND_OBJ_DUP2], true)
+AM_CONDITIONAL([GL_GENERATE_ERRNO_H], true)
+AM_CONDITIONAL([GL_COND_OBJ_ERROR], true)
+AM_CONDITIONAL([GL_COND_OBJ_FCNTL], true)
+AM_CONDITIONAL([GL_COND_OBJ_FSTAT], true)
+AM_CONDITIONAL([GL_COND_OBJ_GETDTABLESIZE], true)
+AM_CONDITIONAL([GL_COND_OBJ_GETPROGNAME], true)
+AM_CONDITIONAL([GL_GENERATE_LIMITS_H], true)
+AM_CONDITIONAL([GL_COND_OBJ_MSVC_INVAL], true)
+AM_CONDITIONAL([GL_COND_OBJ_MSVC_NOTHROW], true)
+AM_CONDITIONAL([GL_COND_OBJ_OPEN], true)
+AM_CONDITIONAL([GL_COND_OBJ_STAT], true)
+AM_CONDITIONAL([GL_GENERATE_STDCKDINT_H], true)
+AM_CONDITIONAL([GL_GENERATE_STDDEF_H], true)
+AM_CONDITIONAL([GL_GENERATE_STDINT_H], true)
+AM_CONDITIONAL([GL_COND_OBJ_STDIO_READ], true)
+AM_CONDITIONAL([GL_COND_OBJ_STDIO_WRITE], true)
+AM_CONDITIONAL([GL_COND_OBJ_STRERROR], true)
+AM_CONDITIONAL([GL_COND_OBJ_STRERROR_OVERRIDE], true)
+
+(오류)
+lib/Makefile.am:43: error: library used but 'RANLIB' is undefined
+lib/Makefile.am:43:   The usual way to define 'RANLIB' is to add 'AC_PROG_RANLIB'
+lib/Makefile.am:43:   to 'configure.ac' and run 'autoconf' again.
+tests/Makefile.gnulib:36: error: library used but 'RANLIB' is undefined
+tests/Makefile.gnulib:36:   The usual way to define 'RANLIB' is to add 'AC_PROG_RANLIB'
+(수정)
+RANLIB 명령어가 정의되지 않았다는 것을 의미
+RANLIB는 라이브러리 인덱싱을 위해 사용하는 도구
+AC_PROG_RANLIB 매크로를 추가하여 RANLIB을 자동으로 설정하게 해야 함
+configure.ac 수정
+AC_PROG_CC # C 컴파일러를 찾고 설정
+AC_PROG_RANLIB # RANLIB 도구 확인
+
+(오류)
+libtoolize: 'AC_PROG_RANLIB' is rendered obsolete by 'LT_INIT'
+(수정)
+libtool을 사용하는 경우 LT_INIT이 AC_PROG_RANLIB 역할을 대신하므로 AC_PROG_RANLIB 제거해야함
+configure.ac 수정
+AC_PROG_RANLIB 제거
+
+(오류)
+autom4te-2.72: formatting traces for '/tmp/am4tUHOQvi/patterns': m4_pattern_allow, m4_pattern_forbid
+(수정)
+#m4_pattern_allow 특정 패턴 허용, m4_pattern_forbid 특정 패턴 금지
+
+(오류)
+autom4te-2.72: forbidden tokens: ^_?A[CHUM]_|_AC_|^LIBOBJS$|^_?m4_|^dnl$|^_?AS_|^_?LT_[A-Z_]+$|^_?PKG_[A-Z_]+$
+autom4te-2.72: forbidden token : ^LIBOBJS$ => do not use LIBOBJS directly, use AC_LIBOBJ (see section 'AC_LIBOBJ vs LIBOBJS'
+(수정)
+autom4te에서 특정 토큰(패턴)을 사용하지 말아야 한다고 알려주는 내용
+LIBOBJS, AC_LIBOBJ, _AC_, _m4_, LT_, PKG_ 등은 특정 조건 하에 사용할 수 없거나 더 나은 대체 방법이 있다는 의미
+LIBOBJS는 더 이상 사용하지 말아야 하며, 대신 AC_LIBOBJ를 사용해야 한다는 경고
+# 잘못된 예시 (LIBOBJS 사용)
+LIBOBJS = some_object.o
+# 수정된 예시 (AC_LIBOBJ 사용)
+AC_LIBOBJ([some_object])
+AC_LIBOBJ는 configure.ac 파일에서 객체 파일을 추가할 때 사용하는 매크로
+configure.ac 파일 내에서 LIBOBJS 대신 AC_LIBOBJ로 변경
+
+GCC
+1. gcc
+std옵션을 명시적으로 선언해야 활성화가 됨
+2. g++
+자동으로 활성화 됨
+
+C, C++ 컴파일러가 지원하는 언어 표준 확인하는 프로그램
+code_test/GCC_info.cpp
+
+#include <iostream>
+#include <cstdlib>
+#include <array>
+#include <memory>
+#include <string>
+#include <fstream>
+
+bool checkGccFeature(const std::string& stdFlag, bool isCpp = false) {
+    // 임시 소스 파일 작성
+    std::ofstream sourceFile("temp.c");
+    sourceFile << "#include <stdio.h>\n"
+               << "int main() { return 0; }\n";
+    sourceFile.close();
+
+    // C 표준 확인은 gcc 사용, C++ 표준 확인은 g++ 사용
+    std::string compilerCommand = isCpp ? "g++" : "gcc";
+    std::string command = compilerCommand + " -o check_gcc_feature -std=" + stdFlag + " temp.c";
+    int result = std::system(command.c_str());
+
+    // 임시 파일 삭제
+    std::remove("temp.c");
+    std::remove("check_gcc_feature");
+
+    return (result == 0);  // 0이면 성공
+}
+
+int main() {
+    std::cout << "Checking C language standard support..." << std::endl;
+
+    // C Standard Checks
+    std::cout << "Checking for C99 support..." << std::endl;
+    if (checkGccFeature("c99")) {
+        std::cout << "C99 Supported: Yes" << std::endl;
+    } else {
+        std::cout << "C99 Supported: No" << std::endl;
+    }
+
+    std::cout << "Checking for C11 support..." << std::endl;
+    if (checkGccFeature("c11")) {
+        std::cout << "C11 Supported: Yes" << std::endl;
+    } else {
+        std::cout << "C11 Supported: No" << std::endl;
+    }
+
+    std::cout << "Checking for C17 support..." << std::endl;
+    if (checkGccFeature("c17")) {
+        std::cout << "C17 Supported: Yes" << std::endl;
+    } else {
+        std::cout << "C17 Supported: No" << std::endl;
+    }
+
+    std::cout << "Checking C++ language standard support..." << std::endl;
+
+    // C++ Standard Checks
+    std::cout << "Checking for C++98 support..." << std::endl;
+    if (checkGccFeature("c++98", true)) {
+        std::cout << "C++98 Supported: Yes" << std::endl;
+    } else {
+        std::cout << "C++98 Supported: No" << std::endl;
+    }
+
+    std::cout << "Checking for C++11 support..." << std::endl;
+    if (checkGccFeature("c++11", true)) {
+        std::cout << "C++11 Supported: Yes" << std::endl;
+    } else {
+        std::cout << "C++11 Supported: No" << std::endl;
+    }
+
+    std::cout << "Checking for C++14 support..." << std::endl;
+    if (checkGccFeature("c++14", true)) {
+        std::cout << "C++14 Supported: Yes" << std::endl;
+    } else {
+        std::cout << "C++14 Supported: No" << std::endl;
+    }
+
+    std::cout << "Checking for C++17 support..." << std::endl;
+    if (checkGccFeature("c++17", true)) {
+        std::cout << "C++17 Supported: Yes" << std::endl;
+    } else {
+        std::cout << "C++17 Supported: No" << std::endl;
+    }
+
+    std::cout << "Checking for C++20 support..." << std::endl;
+    if (checkGccFeature("c++20", true)) {
+        std::cout << "C++20 Supported: Yes" << std::endl;
+    } else {
+        std::cout << "C++20 Supported: No" << std::endl;
+    }
+
+    return 0;
+}
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# g++ code_test/GCC_info.cpp -o GCC_info
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ./GCC_info
+Checking C standard support...
+Older than C99.
+Checking C++ standard support...
+C++17 is supported.
+
+configure.ac 수정
+AC_LANG(C)
+# C11 지원 확인
+AC_COMPILE_IFELSE([  
+   AC_LANG_SOURCE([[  /* C11에서 도입된 _Alignas 사용 */
+       #include <stdio.h>
+       #include <stdlib.h>
+       #include <stdalign.h>
+
+       int main(void) {
+           /* C11에서 도입된 _Alignas를 사용하여 16바이트 정렬된 변수 선언 */
+           _Alignas(16) char buffer[32];  /* 16바이트 정렬된 배열 */
+
+           /* static_assert로 C11 지원 여부 확인 */
+           _Static_assert(1, "C11 is supported.");  /* 항상 참인 조건 */
+
+           printf("C11 is supported.\n");  /* 출력 메시지 */
+           return 0;  /* 성공 */
+       }
+   ]])
+], [
+   CFLAGS="$CFLAGS -std=c11"  # C11 플래그 추가
+   AC_DEFINE([HAVE_C11], [1], [Define to 1 if C11 is supported.])
+], [
+   AC_MSG_ERROR([C11 지원이 없습니다.])
+])
+
+# C++17 지원 확인
+AC_LANG(C++)
+AC_COMPILE_IFELSE([  
+   AC_LANG_SOURCE([[  // C++17에서 추가된 std::string_view 사용
+       #include <iostream>
+       #include <string_view>  // C++17에서 추가된 std::string_view 사용
+
+       int main() {
+           // C++17에서 추가된 static_assert로 지원 여부를 확인합니다.
+           static_assert(true, "C++17 is supported.");
+
+           // C++17에서 추가된 std::string_view 사용
+           std::string_view message = "C++17 is supported.";
+
+           // 메시지를 출력
+           std::cout << message << std::endl;
+
+           return 0;
+       }
+   ]])
+], [
+   CXXFLAGS="$CXXFLAGS -std=c++17"  # C++17 플래그 추가
+   AC_DEFINE([HAVE_CPP17], [1], [Define to 1 if C++17 is supported.])
+], [
+   AC_MSG_ERROR([C++17 지원이 없습니다.])
+])
+
+(오류)
+configure.ac:108: error: m4_require: circular dependency of AC_LANG_COMPILER(C++)
+(수정)
+
+
+
+
+
+
+
+
+
 
 
 
