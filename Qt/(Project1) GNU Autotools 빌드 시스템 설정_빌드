@@ -26618,18 +26618,191 @@ AC_COMPILE_IFELSE([
 (오류)
 configure.ac:108: error: m4_require: circular dependency of AC_LANG_COMPILER(C++)
 (수정)
+C와 C++ 언어를 혼용할 때, AC_LANG_PUSH와 AC_LANG_POP으로 언어 전환을 명시적으로 감싸는 방식으로 언어 간 충돌을 피할 수 있음
+configure.ac 수정
+LT_INIT([win32-dll], [dlopen disable-static])
+LT_LANG([C++]) #Libtool이 C++ 컴파일과 링크 작업을 처리할 수 있게 해주는 설정
+AC_LANG_PUSH([C++])
+AC_COMPILE_IFELSE([
+   AC_LANG_SOURCE([[
+       #include <iostream>
+       #include <string_view>
 
+       int main() {
+           static_assert(true, "C++17 is supported.");
+           std::string_view message = "C++17 is supported.";
+           std::cout << message << std::endl;
+           return 0;
+       }
+   ]])
+], [
+   CXXFLAGS="$CXXFLAGS -std=c++17"
+   AC_DEFINE([HAVE_CPP17], [1], [Define to 1 if C++17 is supported.])
+], [
+   AC_MSG_ERROR([C++17 지원이 없습니다.])
+])
+AC_LANG_POP
 
+(오류)
+./log/autoconf.log:autom4te-2.72: forbidden tokens: ^_?A[CHUM]_|_AC_|^LIBOBJS$|^_?m4_|^dnl$|^_?AS_|^_?LT_[A-Z_]+$|^_?PKG_[A-Z_]+$
+./log/autoconf.log:autom4te-2.72: forbidden token : ^LIBOBJS$ => do not use LIBOBJS directly, use AC_LIBOBJ (see section 'AC_LIBOBJ vs LIBOBJS'
+(수정)
+파일검색
+자동 생성된 파일 Makefile.in, configure, config.h, config.log, autom4te 등 제외한 나머지 파일에서 
+'LIBOBJS'가 사용된 파일 검색
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# find . -type f \
+  -not -name '*.log' \
+  -not -name '*.status' \
+  -not -name 'configure' \
+  -not -name '*.in' \
+  -not -name 'Makefile' \
+  -not -name '*.old' \
+  -not -name '*.0' \
+  -not -name '*.1' \
+  -not -name '*.2' \
+  -not -name '*.3' \
+  -not -name '*.4' \
+  -not -name '*.5' \
+  -not -name '*.6' \
+  -not -name '*.sh' \
+  -not -name '*.ac_sample' \
+  -not -name '*.txt' \
+  -not -name '*.am~' \
+  -not -name '*.m4~' \
+  -not -name '*.gnulib' \
+  -exec grep -l 'LIBOBJS' {} + | grep -vE '(^#|^//|^\s*//|^\s*/\*.*\*/|^\s*\*/.*\*/|^\s*\*/.*$)'
+./configure.ac
+./configure.ac_back20241012.ac
+./configure.ac_back20241014.ac
+./configure~
+./doc/gnulib-tool.texi
+./gnulib-m4/gnulib-comp.m4
+./lib/ltdl/.git/objects/pack/pack-19f43a0211c8d07d4c0843d649b1b8b4074e6434.pack
+./lib/ltdl/doc/libtool.texi
+./lib/ltdl/libltdl/ltdl.mk
+./lib/ltdl/m4/ltdl.m4
+./lib/ltdl/mail/LTLIBOBJ
+./lib/ltdl/Makefile.am
+./lib/Makefile.am
+./libltdl/configure~
+./libltdl/Makefile.am
+./m4/gnulib-comp.m4
+./m4/ltdl.m4
+./m4/non-recursive-gnulib-prefix-hack.m4
+./Makefile.am
 
+Makefile.am 수정
+# LIBOBJS=>AC_LIBOBJ로 변경
+#libtextstyle_la_LIBOBJS = $(LIBOBJS)
+AC_LIBOBJ([color])
+AC_LIBOBJ([gl_array_list])
+AC_LIBOBJ([term-ostream])
+AC_LIBOBJ([ostream])
+AC_LIBOBJ([concat-filename])
+AC_LIBOBJ([xconcat-filename])
+AC_LIBOBJ([xsize])
+AC_LIBOBJ([error])
+AC_LIBOBJ([full-write])
+AC_LIBOBJ([term-style-control])
+AC_LIBOBJ([fsync])
+AC_LIBOBJ([xstrdup])
+AC_LIBOBJ([xgethostname])
+# LIBOBJS=>AC_LIBOBJ로 변경
+#libltdlc_la_LIBOBJS = $(LIBOBJS)
+AC_LIBOBJ([lt__alloc])
+AC_LIBOBJ([lt__argz])
+AC_LIBOBJ([lt_dlloader])
+AC_LIBOBJ([lt_error])
+AC_LIBOBJ([ltdl])
+AC_LIBOBJ([slist])
 
+AC_LIBOBJ는 특정 소스 파일을 객체 파일로 컴파일하기 위한 매크로
+AC_LIBOBJ에 넣어야 하는 값은 라이브러리에 포함되는 소스 파일의 이름
+configure.ac 수정
+AC_PROG_CC # C 컴파일러를 찾고 설정
+AM_PROG_AR # 아카이브 생성 툴 확인 (라이브러리 생성용)
+AC_LIBOBJ([color]) # 객체 파일 목록을 정의
+AC_LIBOBJ([gl_array_list])
+AC_LIBOBJ([term-ostream])
+AC_LIBOBJ([ostream])
+AC_LIBOBJ([concat-filename])
+AC_LIBOBJ([xconcat-filename])
+AC_LIBOBJ([xsize])
+AC_LIBOBJ([error])
+AC_LIBOBJ([full-write])
+AC_LIBOBJ([term-style-control])
+AC_LIBOBJ([fsync])
+AC_LIBOBJ([xstrdup])
+AC_LIBOBJ([xgethostname])
+AC_LIBOBJ([lt__alloc])
+AC_LIBOBJ([lt__argz])
+AC_LIBOBJ([lt_dlloader])
+AC_LIBOBJ([lt_error])
+AC_LIBOBJ([ltdl])
+AC_LIBOBJ([slist])
 
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -r 'LIBOBJS' . \
+--exclude-dir='*백업*' \
+| cut -d: -f1 \
+| grep -v '[0-9]$' \
+| grep -v '\.status$' \
+| grep -v '\.sh$' \
+| grep -v 'back' \
+| grep -v 'Binary' \
+| grep -v '~' \
+| grep -v '\.old' \
+| grep -v '\.log' \
+| grep -v '\.txt' \
+| grep -v '\.ac_sample' \
+| grep -v '\.texi' \
+| grep -v '\.mk' \
+| grep -v '\.gnulib' \
+| grep -v '\.in' \
+| awk -F'/' '{if (length($NF) > 1 && $NF ~ /\./) print}' \
+| sort -u \
+| while read file; do
+    grep -n 'LIBOBJS' "$file" | sed 's/^[ \t]*//;s/[ \t]*$//' | grep -v '#' | sed "s|^|$file: |"
+done
+./lib/ltdl/Makefile.am: 90:libltdl_la_LIBADD    = $(LTLIBOBJS)
+./lib/ltdl/Makefile.am: 91:libltdl_la_DEPENDENCIES      = $(LT_DLLOADERS) $(LTLIBOBJS)
+./lib/ltdl/Makefile.am: 139:CLEANFILES         += $(AC_LIBOBJ) $(LTLIBOBJS)
+./lib/Makefile.am: 63:libgnu_a_LIBADD = $(gl_LIBOBJS)
+./lib/Makefile.am: 64:libgnu_a_DEPENDENCIES = $(gl_LIBOBJS)
+./libltdl/Makefile.am: 90:libltdl_la_LIBADD     = $(LTLIBOBJS)
+./libltdl/Makefile.am: 91:libltdl_la_DEPENDENCIES       = $(LT_DLLOADERS) $(LTLIBOBJS)
+./libltdl/Makefile.am: 138:CLEANFILES          += $(LIBOBJS) $(LTLIBOBJS)
+./Makefile.am: 136:libltdlc_la_LIBS = -lncurses $(GNULIB_LIBS) $(GL_LIBOBJS) $(LTDLIBS) $(LT_LIBOBJS)
+(파일목록)
+./lib/ltdl/Makefile.am
+./lib/Makefile.am
+./libltdl/Makefile.am
+./Makefile.am
 
+(수정)
+lib/ltdl/Makefile.am 수정
+#libltdl_la_LIBADD	= $(LTLIBOBJS) # LIBOBJS -> AC_LIBOBJ
+#libltdl_la_DEPENDENCIES = $(LT_DLLOADERS) $(LTLIBOBJS) # LIBOBJS -> AC_LIBOBJ
+libltdl_la_LIBADD = $(AC_LIBOBJ) # LIBOBJS -> AC_LIBOBJ
+libltdl_la_DEPENDENCIES = $(LT_DLLOADERS) $(AC_LIBOBJ) # LIBOBJS -> AC_LIBOBJ
+#CLEANFILES += $(AC_LIBOBJ) $(LTLIBOBJS)  # LIBOBJS -> AC_LIBOBJ
+CLEANFILES += $(AC_LIBOBJ)  # LIBOBJS -> AC_LIBOBJ
 
+lib/Makefile.am 수정
+#libgnu_a_LIBADD = $(gl_LIBOBJS) # LIBOBJS -> AC_LIBOBJ
+#libgnu_a_DEPENDENCIES = $(gl_LIBOBJS) # LIBOBJS -> AC_LIBOBJ
+libgnu_a_LIBADD = $(AC_LIBOBJ) # LIBOBJS -> AC_LIBOBJ
+libgnu_a_DEPENDENCIES = $(AC_LIBOBJ) # LIBOBJS -> AC_LIBOBJ
 
+libltdl/Makefile.am 수정
+#libltdl_la_LIBADD = $(LTLIBOBJS) # LIBOBJS -> AC_LIBOBJ
+#libltdl_la_DEPENDENCIES = $(LT_DLLOADERS) $(LTLIBOBJS) # LIBOBJS -> AC_LIBOBJ
+libltdl_la_LIBADD = $(AC_LIBOBJ) # LIBOBJS -> AC_LIBOBJ
+libltdl_la_DEPENDENCIES	= $(LT_DLLOADERS) # LIBOBJS -> AC_LIBOBJ
+#CLEANFILES	       += $(LIBOBJS) $(LTLIBOBJS) # LIBOBJS -> AC_LIBOBJ
+CLEANFILES	       += $(AC_LIBOBJ) # LIBOBJS -> AC_LIBOBJ
 
-
-
-
-
-
-
+./Makefile.am 수정
+#libltdlc_la_LIBS = -lncurses $(GNULIB_LIBS) $(GL_LIBOBJS) $(LTDLIBS) $(LT_LIBOBJS) # LIBOBJS -> AC_LIBOBJ
+libltdlc_la_LIBS = -lncurses $(GNULIB_LIBS) $(AC_LIBOBJ) $(LTDLIBS) $(AC_LIBOBJ) # LIBOBJS -> AC_LIBOBJ
