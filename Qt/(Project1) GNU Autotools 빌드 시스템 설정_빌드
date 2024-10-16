@@ -26806,3 +26806,91 @@ CLEANFILES	       += $(AC_LIBOBJ) # LIBOBJS -> AC_LIBOBJ
 ./Makefile.am 수정
 #libltdlc_la_LIBS = -lncurses $(GNULIB_LIBS) $(GL_LIBOBJS) $(LTDLIBS) $(LT_LIBOBJS) # LIBOBJS -> AC_LIBOBJ
 libltdlc_la_LIBS = -lncurses $(GNULIB_LIBS) $(AC_LIBOBJ) $(LTDLIBS) $(AC_LIBOBJ) # LIBOBJS -> AC_LIBOBJ
+
+./lib/libltdl/Makefile.in 수정
+#LIBOBJS = @LIBOBJS@ # LIBOBJS -> AC_LIBOBJ
+LIBOBJS = @AC_LIBOBJ@ # LIBOBJS -> AC_LIBOBJ
+#CLEANFILES = libltdl.la libltdlc.la libdlloader.la $(LIBOBJS) \ # LIBOBJS -> AC_LIBOBJ # LIBOBJS -> AC_LIBOBJ
+#	$(LTLIBOBJS) # LIBOBJS -> AC_LIBOBJ # LIBOBJS -> AC_LIBOBJ
+CLEANFILES = libltdl.la libltdlc.la libdlloader.la $(AC_LIBOBJ) \ # LIBOBJS -> AC_LIBOBJ # LIBOBJS -> AC_LIBOBJ
+	$(AC_LIBOBJ) # LIBOBJS -> AC_LIBOBJ # LIBOBJS -> AC_LIBOBJ
+
+./lib/Makefile.in 수정
+#LIBOBJS = @LIBOBJS@ 
+LIBOBJS = @AC_LIBOBJ@ # LIBOBJS -> AC_LIBOBJ
+#libgnu_a_LIBADD = $(gl_LIBOBJS) # LIBOBJS -> AC_LIBOBJ
+#libgnu_a_DEPENDENCIES = $(gl_LIBOBJS) # LIBOBJS -> AC_LIBOBJ
+libgnu_a_LIBADD = $(AC_LIBOBJ) # LIBOBJS -> AC_LIBOBJ
+libgnu_a_DEPENDENCIES = $(AC_LIBOBJ) # LIBOBJS -> AC_LIBOBJ
+
+./adhoc-tests/Makefile.in 수정
+#LIBOBJS = @LIBOBJS@ # LIBOBJS -> AC_LIBOBJ
+LIBOBJS = @AC_LIBOBJ@ # LIBOBJS -> AC_LIBOBJ
+#LTLIBOBJS = @LTLIBOBJS@ # LIBOBJS -> AC_LIBOBJ
+LTLIBOBJS = @AC_LIBOBJ@ # LIBOBJS -> AC_LIBOBJ
+
+./configure.ac 
+AC_CHECK_LIB([foo], [bar], [LIBOBJS = @LIBOBJS@]) => 없음
+m4_pattern_allow([_LT_LIBOBJS])  => 주석처리되어있음
+
+./doc/Makefile.in 수정
+#LIBOBJS = @LIBOBJS@ # LIBOBJS -> AC_LIBOBJ
+LIBOBJS = @AC_LIBOBJ@ # LIBOBJS -> AC_LIBOBJ
+#LTLIBOBJS = @LTLIBOBJS@ # LIBOBJS -> AC_LIBOBJ
+LTLIBOBJS = @AC_LIBOBJ@ # LIBOBJS -> AC_LIBOBJ
+
+./gnulib-m4/gnulib-comp.m4 수정
+파일로할것
+
+ ./lib/Makefile.gnulib 수정
+#libtextstyle_la_LIBADD = $(lts_LTLIBOBJS) # LIBOBJS -> AC_LIBOBJ
+#libtextstyle_la_DEPENDENCIES = $(lts_LTLIBOBJS) # LIBOBJS -> AC_LIBOBJ
+libtextstyle_la_LIBADD = $(lts_AC_LIBOBJ) # LIBOBJS -> AC_LIBOBJ
+libtextstyle_la_DEPENDENCIES = $(lts_AC_LIBOBJ) # LIBOBJS -> AC_LIBOBJ
+distclean-local: distclean-gnulib-libobjs
+distclean-gnulib-libobjs:
+#	-rm -f @lts_LIBOBJDEPS@ # LIBOBJS -> AC_LIBOBJ
+	-rm -f @lts_AC_LIBOBJ@ # LIBOBJS -> AC_LIBOBJ
+maintainer-clean-local: distclean-gnulib-libobjs
+
+./m4/gnulib-comp.m4 수정
+파일로할것
+
+./m4/ltdl.m4 수정
+파일로할것
+
+./m4/non-recursive-gnulib-prefix-hack.m4 수정
+수정할부분없음
+
+./tests/Makefile.gnulib 수정
+#libtests_a_LIBADD = $(ltstests_LIBOBJS)  # LIBOBJS -> AC_LIBOBJ
+#libtests_a_DEPENDENCIES = $(ltstests_LIBOBJS)  # LIBOBJS -> AC_LIBOBJ
+libtests_a_LIBADD = $(AC_LIBOBJ)  # LIBOBJS -> AC_LIBOBJ
+libtests_a_DEPENDENCIES = $(AC_LIBOBJ)  # LIBOBJS -> AC_LIBOBJ
+
+
+(빌드)
+{ autopoint --force; } 2>&1 | tee ./log/autopoint.log && { rm -f po/Makefile.in.in; } && { rm -rf autom4te.cache; } && { aclocal -I m4 -I gnulib-m4 -I /usr/share/aclocal; } 2>&1 | tee ./log/aclocal.log && { libtoolize --copy --force --verbose; } 2>&1 | tee ./log/libtoolize.log && { cp /usr/share/aclocal/ltdl.m4 ./m4/; } && { autoconf --verbose; } 2>&1 | tee ./log/autoconf.log && { autoheader; } 2>&1 | tee ./log/autoheader.log && { automake --add-missing --force-missing; } 2>&1 | tee ./log/automake.log && { ./configure --verbose --host=x86_64-w64-mingw32; } 2>&1 | tee ./log/configure.log
+
+(오류)
+
+(수정)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
