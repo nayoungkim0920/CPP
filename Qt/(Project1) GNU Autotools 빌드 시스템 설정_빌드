@@ -26898,6 +26898,24 @@ maintainer-clean-local: distclean-gnulib-libobjs
 
 ./m4/gnulib-comp.m4 수정
 파일로할것
+# Like AC_LIBOBJ, except that MODULE_NAME goes into _LT_LIBOBJS instead
+# of into LIBOBJS.
+#m4_pattern_allow([^_LT_LIBOBJS$])
+#_LT_LIBOBJS="$_LT_LIBOBJS $1.$ac_objext"
+#])# _LT_LIBOBJS
+#if test -n "$_LT_LIBOBJS"; then
+#for i in `for i in $_LT_LIBOBJS; do echo "$i"; done | $SED "$_lt_sed_drop_objext" | sort -u`; do
+#AC_SUBST([ltdl_LIBOBJS], [$_ltdl_libobjs])
+#AC_SUBST([ltdl_LTLIBOBJS], [$_ltdl_ltlibobjs])
+# Like AC_LIBOBJ, except that MODULE_NAME goes into _LT_AC_LIBOBJ instead
+# of into AC_LIBOBJ.
+m4_pattern_allow([^_LT_AC_LIBOBJ$])
+_LT_AC_LIBOBJ="$_LT_AC_LIBOBJ $1.$ac_objext"
+])# _LT_AC_LIBOBJ
+if test -n "$_LT_AC_LIBOBJ"; then
+for i in `for i in $_LT_AC_LIBOBJ; do echo "$i"; done | $SED "$_lt_sed_drop_objext" | sort -u`; do
+AC_SUBST([ltdl_AC_LIBOBJ], [$_ltdl_libobjs])
+AC_SUBST([ltdl_LTAC_LIBOBJ], [$_ltdl_ltlibobjs])
 
 ./m4/ltdl.m4 수정
 파일로할것
@@ -27523,11 +27541,7 @@ nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext
 # git pull
 이미 업데이트 상태입니다.
 
-
-
-
-
-
+(빌드)
 { autopoint --force; } 2>&1 | tee ./log/autopoint.log && 
 { rm -f po/Makefile.in.in; } && 
 { rm -rf autom4te.cache; } && 
@@ -27660,19 +27674,96 @@ Makefile.am에서 요구하는 ChangeLog 파일이 없다는 오류가 발생
 ChangeLog 파일 생성
 nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext
 # touch ChangeLog
+
+[aclocal.m4 생성]
 nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext
 # aclocal -I /c/libidn2/gettext-0.22.5/gettext/gnulib-m4
 echo $?
 0
+[configure 스크립트 생성]
 nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext
 # autoconf -I /c/libidn2/gettext-0.22.5/gettext/gnulib-m4
 echo $?
 0
+[config.h.in 생성]
 nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext
 # autoheader -I /c/libidn2/gettext-0.22.5/gettext/gnulib-m4
 echo $?
 0
+[Makefile.in 생]
 nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext
 # automake --add-missing
 echo $?
 0
+각자 실행하면 성공인데 
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext
+# autoreconf -if
+aclocal-1.17: error: couldn't open directory 'gnulib-m4': No such file or directory
+autoreconf-2.72: error: aclocal failed with exit status: 1
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext
+# autoreconf -if -I /c/libidn2/gettext-0.22.5/gettext/gnulib-m4
+aclocal-1.17: error: couldn't open directory 'gnulib-m4': No such file or directory
+autoreconf-2.72: error: aclocal failed with exit status: 1
+autoreconf는 실패
+[Makefile, config.h, config.log, Makefile.in, config.status, config.cache 등 생성]
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext
+# ./configure CFLAGS="-std=c11" --verbose --host=x86_64-w64-mingw32;
+(빌드)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext
+# aclocal -I /c/libidn2/gettext-0.22.5/gettext/gnulib-m4 &&
+autoconf -I /c/libidn2/gettext-0.22.5/gettext/gnulib-m4 &&
+autoheader -I /c/libidn2/gettext-0.22.5/gettext/gnulib-m4 &&
+automake --add-missing &&
+ ./configure CFLAGS="-std=c11" --verbose --host=x86_64-w64-mingw32
+(오류)
+configure: WARNING: no configuration information is in gettext-runtime
+configure: WARNING: no configuration information is in libtextstyle
+configure: WARNING: no configuration information is in gettext-tools
+config.status: line 1063: FIX_MAKEFILE_DISTRIB: command not found
+(수정)
+gettext-runtime 디렉토리에는 configure.ac 파일이나 Makefile.am 파일과 같은 구성 파일이 없다는 경고
+libtextstyle 디렉토리도 구성 파일이 부족하다는 경고
+gettext-tools 디렉토리 또한 빌드를 위한 구성 정보가 부족 경고
+config.status 파일의 1063번째 줄에서 FIX_MAKEFILE_DISTRIB라는 명령어를 찾을 수 없다는 오류. Makefile 생성 시 필요한 명령어
+C:\libidn2\gettext-0.22.5이디렉토리에 있는 gettext-runtime, libtextstyle, gettext-tools 이폴더들을 복사해서 
+C:\libidn2\gettext-0.22.5\gettext에 붙여넣음
+(오류)
+configure: error: cannot find required auxiliary files: config.rpath compile
+configure: error: ./configure failed for gettext-runtime
+(수정)
+gettext-runtime 디렉토리에서 필요한 config.rpath와 compile이라는 파일들이 없다는 것을 의미
+autoreconf 명령어를 실행하거나, automake가 필요한 파일들을 자동으로 생성하는 과정에서 만들어짐
+gettext-runtime 디렉토리에서 보조 파일들이 없어서 발생한 것
+cp "C:\libidn2\gettext-0.22.5\build-aux\config.rpath" "C:\libidn2\gettext-0.22.5\gettext\build-aux\config.rpath"
+
+(오류)
+gnulib-lib/Makefile.am:42: error: GL_COND_OBJ_(LIBUNISTRING_COMPILE) macro not found
+gnulib-lib/Makefile.am:42: error: GL_COND_OBJ_(LIBUNISTRING_COMPILE) is undefined
+gnulib-lib/Makefile.am:42: error: unexpected argument `GL_COND_OBJ_(LIBUNISTRING_COMPILE)' in condition test
+gnulib-lib/Makefile.am:42: error: LIBUNISTRING_COMPILE_* macro not found
+gnulib-lib/Makefile.am:42: error: unexpected argument `LIBUNISTRING_COMPILE_*' in condition test
+aclocal: error: no macros were found
+automake: error: 'Makefile.am' contains errors
+(수정)
+gnulib-lib/Makefile.am 파일에서 GL_*와 LIBUNISTRING_*와 같은 매크로들이 정의되지 않았거나 인식되지 않는 문제로 인해 발생
+"C:\libidn2\gettext-0.22.5\gettext\gettext-runtime\gnulib-lib\Makefile.am"
+Makefile.am과 같은 파일의 오류가 발생한 경우, autotools 도구들을 재생성하는 것이 유용
+autoconf -I /c/libidn2/gettext-0.22.5/gettext/gnulib-m4
+autoheader -I /c/libidn2/gettext-0.22.5/gettext/gnulib-m4
+automake --add-missing
+자동생성이 안돼서 수동으로 수정
+"C:\libidn2\gettext-0.22.5\gettext\gettext-runtime\configure.ac" 수정
+AM_INIT_AUTOMAKE([1.11.1 silent-rules parallel-tests])
+
+# Gnulib 소스 사용 활성화
+AC_GNU_SOURCE
+
+# Gnulib 모듈 활성화 (필요한 기능을 나열)
+GL_MODULES([alloca assert canonicalize_lgpl close dup2 errno getopt iconv iswblank iswdigit iswpunct iswxdigit limits locale mbrtoc32 mbrtowc mbinit mbpcpy msvc raise reallocarray setlocale sigprocmask stat stdckdint stddef stdint strerror wcwidth windows_mutex windows_once windows_recmutex windows_rwlock])
+
+"C:\libidn2\gettext-0.22.5\gettext\gettext-runtime\gnulib-lib\Makefile.am" 수정
+
+
+
+
+
