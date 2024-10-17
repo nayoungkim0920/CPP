@@ -26840,7 +26840,50 @@ LIBOBJS = @AC_LIBOBJ@ # LIBOBJS -> AC_LIBOBJ
 LTLIBOBJS = @AC_LIBOBJ@ # LIBOBJS -> AC_LIBOBJ
 
 ./gnulib-m4/gnulib-comp.m4 수정
-파일로할것
+#   m4_pattern_allow([^gl_LIBOBJS$])dnl a variable
+  m4_pattern_allow([^gl_AC_LIBOBJ$])dnl a variable # LIBOBJS -> AC_LIBOBJ
+#   m4_pattern_allow([^gl_LTLIBOBJS$])dnl a variable
+  m4_pattern_allow([^gl_LTAC_LIBOBJ$])dnl a variable # LIBOBJS -> AC_LIBOBJ
+#  if test $HAVE_ISNANL = 0 || test $REPLACE_ISNAN = 1; then   # LIBOBJS -> AC_LIBOBJ
+#    AC_LIBOBJ([isnanl])
+#    gl_PREREQ_ISNANL
+#  fi
+#  gl_MATH_MODULE_INDICATOR([isnanl])
+#  gl_FUNC_ISNANL_NO_LIBM
+#  if test $gl_func_isnanl_no_libm != yes; then
+#    AC_LIBOBJ([isnanl])
+#    gl_PREREQ_ISNANL
+#  fi
+# if test $HAVE_ISNANL = 0 || test $REPLACE_ISNAN = 1; then   # LIBOBJS -> AC_LIBOBJ
+if test $HAVE_ISNANL = 0 || test $REPLACE_ISNAN = 1; then   # AC_LIBOBJ -> AC_LIBOBJ # LIBOBJS -> AC_LIBOBJ
+  AC_LIBOBJ([isnanl])
+  gl_PREREQ_ISNANL
+fi
+#     if test -n "$lts_LIBOBJS"; then
+    if test -n "$lts_AC_LIBOBJ"; then # LIBOBJS -> AC_LIBOBJ
+#       for i in `for i in $lts_LIBOBJS; do echo "$i"; done | sed -e "$sed_drop_objext" | sort | uniq`; do
+      for i in `for i in $lts_AC_LIBOBJ; do echo "$i"; done | sed -e "$sed_drop_objext" | sort | uniq`; do # LIBOBJS -> AC_LIBOBJ
+#     AC_SUBST([lts_LIBOBJS], [$lts_libobjs])
+    AC_SUBST([lts_AC_LIBOBJ], [$lts_libobjs]) # LIBOBJS -> AC_LIBOBJ
+#     AC_SUBST([lts_LTLIBOBJS], [$lts_ltlibobjs])
+    AC_SUBST([lts_LTAC_LIBOBJ], [$lts_ltlibobjs]) # LIBOBJS -> AC_LIBOBJ
+#     if test -n "$ltstests_LIBOBJS"; then
+    if test -n "$ltstests_AC_LIBOBJ"; then # LIBOBJS -> AC_LIBOBJ
+#       for i in `for i in $ltstests_LIBOBJS; do echo "$i"; done | sed -e "$sed_drop_objext" | sort | uniq`; do
+      for i in `for i in $ltstests_AC_LIBOBJ; do echo "$i"; done | sed -e "$sed_drop_objext" | sort | uniq`; do # LIBOBJS -> AC_LIBOBJ
+#     AC_SUBST([ltstests_LIBOBJS], [$ltstests_libobjs])
+    AC_SUBST([ltstests_AC_LIBOBJ], [$ltstests_libobjs]) # LIBOBJS -> AC_LIBOBJ
+#     AC_SUBST([ltstests_LTLIBOBJS], [$ltstests_ltlibobjs])
+    AC_SUBST([ltstests_LTAC_LIBOBJ], [$ltstests_ltlibobjs]) # LIBOBJS -> AC_LIBOBJ
+# Like AC_LIBOBJ, except that the module name goes
+# into lts_LIBOBJS instead of into LIBOBJS.
+AC_DEFUN([lts_LIBOBJ], [
+  AS_LITERAL_IF([$1], [lts_LIBSOURCES([$1.c])])dnl
+#   lts_LIBOBJS="$lts_LIBOBJS $1.$ac_objext"
+  lts_AC_LIBOBJ="$lts_AC_LIBOBJ $1.$ac_objext" # LIBOBJS -> AC_LIBOBJ
+])
+#   ltstests_LIBOBJS="$ltstests_LIBOBJS $1.$ac_objext"
+  ltstests_AC_LIBOBJ="$ltstests_AC_LIBOBJ $1.$ac_objext" # LIBOBJS -> AC_LIBOBJ
 
  ./lib/Makefile.gnulib 수정
 #libtextstyle_la_LIBADD = $(lts_LTLIBOBJS) # LIBOBJS -> AC_LIBOBJ
@@ -26858,9 +26901,63 @@ maintainer-clean-local: distclean-gnulib-libobjs
 
 ./m4/ltdl.m4 수정
 파일로할것
+#   m4_pattern_allow([^_LT_LIBOBJS$])
+  m4_pattern_allow([^_LT_AC_LIBOBJ$]) # LIBOBJS -> AC_LIBOBJ
+#   _LT_LIBOBJS="$_LT_LIBOBJS $1.$ac_objext"
+  _LT_AC_LIBOBJ="$_LT_AC_LIBOBJ $1.$ac_objext" # LIBOBJS -> AC_LIBOBJ
+# ])# _LT_LIBOBJS
+])# _LT_AC_LIBOBJ # LIBOBJS -> AC_LIBOBJ
+AC_CONFIG_COMMANDS_PRE([
+    _ltdl_libobjs=
+    _ltdl_ltlibobjs=
+#     if test -n "$_LT_LIBOBJS"; then
+    if test -n "$_LT_AC_LIBOBJ"; then # LIBOBJS -> AC_LIBOBJ
+      # Remove the extension.
+      _lt_sed_drop_objext='s/\.o$//;s/\.obj$//'
+#       for i in `for i in $_LT_LIBOBJS; do echo "$i"; done | $SED "$_lt_sed_drop_objext" | sort -u`; do
+      for i in `for i in $_LT_AC_LIBOBJ; do echo "$i"; done | $SED "$_lt_sed_drop_objext" | sort -u`; do # LIBOBJS -> AC_LIBOBJ
+        _ltdl_libobjs="$_ltdl_libobjs $lt_libobj_prefix$i.$ac_objext"
+        _ltdl_ltlibobjs="$_ltdl_ltlibobjs $lt_libobj_prefix$i.lo"
+      done
+    fi
+#     AC_SUBST([ltdl_LIBOBJS], [$_ltdl_libobjs])
+    AC_SUBST([ltdl_AC_LIBOBJ], [$_ltdl_libobjs]) # LIBOBJS -> AC_LIBOBJ
+#     AC_SUBST([ltdl_LTLIBOBJS], [$_ltdl_ltlibobjs])
+    AC_SUBST([ltdl_LTAC_LIBOBJ], [$_ltdl_ltlibobjs]) # LIBOBJS -> AC_LIBOBJ
+])
+# _LT_LIBOBJ(MODULE_NAME)
+# -----------------------
+# Like AC_LIBOBJ, except that MODULE_NAME goes into _LT_LIBOBJS instead
+# of into LIBOBJS.
+AC_DEFUN([_LT_LIBOBJ], [
+#   m4_pattern_allow([^_LT_LIBOBJS$])
+  m4_pattern_allow([^_LT_AC_LIBOBJ$]) # LIBOBJS -> AC_LIBOBJ
+#   _LT_LIBOBJS="$_LT_LIBOBJS $1.$ac_objext"
+  _LT_AC_LIBOBJ="$_LT_AC_LIBOBJ $1.$ac_objext" # LIBOBJS -> AC_LIBOBJ
+# ])# _LT_LIBOBJS
+])# _LT_AC_LIBOBJ # LIBOBJS -> AC_LIBOBJ
+AC_CONFIG_COMMANDS_PRE([
+    _ltdl_libobjs=
+    _ltdl_ltlibobjs=
+#     if test -n "$_LT_LIBOBJS"; then
+    if test -n "$_LT_AC_LIBOBJ"; then # LIBOBJS -> AC_LIBOBJ
+      # Remove the extension.
+      _lt_sed_drop_objext='s/\.o$//;s/\.obj$//'
+#       for i in `for i in $_LT_LIBOBJS; do echo "$i"; done | $SED "$_lt_sed_drop_objext" | sort -u`; do
+      for i in `for i in $_LT_AC_LIBOBJ; do echo "$i"; done | $SED "$_lt_sed_drop_objext" | sort -u`; do # LIBOBJS -> AC_LIBOBJ
+        _ltdl_libobjs="$_ltdl_libobjs $lt_libobj_prefix$i.$ac_objext"
+        _ltdl_ltlibobjs="$_ltdl_ltlibobjs $lt_libobj_prefix$i.lo"
+      done
+    fi
+#     AC_SUBST([ltdl_LIBOBJS], [$_ltdl_libobjs])
+    AC_SUBST([ltdl_AC_LIBOBJ], [$_ltdl_libobjs]) # LIBOBJS -> AC_LIBOBJ
+#     AC_SUBST([ltdl_LTLIBOBJS], [$_ltdl_ltlibobjs])
+    AC_SUBST([ltdl_LTAC_LIBOBJ], [$_ltdl_ltlibobjs]) # LIBOBJS -> AC_LIBOBJ
+])
 
 ./m4/non-recursive-gnulib-prefix-hack.m4 수정
-수정할부분없음
+#   gl_LIBOBJS=`echo "$gl_LIBOBJS" | sed -e 's, , $1/,g'`
+  gl_AC_LIBOBJ=`echo "$gl_AC_LIBOBJ" | sed -e 's, , $1/,g'` # LIBOBJS -> AC_LIBOBJ
 
 ./tests/Makefile.gnulib 수정
 #libtests_a_LIBADD = $(ltstests_LIBOBJS)  # LIBOBJS -> AC_LIBOBJ
@@ -26868,29 +26965,714 @@ maintainer-clean-local: distclean-gnulib-libobjs
 libtests_a_LIBADD = $(AC_LIBOBJ)  # LIBOBJS -> AC_LIBOBJ
 libtests_a_DEPENDENCIES = $(AC_LIBOBJ)  # LIBOBJS -> AC_LIBOBJ
 
-
 (빌드)
 { autopoint --force; } 2>&1 | tee ./log/autopoint.log && { rm -f po/Makefile.in.in; } && { rm -rf autom4te.cache; } && { aclocal -I m4 -I gnulib-m4 -I /usr/share/aclocal; } 2>&1 | tee ./log/aclocal.log && { libtoolize --copy --force --verbose; } 2>&1 | tee ./log/libtoolize.log && { cp /usr/share/aclocal/ltdl.m4 ./m4/; } && { autoconf --verbose; } 2>&1 | tee ./log/autoconf.log && { autoheader; } 2>&1 | tee ./log/autoheader.log && { automake --add-missing --force-missing; } 2>&1 | tee ./log/automake.log && { ./configure --verbose --host=x86_64-w64-mingw32; } 2>&1 | tee ./log/configure.log
 
 (오류)
-
+checking for x86_64-w64-mingw32-gcc option to enable C23 features... unsupported
+checking for x86_64-w64-mingw32-gcc option to enable C11 features... unsupported
+checking for x86_64-w64-mingw32-gcc option to enable C99 features... unsupported
+checking for x86_64-w64-mingw32-gcc option to enable C89 features... unsupported
 (수정)
+빌드명령어에 CFLAGS 옵션을 추가
+{ autopoint --force; } 2>&1 | tee ./log/autopoint.log && { rm -f po/Makefile.in.in; } && { rm -rf autom4te.cache; } && { aclocal -I m4 -I gnulib-m4 -I /usr/share/aclocal; } 2>&1 | tee ./log/aclocal.log && { libtoolize --copy --force --verbose; } 2>&1 | tee ./log/libtoolize.log && { cp /usr/share/aclocal/ltdl.m4 ./m4/; } && { autoconf --verbose; } 2>&1 | tee ./log/autoconf.log && { autoheader; } 2>&1 | tee ./log/autoheader.log && { automake --add-missing --force-missing; } 2>&1 | tee ./log/automake.log && 
+{ ./configure CFLAGS="-std=c11" --verbose --host=x86_64-w64-mingw32; } 2>&1 | tee ./log/configure.log
+(결과)
+checking for x86_64-w64-mingw32-gcc option to enable C23 features... unsupported
+checking for x86_64-w64-mingw32-gcc option to enable C11 features... none needed
+
+(오류)
+config.status: error: input file config.h.in:config.h does not exist - skip generating libtextstyle-config.h
+(수정)
+configure.ac 확인
+AC_CONFIG_HEADERS([config.h.in:config.h lib/argz.h.in:lib/argz.h])
+
+config.h.in 및 lib/argz.h.in 경로 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l config.h.in lib/argz.h.in
+-rw-r--r-- 1 nayou nayou 6276 10월 17 10:00 config.h.in
+-rw-r--r-- 1 nayou nayou 5231 10월 15 19:54 lib/argz.h.in
+(파일타입 소유자 그룹 기타사용자, rwx, 421)
+-: 일반 파일 (일반적인 파일)
+d: 디렉토리 (디렉토리 항목)
+l: 심볼릭 링크 (심볼릭 링크)
+c: 문자 장치 파일 (예: 터미널 장치)
+b: 블록 장치 파일 (예: 하드 드라이브, USB 장치 등)
+p: 이름 있는 파이프 (FIFO 파일)
+s: 소켓 파일
+
+파일 권한 확인
+config.h.in 파일이 읽기 가능한 상태인지 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# chmod 644 config.h.in
+chmod 644 lib/argz.h.in (동일 chmod u=rw,g=r,o=r lib/argz.h.in)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l config.h.in lib/argz.h.in
+-rw-r--r-- 1 nayou nayou 6276 10월 17 10:00 config.h.in
+-rw-r--r-- 1 nayou nayou 5231 10월 15 19:54 lib/argz.h.in
+
+config.status 다시 생성
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# autoreconf -i --force
+
+다시컴파일
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ./configure CFLAGS="-std=c11" --verbose --host=x86_64-w64-mingw32;
+
+(오류)
+libtoolize: Remember to add 'LTDL_INIT' to configure.ac.
+(수정)
+AC_INIT과 AC_CONFIG_HEADERS 사이에 넣고 libtool의 기능을 초기화
+configure.ac 수정
+AC_INIT([Your Project Name], [1.0], [your@email.com])
+
+# Initialize libtool
+LT_INIT
+
+# Initialize ltdl (libltdl)
+LTDL_INIT
+
+# Check for header files and libraries
+AC_CONFIG_HEADERS([config.h.in:config.h lib/argz.h.in:lib/argz.h])
+
+(컴파일)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# autoreconf -i --force
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ./configure CFLAGS="-std=c11" --verbose --host=x86_64-w64-mingw32;
+
+(오류)
+checking for library containing tputs... no
+checking for library containing gettext... no
+checking for library containing ncurses... no
+checking for glib-2.0... no
+(수정)
+# m4 패턴 허용 및 금지
+m4_pattern_allow([AC_GNU_LIB_TOOL])  # 이제는 AC_GNU_LIB_TOOL을 허용하지 않음.
+m4_pattern_allow([AC_CROSS_COMPILER])
+m4_pattern_allow([GL_REQUIRE_VERSION])
+m4_pattern_allow([GNULIB_MODULES])
+m4_pattern_allow([AC_MSG_WARN])
+m4_pattern_allow([_LT_LIBOBJS])
+m4_pattern_allow([gl_CC_GNULIB_WARNINGS])
+m4_pattern_allow([AC_CHECK_FUNCS])
+m4_pattern_allow([gl_INIT])
+m4_pattern_allow([gl_EARLY])
+m4_pattern_allow([gl_COMMON])
+m4_pattern_allow([gl_PROG_AR_RANLIB])
+m4_pattern_allow([AC_CONFIG_RPATH])
+m4_pattern_allow([AC_CONFIG_LIBS])
+m4_pattern_allow([AC_DEFINE])
+m4_pattern_allow([gl_MODULES])
+m4_pattern_allow([m4_ifndef])
+
+# GNULIB 매크로 초기화
+m4_ifdef([GNULIB_INIT], [GNULIB_INIT])
+
+# 필요한 GNULIB 모듈을 로드
+gl_EARLY
+gl_INIT
+
+# 사용할 gnulib 모듈들을 정의
+gl_MODULES([xalloc])
+gl_MODULES([xalloc-die])
+gl_MODULES([xmalloca])
+gl_MODULES([fsync])
+gl_MODULES([xstrdup])
+gl_MODULES([xsize])
+gl_MODULES([size_max])
+
+# ncurses 라이브러리 체크
+AC_CHECK_LIB([ncurses], [tputs], [], [AC_MSG_ERROR([ncurses library not found])])
+
+# gettext 라이브러리 체크
+AC_CHECK_LIB([gettext], [gettext], [], [AC_MSG_ERROR([gettext library not found])])
+
+# glib-2.0 라이브러리 체크
+PKG_CHECK_MODULES([GLIB], [glib-2.0 >= 2.0], [], [AC_MSG_ERROR([glib-2.0 library not found])])
+
+(오류)
+configure.ac:221: warning: AC_COMPILE_IFELSE was called before AC_USE_SYSTEM_EXTENSIONS
+m4/gnulib-comp.m4:34: gl_EARLY is expanded from...
+configure.ac:221: the top level
+
+configure.ac:221: warning: AC_LINK_IFELSE was called before AC_USE_SYSTEM_EXTENSIONS
+m4/gnulib-comp.m4:34: gl_EARLY is expanded from...
+configure.ac:221: the top level
+
+configure.ac:221: warning: AC_RUN_IFELSE was called before AC_USE_SYSTEM_EXTENSIONS
+m4/gnulib-comp.m4:34: gl_EARLY is expanded from...
+configure.ac:221: the top level
+
+configure.ac:221: warning: AC_CHECK_INCLUDES_DEFAULT was called before AC_USE_SYSTEM_EXTENSIONS
+m4/gnulib-comp.m4:34: gl_EARLY is expanded from...
+configure.ac:221: the top level
+
+configure.ac:221: warning: AM_PROG_AR was called before gl_PROG_AR_RANLIB
+m4/gnulib-common.m4:1121: gl_PROG_AR_RANLIB is expanded from...
+m4/gnulib-comp.m4:34: gl_EARLY is expanded from...
+configure.ac:221: the top level
+
+configure.ac:221: warning: LT_INIT was called before AM_PROG_AR
+aclocal.m4:274: AM_PROG_AR is expanded from...
+m4/gnulib-common.m4:1121: gl_PROG_AR_RANLIB is expanded from...
+m4/gnulib-comp.m4:34: gl_EARLY is expanded from...
+configure.ac:221: the top level
+(수정)
+configure.ac 파일에서 여러 함수들이 호출되기 전에 AC_USE_SYSTEM_EXTENSIONS가 호출되지 않았다는 경고
+AC_INIT([libtextstyle], [1.0], [bug-libtextstyle@example.com])
+AC_USE_SYSTEM_EXTENSIONS # 시스템 확장을 활성화 AC_INIT 보다 먼저 호출하면 안됨
+AC_CONFIG_HEADERS([config.h.in:config.h lib/argz.h.in:lib/argz.h])
+
+(오류)
+configure.ac:XX: warning: LT_INIT invoked before AM_PROG_AR
+configure.ac:XX: warning: AM_PROG_AR should be invoked before gl_PROG_AR_RANLIB
+(수정)
+configure.ac 파일 내에서 AM_PROG_AR, gl_PROG_AR_RANLIB, 그리고 LT_INIT 매크로의 호출 순서가 잘못되었음
+configure.ac 수정
+AC_INIT([libtextstyle], [1.0], [bug-libtextstyle@example.com])
+
+# m4 패턴 허용
+m4_pattern_allow([AC_GNU_LIB_TOOL])
+m4_pattern_allow([AC_CROSS_COMPILER])
+m4_pattern_allow([GL_REQUIRE_VERSION])
+m4_pattern_allow([GNULIB_MODULES])
+m4_pattern_allow([AC_MSG_WARN])
+m4_pattern_allow([_LT_LIBOBJS])
+m4_pattern_allow([gl_CC_GNULIB_WARNINGS])
+m4_pattern_allow([AC_CHECK_FUNCS])
+m4_pattern_allow([gl_INIT])
+m4_pattern_allow([gl_EARLY])
+m4_pattern_allow([gl_COMMON])
+m4_pattern_allow([gl_PROG_AR_RANLIB])
+m4_pattern_allow([AC_CONFIG_RPATH])
+m4_pattern_allow([AC_CONFIG_LIBS])
+m4_pattern_allow([AC_DEFINE])
+m4_pattern_allow([gl_MODULES])
+m4_pattern_allow([m4_ifndef])
+
+# GNULIB 초기화
+gl_EARLY
+gl_INIT
+
+# GNULIB 관련 매크로 정의
+GNULIB_MODULES="
+    ncurses \
+    terminfo \
+    rpl_stpcpy \
+    xalloc \
+    xalloc_die \
+    xmalloc \
+    xrealloc \
+    xgethostname \
+    _gl_nothrow_get_osfhandle \
+    fsync \
+    getprogname \
+    _get_osfhandle \
+    strlcpy \
+    argz \
+    can-compile
+"
+# GNULIB 모듈 활성화
+gl_MODULES([xalloc])
+gl_MODULES([xalloc-die])
+gl_MODULES([xmalloca])
+gl_MODULES([fsync])
+gl_MODULES([xstrdup])
+gl_MODULES([xsize])
+gl_MODULES([size_max])
+
+AM_PROG_AR # 아카이브 툴 확인
+
+AC_USE_SYSTEM_EXTENSIONS # 시스템 확장을 활성화 AC_INIT 보다 먼저 호출하면 안됨
+
+AC_CONFIG_HEADERS([config.h.in:config.h lib/argz.h.in:lib/argz.h])
+
+gl_PROG_AR_RANLIB # LT_INIT 뒤에 호출
+
+(오류)
+configure.ac:153: the top level
+configure:18689: error: possibly undefined macro: m4_ifval
+      If this token and others are legitimate, please use m4_pattern_allow.
+      See the Autoconf documentation.
+autoreconf-2.72: error: /usr/bin/autoconf-2.72 failed with exit status: 1
+(수정)
+m4_ifval이라는 매크로가 정의되지 않았다
+m4_ifval을 정의한 GNULIB 모듈을 추가
+GNULIB 모듈에 m4 관련 매크로들이 포함된 모듈을 추가하거나, m4_pattern_allow 매크로를 사용하여 이 매크로의 사용을 허용해야 함
+configure.ac 수정
+GNULIB_MODULES="
+    ncurses \
+    terminfo \
+    rpl_stpcpy \
+    xalloc \
+    xalloc_die \
+    xmalloc \
+    xrealloc \
+    xgethostname \
+    _gl_nothrow_get_osfhandle \
+    fsync \
+    getprogname \
+    _get_osfhandle \
+    strlcpy \
+    argz \
+    can-compile \
+    m4     # m4 모듈 추가
+"
+
+m4_pattern_allow([m4_ifval])
+
+(오류)
+configure.ac:77: warning: AM_PROG_AR was called before gl_PROG_AR_RANLIB
+(수정)
+configure.ac 수정
+AC_CONFIG_HEADERS([config.h.in:config.h lib/argz.h.in:lib/argz.h])
+
+# LT_INIT 호출 (Libtool 초기화)
+LT_INIT([win32-dll], [dlopen disable-static])
+
+# gl_PROG_AR_RANLIB 호출 (Libtool AR, RANLIB 설정)
+gl_PROG_AR_RANLIB
+
+# AM_PROG_AR 호출 (아카이브 툴 확인)
+AM_PROG_AR
+
+(오류)
+configure.ac:42: error: _AC_LANG_ABBREV: unknown language: _AC_LANG
+../autoconf-2.72/lib/autoconf/lang.m4:147: _AC_LANG_ABBREV is expanded from...
+configure.ac:42: _AC_Header_stdio_h is expanded from...
+m4/gnulib-comp.m4:34: gl_EARLY is expanded from...
+configure.ac:42: the top level
+autom4te-2.72: error: /usr/bin/m4 failed with exit status: 1
+aclocal-1.16: error: /usr/bin/autom4te-2.72 failed with exit status: 1
+autoreconf-2.72: error: aclocal failed with exit status: 1
+(수정)
+configure.ac 수정
+m4_pattern_allow([m4_ifndef])
+
+# C 컴파일러 확인
+AC_PROG_CC
+
+# GNULIB 초기화
+gl_EARLY
+
+(오류)
+configure.ac:40: error: m4_defn: undefined macro: _AC_LANG
+../autoconf-2.72/lib/autoconf/lang.m4:108: AC_LANG_POP is expanded from...
+m4/std-gnu23.m4:12: AC_PROG_CC is expanded from...
+configure.ac:40: the top level
+(수정)
+오류는 AC_PROG_CC가 configure.ac 파일에서 호출되었지만, AC_PROG_CC가 내부적으로 사용하는 매크로들이 정의되지 않았다는 것을 의미
+AC_PROG_CC가 사용된 시점에 필요한 매크로인 _AC_LANG가 정의되지 않았다는 것을 의미
+AC_PROG_CC는 gl_EARLY와 gl_INIT 호출 뒤에, 그 이후에 호출되어야 함
+AC_PROG_CC 이전에 필요한 매크로들을 정의
+configure.ac 수정
+AC_PREREQ([2.69])  # Autoconf 버전 요구사항
+AC_INIT([libtextstyle], [1.0], [bug-libtextstyle@example.com])
+...
+AC_USE_SYSTEM_EXTENSIONS # 시스템 확장을 활성화 AC_INIT 보다 먼저 호출하면 안됨
+AC_CONFIG_HEADERS([config.h.in:config.h lib/argz.h.in:lib/argz.h])
+LT_INIT([win32-dll], [dlopen disable-static]) # Libtool 초기화
+gl_PROG_AR_RANLIB # Libtool AR, RANLIB 설정 LT_INIT 뒤에 호출
+AM_PROG_AR # 아카이브 툴 확인 gl_PROG_AR_RANLIB 후에 호출
+
+(오류)
+configure.ac:83: warning: AM_PROG_AR was called before gl_PROG_AR_RANLIB
+m4/gnulib-common.m4:1121: gl_PROG_AR_RANLIB is expanded from...
+configure.ac:83: the top level
+configure.ac:83: warning: LT_INIT was called before AM_PROG_AR
+aclocal.m4:274: AM_PROG_AR is expanded from...
+m4/gnulib-common.m4:1121: gl_PROG_AR_RANLIB is expanded from...
+configure.ac:83: the top level
+configure.ac:85: warning: LT_INIT was called before AM_PROG_AR
+aclocal.m4:274: AM_PROG_AR is expanded from...
+(수정)
+configure.ac 수정
+LT_INIT([win32-dll], [dlopen disable-static]) # Libtool 초기화
+AM_PROG_AR # 아카이브 툴 확인 gl_PROG_AR_RANLIB 전에 호출
+gl_PROG_AR_RANLIB # Libtool AR, RANLIB 설정 LT_INIT 뒤에 호출
+
+(확인)
+configure.ac 수정
+AC_PREREQ([2.72])  # Autoconf 버전
+autoconf --version
+autoconf (GNU Autoconf) 2.72
+Copyright (C) 2023 Free Software Foundation, Inc.
+License GPLv3+/Autoconf: GNU GPL version 3 or later
+<https://gnu.org/licenses/gpl.html>, <https://gnu.org/licenses/exceptions.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Written by David J. MacKenzie and Akim Demaille.
+
+(오류)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# autoreconf -i --force && ./configure CFLAGS="-std=c11" --verbose --host=x86_64-w64-mingw32;
+수정사항이 반영이 안될때
+(방법)
+기존 configure 및 관련 파일 삭제
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# rm -f configure config.h config.h.in Makefile.in
+m4 캐시 파일 삭제
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# rm -rf m4
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# autoreconf -i --force
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ./configure CFLAGS="-std=c11" --verbose --host=x86_64-w64-mingw32;
+파일생성확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l configure config.h config.h.in Makefile.in
+ls: cannot access 'config.h.in': No such file or directory
+-rw-r--r-- 1 nayou nayou   7652 10월 17 17:53 config.h
+-rwxr-xr-x 1 nayou nayou 710228 10월 17 17:53 configure
+-rw-r--r-- 1 nayou nayou  47820 10월 17 17:53 Makefile.in
+
+(config.h.in만 생성안됨)
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# aclocal
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l configure config.h config.h.in Makefile.in
+ls: cannot access 'config.h.in': No such file or directory
+-rw-r--r-- 1 nayou nayou   7652 10월 17 17:53 config.h
+-rwxr-xr-x 1 nayou nayou 710228 10월 17 17:53 configure
+-rw-r--r-- 1 nayou nayou  47820 10월 17 17:53 Makefile.in
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# autoheader
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l configure config.h config.h.in Makefile.in
+ls: cannot access 'config.h.in': No such file or directory
+-rw-r--r-- 1 nayou nayou   7652 10월 17 17:53 config.h
+-rwxr-xr-x 1 nayou nayou 710228 10월 17 17:53 configure
+-rw-r--r-- 1 nayou nayou  47820 10월 17 17:53 Makefile.in
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# autoreconf -i --force
+libtoolize: putting auxiliary files in AC_CONFIG_AUX_DIR, 'build-aux'.
+libtoolize: copying file 'build-aux/ltmain.sh'
+libtoolize: putting macros in AC_CONFIG_MACRO_DIRS, 'm4'.
+libtoolize: copying file 'm4/libtool.m4'
+libtoolize: copying file 'm4/ltoptions.m4'
+libtoolize: copying file 'm4/ltsugar.m4'
+libtoolize: copying file 'm4/ltversion.m4'
+libtoolize: copying file 'm4/lt~obsolete.m4'
+configure.ac:85: warning: LT_INIT was called before AM_PROG_AR
+aclocal.m4:274: AM_PROG_AR is expanded from...
+configure.ac:85: the top level
+configure.ac:88: warning: AM_PROG_AR was called before gl_PROG_AR_RANLIB
+gnulib-m4/gnulib-common.m4:1092: gl_PROG_AR_RANLIB is expanded from...
+configure.ac:88: the top level
+configure.ac:88: warning: LT_INIT was called before AM_PROG_AR
+aclocal.m4:274: AM_PROG_AR is expanded from...
+gnulib-m4/gnulib-common.m4:1092: gl_PROG_AR_RANLIB is expanded from...
+configure.ac:88: the top level
+configure.ac:41: installing 'build-aux/compile'
+configure.ac:117: installing 'build-aux/missing'
+adhoc-tests/Makefile.am: installing 'build-aux/depcomp'
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l configure config.h config.h.in Makefile.in
+ls: cannot access 'config.h.in': No such file or directory
+-rw-r--r-- 1 nayou nayou   7652 10월 17 17:57 config.h
+-rwxr-xr-x 1 nayou nayou 710228 10월 17 17:57 configure
+-rw-r--r-- 1 nayou nayou  47820 10월 17 17:57 Makefile.in
+
+(오류)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# autopoint --force
+autopoint: *** Missing version: please specify in configure.ac through a line 'AM_GNU_GETTEXT_VERSION(x.yy.zz)' the gettext version the package is using
+autopoint: *** Stop.
+(수정)
+configure.ac 파일에 AM_GNU_GETTEXT_VERSION(x.yy.zz)가 정의되지 않았기 때문
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# gettext --version
+gettext (GNU gettext-runtime) 0.22.4
+Copyright (C) 1995-2023 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Ulrich Drepper이(가) 만들었습니다.
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# which gettext
+/usr/bin/gettext
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls /usr/bin/gettext*
+/usr/bin/gettext.exe  /usr/bin/gettext.sh  /usr/bin/gettextize
+
+버전이 0.22.5라고나와야하는데 0.22.4가 나옴
+=>환경변수수정필요
+=>"C:\libidn2\gettext-0.22.5\gettext-runtime\src\gettext.exe"
+~/.bashrc 수정
+export PATH="/c/libidn2/gettext-0.22.5/gettext-runtime/src"
+
+버전확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# gettext --version
+gettext.exe (GNU gettext-runtime) 0.22.5
+Copyright (C) 1995-2023 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Written by Ulrich Drepper.
+
+설치위치변경확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# which gettext
+/c/libidn2/gettext-0.22.5/gettext-runtime/src/gettext
+
+configure.ac 수정
+AC_INIT([libtextstyle], [1.0], [bug-libtextstyle@example.com]) # 프로젝트 초기화
+AM_GNU_GETTEXT_VERSION([0.22.5]) # gettext --version
+
+(오류)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# autopoint --force
+autopoint: *** AM_GNU_GETTEXT without 'external' argument is no longer supported in version 0.22.5
+autopoint: *** Stop.
+(수정)
+gettext 0.22.5 버전에서 AM_GNU_GETTEXT 매크로가 더 이상 external 인자 없이 지원되지 않기 때문에 오류가 발생
+AM_GNU_GETTEXT 매크로에 external 인자를 추가
+configure.ac 수정
+AM_GNU_GETTEXT_VERSION([external]) # gettext --version => external
+
+(오류)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# autopoint --force
+autopoint: *** The AM_GNU_GETTEXT_VERSION declaration in your configure.ac
+               file requires the infrastructure from gettext-external but this version
+               is older. Please upgrade to gettext-external or newer.
+autopoint: *** Stop.
+(수정)
+autopoint는 AM_GNU_GETTEXT_VERSION 매크로를 사용할 때 gettext-external 버전 이상의 인프라가 필요
+최신 버전의 gettext에서는 더 새로운 gettext-external 버전이 필요
+gettext-external 설치 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -Ss gettext-external
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -S gettext-external
+오류: 대상이 없습니다: gettext-external
+이름이 변경되었거나 설치가 안되었을 수 있음
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5
+# pacman -Ss gettext
+패키지명검색안됨
+gettext-external 소스 다운로드
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5
+# git clone https://git.savannah.gnu.org/git/gettext.git
+'gettext'에 복제합니다...
+remote: Enumerating objects: 83149, done.
+remote: Counting objects: 100% (83149/83149), done.
+remote: Compressing objects: 100% (14756/14756), done.
+remote: Total 83149 (delta 69507), reused 81243 (delta 68047), pack-reused 0
+오브젝트를 받는 중: 100% (83149/83149), 36.31 MiB | 779.00 KiB/s, 완료.
+델타를 알아내는 중: 100% (69507/69507), 완료.
+Updating files: 100% (2188/2188), 완료.
+빌드를 진행하기 전에 필요한 종속성들을 설치
+gettext-external을 빌드하려면 autoconf, automake, libtool, 그리고 C 컴파일러가 필요
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext
+# autoreconf -fi
+sh: 줄 1: build-aux/git-version-gen: No such file or directory
+configure.ac:25: error: AC_INIT should be called with package and version arguments
+/usr/share/aclocal-1.17/init.m4:29: AM_INIT_AUTOMAKE is expanded from...
+configure.ac:25: the top level
+autom4te-2.72: error: /usr/bin/m4 failed with exit status: 1
+aclocal-1.17: error: /usr/bin/autom4te-2.72 failed with exit status: 1
+autoreconf-2.72: error: aclocal failed with exit status: 1
+gettext 저장소에서 누락된 파일을 다운로드
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext
+# git pull
+이미 업데이트 상태입니다.
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext
+# cd /c/libidn2/
+nayou@kimnayooung MINGW64 /c/libidn2
+# git clone git://git.savannah.gnu.org/gettext.git gettext-0.22.5
+fatal: 대상 경로가('gettext-0.22.5') 이미 있고 빈 디렉터리가 아닙니다.
+상위폴더에 존재하는 누락폴더복제
+nayou@kimnayooung MINGW64 /c/libidn2
+# mkdir -p /c/libidn2/gettext-0.22.5/gettext/build-aux/
+nayou@kimnayooung MINGW64 /c/libidn2
+# cp /c/libidn2/gettext-0.22.5/build-aux/git-version-gen /c/libidn2/gettext-0.22.5/gettext/build-aux/git-version-gen
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext
+# autoreconf -fi
+aclocal-1.17: error: couldn't open directory 'gnulib-m4': No such file or directory
+autoreconf-2.72: error: aclocal failed with exit status: 1
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5
+# cd gettext
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext
+# git submodule update --init --recursive
+'gnulib' 경로에 대해 'gnulib' (git://git.sv.gnu.org/gnulib.git) 하위 모듈 등록
+'/c/libidn2/gettext-0.22.5/gettext/gnulib'에 복제합니다...
+
+(오류)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext
+# autoreconf -fi
+sh: 줄 1: build-aux/git-version-gen: No such file or directory
+configure.ac:25: error: AC_INIT should be called with package and version arguments
+/usr/share/aclocal-1.17/init.m4:29: AM_INIT_AUTOMAKE is expanded from...
+configure.ac:25: the top level
+autom4te-2.72: error: /usr/bin/m4 failed with exit status: 1
+aclocal-1.17: error: /usr/bin/autom4te-2.72 failed with exit status: 1
+autoreconf-2.72: error: aclocal failed with exit status: 1
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext
+# git pull
+이미 업데이트 상태입니다.
 
 
 
 
 
 
+{ autopoint --force; } 2>&1 | tee ./log/autopoint.log && 
+{ rm -f po/Makefile.in.in; } && 
+{ rm -rf autom4te.cache; } && 
+{ aclocal -I m4 -I gnulib-m4 -I /usr/share/aclocal; } 2>&1 | tee ./log/aclocal.log && 
+{ libtoolize --copy --force --verbose; } 2>&1 | tee ./log/libtoolize.log && 
+{ cp /usr/share/aclocal/ltdl.m4 ./m4/; } && 
+{ autoconf --verbose; } 2>&1 | tee ./log/autoconf.log && 
+{ autoheader; } 2>&1 | tee ./log/autoheader.log && 
+{ automake --add-missing --force-missing; } 2>&1 | tee ./log/automake.log && 
+{ ./configure CFLAGS="-std=c11" --verbose --host=x86_64-w64-mingw32; } 2>&1 | tee ./log/configure.log
 
+nayou@kimnayooung MINGW64 /c/libidn2
+# mkdir -p /c/libidn2/gettext-0.22.5/gettext/build-aux/
 
+nayou@kimnayooung MINGW64 /c/libidn2
+# cp /c/libidn2/gettext-0.22.5/build-aux/git-version-gen /c/libidn2/gettext-0.22.5/gettext/build-aux/git-version-gen
 
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext
+# autoreconf -fi
+aclocal-1.17: error: couldn't open directory 'gnulib-m4': No such file or directory
+autoreconf-2.72: error: aclocal failed with exit status: 1
 
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext
+# git submodule update --init --recursive
+'gnulib' 경로에 대해 'gnulib' (git://git.sv.gnu.org/gnulib.git) 하위 모듈 등록
+'/c/libidn2/gettext-0.22.5/gettext/gnulib'에 복제합니다...
+Submodule path 'gnulib': checked out 'dd07b74893bc2fee44743f775a887930d04e9a85'
 
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext
+# ./gnulib/gnulib-tool --import
+Module list with included dependencies (indented):
+File list:
+  lib/dummy.c
+  m4/00gnulib.m4
+  m4/gnulib-common.m4
+  m4/zzgnulib.m4
+Creating directory ./lib
+Copying file lib/dummy.c
+Copying file m4/00gnulib.m4
+Copying file m4/gnulib-common.m4
+Copying file m4/gnulib-tool.m4
+Copying file m4/zzgnulib.m4
+Creating m4/gnulib-cache.m4
+Creating m4/gnulib-comp.m4
+Creating lib/Makefile.am
+Creating lib/.gitignore
+Creating m4/.gitignore
+Finished.
 
+You may need to add #include directives for the following .h files.
 
+Don't forget to
+  - add "lib/Makefile" to AC_CONFIG_FILES in ./configure.ac,
+  - mention "lib" in SUBDIRS in Makefile.am,
+  - mention "-I m4" in ACLOCAL_AMFLAGS in Makefile.am
+    or add an AC_CONFIG_MACRO_DIRS([m4]) invocation in ./configure.ac,
+  - mention "m4/gnulib-cache.m4" in EXTRA_DIST in Makefile.am,
+  - invoke gl_EARLY in ./configure.ac, right after AC_PROG_CC,
+  - invoke gl_INIT in ./configure.ac.
 
+=> 수동으로 복제하기로함
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext
+# mkdir /c/libidn2/gettext-0.22.5/gettext/gnulib-m4
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext
+# cp /c/libidn2/gettext-0.22.5/gettext/gnulib/m4/*.m4 /c/libidn2/gettext-0.22.5/gettext/gnulib-m4/
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext
+# autoreconf -fi
 
-
-
-
-
+(오류)
+aclocal-1.17: error: couldn't open directory 'gnulib-m4': No such file or directory
+autoreconf-2.72: error: aclocal failed with exit status: 1
+(수정)
+ACLOCAL_PATH 환경 변수 확인
+aclocal이 gnulib-m4 디렉토리를 인식할 수 있도록 환경 변수를 설정
+~/.bashrc 수정
+export ACLOCAL_PATH="/c/libidn2/gettext-0.22.5/gettext/gnulib-m4" (추가했지만 같은에러가나 제거)
+gnulib-m4 디렉토리를 gettext-runtime 디렉토리 내에도 복사
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext
+# cp -r /c/libidn2/gettext-0.22.5/gettext/gnulib-m4 /c/libidn2/gettext-0.22.5/gettext-runtime/
+(오류)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext
+# autoreconf -fi
+aclocal-1.17: error: couldn't open directory 'gnulib-m4': No such file or directory
+autoreconf-2.72: error: aclocal failed with exit status: 1
+(수정)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext
+# aclocal -I /c/libidn2/gettext-0.22.5/gettext/gnulib-m4
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext
+# autoreconf -fi
+aclocal-1.17: error: couldn't open directory 'gnulib-m4': No such file or directory
+autoreconf-2.72: error: aclocal failed with exit status: 1
+~/.bashrc 수정
+export ACLOCAL_PATH="/c/libidn2/gettext-0.22.5/gettext/gnulib-m4" 
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext
+# autoreconf -fi -I /c/libidn2/gettext-0.22.5/gettext/gnulib-m4
+aclocal-1.17: error: couldn't open directory 'gnulib-m4': No such file or directory
+autoreconf-2.72: error: aclocal failed with exit status: 1
+aclocal 단독실행은 성공하는 반면 autoreconf를실행하면 aclocal이 오류발생
+autoreconf는 autoreconf는 aclocal, autoconf, autoheader, automake 등을 차례로 실행함으로 하나씩 수동으로 실행하도록함
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext
+# aclocal -I /c/libidn2/gettext-0.22.5/gettext/gnulib-m4
+echo $?
+0 => 성공
+autoconf -I /c/libidn2/gettext-0.22.5/gettext/gnulib-m4
+echo $?
+0 => 성공
+autoheader -I /c/libidn2/gettext-0.22.5/gettext/gnulib-m4
+echo $?
+autoheader-2.72: error: error: AC_CONFIG_HEADERS not found in configure.ac
+1
+automake -I /c/libidn2/gettext-0.22.5/gettext/gnulib-m4
+echo $?
+automake-1.17: error: unrecognized option '-I'.
+automake-1.17: Try '/usr/bin/automake-1.17 --help' for more information.
+configurea.ac 수정
+AC_CONFIG_HEADERS([config.h])
+automake는 I를 지원하지않음 환경변수사용
+~/.bashrc 수정
+export ACLOCAL_PATH="/c/libidn2/gettext-0.22.5/gettext/gnulib-m4"
+automake --add-missing
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext
+# automake --add-missing
+echo $?
+configure.ac:49: installing 'build-aux/config.guess'
+configure.ac:49: installing 'build-aux/config.sub'
+configure.ac:26: installing 'build-aux/install-sh'
+configure.ac:26: installing 'build-aux/missing'
+Makefile.am: error: required file './ChangeLog' not found
+Makefile.am에서 요구하는 ChangeLog 파일이 없다는 오류가 발생
+ChangeLog 파일 생성
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext
+# touch ChangeLog
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext
+# aclocal -I /c/libidn2/gettext-0.22.5/gettext/gnulib-m4
+echo $?
+0
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext
+# autoconf -I /c/libidn2/gettext-0.22.5/gettext/gnulib-m4
+echo $?
+0
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext
+# autoheader -I /c/libidn2/gettext-0.22.5/gettext/gnulib-m4
+echo $?
+0
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext
+# automake --add-missing
+echo $?
+0
