@@ -27752,16 +27752,161 @@ autoconf -I /c/libidn2/gettext-0.22.5/gettext/gnulib-m4
 autoheader -I /c/libidn2/gettext-0.22.5/gettext/gnulib-m4
 automake --add-missing
 자동생성이 안돼서 수동으로 수정
-"C:\libidn2\gettext-0.22.5\gettext\gettext-runtime\configure.ac" 수정
-AM_INIT_AUTOMAKE([1.11.1 silent-rules parallel-tests])
+cp "C:\libidn2\gettext-0.22.5\gettext\gettext-runtime\configure.ac" "C:\libidn2\gettext-0.22.5\gettext\gettext-runtime\gnulib-lib"
+configure.ac에 사용된 오래된 매크로들을 최신 매크로로 변환
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib
+# autoupdate
+(컴파일)
+aclocal -I /c/libidn2/gettext-0.22.5/gettext/gnulib-m4 && autoconf -I /c/libidn2/gettext-0.22.5/gettext/gnulib-m4 && autoheader -I /c/libidn2/gettext-0.22.5/gettext/gnulib-m4 && automake --add-missing &&  ./configure CFLAGS="-std=c11" --verbose --host=x86_64-w64-mingw32
+(오류)
+sh: 줄 1: ../build-aux/git-version-gen: No such file or directory
+(수정)
+cp "C:\libidn2\gettext-0.22.5\gettext\build-aux" "C:\libidn2\gettext-0.22.5\gettext\gettext-runtime"
+/c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib/configure.ac 수정
+# Check for specific features and set conditionals
+AM_CONDITIONAL([GL_GENERATE_HEADERS], [test "$gl_generate_headers" = "yes"])
+AM_CONDITIONAL([GL_GENERATE_DIFFMARK], [test "$gl_generate_diffmark" = "yes"])
+AM_CONDITIONAL([GL_GENERATE_NANOSLEEP], [test "$gl_generate_nanosleep" = "yes"])
+AM_CONDITIONAL([GL_GENERATE_OBSTACK], [test "$gl_generate_obstack" = "yes"])
+AM_CONDITIONAL([GL_GENERATE_PIPE2], [test "$gl_generate_pipe2" = "yes"])
+AM_CONDITIONAL([GL_GENERATE_POSIX_MEMALIGN], [test "$gl_generate_posix_memalign" = "yes"])
+AM_CONDITIONAL([GL_GENERATE_READUTS], [test "$gl_generate_readuts" = "yes"])
+AM_CONDITIONAL([GL_GENERATE_SCHED], [test "$gl_generate_sched" = "yes"])
+AM_CONDITIONAL([GL_GENERATE_SOCKET], [test "$gl_generate_socket" = "yes"])
+AM_CONDITIONAL([GL_GENERATE_STREAM], [test "$gl_generate_stream" = "yes"])
+AM_CONDITIONAL([GL_GENERATE_THREADS], [test "$gl_generate_threads" = "yes"])
+AM_CONDITIONAL([GL_GENERATE_TLS], [test "$gl_generate_tls" = "yes"])
+AM_CONDITIONAL([GL_GENERATE_TMPFILE], [test "$gl_generate_tmpfile" = "yes"])
+AM_CONDITIONAL([GL_GENERATE_VERIFIER], [test "$gl_generate_verifier" = "yes"])
+AM_CONDITIONAL([GL_GENERATE_XGETTEXT], [test "$gl_generate_xgettext" = "yes"])
 
-# Gnulib 소스 사용 활성화
-AC_GNU_SOURCE
+# Add conditionals for object files if needed
+AM_CONDITIONAL([GL_COND_OBJ_HEADERS], [test "$gl_cond_obj_headers" = "yes"])
+AM_CONDITIONAL([GL_COND_OBJ_DIFFMARK], [test "$gl_cond_obj_diffmark" = "yes"])
+AM_CONDITIONAL([GL_COND_OBJ_NANOSLEEP], [test "$gl_cond_obj_nanosleep" = "yes"])
+AM_CONDITIONAL([GL_COND_OBJ_OBSTACK], [test "$gl_cond_obj_obstack" = "yes"])
+AM_CONDITIONAL([GL_COND_OBJ_PIPE2], [test "$gl_cond_obj_pipe2" = "yes"])
+AM_CONDITIONAL([GL_COND_OBJ_POSIX_MEMALIGN], [test "$gl_cond_obj_posix_memalign" = "yes"])
+AM_CONDITIONAL([GL_COND_OBJ_READUTS], [test "$gl_cond_obj_readuts" = "yes"])
+AM_CONDITIONAL([GL_COND_OBJ_SCHED], [test "$gl_cond_obj_sched" = "yes"])
+AM_CONDITIONAL([GL_COND_OBJ_SOCKET], [test "$gl_cond_obj_socket" = "yes"])
+AM_CONDITIONAL([GL_COND_OBJ_STREAM], [test "$gl_cond_obj_stream" = "yes"])
+AM_CONDITIONAL([GL_COND_OBJ_THREADS], [test "$gl_cond_obj_threads" = "yes"])
+AM_CONDITIONAL([GL_COND_OBJ_TLS], [test "$gl_cond_obj_tls" = "yes"])
+AM_CONDITIONAL([GL_COND_OBJ_TMPFILE], [test "$gl_cond_obj_tmpfile" = "yes"])
+AM_CONDITIONAL([GL_COND_OBJ_VERIFIER], [test "$gl_cond_obj_verifier" = "yes"])
+AM_CONDITIONAL([GL_COND_OBJ_XGETTEXT], [test "$gl_cond_obj_xgettext" = "yes"])
 
-# Gnulib 모듈 활성화 (필요한 기능을 나열)
-GL_MODULES([alloca assert canonicalize_lgpl close dup2 errno getopt iconv iswblank iswdigit iswpunct iswxdigit limits locale mbrtoc32 mbrtowc mbinit mbpcpy msvc raise reallocarray setlocale sigprocmask stat stdckdint stddef stdint strerror wcwidth windows_mutex windows_once windows_recmutex windows_rwlock])
+#AC_OUTPUT
+# Generate the required output files
+AC_OUTPUT([
+  Makefile
+  src/Makefile
+  depcomp
+  compile
+  install-sh
+  missing
+])
 
-"C:\libidn2\gettext-0.22.5\gettext\gettext-runtime\gnulib-lib\Makefile.am" 수정
+/c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib/Makefile.am 수정
+## begin 추가
+# Conditionally include sources based on the AM_CONDITIONAL macros set in configure.ac
+if GL_GENERATE_HEADERS
+  HEADERS_SOURCES = headers.c
+endif
+
+if GL_GENERATE_DIFFMARK
+  DIFFMARK_SOURCES = diffmark.c
+endif
+
+if GL_GENERATE_NANOSLEEP
+  NANOSLEEP_SOURCES = nanosleep.c
+endif
+
+if GL_GENERATE_OBSTACK
+  OBSTACK_SOURCES = obstack.c
+endif
+
+# Conditional objects (examples)
+if GL_COND_OBJ_HEADERS
+  OBJ_HEADERS = headers.o
+endif
+
+if GL_COND_OBJ_DIFFMARK
+  OBJ_DIFFMARK = diffmark.o
+endif
+
+EXTRA_DIST = AUTHORS NEWS README THANKS
+EXTRA_DIST += uninstalled-configure.sh.in
+
+AUTOMAKE_OPTIONS = foreign
+ACLOCAL_AMFLAGS = -I m4
+## end 추가
+
+누락된 파일 생성
+AUTHORS, NEWS, README, THANKS, uninstalled-configure.sh.in, depcomp, compile, install-sh, missing 등의 파일이 필요
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib
+# touch AUTHORS NEWS README THANKS
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib
+# ls -l AUTHORS NEWS README THANKS
+-rw-r--r-- 1 nayou nayou 0 10월 18 20:48 AUTHORS
+-rw-r--r-- 1 nayou nayou 0 10월 18 20:48 NEWS
+-rw-r--r-- 1 nayou nayou 0 10월 18 20:48 README
+-rw-r--r-- 1 nayou nayou 0 10월 18 20:48 THANKS
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib
+# automake --add-missing 명령을 사용하여 누락된 스크립트 파일을 자동으로 생성
+
+(오류)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib
+# automake --add-missing
+configure.ac:279: error: 'Makefile' is already registered with AC_CONFIG_FILES.
+../autoconf-2.72/lib/autoconf/status.m4:289: AC_CONFIG_FILES is expanded from...
+configure.ac:279: the top level
+autom4te-2.72: error: /usr/bin/m4 failed with exit status: 1
+automake-1.16: error: autoconf failed with exit status: 1
+(수정)
+AC_CONFIG_FILES에 Makefile이 중복 등록되어 있다
+configure.ac 수정
+#AC_OUTPUT
+# Generate the required output files
+# AC_CONFIG_FILES에 등록안한것만 남김
+AC_OUTPUT([
+  #Makefile
+  #src/Makefile
+  depcomp
+  compile
+  install-sh
+  missing
+])
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib
+# automake --add-missing
+(오류)
+Makefile.am:108: error: GL_GENERATE_ALLOCA_H does not appear in AM_CONDITIONAL
+Makefile.am:146: error: GL_GENERATE_ASSERT_H does not appear in AM_CONDITIONAL
+Makefile.am:173: error: GL_COND_OBJ_ATEXIT does not appear in AM_CONDITIONAL
+Makefile.am:342: error: GL_COND_OBJ_CANONICALIZE_LGPL does not appear in AM_CONDITIONAL
+Makefile.am:366: error: GL_COND_OBJ_CLOSE does not appear in AM_CONDITIONAL
+Makefile.am:387: error: GL_COND_OBJ_DUP2 does not appear in AM_CONDITIONAL
+Makefile.am:406: error: GL_GENERATE_ERRNO_H does not appear in AM_CONDITIONAL
+Makefile.am:434: error: GL_COND_OBJ_ERROR does not appear in AM_CONDITIONAL
+...
+(수정)
+Makefile.am 수정
+AUTOMAKE_OPTIONS = 1.14 gnits subdir-objects
+# 조건부 컴파일을 위한 정의
+if HAVE_ALLOCA_H
+AM_CONDITIONAL(GL_GENERATE_ALLOCA_H, true)
+endif
+if HAVE_ASSERT_H
+AM_CONDITIONAL(GL_GENERATE_ASSERT_H, true)
+endif
+configure.ac 수정
+# 헤더 파일 확인하기
+AC_CHECK_HEADERS([alloca.h assert.h])
+
+
+
 
 
 
