@@ -27905,6 +27905,168 @@ configure.ac 수정
 # 헤더 파일 확인하기
 AC_CHECK_HEADERS([alloca.h assert.h])
 
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib
+# automake --add-missing
+Makefile.am:108: error: GL_GENERATE_ALLOCA_H does not appear in AM_CONDITIONAL
+Makefile.am:146: error: GL_GENERATE_ASSERT_H does not appear in AM_CONDITIONAL
+Makefile.am:173: error: GL_COND_OBJ_ATEXIT does not appear in AM_CONDITIONAL
+Makefile.am:342: error: GL_COND_OBJ_CANONICALIZE_LGPL does not appear in AM_CONDITIONAL
+Makefile.am:366: error: GL_COND_OBJ_CLOSE does not appear in AM_CONDITIONAL
+Makefile.am:387: error: GL_COND_OBJ_DUP2 does not appear in AM_CONDITIONAL
+Makefile.am:406: error: GL_GENERATE_ERRNO_H does not appear in AM_CONDITIONAL
+Makefile.am:434: error: GL_COND_OBJ_ERROR does not appear in AM_CONDITIONAL
+Makefile.am:474: error: GL_COND_OBJ_FCNTL does not appear in AM_CONDITIONAL
+Makefile.am:541: error: GL_COND_OBJ_FREE does not appear in AM_CONDITIONAL
+Makefile.am:549: error: GL_COND_OBJ_FSTAT does not appear in AM_CONDITIONAL
+Makefile.am:586: error: GL_COND_OBJ_GETDTABLESIZE does not appear in AM_CONDITIONAL
+Makefile.am:598: error: GL_GENERATE_GETOPT_H does not appear in AM_CONDITIONAL
+Makefile.am:615: error: GL_GENERATE_GETOPT_CDEFS_H does not appear in AM_CONDITIONAL
+Makefile.am:628: error: GL_COND_OBJ_GETOPT does not appear in AM_CONDITIONAL
+Makefile.am:638: error: GL_COND_OBJ_GETPROGNAME does not appear in AM_CONDITIONAL
+Makefile.am:726: error: GL_GENERATE_ICONV_H does not appear in AM_CONDITIONAL
+Makefile.am:756: error: GL_COND_OBJ_ICONV_OPEN does not appear in AM_CONDITIONAL
+Makefile.am:759: error: GL_COND_OBJ_ICONV does not appear in AM_CONDITIONAL
+Makefile.am:848: error: GL_COND_OBJ_ISWBLANK does not appear in AM_CONDITIONAL
+Makefile.am:856: error: GL_COND_OBJ_ISWDIGIT does not appear in AM_CONDITIONAL
+Makefile.am:864: error: GL_COND_OBJ_ISWPUNCT does not appear in AM_CONDITIONAL
+Makefile.am:872: error: GL_COND_OBJ_ISWXDIGIT does not appear in AM_CONDITIONAL
+Makefile.am:930: error: GL_GENERATE_LIMITS_H does not appear in AM_CONDITIONAL
+Makefile.am:1008: error: GL_COND_OBJ_LOCALENAME_UNSAFE_LIMITED does not appear in AM_CONDITIONAL
+Makefile.am:1019: error: GL_COND_OBJ_LOCALENAME_UNSAFE_LIMITED does not appear in AM_CONDITIONAL
+Makefile.am:1069: error: GL_COND_OBJ_MBRTOC32 does not appear in AM_CONDITIONAL
+Makefile.am:1081: error: GL_COND_OBJ_MBRTOWC does not appear in AM_CONDITIONAL
+Makefile.am:1093: error: GL_COND_OBJ_MBSINIT does not appear in AM_CONDITIONAL
+Makefile.am:1133: error: GL_COND_OBJ_MEMCHR does not appear in AM_CONDITIONAL
+Makefile.am:1143: error: GL_COND_OBJ_MEMMOVE does not appear in AM_CONDITIONAL
+Makefile.am:1151: error: GL_COND_OBJ_MEMPCPY does not appear in AM_CONDITIONAL
+Makefile.am:1165: error: GL_COND_OBJ_MSVC_INVAL does not appear in AM_CONDITIONAL
+Makefile.am:1175: error: GL_COND_OBJ_MSVC_NOTHROW does not appear in AM_CONDITIONAL
+Makefile.am:1192: error: GL_COND_OBJ_OPEN does not appear in AM_CONDITIONAL
+Makefile.am:1219: error: GL_COND_OBJ_RAISE does not appear in AM_CONDITIONAL
+Makefile.am:1227: error: GL_COND_OBJ_RAWMEMCHR does not appear in AM_CONDITIONAL
+Makefile.am:1237: error: GL_COND_OBJ_READLINK does not appear in AM_CONDITIONAL
+Makefile.am:1263: error: GL_COND_OBJ_REALLOCARRAY does not appear in AM_CONDITIONAL
+Makefile.am:1271: error: GL_COND_OBJ_PROGRELOC does not appear in AM_CONDITIONAL
+Makefile.am:1275: error: RELOCATABLE_VIA_WRAPPER does not appear in AM_CONDITIONAL
+Makefile.am:1310: error: GL_COND_OBJ_SETLOCALE does not appear in AM_CONDITIONAL
+Makefile.am:1319: error: GL_COND_OBJ_SETLOCALE_LOCK does not appear in AM_CONDITIONAL
+Makefile.am:1386: error: GL_COND_OBJ_SIGPROCMASK does not appear in AM_CONDITIONAL
+Makefile.am:1442: error: GL_COND_OBJ_STAT does not appear in AM_CONDITIONAL
+Makefile.am:1466: error: GL_GENERATE_STDCKDINT_H does not appear in AM_CONDITIONAL
+Makefile.am:1487: error: GL_GENERATE_STDDEF_H does not appear in AM_CONDITIONAL
+Makefile.am:1516: error: GL_GENERATE_STDINT_H does not appear in AM_CONDITIONAL
+Makefile.am:1696: error: GL_COND_OBJ_STDIO_READ does not appear in AM_CONDITIONAL
+Makefile.am:1699: error: GL_COND_OBJ_STDIO_WRITE does not appear in AM_CONDITIONAL
+Makefile.am:1884: error: GL_COND_OBJ_STRERROR does not appear in AM_CONDITIONAL
+Makefile.am:1892: error: GL_COND_OBJ_STRERROR_OVERRIDE does not appear in AM_CONDITIONAL
+Makefile.am:2027: error: GL_COND_OBJ_STRNLEN does not appear in AM_CONDITIONAL
+Makefile.am:2041: error: GL_COND_OBJ_STRTOUL does not appear in AM_CONDITIONAL
+Makefile.am:2330: error: LIBUNISTRING_COMPILE_UNICASE_TOLOWER does not appear in AM_CONDITIONAL
+Makefile.am:2497: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_ALNUM does not appear in AM_CONDITIONAL
+Makefile.am:2507: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_ALPHA does not appear in AM_CONDITIONAL
+Makefile.am:2517: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_BLANK does not appear in AM_CONDITIONAL
+Makefile.am:2527: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_CNTRL does not appear in AM_CONDITIONAL
+Makefile.am:2537: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_DIGIT does not appear in AM_CONDITIONAL
+Makefile.am:2547: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_GRAPH does not appear in AM_CONDITIONAL
+Makefile.am:2557: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_LOWER does not appear in AM_CONDITIONAL
+Makefile.am:2567: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_PRINT does not appear in AM_CONDITIONAL
+Makefile.am:2577: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_PUNCT does not appear in AM_CONDITIONAL
+Makefile.am:2587: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_SPACE does not appear in AM_CONDITIONAL
+Makefile.am:2597: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_UPPER does not appear in AM_CONDITIONAL
+Makefile.am:2607: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_XDIGIT does not appear in AM_CONDITIONAL
+Makefile.am:2867: error: LIBUNISTRING_COMPILE_UNISTR_U8_MBTOUCR does not appear in AM_CONDITIONAL
+Makefile.am:2875: error: LIBUNISTRING_COMPILE_UNISTR_U8_UCTOMB does not appear in AM_CONDITIONAL
+Makefile.am:2909: error: LIBUNISTRING_COMPILE_UNIWIDTH_WIDTH does not appear in AM_CONDITIONAL
+Makefile.am:3117: error: GL_COND_OBJ_WCWIDTH does not appear in AM_CONDITIONAL
+Makefile.am:3125: error: GL_COND_OBJ_WINDOWS_MUTEX does not appear in AM_CONDITIONAL
+Makefile.am:3135: error: GL_COND_OBJ_WINDOWS_ONCE does not appear in AM_CONDITIONAL
+Makefile.am:3145: error: GL_COND_OBJ_WINDOWS_RECMUTEX does not appear in AM_CONDITIONAL
+Makefile.am:3155: error: GL_COND_OBJ_WINDOWS_RWLOCK does not appear in AM_CONDITIONAL
+Makefile.am:3191: error: HAVE_ALLOCA_H does not appear in AM_CONDITIONAL
+Makefile.am:3195: error: HAVE_ASSERT_H does not appear in AM_CONDITIONAL
+Makefile.am:3199: warning: EXTRA_DIST multiply defined in condition TRUE ...
+Makefile.am:72: ... 'EXTRA_DIST' previously defined here
+Makefile.am:3202: warning: AUTOMAKE_OPTIONS multiply defined in condition TRUE ...
+Makefile.am:65: ... 'AUTOMAKE_OPTIONS' previously defined here
+configure.ac:257: error: required file 'uninstalled-config.sh.in' not found
+configure.ac:259: error: required file 'doc/Makefile.in' not found
+configure.ac:261: error: required file 'intl-java/Makefile.in' not found
+configure.ac:263: error: required file 'intl-csharp/Makefile.in' not found
+configure.ac:265: error: required file 'gnulib-lib/Makefile.in' not found
+configure.ac:267: error: required file 'src/Makefile.in' not found
+configure.ac:268: error: required file 'src/gettext.sh.in' not found
+configure.ac:272: error: required file 'man/Makefile.in' not found
+configure.ac:274: error: required file 'man/x-to-1.in' not found
+configure.ac:276: error: required file 'm4/Makefile.in' not found
+configure.ac:278: error: required file 'tests/Makefile.in' not found
+configure.ac:283: error: required file '#Makefile.in' not found
+configure.ac:283: error: required file '#src/Makefile.in' not found
+configure.ac:283: error: required file 'depcomp.in' not found
+configure.ac:283: error: required file 'compile.in' not found
+configure.ac:283: error: required file 'install-sh.in' not found
+configure.ac:283: error: required file 'missing.in' not found
+configure.ac: error: AM_GNU_GETTEXT used but SUBDIRS not defined
+Makefile.am:87: warning: source file 'malloc/scratch_buffer_grow.c' is in a subdirectory,
+Makefile.am:87: but option 'subdir-objects' is disabled
+automake-1.16: warning: possible forward-incompatibility.
+automake-1.16: At least one source file is in a subdirectory, but the 'subdir-objects'
+automake-1.16: automake option hasn't been enabled.  For now, the corresponding output
+automake-1.16: object file(s) will be placed in the top-level directory.  However, this
+automake-1.16: behavior may change in a future Automake major version, with object
+automake-1.16: files being placed in the same subdirectory as the corresponding sources.
+automake-1.16: You are advised to start using 'subdir-objects' option throughout your
+automake-1.16: project, to avoid future incompatibilities.
+Makefile.am:87: warning: source file 'malloc/scratch_buffer_grow_preserve.c' is in a subdirectory,
+Makefile.am:87: but option 'subdir-objects' is disabled
+Makefile.am:87: warning: source file 'malloc/scratch_buffer_set_array_size.c' is in a subdirectory,
+Makefile.am:87: but option 'subdir-objects' is disabled
+Makefile.am:87: warning: source file 'glthread/lock.c' is in a subdirectory,
+Makefile.am:87: but option 'subdir-objects' is disabled
+Makefile.am:87: warning: source file 'glthread/threadlib.c' is in a subdirectory,
+Makefile.am:87: but option 'subdir-objects' is disabled
+Makefile.am:2331: warning: source file 'unicase/tolower.c' is in a subdirectory,
+Makefile.am:2331: but option 'subdir-objects' is disabled
+Makefile.am:2498: warning: source file 'unictype/ctype_alnum.c' is in a subdirectory,
+Makefile.am:2498: but option 'subdir-objects' is disabled
+Makefile.am:2508: warning: source file 'unictype/ctype_alpha.c' is in a subdirectory,
+Makefile.am:2508: but option 'subdir-objects' is disabled
+Makefile.am:2518: warning: source file 'unictype/ctype_blank.c' is in a subdirectory,
+Makefile.am:2518: but option 'subdir-objects' is disabled
+Makefile.am:2528: warning: source file 'unictype/ctype_cntrl.c' is in a subdirectory,
+Makefile.am:2528: but option 'subdir-objects' is disabled
+Makefile.am:2538: warning: source file 'unictype/ctype_digit.c' is in a subdirectory,
+Makefile.am:2538: but option 'subdir-objects' is disabled
+Makefile.am:2548: warning: source file 'unictype/ctype_graph.c' is in a subdirectory,
+Makefile.am:2548: but option 'subdir-objects' is disabled
+Makefile.am:2558: warning: source file 'unictype/ctype_lower.c' is in a subdirectory,
+Makefile.am:2558: but option 'subdir-objects' is disabled
+Makefile.am:2568: warning: source file 'unictype/ctype_print.c' is in a subdirectory,
+Makefile.am:2568: but option 'subdir-objects' is disabled
+Makefile.am:2578: warning: source file 'unictype/ctype_punct.c' is in a subdirectory,
+Makefile.am:2578: but option 'subdir-objects' is disabled
+Makefile.am:2588: warning: source file 'unictype/ctype_space.c' is in a subdirectory,
+Makefile.am:2588: but option 'subdir-objects' is disabled
+Makefile.am:2598: warning: source file 'unictype/ctype_upper.c' is in a subdirectory,
+Makefile.am:2598: but option 'subdir-objects' is disabled
+Makefile.am:2608: warning: source file 'unictype/ctype_xdigit.c' is in a subdirectory,
+Makefile.am:2608: but option 'subdir-objects' is disabled
+Makefile.am:2868: warning: source file 'unistr/u8-mbtoucr.c' is in a subdirectory,
+Makefile.am:2868: but option 'subdir-objects' is disabled
+Makefile.am:2876: warning: source file 'unistr/u8-uctomb.c' is in a subdirectory,
+Makefile.am:2876: but option 'subdir-objects' is disabled
+Makefile.am:2876: warning: source file 'unistr/u8-uctomb-aux.c' is in a subdirectory,
+Makefile.am:2876: but option 'subdir-objects' is disabled
+Makefile.am:2910: warning: source file 'uniwidth/width.c' is in a subdirectory,
+Makefile.am:2910: but option 'subdir-objects' is disabled
+Makefile.am:3183: error: 'OBJ_HEADERS' is used but 'OBJdir' is undefined
+Makefile.am:3170: warning: variable 'DIFFMARK_SOURCES' is defined but no program or
+Makefile.am:3170: library has 'DIFFMARK' as canonical name (possible typo)
+Makefile.am:3166: warning: variable 'HEADERS_SOURCES' is defined but no program or
+Makefile.am:3166: library has 'HEADERS' as canonical name (possible typo)
+Makefile.am:3174: warning: variable 'NANOSLEEP_SOURCES' is defined but no program or
+Makefile.am:3174: library has 'NANOSLEEP' as canonical name (possible typo)
+Makefile.am:3178: warning: variable 'OBSTACK_SOURCES' is defined but no program or
+Makefile.am:3178: library has 'OBSTACK' as canonical name (possible typo)
 
 
 
