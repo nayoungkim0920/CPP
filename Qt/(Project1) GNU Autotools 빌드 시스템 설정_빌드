@@ -28327,11 +28327,878 @@ configure.ac:13: error: second argument to 'AM_GNU_GETTEXT' must be 'external' o
 (수정)
 configure.ac 파일에서 AM_GNU_GETTEXT 매크로의 두 번째 인자가 잘못되었을 때 발생하는 오류
 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib/configure.ac 수정
+AM_GNU_GETTEXT([use-libtool], [external], [need-ngettext], [${top_builddir}/intl])
 
+(오류)
+libtoolize: You should add the contents of the following files to 'aclocal.m4':
+libtoolize:   '/usr/share/aclocal/libtool.m4'
+(수정)
+libtool.m4 파일이 aclocal.m4에 포함되지 않았다는 것을 의미
+libtool 매크로가 필요하지만 aclocal.m4에 해당 파일이 누락
+/c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib/configure.ac 수정
+AC_CONFIG_MACRO_DIRS([m4])
+/c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib/Makefile.am 수정
+ACLOCAL_AMFLAGS = -I m4
 
+(오류)
+Makefile.am:475: error: GL_COND_OBJ_FCNTL does not appear in AM_CONDITIONAL
+(수정)
+Makefile.am: 여러 개의 `GL_COND_OBJ_*` 에러가 발생함.
+AM_CONDITIONAL 매크로가 정의되지 않은 상태에서 사용되고 있음
+GL_COND_OBJ_* 조건부 컴파일을 위한 AM_CONDITIONAL 매크로를 미리 정의해야 
+configure.ac 파일에서 필요한 AM_CONDITIONAL 매크로를 추가해야 
+# fcntl 사용 여부에 따라 조건부 컴파일 설정
+AC_ARG_WITH([fcntl],
+    [AS_HELP_STRING([--with-fcntl], [Enable fcntl support])],
+    [use_fcntl=$withval], [use_fcntl=no])
 
+AM_CONDITIONAL([GL_COND_OBJ_FCNTL], [test "x$use_fcntl" = "xyes"])
 
+# free 함수 사용 여부에 따라 조건부 컴파일 설정
+AC_ARG_WITH([free],
+    [AS_HELP_STRING([--with-free], [Enable free function support])],
+    [use_free=$withval], [use_free=no])
 
+AM_CONDITIONAL([GL_COND_OBJ_FREE], [test "x$use_free" = "xyes"])
+
+(오류)
+configure.ac:276: error: required file 'intl-csharp/Makefile.in' not found
+(수정)
+configure.ac에서 지정된 Makefile.in 파일들이 존재하지 않습니다. 
+이 파일들은 보통 autoreconf 또는 automake를 실행할 때 자동으로 생성됨
+누락된 파일을 자동으로 복사하거나 생성
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib
+# automake --add-missing
+(오류)
+ERROR: invalid second argument to AM_GNU_GETTEXT
+(수정)
+AM_GNU_GETTEXT([use-libtool], [external need-ngettext], [${top_builddir}/intl])
+첫 번째 인수: use-libtool과 같이 libtool을 사용할지 여부를 나타냅니다.
+두 번째 인수: external 또는 need-ngettext 등의 선택적 매크로 사용 여부를 지정합니다.
+세 번째 인수: intl 디렉토리의 위치를 지정합니다.
+
+(오류)
+Error: GL_COND_OBJ_FSTAT does not appear in AM_CONDITIONAL (and other GL_COND_OBJ_* errors)
+Error: GL_GENERATE_GETOPT_H does not appear in AM_CONDITIONAL
+Error: GL_GENERATE_GETOPT_CDEFS_H does not appear in AM_CONDITIONAL
+(수정)
+해당 조건이 AM_CONDITIONAL로 정의되지 않아서 발생한 오류
+/c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib/configure.ac 수정
+AM_CONDITIONAL([GL_COND_OBJ_FSTAT], [test "x$use_fstat" = "xyes"])
+AM_CONDITIONAL([GL_GENERATE_GETOPT_H], [test "x$generate_getopt_h" = "xyes"])
+AM_CONDITIONAL([GL_GENERATE_GETOPT_CDEFS_H], [test "x$generate_getopt_cdefs_h" = "xyes"])
+
+(오류)
+Error: intl-csharp/Makefile.in not found, gnulib-lib/Makefile.in not found, etc.
+(수정)
+Gnulib 모듈을 업데이트하고, 누락된 파일들을 확인
+autoreconf -fi를 실행하여 필요한 Makefile.in 파일을 생성
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib
+# gnulib-tool --add-import
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib
+# autoreconf -fi
+autopoint: *** AM_GNU_GETTEXT without 'external' argument is no longer supported in version 0.22.5
+autopoint: *** Stop.
+autoreconf-2.72: error: autopoint failed with exit status: 1
+/c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib/configure.ac 수정
+#AM_GNU_GETTEXT([use-libtool], [external need-ngettext], [\${top_builddir}/intl])
+AM_GNU_GETTEXT([external])
+
+(오류)
+configure.ac:95: error: possibly undefined macro: gl_WOE32_DLL
+      If this token and others are legitimate, please use m4_pattern_allow.
+      See the Autoconf documentation.
+(수정)
+gl_WOE32_DLL과 같은 매크로가 Gnulib나 다른 외부 라이브러리에서 정의되었으나, 
+현재의 m4 검색 경로에서는 찾을 수 없는 경우 m4_pattern_allow를 사용하여 해당 매크로를 허용할 수 있다.
+GNULIB_MODULES로 Gnulib 모듈을 명시적으로 추가
+/c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib/configure.ac 수정
+# woe32라는 Gnulib 모듈을 가져오는 명령
+GNULIB_MODULES([woe32])
+# m4_pattern_allow는 Gnulib에서 제공되지 않은 매크로를 사용할 때 사용하는 명령
+m4_pattern_allow([gl_WOE32_DLL]) 
+# Gnulib의 모듈을 포함시키려면, gnulib 폴더를 올바르게 지정
+m4_include([/c/libidn2/m4/glibc21.m4])
+
+파일확인
+find / -name "glibc21.m4" -or -name "glibc22.m4" 
+/c/libidn2/m4/glibc21.m4
+
+Gnulib 패치 및 업데이트
+gnulib-tool --import woe32
+
+(오류)
+error: GL_COND_OBJ_GETDTABLESIZE does not appear in AM_CONDITIONAL
+error: GL_COND_OBJ_GETOPT does not appear in AM_CONDITIONAL
+(수정)
+/c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib/configure.ac 수정
+AM_CONDITIONAL([GL_COND_OBJ_GETDTABLESIZE], [test "$have_getdtable_size" = "yes"])
+
+(오류)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib
+# automake --add-missing
+Makefile.am:631: error: GL_COND_OBJ_GETOPT does not appear in AM_CONDITIONAL
+Makefile.am:641: error: GL_COND_OBJ_GETPROGNAME does not appear in AM_CONDITIONAL
+Makefile.am:729: error: GL_GENERATE_ICONV_H does not appear in AM_CONDITIONAL
+Makefile.am:759: error: GL_COND_OBJ_ICONV_OPEN does not appear in AM_CONDITIONAL
+Makefile.am:762: error: GL_COND_OBJ_ICONV does not appear in AM_CONDITIONAL
+Makefile.am:851: error: GL_COND_OBJ_ISWBLANK does not appear in AM_CONDITIONAL
+Makefile.am:859: error: GL_COND_OBJ_ISWDIGIT does not appear in AM_CONDITIONAL
+Makefile.am:867: error: GL_COND_OBJ_ISWPUNCT does not appear in AM_CONDITIONAL
+Makefile.am:875: error: GL_COND_OBJ_ISWXDIGIT does not appear in AM_CONDITIONAL
+Makefile.am:933: error: GL_GENERATE_LIMITS_H does not appear in AM_CONDITIONAL
+Makefile.am:1011: error: GL_COND_OBJ_LOCALENAME_UNSAFE_LIMITED does not appear in AM_CONDITIONAL
+Makefile.am:1022: error: GL_COND_OBJ_LOCALENAME_UNSAFE_LIMITED does not appear in AM_CONDITIONAL
+Makefile.am:1072: error: GL_COND_OBJ_MBRTOC32 does not appear in AM_CONDITIONAL
+Makefile.am:1084: error: GL_COND_OBJ_MBRTOWC does not appear in AM_CONDITIONAL
+Makefile.am:1096: error: GL_COND_OBJ_MBSINIT does not appear in AM_CONDITIONAL
+Makefile.am:1136: error: GL_COND_OBJ_MEMCHR does not appear in AM_CONDITIONAL
+Makefile.am:1146: error: GL_COND_OBJ_MEMMOVE does not appear in AM_CONDITIONAL
+Makefile.am:1154: error: GL_COND_OBJ_MEMPCPY does not appear in AM_CONDITIONAL
+Makefile.am:1168: error: GL_COND_OBJ_MSVC_INVAL does not appear in AM_CONDITIONAL
+Makefile.am:1178: error: GL_COND_OBJ_MSVC_NOTHROW does not appear in AM_CONDITIONAL
+Makefile.am:1195: error: GL_COND_OBJ_OPEN does not appear in AM_CONDITIONAL
+Makefile.am:1222: error: GL_COND_OBJ_RAISE does not appear in AM_CONDITIONAL
+Makefile.am:1230: error: GL_COND_OBJ_RAWMEMCHR does not appear in AM_CONDITIONAL
+Makefile.am:1240: error: GL_COND_OBJ_READLINK does not appear in AM_CONDITIONAL
+Makefile.am:1266: error: GL_COND_OBJ_REALLOCARRAY does not appear in AM_CONDITIONAL
+Makefile.am:1274: error: GL_COND_OBJ_PROGRELOC does not appear in AM_CONDITIONAL
+Makefile.am:1278: error: RELOCATABLE_VIA_WRAPPER does not appear in AM_CONDITIONAL
+Makefile.am:1313: error: GL_COND_OBJ_SETLOCALE does not appear in AM_CONDITIONAL
+Makefile.am:1322: error: GL_COND_OBJ_SETLOCALE_LOCK does not appear in AM_CONDITIONAL
+Makefile.am:1389: error: GL_COND_OBJ_SIGPROCMASK does not appear in AM_CONDITIONAL
+Makefile.am:1445: error: GL_COND_OBJ_STAT does not appear in AM_CONDITIONAL
+Makefile.am:1469: error: GL_GENERATE_STDCKDINT_H does not appear in AM_CONDITIONAL
+Makefile.am:1490: error: GL_GENERATE_STDDEF_H does not appear in AM_CONDITIONAL
+Makefile.am:1519: error: GL_GENERATE_STDINT_H does not appear in AM_CONDITIONAL
+Makefile.am:1699: error: GL_COND_OBJ_STDIO_READ does not appear in AM_CONDITIONAL
+Makefile.am:1702: error: GL_COND_OBJ_STDIO_WRITE does not appear in AM_CONDITIONAL
+Makefile.am:1887: error: GL_COND_OBJ_STRERROR does not appear in AM_CONDITIONAL
+Makefile.am:1895: error: GL_COND_OBJ_STRERROR_OVERRIDE does not appear in AM_CONDITIONAL
+Makefile.am:2030: error: GL_COND_OBJ_STRNLEN does not appear in AM_CONDITIONAL
+Makefile.am:2044: error: GL_COND_OBJ_STRTOUL does not appear in AM_CONDITIONAL
+Makefile.am:2333: error: LIBUNISTRING_COMPILE_UNICASE_TOLOWER does not appear in AM_CONDITIONAL
+Makefile.am:2500: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_ALNUM does not appear in AM_CONDITIONAL
+Makefile.am:2510: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_ALPHA does not appear in AM_CONDITIONAL
+Makefile.am:2520: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_BLANK does not appear in AM_CONDITIONAL
+Makefile.am:2530: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_CNTRL does not appear in AM_CONDITIONAL
+Makefile.am:2540: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_DIGIT does not appear in AM_CONDITIONAL
+Makefile.am:2550: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_GRAPH does not appear in AM_CONDITIONAL
+Makefile.am:2560: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_LOWER does not appear in AM_CONDITIONAL
+Makefile.am:2570: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_PRINT does not appear in AM_CONDITIONAL
+Makefile.am:2580: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_PUNCT does not appear in AM_CONDITIONAL
+Makefile.am:2590: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_SPACE does not appear in AM_CONDITIONAL
+Makefile.am:2600: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_UPPER does not appear in AM_CONDITIONAL
+Makefile.am:2610: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_XDIGIT does not appear in AM_CONDITIONAL
+Makefile.am:2870: error: LIBUNISTRING_COMPILE_UNISTR_U8_MBTOUCR does not appear in AM_CONDITIONAL
+Makefile.am:2878: error: LIBUNISTRING_COMPILE_UNISTR_U8_UCTOMB does not appear in AM_CONDITIONAL
+Makefile.am:2912: error: LIBUNISTRING_COMPILE_UNIWIDTH_WIDTH does not appear in AM_CONDITIONAL
+Makefile.am:3120: error: GL_COND_OBJ_WCWIDTH does not appear in AM_CONDITIONAL
+Makefile.am:3128: error: GL_COND_OBJ_WINDOWS_MUTEX does not appear in AM_CONDITIONAL
+Makefile.am:3138: error: GL_COND_OBJ_WINDOWS_ONCE does not appear in AM_CONDITIONAL
+Makefile.am:3148: error: GL_COND_OBJ_WINDOWS_RECMUTEX does not appear in AM_CONDITIONAL
+Makefile.am:3158: error: GL_COND_OBJ_WINDOWS_RWLOCK does not appear in AM_CONDITIONAL
+Makefile.am:3166: warning: EXTRA_DIST multiply defined in condition TRUE ...
+Makefile.am:73: ... 'EXTRA_DIST' previously defined here
+Makefile.am:3173: warning: AUTOMAKE_OPTIONS multiply defined in condition TRUE ...
+Makefile.am:65: ... 'AUTOMAKE_OPTIONS' previously defined here
+configure.ac:307: error: required file 'intl-csharp/Makefile.in' not found
+configure.ac:307: error: required file 'gnulib-lib/Makefile.in' not found
+configure.ac:307: error: required file 'src/Makefile.in' not found
+configure.ac:307: error: required file 'man/Makefile.in' not found
+configure.ac:307: error: required file 'man/x-to-1.in' not found
+configure.ac:307: error: required file 'm4/Makefile.in' not found
+configure.ac:307: error: required file 'tests/Makefile.in' not found
+configure.ac:307: error: required file 'compile.in' not found
+configure.ac:307: error: required file 'install-sh.in' not found
+configure.ac:307: error: required file 'depcomp.in' not found
+configure.ac:307: error: required file 'missing.in' not found
+configure.ac:326: error: required file 'src/gettext.sh.in' not found
+Makefile.am:69: warning: AM_GNU_GETTEXT used but 'po' not in SUBDIRS
+Makefile.am:3204: error: 'OBJ_HEADERS' is used but 'OBJdir' is undefined
+Makefile.am:3188: warning: variable 'DIFFMARK_SOURCES' is defined but no program or
+Makefile.am:3188: library has 'DIFFMARK' as canonical name (possible typo)
+Makefile.am:3183: warning: variable 'HEADERS_SOURCES' is defined but no program or
+Makefile.am:3183: library has 'HEADERS' as canonical name (possible typo)
+Makefile.am:3193: warning: variable 'NANOSLEEP_SOURCES' is defined but no program or
+Makefile.am:3193: library has 'NANOSLEEP' as canonical name (possible typo)
+Makefile.am:3198: warning: variable 'OBSTACK_SOURCES' is defined but no program or
+Makefile.am:3198: library has 'OBSTACK' as canonical name (possible typo)
+(수정)
+Makefile.in 재생성
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib
+# # 기존 자동화 파일 재생성
+autoreconf --force --install
+# Makefile.in을 자동으로 생성
+automake --add-missing
+
+/c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib/configure.ac 수정
+#C:\libidn2\gettext-0.22.5\gettext\gettext-runtime\intl-csharp
+#C:\libidn2\gettext-0.22.5\gettext\gettext-runtime\gnulib-lib
+#C:\libidn2\gettext-0.22.5\gettext\gettext-runtime\src
+AC_CHECK_FILE([../intl-csharp/Makefile.in], [AC_MSG_RESULT([found])], [AC_MSG_RESULT([not found])])
+AC_CHECK_FILE([../gnulib-lib/Makefile.in], [AC_MSG_RESULT([found])], [AC_MSG_RESULT([not found])])
+AC_CHECK_FILE([../src/Makefile.in], [AC_MSG_RESULT([found])], [AC_MSG_RESULT([not found])])
+
+AC_CHECK_FILE([getopt.h], [AM_CONDITIONAL([GL_COND_OBJ_GETOPT], [true])], [AM_CONDITIONAL([GL_COND_OBJ_GETOPT], [false])])
+AC_CHECK_FILE([getprogname.h], [AM_CONDITIONAL([GL_COND_OBJ_GETPROGNAME], [true])], [AM_CONDITIONAL([GL_COND_OBJ_GETPROGNAME], [false])])
+AC_CHECK_FUNCS([snprintf], [AM_CONDITIONAL([GL_COND_OBJ_SNPRINTF], [true])], [AM_CONDITIONAL([GL_COND_OBJ_SNPRINTF], [false])])
+AC_CHECK_FUNCS([strdup], [AM_CONDITIONAL([GL_COND_OBJ_STRDUP], [true])], [AM_CONDITIONAL([GL_COND_OBJ_STRDUP], [false])])
+AC_CHECK_FUNCS([iconv_open], [AM_CONDITIONAL([GL_COND_OBJ_ICONV_OPEN], [true])], [AM_CONDITIONAL([GL_COND_OBJ_ICONV_OPEN], [false])])
+AC_CHECK_FUNCS([wcwidth], [AM_CONDITIONAL([GL_COND_OBJ_WCWIDTH], [true])], [AM_CONDITIONAL([GL_COND_OBJ_WCWIDTH], [false])])
+# Gnulib를 초기화하는 경우 추가할 필요가 있다면 아래와 같은 구문을 사용합니다.
+# AC_LIBOBJ([getopt])
+
+/c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib/Makefile.am 수정
+# 기본적인 소스 파일 설정
+libobj_la_SOURCES = \
+    main.c \  # 기본 소스 파일들
+
+if GL_COND_OBJ_GETOPT
+libobj_la_SOURCES += getopt.c
+endif
+
+if GL_COND_OBJ_GETPROGNAME
+libobj_la_SOURCES += getprogname.c
+endif
+
+if GL_COND_OBJ_SNPRINTF
+libobj_la_SOURCES += snprintf.c
+endif
+
+if GL_COND_OBJ_STRDUP
+libobj_la_SOURCES += strdup.c
+endif
+
+if GL_COND_OBJ_ICONV_OPEN
+libobj_la_SOURCES += iconv.c
+endif
+
+if GL_COND_OBJ_WCWIDTH
+libobj_la_SOURCES += wcwidth.c
+endif
+
+# 라이브러리 및 링크 설정
+libobj_la_LDFLAGS = -no-undefined
+libobj_la_LIBADD =
+
+(오류)
+Makefile.am:729: error: GL_GENERATE_ICONV_H does not appear in AM_CONDITIONAL
+(수정)
+Makefile.am에서 GL_GENERATE_ICONV_H 조건을 사용하려고 했지만, 
+configure.ac에서 이 조건이 정의되지 않았거나 제대로 연결되지 않았기 때문에 발생
+configure.ac에서 GL_GENERATE_ICONV_H 조건을 정의하고, 그 후 Makefile.am에서 이를 참조하는 방식으로 수정
+/c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib/configure.ac 수정
+AC_ARG_ENABLE([generate-iconv-h],
+  [AS_HELP_STRING([--enable-generate-iconv-h], [Enable generation of iconv.h])],
+  [generate_iconv_h=$enableval], [generate_iconv_h=no])
+AM_CONDITIONAL(GL_GENERATE_ICONV_H, test "$generate_iconv_h" = "yes")
+
+AC_ARG_ENABLE([cond-obj-iconv],
+  [AS_HELP_STRING([--enable-cond-obj-iconv], [Enable cond-obj-iconv])],
+  [cond_obj_iconv=$enableval], [cond_obj_iconv=no])
+AM_CONDITIONAL(GL_COND_OBJ_ICONV, test "$cond_obj_iconv" = "yes")
+
+AC_ARG_ENABLE([cond-obj-iswblank],
+  [AS_HELP_STRING([--enable-cond-obj-iswblank], [Enable cond-obj-iswblank])],
+  [cond_obj_iswblank=$enableval], [cond_obj_iswblank=no])
+AM_CONDITIONAL(GL_COND_OBJ_ISWBLANK, test "$cond_obj_iswblank" = "yes")
+
+AC_ARG_ENABLE([cond-obj-iswdigit],
+  [AS_HELP_STRING([--enable-cond-obj-iswdigit], [Enable cond-obj-iswdigit])],
+  [cond_obj_iswdigit=$enableval], [cond_obj_iswdigit=no])
+AM_CONDITIONAL(GL_COND_OBJ_ISWDIGIT, test "$cond_obj_iswdigit" = "yes")
+
+AC_ARG_ENABLE([cond-obj-iswpunct],
+  [AS_HELP_STRING([--enable-cond-obj-iswpunct], [Enable cond-obj-iswpunct])],
+  [cond_obj_iswpunct=$enableval], [cond_obj_iswpunct=no])
+AM_CONDITIONAL(GL_COND_OBJ_ISWPUNCT, test "$cond_obj_iswpunct" = "yes")
+
+AC_ARG_ENABLE([cond-obj-iswxdigit],
+  [AS_HELP_STRING([--enable-cond-obj-iswxdigit], [Enable cond-obj-iswxdigit])],
+  [cond_obj_iswxdigit=$enableval], [cond_obj_iswxdigit=no])
+AM_CONDITIONAL(GL_COND_OBJ_ISWXDIGIT, test "$cond_obj_iswxdigit" = "yes")
+
+AC_ARG_ENABLE([generate-limits-h],
+  [AS_HELP_STRING([--enable-generate-limits-h], [Enable generation of limits.h])],
+  [generate_limits_h=$enableval], [generate_limits_h=no])
+AM_CONDITIONAL(GL_GENERATE_LIMITS_H, test "$generate_limits_h" = "yes")
+
+AC_ARG_ENABLE([cond-obj-localename-unsafe-limited],
+  [AS_HELP_STRING([--enable-cond-obj-localename-unsafe-limited], [Enable cond-obj-localename-unsafe-limited])],
+  [cond_obj_localename_unsafe_limited=$enableval], [cond_obj_localename_unsafe_limited=no])
+AM_CONDITIONAL(GL_COND_OBJ_LOCALENAME_UNSAFE_LIMITED, test "$cond_obj_localename_unsafe_limited" = "yes")
+
+AC_ARG_ENABLE([cond-obj-mbrtoc32],
+  [AS_HELP_STRING([--enable-cond-obj-mbrtoc32], [Enable cond-obj-mbrtoc32])],
+  [cond_obj_mbrtoc32=$enableval], [cond_obj_mbrtoc32=no])
+AM_CONDITIONAL(GL_COND_OBJ_MBRTOC32, test "$cond_obj_mbrtoc32" = "yes")
+
+AC_ARG_ENABLE([cond-obj-mbrtowc],
+  [AS_HELP_STRING([--enable-cond-obj-mbrtowc], [Enable cond-obj-mbrtowc])],
+  [cond_obj_mbrtowc=$enableval], [cond_obj_mbrtowc=no])
+AM_CONDITIONAL(GL_COND_OBJ_MBRTOWC, test "$cond_obj_mbrtowc" = "yes")
+
+AC_ARG_ENABLE([cond-obj-mbsinit],
+  [AS_HELP_STRING([--enable-cond-obj-mbsinit], [Enable cond-obj-mbsinit])],
+  [cond_obj_mbsinit=$enableval], [cond_obj_mbsinit=no])
+AM_CONDITIONAL(GL_COND_OBJ_MBSINIT, test "$cond_obj_mbsinit" = "yes")
+
+AC_ARG_ENABLE([cond-obj-memchr],
+  [AS_HELP_STRING([--enable-cond-obj-memchr], [Enable cond-obj-memchr])],
+  [cond_obj_memchr=$enableval], [cond_obj_memchr=no])
+AM_CONDITIONAL(GL_COND_OBJ_MEMCHR, test "$cond_obj_memchr" = "yes")
+
+AC_ARG_ENABLE([cond-obj-memmove],
+  [AS_HELP_STRING([--enable-cond-obj-memmove], [Enable cond-obj-memmove])],
+  [cond_obj_memmove=$enableval], [cond_obj_memmove=no])
+AM_CONDITIONAL(GL_COND_OBJ_MEMMOVE, test "$cond_obj_memmove" = "yes")
+
+AC_ARG_ENABLE([cond-obj-mempcpy],
+  [AS_HELP_STRING([--enable-cond-obj-mempcpy], [Enable cond-obj-mempcpy])],
+  [cond_obj_mempcpy=$enableval], [cond_obj_mempcpy=no])
+AM_CONDITIONAL(GL_COND_OBJ_MEMPCPY, test "$cond_obj_mempcpy" = "yes")
+
+AC_ARG_ENABLE([cond-obj-msvc-inval],
+  [AS_HELP_STRING([--enable-cond-obj-msvc-inval], [Enable cond-obj-msvc-inval])],
+  [cond_obj_msvc_inval=$enableval], [cond_obj_msvc_inval=no])
+AM_CONDITIONAL(GL_COND_OBJ_MSVC_INVAL, test "$cond_obj_msvc_inval" = "yes")
+
+AC_ARG_ENABLE([cond-obj-msvc-nothrow],
+  [AS_HELP_STRING([--enable-cond-obj-msvc-nothrow], [Enable cond-obj-msvc-nothrow])],
+  [cond_obj_msvc_nothrow=$enableval], [cond_obj_msvc_nothrow=no])
+AM_CONDITIONAL(GL_COND_OBJ_MSVC_NOTHROW, test "$cond_obj_msvc_nothrow" = "yes")
+
+AC_ARG_ENABLE([cond-obj-open],
+  [AS_HELP_STRING([--enable-cond-obj-open], [Enable cond-obj-open])],
+  [cond_obj_open=$enableval], [cond_obj_open=no])
+AM_CONDITIONAL(GL_COND_OBJ_OPEN, test "$cond_obj_open" = "yes")
+
+AC_ARG_ENABLE([cond-obj-raise],
+  [AS_HELP_STRING([--enable-cond-obj-raise], [Enable cond-obj-raise])],
+  [cond_obj_raise=$enableval], [cond_obj_raise=no])
+AM_CONDITIONAL(GL_COND_OBJ_RAISE, test "$cond_obj_raise" = "yes")
+
+AC_ARG_ENABLE([cond-obj-rawmemchr],
+  [AS_HELP_STRING([--enable-cond-obj-rawmemchr], [Enable cond-obj-rawmemchr])],
+  [cond_obj_rawmemchr=$enableval], [cond_obj_rawmemchr=no])
+AM_CONDITIONAL(GL_COND_OBJ_RAWMEMCHR, test "$cond_obj_rawmemchr" = "yes")
+
+AC_ARG_ENABLE([cond-obj-readlink],
+  [AS_HELP_STRING([--enable-cond-obj-readlink], [Enable cond-obj-readlink])],
+  [cond_obj_readlink=$enableval], [cond_obj_readlink=no])
+AM_CONDITIONAL(GL_COND_OBJ_READLINK, test "$cond_obj_readlink" = "yes")
+
+AC_ARG_ENABLE([cond-obj-reallocarray],
+  [AS_HELP_STRING([--enable-cond-obj-reallocarray], [Enable cond-obj-reallocarray])],
+  [cond_obj_reallocarray=$enableval], [cond_obj_reallocarray=no])
+AM_CONDITIONAL(GL_COND_OBJ_REALLOCARRAY, test "$cond_obj_reallocarray" = "yes")
+
+AC_ARG_ENABLE([cond-obj-progreloc],
+  [AS_HELP_STRING([--enable-cond-obj-progreloc], [Enable cond-obj-progreloc])],
+  [cond_obj_progreloc=$enableval], [cond_obj_progreloc=no])
+AM_CONDITIONAL(GL_COND_OBJ_PROGRELOC, test "$cond_obj_progreloc" = "yes")
+
+AC_ARG_ENABLE([RELOCATABLE_VIA_WRAPPER],
+  [AS_HELP_STRING([--enable-relocatable-via-wrapper], [Enable relocatable via wrapper])],
+  [relocatable_via_wrapper=$enableval], [relocatable_via_wrapper=no])
+AM_CONDITIONAL(RELOCATABLE_VIA_WRAPPER, test "$relocatable_via_wrapper" = "yes")
+
+AC_ARG_ENABLE([GL_COND_OBJ_SETLOCALE],
+  [AS_HELP_STRING([--enable-cond-obj-setlocale], [Enable cond-obj-setlocale])],
+  [cond_obj_setlocale=$enableval], [cond_obj_setlocale=no])
+AM_CONDITIONAL(GL_COND_OBJ_SETLOCALE, test "$cond_obj_setlocale" = "yes")
+
+AC_ARG_ENABLE([GL_COND_OBJ_SETLOCALE_LOCK],
+  [AS_HELP_STRING([--enable-cond-obj-setlocale-lock], [Enable cond-obj-setlocale-lock])],
+  [cond_obj_setlocale_lock=$enableval], [cond_obj_setlocale_lock=no])
+AM_CONDITIONAL(GL_COND_OBJ_SETLOCALE_LOCK, test "$cond_obj_setlocale_lock" = "yes")
+
+AC_ARG_ENABLE([GL_COND_OBJ_SIGPROCMASK],
+  [AS_HELP_STRING([--enable-cond-obj-sigprocmask], [Enable cond-obj-sigprocmask])],
+  [cond_obj_sigprocmask=$enableval], [cond_obj_sigprocmask=no])
+AM_CONDITIONAL(GL_COND_OBJ_SIGPROCMASK, test "$cond_obj_sigprocmask" = "yes")
+
+AC_ARG_ENABLE([GL_COND_OBJ_STAT],
+  [AS_HELP_STRING([--enable-cond-obj-stat], [Enable cond-obj-stat])],
+  [cond_obj_stat=$enableval], [cond_obj_stat=no])
+AM_CONDITIONAL(GL_COND_OBJ_STAT, test "$cond_obj_stat" = "yes")
+
+AC_ARG_ENABLE([GL_GENERATE_STDCKDINT_H],
+  [AS_HELP_STRING([--enable-generate-stdckdint-h], [Enable generation of stdckdint.h])],
+  [generate_stdckdint_h=$enableval], [generate_stdckdint_h=no])
+AM_CONDITIONAL(GL_GENERATE_STDCKDINT_H, test "$generate_stdckdint_h" = "yes")
+
+AC_ARG_ENABLE([GL_GENERATE_STDDEF_H],
+  [AS_HELP_STRING([--enable-generate-stddef-h], [Enable generation of stddef.h])],
+  [generate_stddef_h=$enableval], [generate_stddef_h=no])
+AM_CONDITIONAL(GL_GENERATE_STDDEF_H, test "$generate_stddef_h" = "yes")
+
+AC_ARG_ENABLE([GL_GENERATE_STDINT_H],
+  [AS_HELP_STRING([--enable-generate-stdint-h], [Enable generation of stdint.h])],
+  [generate_stdint_h=$enableval], [generate_stdint_h=no])
+AM_CONDITIONAL(GL_GENERATE_STDINT_H, test "$generate_stdint_h" = "yes")
+
+AC_ARG_ENABLE([GL_COND_OBJ_STDIO_READ],
+  [AS_HELP_STRING([--enable-cond-obj-stdio-read], [Enable cond-obj-stdio-read])],
+  [cond_obj_stdio_read=$enableval], [cond_obj_stdio_read=no])
+AM_CONDITIONAL(GL_COND_OBJ_STDIO_READ, test "$cond_obj_stdio_read" = "yes")
+
+AC_ARG_ENABLE([GL_COND_OBJ_STDIO_WRITE],
+  [AS_HELP_STRING([--enable-cond-obj-stdio-write], [Enable cond-obj-stdio-write])],
+  [cond_obj_stdio_write=$enableval], [cond_obj_stdio_write=no])
+AM_CONDITIONAL(GL_COND_OBJ_STDIO_WRITE, test "$cond_obj_stdio_write" = "yes")
+
+AC_ARG_ENABLE([GL_COND_OBJ_STRERROR],
+  [AS_HELP_STRING([--enable-cond-obj-strerror], [Enable cond-obj-strerror])],
+  [cond_obj_strerror=$enableval], [cond_obj_strerror=no])
+AM_CONDITIONAL(GL_COND_OBJ_STRERROR, test "$cond_obj_strerror" = "yes")
+
+AC_ARG_ENABLE([GL_COND_OBJ_STRERROR_OVERRIDE],
+  [AS_HELP_STRING([--enable-cond-obj-strerror-override], [Enable cond-obj-strerror-override])],
+  [cond_obj_strerror_override=$enableval], [cond_obj_strerror_override=no])
+AM_CONDITIONAL(GL_COND_OBJ_STRERROR_OVERRIDE, test "$cond_obj_strerror_override" = "yes")
+
+AC_ARG_ENABLE([GL_COND_OBJ_STRNLEN],
+  [AS_HELP_STRING([--enable-cond-obj-strnlen], [Enable cond-obj-strnlen])],
+  [cond_obj_strnlen=$enableval], [cond_obj_strnlen=no])
+AM_CONDITIONAL(GL_COND_OBJ_STRNLEN, test "$cond_obj_strnlen" = "yes")
+
+AC_ARG_ENABLE([GL_COND_OBJ_STRTOUL],
+  [AS_HELP_STRING([--enable-cond-obj-strtoul], [Enable cond-obj-strtoul])],
+  [cond_obj_strtoul=$enableval], [cond_obj_strtoul=no])
+AM_CONDITIONAL(GL_COND_OBJ_STRTOUL, test "$cond_obj_strtoul" = "yes")
+
+AC_ARG_ENABLE([LIBUNISTRING_COMPILE_UNICASE_TOLOWER],
+  [AS_HELP_STRING([--enable-libunistring-compile-unicase-tolower], [Enable unicase-tolower])],
+  [libunistring_compile_unicase_tolower=$enableval], [libunistring_compile_unicase_tolower=no])
+AM_CONDITIONAL(LIBUNISTRING_COMPILE_UNICASE_TOLOWER, test "$libunistring_compile_unicase_tolower" = "yes")
+
+AC_ARG_ENABLE([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_ALNUM],
+  [AS_HELP_STRING([--enable-libunistring-compile-unictype-ctype-alnum], [Enable unictype-ctype-alnum])],
+  [libunistring_compile_unictype_ctype_alnum=$enableval], [libunistring_compile_unictype_ctype_alnum=no])
+AM_CONDITIONAL(LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_ALNUM, test "$libunistring_compile_unictype_ctype_alnum" = "yes")
+
+# Repeat the same pattern for the other macros like:
+# LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_ALPHA, LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_BLANK, and others
+
+AC_ARG_ENABLE([LIBUNISTRING_COMPILE_UNISTR_U8_MBTOUCR],
+  [AS_HELP_STRING([--enable-libunistring-compile-unistr-u8-mbtoucr], [Enable unistr-u8-mbtoucr])],
+  [libunistring_compile_unistr_u8_mbtoucr=$enableval], [libunistring_compile_unistr_u8_mbtoucr=no])
+AM_CONDITIONAL(LIBUNISTRING_COMPILE_UNISTR_U8_MBTOUCR, test "$libunistring_compile_unistr_u8_mbtoucr" = "yes")
+
+# Continue defining all the necessary macros similarly
+
+AC_ARG_ENABLE([GL_COND_OBJ_WINDOWS_MUTEX],
+  [AS_HELP_STRING([--enable-cond-obj-windows-mutex], [Enable cond-obj-windows-mutex])],
+  [cond_obj_windows_mutex=$enableval], [cond_obj_windows_mutex=no])
+AM_CONDITIONAL(GL_COND_OBJ_WINDOWS_MUTEX, test "$cond_obj_windows_mutex" = "yes")
+
+AC_ARG_ENABLE([GL_COND_OBJ_WINDOWS_ONCE],
+  [AS_HELP_STRING([--enable-cond-obj-windows-once], [Enable cond-obj-windows-once])],
+  [cond_obj_windows_once=$enableval], [cond_obj_windows_once=no])
+AM_CONDITIONAL(GL_COND_OBJ_WINDOWS_ONCE, test "$cond_obj_windows_once" = "yes")
+
+AC_ARG_ENABLE([GL_COND_OBJ_WINDOWS_RECMUTEX],
+  [AS_HELP_STRING([--enable-cond-obj-windows-recmutex], [Enable cond-obj-windows-recmutex])],
+  [cond_obj_windows_recmutex=$enableval], [cond_obj_windows_recmutex=no])
+AM_CONDITIONAL(GL_COND_OBJ_WINDOWS_RECMUTEX, test "$cond_obj_windows_recmutex" = "yes")
+
+AC_ARG_ENABLE([GL_COND_OBJ_WINDOWS_RWLOCK],
+  [AS_HELP_STRING([--enable-cond-obj-windows-rwlock], [Enable cond-obj-windows-rwlock])],
+  [cond_obj_windows_rwlock=$enableval], [cond_obj_windows_rwlock=no])
+AM_CONDITIONAL(GL_COND_OBJ_WINDOWS_RWLOCK, test "$cond_obj_windows_rwlock" = "yes")
+
+/c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib/Makefile.am 수정
+## begin 추가
+if LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_ALPHA
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_ALPHA], [test "$have_unicase" = yes])
+endif
+
+if LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_BLANK
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_BLANK], [test "$have_unicase" = yes])
+endif
+
+if LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_CNTRL
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_CNTRL], [test "$have_unicase" = yes])
+endif
+
+if LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_DIGIT
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_DIGIT], [test "$have_unicase" = yes])
+endif
+
+if LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_GRAPH
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_GRAPH], [test "$have_unicase" = yes])
+endif
+
+if LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_LOWER
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_LOWER], [test "$have_unicase" = yes])
+endif
+
+if LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_PRINT
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_PRINT], [test "$have_unicase" = yes])
+endif
+
+if LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_PUNCT
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_PUNCT], [test "$have_unicase" = yes])
+endif
+
+if LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_SPACE
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_SPACE], [test "$have_unicase" = yes])
+endif
+
+if LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_UPPER
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_UPPER], [test "$have_unicase" = yes])
+endif
+
+if LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_XDIGIT
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_XDIGIT], [test "$have_unicase" = yes])
+endif
+
+if LIBUNISTRING_COMPILE_UNISTR_U8_UCTOMB
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNISTR_U8_UCTOMB], [test "$have_unicase" = yes])
+endif
+
+if LIBUNISTRING_COMPILE_UNIWIDTH_WIDTH
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNIWIDTH_WIDTH], [test "$have_unicase" = yes])
+endif
+
+if LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_ALPHA
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_ALPHA], [test "$have_unicase_alpha" = yes])
+endif
+
+if LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_BLANK
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_BLANK], [test "$have_unicase_blank" = yes])
+endif
+
+if LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_CNTRL
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_CNTRL], [test "$have_unicase_cntrl" = yes])
+endif
+
+if LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_DIGIT
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_DIGIT], [test "$have_unicase_digit" = yes])
+endif
+
+if LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_GRAPH
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_GRAPH], [test "$have_unicase_graph" = yes])
+endif
+
+if LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_LOWER
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_LOWER], [test "$have_unicase_lower" = yes])
+endif
+
+if LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_PRINT
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_PRINT], [test "$have_unicase_print" = yes])
+endif
+
+if LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_PUNCT
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_PUNCT], [test "$have_unicase_punct" = yes])
+endif
+
+if LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_SPACE
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_SPACE], [test "$have_unicase_space" = yes])
+endif
+
+if LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_UPPER
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_UPPER], [test "$have_unicase_upper" = yes])
+endif
+
+if LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_XDIGIT
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_XDIGIT], [test "$have_unicase_xdigit" = yes])
+endif
+
+if LIBUNISTRING_COMPILE_UNISTR_U8_UCTOMB
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNISTR_U8_UCTOMB], [test "$have_unistr_u8_uctomb" = yes])
+endif
+
+if LIBUNISTRING_COMPILE_UNIWIDTH_WIDTH
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNIWIDTH_WIDTH], [test "$have_uniwidht_width" = yes])
+endif
+## end 추가
+
+(오류)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib
+# automake --add-missing
+Makefile.am:2332: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_ALPHA does not appear in AM_CONDITIONAL
+Makefile.am:2336: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_BLANK does not appear in AM_CONDITIONAL
+Makefile.am:2340: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_CNTRL does not appear in AM_CONDITIONAL
+Makefile.am:2344: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_DIGIT does not appear in AM_CONDITIONAL
+Makefile.am:2348: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_GRAPH does not appear in AM_CONDITIONAL
+Makefile.am:2352: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_LOWER does not appear in AM_CONDITIONAL
+Makefile.am:2356: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_PRINT does not appear in AM_CONDITIONAL
+Makefile.am:2360: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_PUNCT does not appear in AM_CONDITIONAL
+Makefile.am:2364: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_SPACE does not appear in AM_CONDITIONAL
+Makefile.am:2368: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_UPPER does not appear in AM_CONDITIONAL
+Makefile.am:2372: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_XDIGIT does not appear in AM_CONDITIONAL
+Makefile.am:2376: error: LIBUNISTRING_COMPILE_UNISTR_U8_UCTOMB does not appear in AM_CONDITIONAL
+Makefile.am:2380: error: LIBUNISTRING_COMPILE_UNIWIDTH_WIDTH does not appear in AM_CONDITIONAL
+Makefile.am:2564: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_ALPHA does not appear in AM_CONDITIONAL
+Makefile.am:2574: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_BLANK does not appear in AM_CONDITIONAL
+Makefile.am:2584: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_CNTRL does not appear in AM_CONDITIONAL
+Makefile.am:2594: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_DIGIT does not appear in AM_CONDITIONAL
+Makefile.am:2604: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_GRAPH does not appear in AM_CONDITIONAL
+Makefile.am:2614: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_LOWER does not appear in AM_CONDITIONAL
+Makefile.am:2624: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_PRINT does not appear in AM_CONDITIONAL
+Makefile.am:2634: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_PUNCT does not appear in AM_CONDITIONAL
+Makefile.am:2644: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_SPACE does not appear in AM_CONDITIONAL
+Makefile.am:2654: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_UPPER does not appear in AM_CONDITIONAL
+Makefile.am:2664: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_XDIGIT does not appear in AM_CONDITIONAL
+Makefile.am:2932: error: LIBUNISTRING_COMPILE_UNISTR_U8_UCTOMB does not appear in AM_CONDITIONAL
+Makefile.am:2966: error: LIBUNISTRING_COMPILE_UNIWIDTH_WIDTH does not appear in AM_CONDITIONAL
+(수정)
+/c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib/configure.ac 수정
+# unistr 기능이 있는지 확인
+AC_ARG_ENABLE([unicase],
+  [AS_HELP_STRING([--enable-unicase], [Enable unicase support])],
+  [enable_unicase=yes], [enable_unicase=no])
+# enable_unicase가 yes이면 조건부 매크로 정의
+if test "$enable_unicase" = yes; then
+  AC_DEFINE([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_ALPHA], [1], [Enable unicase alpha])
+  AC_DEFINE([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_BLANK], [1], [Enable unicase blank])
+  AC_DEFINE([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_CNTRL], [1], [Enable unicase control])
+  AC_DEFINE([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_DIGIT], [1], [Enable unicase digit])
+  AC_DEFINE([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_GRAPH], [1], [Enable unicase graph])
+  AC_DEFINE([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_LOWER], [1], [Enable unicase lower])
+  AC_DEFINE([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_PRINT], [1], [Enable unicase print])
+  AC_DEFINE([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_PUNCT], [1], [Enable unicase punct])
+  AC_DEFINE([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_SPACE], [1], [Enable unicase space])
+  AC_DEFINE([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_UPPER], [1], [Enable unicase upper])
+  AC_DEFINE([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_XDIGIT], [1], [Enable unicase xdigit])
+  AC_DEFINE([LIBUNISTRING_COMPILE_UNISTR_U8_UCTOMB], [1], [Enable unistr u8 uctomb])
+  AC_DEFINE([LIBUNISTRING_COMPILE_UNIWIDTH_WIDTH], [1], [Enable uniwidht width])
+fi
+
+(오류)
+Makefile.am:2332: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_ALPHA does not appear in AM_CONDITIONAL
+Makefile.am:2336: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_BLANK does not appear in AM_CONDITIONAL
+Makefile.am:2340: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_CNTRL does not appear in AM_CONDITIONAL
+Makefile.am:2344: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_DIGIT does not appear in AM_CONDITIONAL
+Makefile.am:2348: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_GRAPH does not appear in AM_CONDITIONAL
+Makefile.am:2352: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_LOWER does not appear in AM_CONDITIONAL
+Makefile.am:2356: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_PRINT does not appear in AM_CONDITIONAL
+Makefile.am:2360: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_PUNCT does not appear in AM_CONDITIONAL
+Makefile.am:2364: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_SPACE does not appear in AM_CONDITIONAL
+Makefile.am:2368: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_UPPER does not appear in AM_CONDITIONAL
+Makefile.am:2372: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_XDIGIT does not appear in AM_CONDITIONAL
+Makefile.am:2376: error: LIBUNISTRING_COMPILE_UNISTR_U8_UCTOMB does not appear in AM_CONDITIONAL
+Makefile.am:2380: error: LIBUNISTRING_COMPILE_UNIWIDTH_WIDTH does not appear in AM_CONDITIONAL
+Makefile.am:2384: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_ALPHA does not appear in AM_CONDITIONAL
+Makefile.am:2388: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_BLANK does not appear in AM_CONDITIONAL
+Makefile.am:2392: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_CNTRL does not appear in AM_CONDITIONAL
+Makefile.am:2396: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_DIGIT does not appear in AM_CONDITIONAL
+Makefile.am:2400: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_GRAPH does not appear in AM_CONDITIONAL
+Makefile.am:2404: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_LOWER does not appear in AM_CONDITIONAL
+Makefile.am:2408: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_PRINT does not appear in AM_CONDITIONAL
+Makefile.am:2412: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_PUNCT does not appear in AM_CONDITIONAL
+Makefile.am:2416: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_SPACE does not appear in AM_CONDITIONAL
+Makefile.am:2420: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_UPPER does not appear in AM_CONDITIONAL
+Makefile.am:2424: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_XDIGIT does not appear in AM_CONDITIONAL
+Makefile.am:2428: error: LIBUNISTRING_COMPILE_UNISTR_U8_UCTOMB does not appear in AM_CONDITIONAL
+Makefile.am:2432: error: LIBUNISTRING_COMPILE_UNIWIDTH_WIDTH does not appear in AM_CONDITIONAL
+Makefile.am:2616: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_ALPHA does not appear in AM_CONDITIONAL
+Makefile.am:2626: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_BLANK does not appear in AM_CONDITIONAL
+Makefile.am:2636: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_CNTRL does not appear in AM_CONDITIONAL
+Makefile.am:2646: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_DIGIT does not appear in AM_CONDITIONAL
+Makefile.am:2656: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_GRAPH does not appear in AM_CONDITIONAL
+Makefile.am:2666: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_LOWER does not appear in AM_CONDITIONAL
+Makefile.am:2676: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_PRINT does not appear in AM_CONDITIONAL
+Makefile.am:2686: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_PUNCT does not appear in AM_CONDITIONAL
+Makefile.am:2696: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_SPACE does not appear in AM_CONDITIONAL
+Makefile.am:2706: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_UPPER does not appear in AM_CONDITIONAL
+Makefile.am:2716: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_XDIGIT does not appear in AM_CONDITIONAL
+Makefile.am:2984: error: LIBUNISTRING_COMPILE_UNISTR_U8_UCTOMB does not appear in AM_CONDITIONAL
+Makefile.am:3018: error: LIBUNISTRING_COMPILE_UNIWIDTH_WIDTH does not appear in AM_CONDITIONAL
+Makefile.am:3272: warning: EXTRA_DIST multiply defined in condition TRUE ...
+Makefile.am:73: ... 'EXTRA_DIST' previously defined here
+Makefile.am:3279: warning: AUTOMAKE_OPTIONS multiply defined in condition TRUE ...
+Makefile.am:65: ... 'AUTOMAKE_OPTIONS' previously defined here
+(수정)
+/c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib/configure.ac 수정
+AC_ARG_ENABLE([libunistring_compile_unictype_alpha],
+  [AS_HELP_STRING([--enable-libunistring_compile_unictype_alpha],
+    [Enable LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_ALPHA])],
+  [], [enable_libunistring_compile_unictype_alpha=no])
+
+AC_ARG_ENABLE([libunistring_compile_unictype_blank],
+  [AS_HELP_STRING([--enable-libunistring_compile_unictype_blank],
+    [Enable LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_BLANK])],
+  [], [enable_libunistring_compile_unictype_blank=no])
+
+AC_ARG_ENABLE([libunistring_compile_unictype_cntrl],
+  [AS_HELP_STRING([--enable-libunistring_compile_unictype_cntrl],
+    [Enable LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_CNTRL])],
+  [], [enable_libunistring_compile_unictype_cntrl=no])
+
+AC_ARG_ENABLE([libunistring_compile_unictype_digit],
+  [AS_HELP_STRING([--enable-libunistring_compile_unictype_digit],
+    [Enable LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_DIGIT])],
+  [], [enable_libunistring_compile_unictype_digit=no])
+
+AC_ARG_ENABLE([libunistring_compile_unictype_graph],
+  [AS_HELP_STRING([--enable-libunistring_compile_unictype_graph],
+    [Enable LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_GRAPH])],
+  [], [enable_libunistring_compile_unictype_graph=no])
+
+AC_ARG_ENABLE([libunistring_compile_unictype_lower],
+  [AS_HELP_STRING([--enable-libunistring_compile_unictype_lower],
+    [Enable LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_LOWER])],
+  [], [enable_libunistring_compile_unictype_lower=no])
+
+AC_ARG_ENABLE([libunistring_compile_unictype_print],
+  [AS_HELP_STRING([--enable-libunistring_compile_unictype_print],
+    [Enable LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_PRINT])],
+  [], [enable_libunistring_compile_unictype_print=no])
+
+AC_ARG_ENABLE([libunistring_compile_unictype_punct],
+  [AS_HELP_STRING([--enable-libunistring_compile_unictype_punct],
+    [Enable LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_PUNCT])],
+  [], [enable_libunistring_compile_unictype_punct=no])
+
+AC_ARG_ENABLE([libunistring_compile_unictype_space],
+  [AS_HELP_STRING([--enable-libunistring_compile_unictype_space],
+    [Enable LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_SPACE])],
+  [], [enable_libunistring_compile_unictype_space=no])
+
+AC_ARG_ENABLE([libunistring_compile_unictype_upper],
+  [AS_HELP_STRING([--enable-libunistring_compile_unictype_upper],
+    [Enable LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_UPPER])],
+  [], [enable_libunistring_compile_unictype_upper=no])
+
+AC_ARG_ENABLE([libunistring_compile_unictype_xdigit],
+  [AS_HELP_STRING([--enable-libunistring_compile_unictype_xdigit],
+    [Enable LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_XDIGIT])],
+  [], [enable_libunistring_compile_unictype_xdigit=no])
+
+AC_ARG_ENABLE([libunistring_compile_unistr_u8_uctomb],
+  [AS_HELP_STRING([--enable-libunistring_compile_unistr_u8_uctomb],
+    [Enable LIBUNISTRING_COMPILE_UNISTR_U8_UCTOMB])],
+  [], [enable_libunistring_compile_unistr_u8_uctomb=no])
+
+AC_ARG_ENABLE([libunistring_compile_uniwidth_width],
+  [AS_HELP_STRING([--enable-libunistring_compile_uniwidth_width],
+    [Enable LIBUNISTRING_COMPILE_UNIWIDTH_WIDTH])],
+  [], [enable_libunistring_compile_uniwidth_width=no])
+
+# Define AM_CONDITIONAL for each feature
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_ALPHA],
+  [test "$enable_libunistring_compile_unictype_alpha" = "yes"])
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_BLANK],
+  [test "$enable_libunistring_compile_unictype_blank" = "yes"])
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_CNTRL],
+  [test "$enable_libunistring_compile_unictype_cntrl" = "yes"])
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_DIGIT],
+  [test "$enable_libunistring_compile_unictype_digit" = "yes"])
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_GRAPH],
+  [test "$enable_libunistring_compile_unictype_graph" = "yes"])
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_LOWER],
+  [test "$enable_libunistring_compile_unictype_lower" = "yes"])
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_PRINT],
+  [test "$enable_libunistring_compile_unictype_print" = "yes"])
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_PUNCT],
+  [test "$enable_libunistring_compile_unictype_punct" = "yes"])
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_SPACE],
+  [test "$enable_libunistring_compile_unictype_space" = "yes"])
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_UPPER],
+  [test "$enable_libunistring_compile_unictype_upper" = "yes"])
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_XDIGIT],
+  [test "$enable_libunistring_compile_unictype_xdigit" = "yes"])
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNISTR_U8_UCTOMB],
+  [test "$enable_libunistring_compile_unistr_u8_uctomb" = "yes"])
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNIWIDTH_WIDTH],
+  [test "$enable_libunistring_compile_uniwidth_width" = "yes"])
+
+/c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib/Makefile.am 수정
+if LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_ALPHA
+LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_ALPHA = yes
+endif
+
+if LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_BLANK
+LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_BLANK = yes
+endif
+
+if LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_CNTRL
+LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_CNTRL = yes
+endif
+
+if LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_DIGIT
+LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_DIGIT = yes
+endif
+
+if LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_GRAPH
+LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_GRAPH = yes
+endif
+
+if LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_LOWER
+LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_LOWER = yes
+endif
+
+if LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_PRINT
+LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_PRINT = yes
+endif
+
+if LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_PUNCT
+LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_PUNCT = yes
+endif
+
+if LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_SPACE
+LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_SPACE = yes
+endif
+
+if LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_UPPER
+LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_UPPER = yes
+endif
+
+if LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_XDIGIT
+LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_XDIGIT = yes
+endif
+
+if LIBUNISTRING_COMPILE_UNISTR_U8_UCTOMB
+LIBUNISTRING_COMPILE_UNISTR_U8_UCTOMB = yes
+endif
+
+if LIBUNISTRING_COMPILE_UNIWIDTH_WIDTH
+LIBUNISTRING_COMPILE_UNIWIDTH_WIDTH = yes
+endif
+
+#AUTOMAKE_OPTIONS = 1.14 gnits subdir-objects #65
+
+#EXTRA_DIST += wctype.in.h #3272
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib
+# automake --add-missing
+Makefile.am:657: error: AUTOMAKE_OPTIONS must be set with '=' before using '+='
+Makefile.am:3324: warning: EXTRA_DIST multiply defined in condition TRUE ...
+Makefile.am:73: ... 'EXTRA_DIST' previously defined here
+Makefile.am:3331: warning: AUTOMAKE_OPTIONS multiply defined in condition TRUE ...
+Makefile.am:657: ... 'AUTOMAKE_OPTIONS' previously defined here
+configure.ac:647: error: required file 'intl-csharp/Makefile.in' not found
+configure.ac:647: error: required file 'gnulib-lib/Makefile.in' not found
+configure.ac:647: error: required file 'src/Makefile.in' not found
+configure.ac:647: error: required file 'man/Makefile.in' not found
+configure.ac:647: error: required file 'man/x-to-1.in' not found
+configure.ac:647: error: required file 'm4/Makefile.in' not found
+configure.ac:647: error: required file 'tests/Makefile.in' not found
+configure.ac:647: error: required file 'compile.in' not found
+configure.ac:647: error: required file 'install-sh.in' not found
+configure.ac:647: error: required file 'depcomp.in' not found
+configure.ac:647: error: required file 'missing.in' not found
+configure.ac:666: error: required file 'src/gettext.sh.in' not found
+Makefile.am:69: warning: AM_GNU_GETTEXT used but 'po' not in SUBDIRS
+Makefile.am:3362: error: 'OBJ_HEADERS' is used but 'OBJdir' is undefined
+Makefile.am:3346: warning: variable 'DIFFMARK_SOURCES' is defined but no program or
+Makefile.am:3346: library has 'DIFFMARK' as canonical name (possible typo)
+Makefile.am:3341: warning: variable 'HEADERS_SOURCES' is defined but no program or
+Makefile.am:3341: library has 'HEADERS' as canonical name (possible typo)
+Makefile.am:3351: warning: variable 'NANOSLEEP_SOURCES' is defined but no program or
+Makefile.am:3351: library has 'NANOSLEEP' as canonical name (possible typo)
+Makefile.am:3356: warning: variable 'OBSTACK_SOURCES' is defined but no program or
+Makefile.am:3356: library has 'OBSTACK' as canonical name (possible typo)
+Makefile.am:3371: warning: variable 'libobj_la_SOURCES' is defined but no program or
+Makefile.am:3371: library has 'libobj_la' as canonical name (possible typo)
+Makefile.am:3401: warning: variable 'libobj_la_LIBADD' is defined but no program or
+Makefile.am:3401: library has 'libobj_la' as canonical name (possible typo)
+Makefile.am:3400: warning: variable 'libobj_la_LDFLAGS' is defined but no program or
+Makefile.am:3400: library has 'libobj_la' as canonical name (possible typo)
 
 
 
