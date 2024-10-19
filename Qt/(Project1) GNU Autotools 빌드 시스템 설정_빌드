@@ -27905,168 +27905,434 @@ configure.ac 수정
 # 헤더 파일 확인하기
 AC_CHECK_HEADERS([alloca.h assert.h])
 
+여기서부터 해결해야함
+(컴파일)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib
+# automake --add-missing
+
+(오류)
+configure: error: cannot find install-sh, install.sh, or shtool in "." "./.." "./../.."
+(수정)
+파일 누락 : depcomp, compile, install-sh, missing 등
+
+(오류)
+Makefile.am: error: AM_CONDITIONAL: invalid condition: 'GL_GENERATE_HEADERS'
+(수정)
+AM_CONDITIONAL 정의 누락
+설정한 AM_CONDITIONAL이 제대로 정의되지 않음
+
+(오류)
+configure: error: AC_OUTPUT was called before AM_INIT_AUTOMAKE
+(수정)
+configure.ac에서 AC_OUTPUT을 사용하지 않았거나, 잘못 설정한 경우
+
+(오류)
+Makefile.am: error: required file 'headers.c' not found
+(수정)
+조건부 소스 관련 에러
+조건부로 추가한 소스 파일들이 Automake에서 인식되지 않을 때 발생
+bin_PROGRAMS 또는 BUILT_SOURCES를 사용해 파일을 추가
+
+(컴파일)
 nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib
 # automake --add-missing
 Makefile.am:108: error: GL_GENERATE_ALLOCA_H does not appear in AM_CONDITIONAL
 Makefile.am:146: error: GL_GENERATE_ASSERT_H does not appear in AM_CONDITIONAL
 Makefile.am:173: error: GL_COND_OBJ_ATEXIT does not appear in AM_CONDITIONAL
+...
+
+(오류)
+Makefile.am:108: error: GL_GENERATE_ALLOCA_H does not appear in AM_CONDITIONAL
+Makefile.am:146: error: GL_GENERATE_ASSERT_H does not appear in AM_CONDITIONAL
+Makefile.am:173: error: GL_COND_OBJ_ATEXIT does not appear in AM_CONDITIONAL
 Makefile.am:342: error: GL_COND_OBJ_CANONICALIZE_LGPL does not appear in AM_CONDITIONAL
-Makefile.am:366: error: GL_COND_OBJ_CLOSE does not appear in AM_CONDITIONAL
-Makefile.am:387: error: GL_COND_OBJ_DUP2 does not appear in AM_CONDITIONAL
-Makefile.am:406: error: GL_GENERATE_ERRNO_H does not appear in AM_CONDITIONAL
-Makefile.am:434: error: GL_COND_OBJ_ERROR does not appear in AM_CONDITIONAL
-Makefile.am:474: error: GL_COND_OBJ_FCNTL does not appear in AM_CONDITIONAL
-Makefile.am:541: error: GL_COND_OBJ_FREE does not appear in AM_CONDITIONAL
-Makefile.am:549: error: GL_COND_OBJ_FSTAT does not appear in AM_CONDITIONAL
-Makefile.am:586: error: GL_COND_OBJ_GETDTABLESIZE does not appear in AM_CONDITIONAL
-Makefile.am:598: error: GL_GENERATE_GETOPT_H does not appear in AM_CONDITIONAL
-Makefile.am:615: error: GL_GENERATE_GETOPT_CDEFS_H does not appear in AM_CONDITIONAL
-Makefile.am:628: error: GL_COND_OBJ_GETOPT does not appear in AM_CONDITIONAL
-Makefile.am:638: error: GL_COND_OBJ_GETPROGNAME does not appear in AM_CONDITIONAL
-Makefile.am:726: error: GL_GENERATE_ICONV_H does not appear in AM_CONDITIONAL
-Makefile.am:756: error: GL_COND_OBJ_ICONV_OPEN does not appear in AM_CONDITIONAL
-Makefile.am:759: error: GL_COND_OBJ_ICONV does not appear in AM_CONDITIONAL
-Makefile.am:848: error: GL_COND_OBJ_ISWBLANK does not appear in AM_CONDITIONAL
-Makefile.am:856: error: GL_COND_OBJ_ISWDIGIT does not appear in AM_CONDITIONAL
-Makefile.am:864: error: GL_COND_OBJ_ISWPUNCT does not appear in AM_CONDITIONAL
-Makefile.am:872: error: GL_COND_OBJ_ISWXDIGIT does not appear in AM_CONDITIONAL
-Makefile.am:930: error: GL_GENERATE_LIMITS_H does not appear in AM_CONDITIONAL
-Makefile.am:1008: error: GL_COND_OBJ_LOCALENAME_UNSAFE_LIMITED does not appear in AM_CONDITIONAL
-Makefile.am:1019: error: GL_COND_OBJ_LOCALENAME_UNSAFE_LIMITED does not appear in AM_CONDITIONAL
-Makefile.am:1069: error: GL_COND_OBJ_MBRTOC32 does not appear in AM_CONDITIONAL
-Makefile.am:1081: error: GL_COND_OBJ_MBRTOWC does not appear in AM_CONDITIONAL
-Makefile.am:1093: error: GL_COND_OBJ_MBSINIT does not appear in AM_CONDITIONAL
-Makefile.am:1133: error: GL_COND_OBJ_MEMCHR does not appear in AM_CONDITIONAL
-Makefile.am:1143: error: GL_COND_OBJ_MEMMOVE does not appear in AM_CONDITIONAL
-Makefile.am:1151: error: GL_COND_OBJ_MEMPCPY does not appear in AM_CONDITIONAL
-Makefile.am:1165: error: GL_COND_OBJ_MSVC_INVAL does not appear in AM_CONDITIONAL
-Makefile.am:1175: error: GL_COND_OBJ_MSVC_NOTHROW does not appear in AM_CONDITIONAL
-Makefile.am:1192: error: GL_COND_OBJ_OPEN does not appear in AM_CONDITIONAL
-Makefile.am:1219: error: GL_COND_OBJ_RAISE does not appear in AM_CONDITIONAL
-Makefile.am:1227: error: GL_COND_OBJ_RAWMEMCHR does not appear in AM_CONDITIONAL
-Makefile.am:1237: error: GL_COND_OBJ_READLINK does not appear in AM_CONDITIONAL
-Makefile.am:1263: error: GL_COND_OBJ_REALLOCARRAY does not appear in AM_CONDITIONAL
-Makefile.am:1271: error: GL_COND_OBJ_PROGRELOC does not appear in AM_CONDITIONAL
-Makefile.am:1275: error: RELOCATABLE_VIA_WRAPPER does not appear in AM_CONDITIONAL
-Makefile.am:1310: error: GL_COND_OBJ_SETLOCALE does not appear in AM_CONDITIONAL
-Makefile.am:1319: error: GL_COND_OBJ_SETLOCALE_LOCK does not appear in AM_CONDITIONAL
-Makefile.am:1386: error: GL_COND_OBJ_SIGPROCMASK does not appear in AM_CONDITIONAL
-Makefile.am:1442: error: GL_COND_OBJ_STAT does not appear in AM_CONDITIONAL
-Makefile.am:1466: error: GL_GENERATE_STDCKDINT_H does not appear in AM_CONDITIONAL
-Makefile.am:1487: error: GL_GENERATE_STDDEF_H does not appear in AM_CONDITIONAL
-Makefile.am:1516: error: GL_GENERATE_STDINT_H does not appear in AM_CONDITIONAL
-Makefile.am:1696: error: GL_COND_OBJ_STDIO_READ does not appear in AM_CONDITIONAL
-Makefile.am:1699: error: GL_COND_OBJ_STDIO_WRITE does not appear in AM_CONDITIONAL
-Makefile.am:1884: error: GL_COND_OBJ_STRERROR does not appear in AM_CONDITIONAL
-Makefile.am:1892: error: GL_COND_OBJ_STRERROR_OVERRIDE does not appear in AM_CONDITIONAL
-Makefile.am:2027: error: GL_COND_OBJ_STRNLEN does not appear in AM_CONDITIONAL
-Makefile.am:2041: error: GL_COND_OBJ_STRTOUL does not appear in AM_CONDITIONAL
-Makefile.am:2330: error: LIBUNISTRING_COMPILE_UNICASE_TOLOWER does not appear in AM_CONDITIONAL
-Makefile.am:2497: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_ALNUM does not appear in AM_CONDITIONAL
-Makefile.am:2507: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_ALPHA does not appear in AM_CONDITIONAL
-Makefile.am:2517: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_BLANK does not appear in AM_CONDITIONAL
-Makefile.am:2527: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_CNTRL does not appear in AM_CONDITIONAL
-Makefile.am:2537: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_DIGIT does not appear in AM_CONDITIONAL
-Makefile.am:2547: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_GRAPH does not appear in AM_CONDITIONAL
-Makefile.am:2557: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_LOWER does not appear in AM_CONDITIONAL
-Makefile.am:2567: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_PRINT does not appear in AM_CONDITIONAL
-Makefile.am:2577: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_PUNCT does not appear in AM_CONDITIONAL
-Makefile.am:2587: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_SPACE does not appear in AM_CONDITIONAL
-Makefile.am:2597: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_UPPER does not appear in AM_CONDITIONAL
-Makefile.am:2607: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_XDIGIT does not appear in AM_CONDITIONAL
-Makefile.am:2867: error: LIBUNISTRING_COMPILE_UNISTR_U8_MBTOUCR does not appear in AM_CONDITIONAL
-Makefile.am:2875: error: LIBUNISTRING_COMPILE_UNISTR_U8_UCTOMB does not appear in AM_CONDITIONAL
-Makefile.am:2909: error: LIBUNISTRING_COMPILE_UNIWIDTH_WIDTH does not appear in AM_CONDITIONAL
-Makefile.am:3117: error: GL_COND_OBJ_WCWIDTH does not appear in AM_CONDITIONAL
-Makefile.am:3125: error: GL_COND_OBJ_WINDOWS_MUTEX does not appear in AM_CONDITIONAL
-Makefile.am:3135: error: GL_COND_OBJ_WINDOWS_ONCE does not appear in AM_CONDITIONAL
-Makefile.am:3145: error: GL_COND_OBJ_WINDOWS_RECMUTEX does not appear in AM_CONDITIONAL
-Makefile.am:3155: error: GL_COND_OBJ_WINDOWS_RWLOCK does not appear in AM_CONDITIONAL
+...
 Makefile.am:3191: error: HAVE_ALLOCA_H does not appear in AM_CONDITIONAL
 Makefile.am:3195: error: HAVE_ASSERT_H does not appear in AM_CONDITIONAL
-Makefile.am:3199: warning: EXTRA_DIST multiply defined in condition TRUE ...
-Makefile.am:72: ... 'EXTRA_DIST' previously defined here
-Makefile.am:3202: warning: AUTOMAKE_OPTIONS multiply defined in condition TRUE ...
-Makefile.am:65: ... 'AUTOMAKE_OPTIONS' previously defined here
+(수정)
+AM_CONDITIONAL 관련 에러
+Makefile.am에 정의된 여러 GL_COND 또는 GL_GENERATE 매크로들이 AM_CONDITIONAL에서 정의되지 않음
+/c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib/configure.ac 수정
+AM_CONDITIONAL([GL_GENERATE_ALLOCA_H], [test "x$generate_alloca_h" = "xyes"])
+AM_CONDITIONAL([GL_GENERATE_ASSERT_H], [test "x$generate_assert_h" = "xyes"])
+AM_CONDITIONAL([GL_COND_OBJ_ATEXIT], [test "x$cond_obj_atexit" = "xyes"])
+AM_CONDITIONAL([GL_COND_OBJ_CANONICALIZE_LGPL], [test "x$cond_obj_canonicalize_lgpl" = "xyes"])
+AM_CONDITIONAL([HAVE_ALLOCA_H], [test "x$have_alloca_h" = "xyes"])
+AM_CONDITIONAL([HAVE_ASSERT_H], [test "x$have_assert_h" = "xyes"])
+
+(오류)
 configure.ac:257: error: required file 'uninstalled-config.sh.in' not found
 configure.ac:259: error: required file 'doc/Makefile.in' not found
 configure.ac:261: error: required file 'intl-java/Makefile.in' not found
-configure.ac:263: error: required file 'intl-csharp/Makefile.in' not found
-configure.ac:265: error: required file 'gnulib-lib/Makefile.in' not found
-configure.ac:267: error: required file 'src/Makefile.in' not found
-configure.ac:268: error: required file 'src/gettext.sh.in' not found
-configure.ac:272: error: required file 'man/Makefile.in' not found
-configure.ac:274: error: required file 'man/x-to-1.in' not found
-configure.ac:276: error: required file 'm4/Makefile.in' not found
-configure.ac:278: error: required file 'tests/Makefile.in' not found
-configure.ac:283: error: required file '#Makefile.in' not found
-configure.ac:283: error: required file '#src/Makefile.in' not found
-configure.ac:283: error: required file 'depcomp.in' not found
+...
 configure.ac:283: error: required file 'compile.in' not found
 configure.ac:283: error: required file 'install-sh.in' not found
-configure.ac:283: error: required file 'missing.in' not found
-configure.ac: error: AM_GNU_GETTEXT used but SUBDIRS not defined
+(수정)
+configure.ac에서 요구하는 여러 파일이 존재하지 않아서 발생하는 에러
+누락된 파일을 확인하고, 필요한 파일을 생성하거나 경로를 수정
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib
+# mkdir -p doc intl-java
+touch uninstalled-config.sh.in
+touch doc/Makefile.in
+touch intl-java/Makefile.in
+
+configure.ac 수정
+AC_CONFIG_FILES([
+  Makefile
+  uninstalled-config.sh
+  doc/Makefile
+  intl-java/Makefile
+  intl-csharp/Makefile
+  gnulib-lib/Makefile
+  src/Makefile
+  src/gettext.sh
+  po/Makefile.in
+  man/Makefile
+  man/x-to-1
+  m4/Makefile
+  tests/Makefile
+  compile
+  install-sh
+])
+
+AC_CONFIG_FILES([src/gettext.sh], [chmod a+x src/gettext.sh]) # 별도설정시 따로 빼서 설정
+
+(오류)
+Makefile.am:3199: warning: EXTRA_DIST multiply defined in condition TRUE ...
+Makefile.am:3202: warning: AUTOMAKE_OPTIONS multiply defined in condition TRUE ...
+(수정)
+EXTRA_DIST와 AUTOMAKE_OPTIONS가 중복 정의되었다는 경고
+하나의 블록으로 합치거나, 불필요한 중복된 정의를 제거
+/c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib/Makefile.am 수정
+
+# EXTRA_DIST와 AUTOMAKE_OPTIONS를 하나로 합치기
+#EXTRA_DIST = $(EXTRA_DIST_VAR1) $(EXTRA_DIST_VAR2)
+#AUTOMAKE_OPTIONS = $(AUTOMAKE_OPTIONS_VAR1) $(AUTOMAKE_OPTIONS_VAR2)
+
+# 이미 정의된 EXTRA_DIST와 AUTOMAKE_OPTIONS를 사용하되, 조건에 따라 추가하기
+EXTRA_DIST = $(EXTRA_DIST_VAR1) $(EXTRA_DIST_VAR2) AUTHORS NEWS README THANKS
+EXTRA_DIST += uninstalled-configure.sh.in
+
+AUTOMAKE_OPTIONS = foreign
+AUTOMAKE_OPTIONS += $(AUTOMAKE_OPTIONS_VAR1) $(AUTOMAKE_OPTIONS_VAR2)
+
+## begin 추가
+# Conditionally include sources based on the AM_CONDITIONAL macros set in configure.ac
+if GL_GENERATE_HEADERS
+  HEADERS_SOURCES = headers.c
+endif
+
+if GL_GENERATE_DIFFMARK
+  DIFFMARK_SOURCES = diffmark.c
+endif
+
+if GL_GENERATE_NANOSLEEP
+  NANOSLEEP_SOURCES = nanosleep.c
+endif
+
+if GL_GENERATE_OBSTACK
+  OBSTACK_SOURCES = obstack.c
+endif
+
+# Conditional objects (examples)
+if GL_COND_OBJ_HEADERS
+  OBJ_HEADERS = headers.o
+endif
+
+if GL_COND_OBJ_DIFFMARK
+  OBJ_DIFFMARK = diffmark.o
+endif
+## end 추가
+
+(오류)
 Makefile.am:87: warning: source file 'malloc/scratch_buffer_grow.c' is in a subdirectory,
 Makefile.am:87: but option 'subdir-objects' is disabled
-automake-1.16: warning: possible forward-incompatibility.
-automake-1.16: At least one source file is in a subdirectory, but the 'subdir-objects'
-automake-1.16: automake option hasn't been enabled.  For now, the corresponding output
-automake-1.16: object file(s) will be placed in the top-level directory.  However, this
-automake-1.16: behavior may change in a future Automake major version, with object
-automake-1.16: files being placed in the same subdirectory as the corresponding sources.
-automake-1.16: You are advised to start using 'subdir-objects' option throughout your
-automake-1.16: project, to avoid future incompatibilities.
-Makefile.am:87: warning: source file 'malloc/scratch_buffer_grow_preserve.c' is in a subdirectory,
+(수정)
+소스 파일이 하위 디렉토리에 있지만 subdir-objects 옵션이 비활성화되었다는 경고
+이 옵션을 활성화
+Makefile.am:87: warning: source file 'malloc/scratch_buffer_grow.c' is in a subdirectory,
 Makefile.am:87: but option 'subdir-objects' is disabled
-Makefile.am:87: warning: source file 'malloc/scratch_buffer_set_array_size.c' is in a subdirectory,
-Makefile.am:87: but option 'subdir-objects' is disabled
-Makefile.am:87: warning: source file 'glthread/lock.c' is in a subdirectory,
-Makefile.am:87: but option 'subdir-objects' is disabled
-Makefile.am:87: warning: source file 'glthread/threadlib.c' is in a subdirectory,
-Makefile.am:87: but option 'subdir-objects' is disabled
-Makefile.am:2331: warning: source file 'unicase/tolower.c' is in a subdirectory,
-Makefile.am:2331: but option 'subdir-objects' is disabled
-Makefile.am:2498: warning: source file 'unictype/ctype_alnum.c' is in a subdirectory,
-Makefile.am:2498: but option 'subdir-objects' is disabled
-Makefile.am:2508: warning: source file 'unictype/ctype_alpha.c' is in a subdirectory,
-Makefile.am:2508: but option 'subdir-objects' is disabled
-Makefile.am:2518: warning: source file 'unictype/ctype_blank.c' is in a subdirectory,
-Makefile.am:2518: but option 'subdir-objects' is disabled
-Makefile.am:2528: warning: source file 'unictype/ctype_cntrl.c' is in a subdirectory,
-Makefile.am:2528: but option 'subdir-objects' is disabled
-Makefile.am:2538: warning: source file 'unictype/ctype_digit.c' is in a subdirectory,
-Makefile.am:2538: but option 'subdir-objects' is disabled
-Makefile.am:2548: warning: source file 'unictype/ctype_graph.c' is in a subdirectory,
-Makefile.am:2548: but option 'subdir-objects' is disabled
-Makefile.am:2558: warning: source file 'unictype/ctype_lower.c' is in a subdirectory,
-Makefile.am:2558: but option 'subdir-objects' is disabled
-Makefile.am:2568: warning: source file 'unictype/ctype_print.c' is in a subdirectory,
-Makefile.am:2568: but option 'subdir-objects' is disabled
-Makefile.am:2578: warning: source file 'unictype/ctype_punct.c' is in a subdirectory,
-Makefile.am:2578: but option 'subdir-objects' is disabled
-Makefile.am:2588: warning: source file 'unictype/ctype_space.c' is in a subdirectory,
-Makefile.am:2588: but option 'subdir-objects' is disabled
-Makefile.am:2598: warning: source file 'unictype/ctype_upper.c' is in a subdirectory,
-Makefile.am:2598: but option 'subdir-objects' is disabled
-Makefile.am:2608: warning: source file 'unictype/ctype_xdigit.c' is in a subdirectory,
-Makefile.am:2608: but option 'subdir-objects' is disabled
-Makefile.am:2868: warning: source file 'unistr/u8-mbtoucr.c' is in a subdirectory,
-Makefile.am:2868: but option 'subdir-objects' is disabled
-Makefile.am:2876: warning: source file 'unistr/u8-uctomb.c' is in a subdirectory,
-Makefile.am:2876: but option 'subdir-objects' is disabled
-Makefile.am:2876: warning: source file 'unistr/u8-uctomb-aux.c' is in a subdirectory,
-Makefile.am:2876: but option 'subdir-objects' is disabled
-Makefile.am:2910: warning: source file 'uniwidth/width.c' is in a subdirectory,
-Makefile.am:2910: but option 'subdir-objects' is disabled
-Makefile.am:3183: error: 'OBJ_HEADERS' is used but 'OBJdir' is undefined
-Makefile.am:3170: warning: variable 'DIFFMARK_SOURCES' is defined but no program or
-Makefile.am:3170: library has 'DIFFMARK' as canonical name (possible typo)
-Makefile.am:3166: warning: variable 'HEADERS_SOURCES' is defined but no program or
-Makefile.am:3166: library has 'HEADERS' as canonical name (possible typo)
-Makefile.am:3174: warning: variable 'NANOSLEEP_SOURCES' is defined but no program or
-Makefile.am:3174: library has 'NANOSLEEP' as canonical name (possible typo)
-Makefile.am:3178: warning: variable 'OBSTACK_SOURCES' is defined but no program or
-Makefile.am:3178: library has 'OBSTACK' as canonical name (possible typo)
+/c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib/Makefile.am 수정
+AUTOMAKE_OPTIONS = 1.14 gnits subdir-objects
+noinst_LIBRARIES += libgrt.a
+SUBDIRS = malloc
+EXTRA_DIST = $(EXTRA_DIST_VAR1) $(EXTRA_DIST_VAR2) AUTHORS NEWS README THANKS
+EXTRA_DIST += uninstalled-configure.sh.in
+## begin 추가
+# Conditionally include sources based on the AM_CONDITIONAL macros set in configure.ac
+if GL_GENERATE_HEADERS
+  HEADERS_SOURCES = headers.c
+endif
+
+if GL_GENERATE_DIFFMARK
+  DIFFMARK_SOURCES = diffmark.c
+endif
+
+if GL_GENERATE_NANOSLEEP
+  NANOSLEEP_SOURCES = nanosleep.c
+endif
+
+if GL_GENERATE_OBSTACK
+  OBSTACK_SOURCES = obstack.c
+endif
+
+# Conditional objects (examples)
+if GL_COND_OBJ_HEADERS
+  OBJ_HEADERS = headers.o
+endif
+
+if GL_COND_OBJ_DIFFMARK
+  OBJ_DIFFMARK = diffmark.o
+endif
+## end 추가
+
+(오류)
+configure.ac:283: error: AM_GNU_GETTEXT used but SUBDIRS not defined
+(수정)
+AM_GNU_GETTEXT가 사용되었지만 SUBDIRS가 정의되지 않았다는 에러
+SUBDIRS를 설정
+/c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib/Makefile.am 수정
+# Automake 옵션 설정
+AUTOMAKE_OPTIONS = 1.14 gnits subdir-objects
+
+# 정적 라이브러리 설정
+noinst_LIBRARIES += libgrt.a
+SUBDIRS = malloc # malloc/scratch_buffer_grow.c
+
+EXTRA_DIST = \
+  AUTHORS \
+  NEWS \
+  README \
+  THANKS \
+  uninstalled-configure.sh.i
+
+AUTOMAKE_OPTIONS = foreign 1.14 subdir-objects
+#AUTOMAKE_OPTIONS_VAR1 = 1.14
+#AUTOMAKE_OPTIONS_VAR2 = subdir-objects
+#AUTOMAKE_OPTIONS = foreign # 변수처리하지않
+#AUTOMAKE_OPTIONS += $(AUTOMAKE_OPTIONS_VAR1) $(AUTOMAKE_OPTIONS_VAR2)
+
+# 조건부 소스 파일 포함
+## 헤더 파일이 필요하면 headers.c 추가
+if GL_GENERATE_HEADERS
+  HEADERS_SOURCES = headers.c
+endif
+
+## diffmark가 필요하면 diffmark.c 추가
+if GL_GENERATE_DIFFMARK
+  DIFFMARK_SOURCES = diffmark.c
+endif
+
+## nanosleep이 필요하면 nanosleep.c 추가
+if GL_GENERATE_NANOSLEEP
+  NANOSLEEP_SOURCES = nanosleep.c
+endif
+
+## obstack이 필요하면 obstack.c 추가
+if GL_GENERATE_OBSTACK
+  OBSTACK_SOURCES = obstack.c
+endif
+
+# 조건부 객체 처리
+## GL_COND_OBJ_HEADERS가 참이면 headers.o 객체 추가
+if GL_COND_OBJ_HEADERS
+  OBJ_HEADERS = headers.o
+endif
+
+## GL_COND_OBJ_DIFFMARK가 참이면 diffmark.o 객체 추가
+if GL_COND_OBJ_DIFFMARK
+  OBJ_DIFFMARK = diffmark.o
+endif
+
+파일확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib
+# find / \( -name "headers.c" -o -name "diffmark.c" -o -name "nanosleep.c" -o -name "obstack.c" -o -name "headers.o" -o -name "diffmark.o" \)
+(dir:Windows 환경에서 주로 사용되며, 지정된 디렉터리의 내용을 나열하는 데 사용,
+find:파일 시스템 내에서 조건에 맞는 파일을 검색하는 명령어)
+/c/curl/lib/headers.c
+/c/gnulib/lib/nanosleep.c
+/c/gnulib/lib/obstack.c
+...
+
+환경변수등록
+ ~/.bashrc 수정
+export PATH="$PATH:/c/curl/lib"
+export PATH="$PATH:/c/gnulib/lib"
+
+나머지파일 다시 검색
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib
+# find / -name "diffmark.c" -or -name "headers.o" -or -name "diffmark.o"
+find: 파일 시스템 순환 발견. ‘/c/msys64’은(는) ‘/’와 동일한 파일 시스템 순환의 일부입니다.
+(오류)
+파일 시스템 순환(circular file system)이 발견
+특정 디렉토리에서만 검색하거나 순환 경로 무시하고 검색 -xdev 옵션을 추가=>해결안됨
+추가설치하기로함
+Gnulib에서 사용 가능한 모듈을 검색
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib
+# gnulib-tool --list
+...
+d-ino
+d-type
+dev-ino
+dfa
+di-set
+diffseq <-- 추정
+dirent
+dirent-safer
+dirfd
+dirname
+...
+diffseq 모듈 추가
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib
+# gnulib-tool --add diffseq
+설치성공
+
+/c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib/Makefile.am 수정
+## diffseq가 필요하면 diffseq.c 추가 (diffmark -> diffseq로 변경)
+if GL_GENERATE_DIFFSEQ
+  DIFFSEQ_SOURCES = diffseq.c # diffseq설치
+endif
+
+## GL_COND_OBJ_DIFFSEQ가 참이면 diffseq.o 객체 추가 (diffmark -> diffseq로 변경)
+if GL_COND_OBJ_DIFFSEQ
+  OBJ_DIFFSEQ = diffseq.o # diffseq설치
+endif
+
+(컴파일)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib
+# automake --add-missing
+(오류)
+configure.ac:279: error: 'src/gettext.sh' is already registered with AC_CONFIG_FILES.
+../autoconf-2.72/lib/autoconf/status.m4:289: AC_CONFIG_FILES is expanded from...
+(수정)
+src/gettext.sh 파일이 이미 AC_CONFIG_FILES에 등록되어 있어서 발생하는 충돌
+src/gettext.sh가 AC_CONFIG_FILES에 등록된 부분 삭
+/c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib/configure.ac 수정
+AC_CONFIG_FILES([
+#  src/gettext.sh # 제거
+])
+AC_CONFIG_FILES([src/gettext.sh], [chmod a+x src/gettext.sh]) # 별도설정시 따로 빼서 설정
+
+(오류)
+configure.ac:284: error: 'compile' is already registered with AC_CONFIG_FILES.
+../autoconf-2.72/lib/autoconf/status.m4:289: AC_CONFIG_FILES is expanded from...
+(수정)
+/c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib/configure.ac 수정
+AC_CONFIG_FILES([
+  Makefile
+  uninstalled-config.sh
+  doc/Makefile
+  intl-java/Makefile
+  intl-csharp/Makefile
+  gnulib-lib/Makefile
+  src/Makefile
+  po/Makefile.in
+  man/Makefile
+  man/x-to-1
+  m4/Makefile
+  tests/Makefile
+  compile
+  install-sh
+  depcomp
+  missing
+])
+
+AC_CONFIG_FILES([src/gettext.sh], [chmod a+x src/gettext.sh]) # 별도설정시 따로 빼서 설정
+
+#AC_OUTPUT([
+  #Makefile
+  #src/Makefile
+  #depcomp
+  #compile # 제거
+  #install-sh # 제거
+  #missing
+#])
+AC_OUTPUT
+
+(오류)
+error: GL_COND_OBJ_CLOSE does not appear in AM_CONDITIONAL
+error: GL_COND_OBJ_DUP2 does not appear in AM_CONDITIONAL
+error: required file 'intl-csharp/Makefile.in' not found
+error: required file 'gnulib-lib/Makefile.in' not found
+error: required file 'src/Makefile.in' not found
+(수정)
+Makefile.am에서 사용된 조건부 매크로들(GL_COND_OBJ_CLOSE, GL_COND_OBJ_DUP2)이 configure.ac에서 정의되지 않았음을 의미
+configure.ac에서 찾으려는 파일들이 실제로 존재하지 않거나 누락
+/c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib/configure.ac 수정
+# gnulib 초기화
+gl_EARLY
+gl_INIT
+
+AM_CONDITIONAL([GL_COND_OBJ_CLOSE], [test x$enable_feature_x = xyes])
+AM_CONDITIONAL([GL_COND_OBJ_DUP2], [test x$enable_feature_y = xyes])
+
+AC_CHECK_FILE([intl-csharp/Makefile.in], [AC_MSG_RESULT([found])], [AC_MSG_RESULT([not found])])
+AC_CHECK_FILE([gnulib-lib/Makefile.in], [AC_MSG_RESULT([found])], [AC_MSG_RESULT([not found])])
+AC_CHECK_FILE([src/Makefile.in], [AC_MSG_RESULT([found])], [AC_MSG_RESULT([not found])])
+
+환경변수등록
+~/.bashrc 수정
+#C:\libidn2\gettext-0.22.5\gettext\gettext-runtime\intl-csharp
+#C:\libidn2\gettext-0.22.5\gettext\gettext-runtime\gnulib-lib
+#C:\libidn2\gettext-0.22.5\gettext\gettext-runtime\src
+/c/libidn2/gettext-0.22.5/gettext/gettext-runtime 을 PATH에 등록
+export PATH="$PATH:/c/libidn2/gettext-0.22.5/gettext/gettext-runtime"
+
+(컴파일)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib
+# autoreconf --install
+
+(오류)
+configure.ac: warning: AM_GNU_GETTEXT is used, but not AM_GNU_GETTEXT_VERSION or AM_GNU_GETTEXT_REQUIRE_VERSION
+(수정)
+AM_GNU_GETTEXT가 configure.ac에 사용되고 있지만, 버전 확인을 위한 AM_GNU_GETTEXT_VERSION 또는 AM_GNU_GETTEXT_REQUIRE_VERSION 매크로가 없다는 경고
+/c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib/configure.ac 수정
+AM_GNU_GETTEXT([use-libtool], [need-ngettext], [\${top_builddir}/intl])
+AM_GNU_GETTEXT_REQUIRE_VERSION([0.22.5])
+
+(오류)
+libtoolize: You should add the contents of the following files to 'aclocal.m4':
+  '/usr/share/aclocal/libtool.m4'
+(수정)
+libtoolize가 필요한 파일을 aclocal.m4에 추가하라는 경고
+libtool 관련 설정을 aclocal.m4에 반영하지 않았다는 의미
+libtool.m4 파일을 프로젝트의 m4 디렉토리에 복사하고, aclocal.m4를 업데이트
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib
+# libtoolize --copy --force
+
+(오류)
+Makefile.am:407: error: GL_GENERATE_ERRNO_H does not appear in AM_CONDITIONAL
+Makefile.am:435: error: GL_COND_OBJ_ERROR does not appear in AM_CONDITIONAL
+(수정)
+/c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib/configure.ac 수정
+Makefile.am에서 GL_GENERATE_ERRNO_H가 AM_CONDITIONAL에 정의되지 않은 상태로 사용
+configure.ac에 해당 조건부 매크로를 정의
+AM_CONDITIONAL([GL_GENERATE_ERRNO_H], [test "$have_errno_h" = yes])
+AM_CONDITIONAL([GL_COND_OBJ_ERROR], [test "$have_error" = yes])
+
+(오류)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib
+# autoreconf --install
+autopoint: *** AM_GNU_GETTEXT without 'external' argument is no longer supported in version 0.22.5
+autopoint: *** Stop.
+autoreconf-2.72: error: autopoint failed with exit status: 1
+(수정)
+AM_GNU_GETTEXT가 gettext 버전 0.22.5에서 더 이상 external 인자를 명시하지 않은 경우를 지원하지 않기 때문에 발생
+최신 버전에서는 gettext 관련 파일을 외부에서 가져와 사용하는 경우, AM_GNU_GETTEXT([external])을 명시적으로 추가
+/c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib/configure.ac 수정
+AM_GNU_GETTEXT([external], [use-libtool], [need-ngettext], [${top_builddir}/intl])
+
+(오류)
+configure.ac:13: error: second argument to 'AM_GNU_GETTEXT' must be 'external' or 'no-libtool'
+(수정)
+configure.ac 파일에서 AM_GNU_GETTEXT 매크로의 두 번째 인자가 잘못되었을 때 발생하는 오류
+/c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib/configure.ac 수정
+
+
+
+
+
+
 
 
 
