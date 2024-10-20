@@ -29164,41 +29164,283 @@ endif
 
 #EXTRA_DIST += wctype.in.h #3272
 
-nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib
-# automake --add-missing
+(오류)
 Makefile.am:657: error: AUTOMAKE_OPTIONS must be set with '=' before using '+='
+(수정)
+AUTOMAKE_OPTIONS는 +=로 확장할 수 없으며, 반드시 =를 사용해야 
+657 AUTOMAKE_OPTIONS += no-dependencies
+3331 AUTOMAKE_OPTIONS = foreign 1.14 subdir-objects
+/c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib/Makefile.am 수정
+AUTOMAKE_OPTIONS = foreign 1.14 subdir-objects no-dependencies
+
+(오류)
 Makefile.am:3324: warning: EXTRA_DIST multiply defined in condition TRUE ...
-Makefile.am:73: ... 'EXTRA_DIST' previously defined here
-Makefile.am:3331: warning: AUTOMAKE_OPTIONS multiply defined in condition TRUE ...
-Makefile.am:657: ... 'AUTOMAKE_OPTIONS' previously defined here
+(수정)
+EXTRA_DIST가 여러번 정의됨
+#EXTRA_DIST = \
+EXTRA_DIST += \ 
+  AUTHORS \
+  NEWS \
+  README \
+  THANKS \
+  uninstalled-configure.sh.in
+
+(오류)
 configure.ac:647: error: required file 'intl-csharp/Makefile.in' not found
-configure.ac:647: error: required file 'gnulib-lib/Makefile.in' not found
-configure.ac:647: error: required file 'src/Makefile.in' not found
-configure.ac:647: error: required file 'man/Makefile.in' not found
-configure.ac:647: error: required file 'man/x-to-1.in' not found
-configure.ac:647: error: required file 'm4/Makefile.in' not found
-configure.ac:647: error: required file 'tests/Makefile.in' not found
-configure.ac:647: error: required file 'compile.in' not found
-configure.ac:647: error: required file 'install-sh.in' not found
-configure.ac:647: error: required file 'depcomp.in' not found
-configure.ac:647: error: required file 'missing.in' not found
-configure.ac:666: error: required file 'src/gettext.sh.in' not found
+(수정)
+intl-csharp/Makefile.in, gnulib-lib/Makefile.in 등 필수적인 Makefile.in 파일들이 없다
+automake가 생성하는 파일
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib
+# autoreconf -fiv
+
+(오류)
 Makefile.am:69: warning: AM_GNU_GETTEXT used but 'po' not in SUBDIRS
+(수정)
+AM_GNU_GETTEXT 매크로를 사용하고 있지만, po 디렉토리가 SUBDIRS에 포함되지 않
+SUBDIRS에 po를 추가
+/c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib/Makefile.am 수정
+
+SUBDIRS = po malloc # malloc/scratch_buffer_grow.c
+
+(오류)
 Makefile.am:3362: error: 'OBJ_HEADERS' is used but 'OBJdir' is undefined
-Makefile.am:3346: warning: variable 'DIFFMARK_SOURCES' is defined but no program or
-Makefile.am:3346: library has 'DIFFMARK' as canonical name (possible typo)
-Makefile.am:3341: warning: variable 'HEADERS_SOURCES' is defined but no program or
-Makefile.am:3341: library has 'HEADERS' as canonical name (possible typo)
-Makefile.am:3351: warning: variable 'NANOSLEEP_SOURCES' is defined but no program or
-Makefile.am:3351: library has 'NANOSLEEP' as canonical name (possible typo)
-Makefile.am:3356: warning: variable 'OBSTACK_SOURCES' is defined but no program or
-Makefile.am:3356: library has 'OBSTACK' as canonical name (possible typo)
-Makefile.am:3371: warning: variable 'libobj_la_SOURCES' is defined but no program or
-Makefile.am:3371: library has 'libobj_la' as canonical name (possible typo)
-Makefile.am:3401: warning: variable 'libobj_la_LIBADD' is defined but no program or
-Makefile.am:3401: library has 'libobj_la' as canonical name (possible typo)
-Makefile.am:3400: warning: variable 'libobj_la_LDFLAGS' is defined but no program or
-Makefile.am:3400: library has 'libobj_la' as canonical name (possible typo)
+(수정)
+OBJ_HEADERS 변수를 사용하지만 OBJdir이 정의되지 않음
+headers.o 파일을검색해 경로 찾기
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib
+# find / -name "headers.o"
+find: 파일 시스템 순환 발견. ‘/c/msys64’은(는) ‘/’와 동일한 파일 시스템 순환의 일부입니다.
+탐색기로 검색
+/c/curl/lib/headers.c
+/c/gnulib/lib/nanosleep.c
+/c/gnulib/lib/obstack.c
+headers.o, nanosleep.o, obstack.o 들은 위치를 찾을 수 없음 => 임의생성
+
+/c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib/Makefile.am 수정
+# 빌드할 오브젝트 파일들의 objdir (임의로 설정)
+objdir = $(top_builddir)/obj
+# Print top_builddir
+echo "Top build directory is: $top_builddir"
+
+# 라이브러리 및 링크 설정
+libobj_la_LDFLAGS = -no-undefined
+libobj_la_LIBADD =
+
+(오류)
+configure.ac:651: error: required file 'intl-csharp/Makefile.in' not found
+configure.ac:651: error: required file 'gnulib-lib/Makefile.in' not found
+configure.ac:651: error: required file 'src/Makefile.in' not found
+configure.ac:651: error: required file 'man/Makefile.in' not found
+configure.ac:651: error: required file 'man/x-to-1.in' not found
+configure.ac:651: error: required file 'm4/Makefile.in' not found
+configure.ac:651: error: required file 'tests/Makefile.in' not found
+configure.ac:651: error: required file 'compile.in' not found
+configure.ac:651: error: required file 'install-sh.in' not found
+configure.ac:651: error: required file 'depcomp.in' not found
+configure.ac:651: error: required file 'missing.in' not found
+configure.ac:670: error: required file 'src/gettext.sh.in' not found
+(수정)
+# /c/libidn2/gettext-0.22.5/gettext/gettext-runtime
+AC_CHECK_FILE([Makefile], [AC_MSG_RESULT([found])], [AC_MSG_RESULT([not found])])
+AC_CHECK_FILE([uninstalled-config.sh], [AC_MSG_RESULT([found])], [AC_MSG_RESULT([not found])])
+AC_CHECK_FILE([doc/Makefile], [AC_MSG_RESULT([found])], [AC_MSG_RESULT([not found])])
+AC_CHECK_FILE([intl-java/Makefile], [AC_MSG_RESULT([found])], [AC_MSG_RESULT([not found])])
+AC_CHECK_FILE([intl-csharp/Makefile], [AC_MSG_RESULT([found])], [AC_MSG_RESULT([not found])])
+AC_CHECK_FILE([gnulib-lib/Makefile], [AC_MSG_RESULT([found])], [AC_MSG_RESULT([not found])])
+AC_CHECK_FILE([src/Makefile], [AC_MSG_RESULT([found])], [AC_MSG_RESULT([not found])])
+AC_CHECK_FILE([po/Makefile.in], [AC_MSG_RESULT([found])], [AC_MSG_RESULT([not found])])
+AC_CHECK_FILE([man/Makefile], [AC_MSG_RESULT([found])], [AC_MSG_RESULT([not found])])
+AC_CHECK_FILE([man/x-to-1], [AC_MSG_RESULT([found])], [AC_MSG_RESULT([not found])])
+AC_CHECK_FILE([m4/Makefile], [AC_MSG_RESULT([found])], [AC_MSG_RESULT([not found])])
+AC_CHECK_FILE([tests/Makefile], [AC_MSG_RESULT([found])], [AC_MSG_RESULT([not found])])
+AC_CHECK_FILE([compile], [AC_MSG_RESULT([found])], [AC_MSG_RESULT([not found])])
+AC_CHECK_FILE([install-sh], [AC_MSG_RESULT([found])], [AC_MSG_RESULT([not found])])
+AC_CHECK_FILE([depcomp], [AC_MSG_RESULT([found])], [AC_MSG_RESULT([not found])])
+AC_CHECK_FILE([missing], [AC_MSG_RESULT([found])], [AC_MSG_RESULT([not found])])
+AC_CONFIG_FILES([
+  Makefile
+  uninstalled-config.sh
+  doc/Makefile
+  intl-java/Makefile
+  ../intl-csharp/Makefile
+  ../gnulib-lib/Makefile
+  ../src/Makefile
+  po/Makefile.in
+  ../man/Makefile
+  ../man/x-to-1
+  ../m4/Makefile
+  ../tests/Makefile
+  ../compile
+  ../install-sh
+  ../depcomp
+  ../missing
+])
+
+아래파일들은 검색이 되지않아 주석처리함
+find . \( -name "compile.in" -o -name "install-sh.in" -o -name "depcomp.in" -o -name "missing.in" \)
+#AC_CHECK_FILE([compile], [AC_MSG_RESULT([found])], [AC_MSG_RESULT([not found])])
+#AC_CHECK_FILE([install-sh], [AC_MSG_RESULT([found])], [AC_MSG_RESULT([not found])])
+#AC_CHECK_FILE([depcomp], [AC_MSG_RESULT([found])], [AC_MSG_RESULT([not found])])
+#AC_CHECK_FILE([missing], [AC_MSG_RESULT([found])], [AC_MSG_RESULT([not found])])
+AC_CONFIG_FILES([
+  #../compile
+  #../install-sh
+  #../depcomp
+  #../missing
+])
+
+(오류)
+../gnulib-lib/Makefile.am:631: error: GL_COND_OBJ_GETOPT does not appear in AM_CONDITIONAL
+../gnulib-lib/Makefile.am:641: error: GL_COND_OBJ_GETPROGNAME does not appear in AM_CONDITIONAL
+../gnulib-lib/Makefile.am:760: error: GL_COND_OBJ_ICONV_OPEN does not appear in AM_CONDITIONAL
+../gnulib-lib/Makefile.am:3279: error: GL_COND_OBJ_WCWIDTH does not appear in AM_CONDITIONAL
+../gnulib-lib/Makefile.am:3376: error: GL_COND_OBJ_GETOPT does not appear in AM_CONDITIONAL
+../gnulib-lib/Makefile.am:3380: error: GL_COND_OBJ_GETPROGNAME does not appear in AM_CONDITIONAL
+../gnulib-lib/Makefile.am:3384: error: GL_COND_OBJ_SNPRINTF does not appear in AM_CONDITIONAL
+../gnulib-lib/Makefile.am:3388: error: GL_COND_OBJ_STRDUP does not appear in AM_CONDITIONAL
+../gnulib-lib/Makefile.am:3393: error: GL_COND_OBJ_ICONV_OPEN does not appear in AM_CONDITIONAL
+../gnulib-lib/Makefile.am:3397: error: GL_COND_OBJ_WCWIDTH does not appear in AM_CONDITIONAL
+../gnulib-lib/Makefile.am:3364: error: 'OBJ_HEADERS' is used but 'OBJdir' is undefined
+../gnulib-lib/Makefile.am:3348: warning: variable 'DIFFMARK_SOURCES' is defined but no program or
+../gnulib-lib/Makefile.am:3348: library has 'DIFFMARK' as canonical name (possible typo)
+../gnulib-lib/Makefile.am:3343: warning: variable 'HEADERS_SOURCES' is defined but no program or
+../gnulib-lib/Makefile.am:3343: library has 'HEADERS' as canonical name (possible typo)
+../gnulib-lib/Makefile.am:3353: warning: variable 'NANOSLEEP_SOURCES' is defined but no program or
+../gnulib-lib/Makefile.am:3353: library has 'NANOSLEEP' as canonical name (possible typo)
+../gnulib-lib/Makefile.am:3358: warning: variable 'OBSTACK_SOURCES' is defined but no program or
+../gnulib-lib/Makefile.am:3358: library has 'OBSTACK' as canonical name (possible typo)
+../gnulib-lib/Makefile.am:3373: warning: variable 'libobj_la_SOURCES' is defined but no program or
+../gnulib-lib/Makefile.am:3373: library has 'libobj_la' as canonical name (possible typo)
+../gnulib-lib/Makefile.am:3408: warning: variable 'libobj_la_LIBADD' is defined but no program or
+../gnulib-lib/Makefile.am:3408: library has 'libobj_la' as canonical name (possible typo)
+../gnulib-lib/Makefile.am:3407: warning: variable 'libobj_la_LDFLAGS' is defined but no program or
+../gnulib-lib/Makefile.am:3407: library has 'libobj_la' as canonical name (possible typo)
+../src/Makefile.am:52: error: RELOCATABLE_VIA_LD does not appear in AM_CONDITIONAL
+(수정)
+/c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib/Makefile.am 수정
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_ALPHA], [test "$have_unicase" = yes])
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_BLANK], [test "$have_unicase" = yes])
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_CNTRL], [test "$have_unicase" = yes])
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_DIGIT], [test "$have_unicase" = yes])
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_GRAPH], [test "$have_unicase" = yes])
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_LOWER], [test "$have_unicase" = yes])
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_PRINT], [test "$have_unicase" = yes])
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_PUNCT], [test "$have_unicase" = yes])
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_SPACE], [test "$have_unicase" = yes])
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_UPPER], [test "$have_unicase" = yes])
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_XDIGIT], [test "$have_unicase" = yes])
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNISTR_U8_UCTOMB], [test "$have_unicase" = yes])
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNIWIDTH_WIDTH], [test "$have_unicase" = yes])
+
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_ALPHA], [test "$have_unicase_alpha" = yes])
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_BLANK], [test "$have_unicase_blank" = yes])
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_CNTRL], [test "$have_unicase_cntrl" = yes])
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_DIGIT], [test "$have_unicase_digit" = yes])
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_GRAPH], [test "$have_unicase_graph" = yes])
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_LOWER], [test "$have_unicase_lower" = yes])
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_PRINT], [test "$have_unicase_print" = yes])
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_PUNCT], [test "$have_unicase_punct" = yes])
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_SPACE], [test "$have_unicase_space" = yes])
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_UPPER], [test "$have_unicase_upper" = yes])
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_XDIGIT], [test "$have_unicase_xdigit" = yes])
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNISTR_U8_UCTOMB], [test "$have_unistr_u8_uctomb" = yes])
+AM_CONDITIONAL([LIBUNISTRING_COMPILE_UNIWIDTH_WIDTH], [test "$have_uniwidht_width" = yes])
+
+AM_CONDITIONAL([GL_COND_OBJ_GETOPT], [test "x$have_getopt" = xyes])
+AM_CONDITIONAL([GL_COND_OBJ_GETPROGNAME], [test "x$have_getprogname" = xyes])
+AM_CONDITIONAL([GL_COND_OBJ_ICONV_OPEN], [test "x$have_iconv_open" = xyes])
+AM_CONDITIONAL([GL_COND_OBJ_WCWIDTH], [test "x$have_wcwidth" = xyes])
+
+(오류)
+../gnulib-lib/Makefile.am:631: error: GL_COND_OBJ_GETOPT does not appear in AM_CONDITIONAL
+../gnulib-lib/Makefile.am:641: error: GL_COND_OBJ_GETPROGNAME does not appear in AM_CONDITIONAL
+../gnulib-lib/Makefile.am:760: error: GL_COND_OBJ_ICONV_OPEN does not appear in AM_CONDITIONAL
+../gnulib-lib/Makefile.am:3156: error: GL_COND_OBJ_WCWIDTH does not appear in AM_CONDITIONAL
+../gnulib-lib/Makefile.am:3253: error: GL_COND_OBJ_GETOPT does not appear in AM_CONDITIONAL
+../gnulib-lib/Makefile.am:3257: error: GL_COND_OBJ_GETPROGNAME does not appear in AM_CONDITIONAL
+../gnulib-lib/Makefile.am:3261: error: GL_COND_OBJ_SNPRINTF does not appear in AM_CONDITIONAL
+../gnulib-lib/Makefile.am:3265: error: GL_COND_OBJ_STRDUP does not appear in AM_CONDITIONAL
+../gnulib-lib/Makefile.am:3270: error: GL_COND_OBJ_ICONV_OPEN does not appear in AM_CONDITIONAL
+../gnulib-lib/Makefile.am:3274: error: GL_COND_OBJ_WCWIDTH does not appear in AM_CONDITIONAL
+../gnulib-lib/Makefile.am:3241: error: 'OBJ_HEADERS' is used but 'OBJdir' is undefined
+../gnulib-lib/Makefile.am:3225: warning: variable 'DIFFMARK_SOURCES' is defined but no program or
+../gnulib-lib/Makefile.am:3225: library has 'DIFFMARK' as canonical name (possible typo)
+../gnulib-lib/Makefile.am:3220: warning: variable 'HEADERS_SOURCES' is defined but no program or
+../gnulib-lib/Makefile.am:3220: library has 'HEADERS' as canonical name (possible typo)
+../gnulib-lib/Makefile.am:3230: warning: variable 'NANOSLEEP_SOURCES' is defined but no program or
+../gnulib-lib/Makefile.am:3230: library has 'NANOSLEEP' as canonical name (possible typo)
+../gnulib-lib/Makefile.am:3235: warning: variable 'OBSTACK_SOURCES' is defined but no program or
+../gnulib-lib/Makefile.am:3235: library has 'OBSTACK' as canonical name (possible typo)
+../gnulib-lib/Makefile.am:3250: warning: variable 'libobj_la_SOURCES' is defined but no program or
+../gnulib-lib/Makefile.am:3250: library has 'libobj_la' as canonical name (possible typo)
+../gnulib-lib/Makefile.am:3285: warning: variable 'libobj_la_LIBADD' is defined but no program or
+../gnulib-lib/Makefile.am:3285: library has 'libobj_la' as canonical name (possible typo)
+../gnulib-lib/Makefile.am:3284: warning: variable 'libobj_la_LDFLAGS' is defined but no program or
+../gnulib-lib/Makefile.am:3284: library has 'libobj_la' as canonical name (possible typo)
+(수정)
+누락된것 추가하고
+2361 line AM_CONDITIONAL([GL_COND_OBJ_GETOPT], [test "x$have_getopt" = xyes])
+631: error: GL_COND_OBJ_GETOPT does not appear in AM_CONDITIONAL
+
+/c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib/configure.ac 수정
+# Define conditionals for object files or features
+AC_CHECK_FUNC([getopt], [gl_cond_obj_getopt=yes], [gl_cond_obj_getopt=no])
+AM_CONDITIONAL([GL_COND_OBJ_GETOPT], [test "x$gl_cond_obj_getopt" = "xyes"])
+
+AC_CHECK_FUNC([getprogname], [gl_cond_obj_getprogname=yes], [gl_cond_obj_getprogname=no])
+AM_CONDITIONAL([GL_COND_OBJ_GETPROGNAME], [test "x$gl_cond_obj_getprogname" = "xyes"])
+
+AC_CHECK_FUNCS([iconv_open], [gl_cond_obj_iconv_open=yes], [gl_cond_obj_iconv_open=no])
+AM_CONDITIONAL([GL_COND_OBJ_ICONV_OPEN], [test "x$gl_cond_obj_iconv_open" = "xyes"])
+
+AC_CHECK_FUNC([wcwidth], [gl_cond_obj_wcwidth=yes], [gl_cond_obj_wcwidth=no])
+AM_CONDITIONAL([GL_COND_OBJ_WCWIDTH], [test "x$gl_cond_obj_wcwidth" = "xyes"])
+
+# snprintf 함수가 있는지 확인
+AC_CHECK_FUNC([snprintf], [gl_cond_obj_snprintf=yes], [gl_cond_obj_snprintf=no])
+AM_CONDITIONAL([GL_COND_OBJ_SNPRINTF], [test "x$gl_cond_obj_snprintf" = "xyes"])
+
+# strdup 함수가 존재하는지 확인
+AC_CHECK_FUNC([strdup], [gl_cond_obj_strdup=yes], [gl_cond_obj_strdup=no])
+AM_CONDITIONAL([GL_COND_OBJ_STRDUP], [test "x$gl_cond_obj_strdup" = "xyes"])
+
+/c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib/Makefile.am 수정
+AM_CONDITIONAL([GL_COND_OBJ_SNPRINTF], [test "x$have_snprintf" = xyes])
+AM_CONDITIONAL([GL_COND_OBJ_STRDUP], [test "x$have_strdup" = xyes])
+
+(오류)
+../gnulib-lib/Makefile.am:3244: error: 'OBJ_HEADERS' is used but 'OBJdir' is undefined
+../gnulib-lib/Makefile.am:3228: warning: variable 'DIFFMARK_SOURCES' is defined but no program or
+../gnulib-lib/Makefile.am:3228: library has 'DIFFMARK' as canonical name (possible typo)
+../gnulib-lib/Makefile.am:3223: warning: variable 'HEADERS_SOURCES' is defined but no program or
+../gnulib-lib/Makefile.am:3223: library has 'HEADERS' as canonical name (possible typo)
+../gnulib-lib/Makefile.am:3233: warning: variable 'NANOSLEEP_SOURCES' is defined but no program or
+../gnulib-lib/Makefile.am:3233: library has 'NANOSLEEP' as canonical name (possible typo)
+../gnulib-lib/Makefile.am:3238: warning: variable 'OBSTACK_SOURCES' is defined but no program or
+../gnulib-lib/Makefile.am:3238: library has 'OBSTACK' as canonical name (possible typo)
+../gnulib-lib/Makefile.am:3253: warning: variable 'libobj_la_SOURCES' is defined but no program or
+../gnulib-lib/Makefile.am:3253: library has 'libobj_la' as canonical name (possible typo)
+../gnulib-lib/Makefile.am:3288: warning: variable 'libobj_la_LIBADD' is defined but no program or
+../gnulib-lib/Makefile.am:3288: library has 'libobj_la' as canonical name (possible typo)
+../gnulib-lib/Makefile.am:3287: warning: variable 'libobj_la_LDFLAGS' is defined but no program or
+../gnulib-lib/Makefile.am:3287: library has 'libobj_la' as canonical name (possible typo)
+(수정)
+OBJ_HEADERS 변수를 사용하고 있지만, OBJdir이 정의되지 않았다는 의미
+/c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib/Makefile.am 수정
+# 빌드할 오브젝트 파일들의 objdir (임의로 설정)
+objdir = $(top_builddir)/obj
+# Print top_builddir
+echo "Top build directory is: $top_builddir"
+
+# 라이브러리 및 링크 설정
+libobj_la_LDFLAGS = -no-undefined
+libobj_la_LIBADD =
+
+# 조건부 객체 처리
+## GL_COND_OBJ_HEADERS가 참이면 headers.o 객체 추가
+if GL_COND_OBJ_HEADERS
+  OBJ_HEADERS = headers.o
+endif
 
 
 
