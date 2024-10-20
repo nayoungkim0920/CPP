@@ -29410,20 +29410,6 @@ AM_CONDITIONAL([GL_COND_OBJ_STRDUP], [test "x$have_strdup" = xyes])
 
 (오류)
 ../gnulib-lib/Makefile.am:3244: error: 'OBJ_HEADERS' is used but 'OBJdir' is undefined
-../gnulib-lib/Makefile.am:3228: warning: variable 'DIFFMARK_SOURCES' is defined but no program or
-../gnulib-lib/Makefile.am:3228: library has 'DIFFMARK' as canonical name (possible typo)
-../gnulib-lib/Makefile.am:3223: warning: variable 'HEADERS_SOURCES' is defined but no program or
-../gnulib-lib/Makefile.am:3223: library has 'HEADERS' as canonical name (possible typo)
-../gnulib-lib/Makefile.am:3233: warning: variable 'NANOSLEEP_SOURCES' is defined but no program or
-../gnulib-lib/Makefile.am:3233: library has 'NANOSLEEP' as canonical name (possible typo)
-../gnulib-lib/Makefile.am:3238: warning: variable 'OBSTACK_SOURCES' is defined but no program or
-../gnulib-lib/Makefile.am:3238: library has 'OBSTACK' as canonical name (possible typo)
-../gnulib-lib/Makefile.am:3253: warning: variable 'libobj_la_SOURCES' is defined but no program or
-../gnulib-lib/Makefile.am:3253: library has 'libobj_la' as canonical name (possible typo)
-../gnulib-lib/Makefile.am:3288: warning: variable 'libobj_la_LIBADD' is defined but no program or
-../gnulib-lib/Makefile.am:3288: library has 'libobj_la' as canonical name (possible typo)
-../gnulib-lib/Makefile.am:3287: warning: variable 'libobj_la_LDFLAGS' is defined but no program or
-../gnulib-lib/Makefile.am:3287: library has 'libobj_la' as canonical name (possible typo)
 (수정)
 OBJ_HEADERS 변수를 사용하고 있지만, OBJdir이 정의되지 않았다는 의미
 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib/Makefile.am 수정
@@ -29442,8 +29428,168 @@ if GL_COND_OBJ_HEADERS
   OBJ_HEADERS = headers.o
 endif
 
+(오류)
+../gnulib-lib/Makefile.am:3228: warning: variable 'DIFFMARK_SOURCES' is defined but no program or
+../gnulib-lib/Makefile.am:3228: library has 'DIFFMARK' as canonical name (possible typo)
+../gnulib-lib/Makefile.am:3223: warning: variable 'HEADERS_SOURCES' is defined but no program or
+../gnulib-lib/Makefile.am:3223: library has 'HEADERS' as canonical name (possible typo)
+../gnulib-lib/Makefile.am:3233: warning: variable 'NANOSLEEP_SOURCES' is defined but no program or
+../gnulib-lib/Makefile.am:3233: library has 'NANOSLEEP' as canonical name (possible typo)
+../gnulib-lib/Makefile.am:3238: warning: variable 'OBSTACK_SOURCES' is defined but no program or
+../gnulib-lib/Makefile.am:3238: library has 'OBSTACK' as canonical name (possible typo)
+../gnulib-lib/Makefile.am:3253: warning: variable 'libobj_la_SOURCES' is defined but no program or
+../gnulib-lib/Makefile.am:3253: library has 'libobj_la' as canonical name (possible typo)
+../gnulib-lib/Makefile.am:3288: warning: variable 'libobj_la_LIBADD' is defined but no program or
+../gnulib-lib/Makefile.am:3288: library has 'libobj_la' as canonical name (possible typo)
+../gnulib-lib/Makefile.am:3287: warning: variable 'libobj_la_LDFLAGS' is defined but no program or
+../gnulib-lib/Makefile.am:3287: library has 'libobj_la' as canonical name (possible typo)
+(수정)
+Makefile.am 파일에서 DIFFMARK_SOURCES라는 변수가 정의되어 있지만, 
+DIFFMARK라는 프로그램이나 라이브러리가 존재하지 않기 때문에 발생하는 경고
+DIFFMARK라는 프로그램이나 라이브러리를 정의하는 부분이 Makefile.am에 누락되었을 수 있음
+bin_PROGRAMS나 lib_LTLIBRARIES 등의 항목에 DIFFMARK를 추가
 
+(오류)
 
+(수정)
+## begin 수정
+# 조건부 소스 파일 포함
+
+# 빌드할 오브젝트 파일들의 objdir (임의로 설정)
+objdir = $(top_builddir)/obj
+# Print top_builddir  
+echo "Top build directory is: $top_builddir"
+
+# 기본적인 소스 파일 설정
+libobj_la_SOURCES = \
+    main.c  # 기본 소스 파일들
+
+# 라이브러리 및 링크 설정
+libobj_la_LDFLAGS = -no-undefined
+libobj_la_LIBADD =
+
+if GL_GENERATE_HEADERS
+  libobj_la_SOURCES += headers.c
+endif
+
+if GL_GENERATE_DIFFMARK
+  libobj_la_SOURCES += diffseq.c  # diffseq 설치
+endif
+
+if GL_GENERATE_NANOSLEEP
+  libobj_la_SOURCES += nanosleep.c
+endif
+
+if GL_GENERATE_OBSTACK
+  libobj_la_SOURCES += obstack.c
+endif
+
+if GL_COND_OBJ_HEADERS
+  libobj_la_SOURCES += headers.c
+endif
+
+if GL_COND_OBJ_DIFFMARK
+  libobj_la_SOURCES += diffseq.c  # diffseq 설치
+endif
+
+if GL_COND_OBJ_GETOPT
+libobj_la_SOURCES += getopt.c
+endif
+
+if GL_COND_OBJ_GETPROGNAME
+libobj_la_SOURCES += getprogname.c
+endif
+
+if GL_COND_OBJ_SNPRINTF
+libobj_la_SOURCES += snprintf.c
+endif
+
+if GL_COND_OBJ_STRDUP
+libobj_la_SOURCES += strdup.c
+endif
+
+if GL_COND_OBJ_ICONV_OPEN
+libobj_la_SOURCES += iconv.c
+endif
+
+if GL_COND_OBJ_WCWIDTH
+libobj_la_SOURCES += wcwidth.c
+endif
+## end 수정
+
+libobj_la_SOURCES에 추가되는 파일들이 존재하는 경로
+"C:\libidn2\gettext-0.22.5\gettext\gettext-runtime\gnulib-lib\xmalloc.c" 
+아래 파일들은 존재하지 않음
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib
+# find /c/gnulib/lib -type f \( \
+  -name "headers.c" -o \ 
+  -name "diffseq.c" -o \
+  -name "nanosleep.c" -o \ 
+  -name "obstack.c" -o \ 
+  -name "getopt.c" -o \  
+  -name "getprogname.c" -o \  
+  -name "snprintf.c" -o \ 
+  -name "strdup.c" -o \ 
+  -name "iconv.c" -o \  
+  -name "wcwidth.c" \  
+\)
+/c/curl/lib/headers.c
+/c/gnulib/libdiffseq.c #diffseq.h로 생성
+/c/gnulib/lib/nanosleep.c
+/c/gnulib/lib/obstack.c
+/c/gnulib/lib/getopt.c
+/c/gnulib/lib/getprogname.c
+/c/gnulib/lib/snprintf.c
+/c/gnulib/lib/strdup.c
+/c/gnulib/lib/iconv.c
+/c/gnulib/lib/wcwidth.c
+환경변수수정
+~/.bashrc 수정
+export PATH="$PATH:/c/curl/lib"
+export PATH="$PATH:/c/gnulib/lib"
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib
+# autoreconf -fiv
+
+(오류)
+../gnulib-lib/Makefile.am:3228: warning: variable 'libobj_la_SOURCES' is defined but no program or
+../gnulib-lib/Makefile.am:3228: library has 'libobj_la' as canonical name (possible typo)
+../gnulib-lib/Makefile.am:3232: warning: variable 'libobj_la_LIBADD' is defined but no program or
+../gnulib-lib/Makefile.am:3232: library has 'libobj_la' as canonical name (possible typo)
+../gnulib-lib/Makefile.am:3231: warning: variable 'libobj_la_LDFLAGS' is defined but no program or
+../gnulib-lib/Makefile.am:3231: library has 'libobj_la' as canonical name (possible typo)
+../src/Makefile.am:52: error: RELOCATABLE_VIA_LD does not appear in AM_CONDITIONAL
+(수정)
+libobj_la_SOURCES, libobj_la_LIBADD, libobj_la_LDFLAGS 변수가 정의되어 있지만, 
+libobj_la라는 이름을 가진 라이브러리나 프로그램이 실제로 존재하지 않는다는 의미
+libobj_la가 실제로 프로그램이나 라이브러리 이름이어야 하는지 확인
+/c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib/Makefile.am 수정
+lib_LTLIBRARIES = libobj.la
+# RELOCATABLE_VIA_LD 조건을 사용하기 전에 정의
+if RELOCATABLE_VIA_LD
+  AM_CONDITIONAL([RELOCATABLE_VIA_LD], [test "$$RELOCATABLE_VIA_LD" = "1"])
+  LDADD += -lrelocatable
+  gettext_LDFLAGS = $(RELOCATABLE_LDFLAGS) $(bindir)
+  ngettext_LDFLAGS = $(RELOCATABLE_LDFLAGS) $(bindir)
+  envsubst_LDFLAGS = $(RELOCATABLE_LDFLAGS) $(bindir)
+endif
+
+/c/libidn2/gettext-0.22.5/gettext/gettext-runtime/configure.ac 수정
+# relocatable-ld 옵션을 사용할 수 있게 설정
+AC_ARG_ENABLE([relocatable-ld],
+  [AS_HELP_STRING([--enable-relocatable-ld], [Enable relocatable LD])],
+  [relocatable_ld=$enableval],
+  [relocatable_ld=no])
+
+# relocatable-ld가 활성화된 경우에만 RELOCATABLE_VIA_LD 정의
+if test "$relocatable_ld" = "yes"; then
+  AC_DEFINE([RELOCATABLE_VIA_LD], [1], [Define if relocatable LD is enabled])
+  AC_MSG_NOTICE([Relocatable LD is enabled])
+else
+  AC_MSG_NOTICE([Relocatable LD is not enabled])
+fi
+
+../src/Makefile.am:54: error: RELOCATABLE_VIA_LD does not appear in AM_CONDITIONAL
 
 
 
