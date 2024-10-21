@@ -29564,17 +29564,17 @@ libobj_la_SOURCES, libobj_la_LIBADD, libobj_la_LDFLAGS 변수가 정의되어 �
 libobj_la라는 이름을 가진 라이브러리나 프로그램이 실제로 존재하지 않는다는 의미
 libobj_la가 실제로 프로그램이나 라이브러리 이름이어야 하는지 확인
 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib/Makefile.am 수정
-lib_LTLIBRARIES = libobj.la
+bin_PROGRAMS = gettext ngettext envsubst
+
 # RELOCATABLE_VIA_LD 조건을 사용하기 전에 정의
 if RELOCATABLE_VIA_LD
-  AM_CONDITIONAL([RELOCATABLE_VIA_LD], [test "$$RELOCATABLE_VIA_LD" = "1"])
   LDADD += -lrelocatable
   gettext_LDFLAGS = $(RELOCATABLE_LDFLAGS) $(bindir)
   ngettext_LDFLAGS = $(RELOCATABLE_LDFLAGS) $(bindir)
   envsubst_LDFLAGS = $(RELOCATABLE_LDFLAGS) $(bindir)
 endif
 
-/c/libidn2/gettext-0.22.5/gettext/gettext-runtime/configure.ac 수정
+/c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib/configure.ac 수정
 # relocatable-ld 옵션을 사용할 수 있게 설정
 AC_ARG_ENABLE([relocatable-ld],
   [AS_HELP_STRING([--enable-relocatable-ld], [Enable relocatable LD])],
@@ -29582,14 +29582,485 @@ AC_ARG_ENABLE([relocatable-ld],
   [relocatable_ld=no])
 
 # relocatable-ld가 활성화된 경우에만 RELOCATABLE_VIA_LD 정의
-if test "$relocatable_ld" = "yes"; then
-  AC_DEFINE([RELOCATABLE_VIA_LD], [1], [Define if relocatable LD is enabled])
-  AC_MSG_NOTICE([Relocatable LD is enabled])
-else
-  AC_MSG_NOTICE([Relocatable LD is not enabled])
-fi
+# Specify installation directory, for --enable-relocatable.
+gettext_CFLAGS = -DINSTALLDIR=\"$(bindir)\"
+ngettext_CFLAGS = -DINSTALLDIR=\"$(bindir)\"
+envsubst_CFLAGS = -DINSTALLDIR=\"$(bindir)\"
 
-../src/Makefile.am:54: error: RELOCATABLE_VIA_LD does not appear in AM_CONDITIONAL
+# RELOCATABLE_VIA_LD
+bin_PROGRAMS = gettext ngettext envsubst
+
+# RELOCATABLE_VIA_LD 조건을 사용하기 전에 정의
+if RELOCATABLE_VIA_LD
+  LDADD += -lrelocatable
+  gettext_LDFLAGS = $(RELOCATABLE_LDFLAGS) $(bindir)
+  ngettext_LDFLAGS = $(RELOCATABLE_LDFLAGS) $(bindir)
+  envsubst_LDFLAGS = $(RELOCATABLE_LDFLAGS) $(bindir)
+endif
+
+(프로젝트에 필요한 자동화 파일들을 추가하는 작업)
+# 기존 자동화 파일 재생성
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib
+# autoreconf --force --install
+# Makefile.in을 자동으로 생성
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib
+# automake --add-missing
+configure.ac에 사용된 오래된 매크로들을 최신 매크로로 변환
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib
+# autoupdate
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib
+# aclocal -I /c/libidn2/gettext-0.22.5/gettext/gnulib-m4 &&
+autoconf -I /c/libidn2/gettext-0.22.5/gettext/gnulib-m4 &&
+autoheader -I /c/libidn2/gettext-0.22.5/gettext/gnulib-m4 &&
+automake --add-missing &&
+ ./configure CFLAGS="-std=c11" --verbose --host=x86_64-w64-mingw32 
+configure: error: source directory already configured; run "make distclean" there first
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib
+# make distclean
+cd .. && make  am--refresh
+(오류)
+make[1]: 디렉터리 '/c/libidn2/gettext-0.22.5/gettext/gettext-runtime' 들어감
+CDPATH="${ZSH_VERSION+.}:" && cd . && /bin/sh '/c/libidn2/gettext-0.22.5/build-aux/missing' aclocal-1.16 -I m4 -I ../m4 -I gnulib-m4
+ cd . && /bin/sh /c/libidn2/gettext-0.22.5/build-aux/missing automake-1.16 --gnu
+gnulib-lib/Makefile.am:111: error: GL_GENERATE_ALLOCA_H does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:149: error: GL_GENERATE_ASSERT_H does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:176: error: GL_COND_OBJ_ATEXIT does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:345: error: GL_COND_OBJ_CANONICALIZE_LGPL does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:369: error: GL_COND_OBJ_CLOSE does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:390: error: GL_COND_OBJ_DUP2 does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:409: error: GL_GENERATE_ERRNO_H does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:437: error: GL_COND_OBJ_ERROR does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:477: error: GL_COND_OBJ_FCNTL does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:544: error: GL_COND_OBJ_FREE does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:552: error: GL_COND_OBJ_FSTAT does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:589: error: GL_COND_OBJ_GETDTABLESIZE does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:601: error: GL_GENERATE_GETOPT_H does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:618: error: GL_GENERATE_GETOPT_CDEFS_H does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:669: error: GL_COND_OBJ_GETOPT does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:679: error: GL_COND_OBJ_GETPROGNAME does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:768: error: GL_GENERATE_ICONV_H does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:798: error: GL_COND_OBJ_ICONV_OPEN does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:801: error: GL_COND_OBJ_ICONV does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:890: error: GL_COND_OBJ_ISWBLANK does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:898: error: GL_COND_OBJ_ISWDIGIT does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:906: error: GL_COND_OBJ_ISWPUNCT does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:914: error: GL_COND_OBJ_ISWXDIGIT does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:972: error: GL_GENERATE_LIMITS_H does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1050: error: GL_COND_OBJ_LOCALENAME_UNSAFE_LIMITED does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1061: error: GL_COND_OBJ_LOCALENAME_UNSAFE_LIMITED does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1111: error: GL_COND_OBJ_MBRTOC32 does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1123: error: GL_COND_OBJ_MBRTOWC does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1135: error: GL_COND_OBJ_MBSINIT does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1175: error: GL_COND_OBJ_MEMCHR does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1185: error: GL_COND_OBJ_MEMMOVE does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1193: error: GL_COND_OBJ_MEMPCPY does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1207: error: GL_COND_OBJ_MSVC_INVAL does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1217: error: GL_COND_OBJ_MSVC_NOTHROW does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1234: error: GL_COND_OBJ_OPEN does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1261: error: GL_COND_OBJ_RAISE does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1269: error: GL_COND_OBJ_RAWMEMCHR does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1279: error: GL_COND_OBJ_READLINK does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1305: error: GL_COND_OBJ_REALLOCARRAY does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1313: error: GL_COND_OBJ_PROGRELOC does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1317: error: RELOCATABLE_VIA_WRAPPER does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1352: error: GL_COND_OBJ_SETLOCALE does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1361: error: GL_COND_OBJ_SETLOCALE_LOCK does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1428: error: GL_COND_OBJ_SIGPROCMASK does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1484: error: GL_COND_OBJ_STAT does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1508: error: GL_GENERATE_STDCKDINT_H does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1529: error: GL_GENERATE_STDDEF_H does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1558: error: GL_GENERATE_STDINT_H does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1738: error: GL_COND_OBJ_STDIO_READ does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1741: error: GL_COND_OBJ_STDIO_WRITE does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1926: error: GL_COND_OBJ_STRERROR does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1934: error: GL_COND_OBJ_STRERROR_OVERRIDE does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:2069: error: GL_COND_OBJ_STRNLEN does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:2083: error: GL_COND_OBJ_STRTOUL does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:2372: error: LIBUNISTRING_COMPILE_UNICASE_TOLOWER does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:2539: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_ALNUM does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:2549: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_ALPHA does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:2559: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_BLANK does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:2569: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_CNTRL does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:2579: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_DIGIT does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:2589: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_GRAPH does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:2599: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_LOWER does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:2609: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_PRINT does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:2619: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_PUNCT does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:2629: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_SPACE does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:2639: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_UPPER does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:2649: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_XDIGIT does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:2909: error: LIBUNISTRING_COMPILE_UNISTR_U8_MBTOUCR does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:2917: error: LIBUNISTRING_COMPILE_UNISTR_U8_UCTOMB does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:2951: error: LIBUNISTRING_COMPILE_UNIWIDTH_WIDTH does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:3159: error: GL_COND_OBJ_WCWIDTH does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:3167: error: GL_COND_OBJ_WINDOWS_MUTEX does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:3177: error: GL_COND_OBJ_WINDOWS_ONCE does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:3187: error: GL_COND_OBJ_WINDOWS_RECMUTEX does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:3197: error: GL_COND_OBJ_WINDOWS_RWLOCK does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:3238: error: GL_GENERATE_HEADERS does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:3242: error: GL_GENERATE_DIFFMARK does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:3246: error: GL_GENERATE_NANOSLEEP does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:3250: error: GL_GENERATE_OBSTACK does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:3254: error: GL_COND_OBJ_HEADERS does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:3258: error: GL_COND_OBJ_DIFFMARK does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:3262: error: GL_COND_OBJ_GETOPT does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:3266: error: GL_COND_OBJ_GETPROGNAME does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:3270: error: GL_COND_OBJ_SNPRINTF does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:3274: error: GL_COND_OBJ_STRDUP does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:3278: error: GL_COND_OBJ_ICONV_OPEN does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:3282: error: GL_COND_OBJ_WCWIDTH does not appear in AM_CONDITIONAL
+make[1]: *** [Makefile:1763: Makefile.in] 오류 1
+make[1]: 디렉터리 '/c/libidn2/gettext-0.22.5/gettext/gettext-runtime' 나감
+make: *** [Makefile:2248: ../aclocal.m4] 오류 2
+(수정)
+GL_ 매크로들이 AM_CONDITIONAL에서 참조되지 않아서 발생한 문제
+gnulib 모듈에서 특정 조건부 매크로들을 처리할 때 필요한 조건이 제대로 설정되지 않았음을 의미
+Makefile을 재생성하고 필요한 매크로들을 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib
+# make distclean && aclocal && automake --add-missing && autoconf && ./configure
+configure.ac 파일 매크로가 누락 점검
+
+(오류)
+./configure: line 5042: syntax error near unexpected token `alloca'
+./configure: line 5042: `GL_MODULES(alloca assert canonicalize_lgpl ...)`
+(수정)
+C:\libidn2\gettext-0.22.5\gettext\gettext-runtime\gnulib-lib\configure.ac
+GL_MODULES([alloca assert canonicalize_lgpl close dup2 errno getopt iconv iswblank iswdigit iswpunct iswxdigit limits locale mbrtoc32 mbrtowc mbinit mbpcpy msvc raise reallocarray setlocale sigprocmask stat stdckdint stddef stdint strerror wcwidth windows_mutex windows_once windows_recmutex windows_rwlock])
+GL_MODULES 매크로는 Gnulib 모듈을 설정하는데 사용
+configure.ac 파일에 정의되어 있어야 하며, 사용 환경에 맞는 모듈들을 포함
+=>aclocal과 autoconf 명령어를 다시 실행
+=>다시 빌드 시도: 그 다음, ./configure를 다시 실행
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib
+# aclocal && autoconf
+/c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib/configure.ac 수정
+# Gnulib 모듈 활성화 (필요한 기능을 나열) 너무 긴 모듈 리스트를 여러 줄로 나누어 작성
+GL_MODULES([
+  alloca assert canonicalize_lgpl close dup2 errno getopt iconv iswblank 
+  iswdigit iswpunct iswxdigit limits locale mbrtoc32 mbrtowc mbinit 
+  mbpcpy msvc raise reallocarray setlocale sigprocmask stat stdckdint 
+  stddef stdint strerror wcwidth windows_mutex windows_once windows_recmutex 
+  windows_rwlock])
+gnulib 재설정
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib
+# git pull
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib
+# aclocal && autoconf && autoheader && make distclean
+
+(오류)
+checking whether _XOPEN_SOURCE should be defined... no
+./configure: line 5042: syntax error near unexpected token `alloca'
+./configure: line 5042: `GL_MODULES(alloca assert canonicalize_lgpl close dup2 errno getopt iconv iswblank iswdigit iswpunct iswxdigit limits locale mbrtoc32 mbrtowc mbinit mbpcpy msvc raise reallocarray setlocale sigprocmask stat stdckdint stddef stdint strerror wcwidth windows_mutex windows_once windows_recmutex windows_rwlock)'
+(수정)
+./configure가 GL_MODULES에 나열된 매크로들을 해석하려고 시도하면서 문제가 발생
+
+(컴파일)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib
+# ./configure
+(오류)
+configure: loading site script /etc/config.site
+configure: error: cannot find required auxiliary files: compile
+(수정)
+gnulib의 구성 스크립트가 필요한 파일들을 찾을 수 없기 때문에 발생
+configure 스크립트가 필요한 파일들을 자동으로 생성하는 과정이 필요
+autoreconf 명령어를 실행하여 Makefile.in, configure 등의 보조 파일들을 다시 생성
+aclocal, autoconf, autoheader 다시 실행 => autoreconf 대체
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib
+# make distclean && # 이전에 수행한 빌드 작업의 잔여물을 삭제
+autoreconf --install && #Makefile.in 또는 configure.ac 파일을 재생성하여 환경에 맞는 구성 파일을 업데이트
+automake --add-missing && # Makefile.in, m4 매크로 파일 등 누락된 파일들을 자동으로 추가
+./configure # config.h와 Makefile을 생성
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib
+# ./configure
+(오류)
+./configure: line 5042: syntax error near unexpected token `alloca'
+./configure: line 5042: `GL_MODULES(alloca assert canonicalize_lgpl close dup2 errno getopt iconv iswblank iswdigit iswpunct iswxdigit limits locale mbrtoc32 mbrtowc mbinit mbpcpy msvc raise reallocarray setlocale sigprocmask stat stdckdint stddef stdint strerror wcwidth windows_mutex windows_once windows_recmutex windows_rwlock)'
+(수정)
+/c/libidn2/gettext-0.22.5/gettext/gettext-runtime/configure.ac 수정(경로를 똑바로 확인)
+GL_MODULES"([alloca assert canonicalize_lgpl close dup2 errno getopt iconv iswblank iswdigit iswpunct iswxdigit limits locale mbrtoc32 mbrtowc mbinit mbpcpy msvc raise reallocarray setlocale sigprocmask stat stdckdint stddef stdint strerror wcwidth windows_mutex windows_once windows_recmutex windows_rwlock])"
+
+(오류)
+gnulib-lib/Makefile.am:111: error: GL_GENERATE_ALLOCA_H does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:149: error: GL_GENERATE_ASSERT_H does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:176: error: GL_COND_OBJ_ATEXIT does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:345: error: GL_COND_OBJ_CANONICALIZE_LGPL does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:369: error: GL_COND_OBJ_CLOSE does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:390: error: GL_COND_OBJ_DUP2 does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:409: error: GL_GENERATE_ERRNO_H does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:437: error: GL_COND_OBJ_ERROR does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:477: error: GL_COND_OBJ_FCNTL does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:544: error: GL_COND_OBJ_FREE does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:552: error: GL_COND_OBJ_FSTAT does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:589: error: GL_COND_OBJ_GETDTABLESIZE does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:601: error: GL_GENERATE_GETOPT_H does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:618: error: GL_GENERATE_GETOPT_CDEFS_H does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:669: error: GL_COND_OBJ_GETOPT does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:679: error: GL_COND_OBJ_GETPROGNAME does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:768: error: GL_GENERATE_ICONV_H does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:798: error: GL_COND_OBJ_ICONV_OPEN does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:801: error: GL_COND_OBJ_ICONV does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:890: error: GL_COND_OBJ_ISWBLANK does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:898: error: GL_COND_OBJ_ISWDIGIT does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:906: error: GL_COND_OBJ_ISWPUNCT does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:914: error: GL_COND_OBJ_ISWXDIGIT does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:972: error: GL_GENERATE_LIMITS_H does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1050: error: GL_COND_OBJ_LOCALENAME_UNSAFE_LIMITED does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1061: error: GL_COND_OBJ_LOCALENAME_UNSAFE_LIMITED does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1111: error: GL_COND_OBJ_MBRTOC32 does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1123: error: GL_COND_OBJ_MBRTOWC does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1135: error: GL_COND_OBJ_MBSINIT does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1175: error: GL_COND_OBJ_MEMCHR does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1185: error: GL_COND_OBJ_MEMMOVE does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1193: error: GL_COND_OBJ_MEMPCPY does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1207: error: GL_COND_OBJ_MSVC_INVAL does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1217: error: GL_COND_OBJ_MSVC_NOTHROW does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1234: error: GL_COND_OBJ_OPEN does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1261: error: GL_COND_OBJ_RAISE does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1269: error: GL_COND_OBJ_RAWMEMCHR does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1279: error: GL_COND_OBJ_READLINK does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1305: error: GL_COND_OBJ_REALLOCARRAY does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1313: error: GL_COND_OBJ_PROGRELOC does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1317: error: RELOCATABLE_VIA_WRAPPER does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1352: error: GL_COND_OBJ_SETLOCALE does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1361: error: GL_COND_OBJ_SETLOCALE_LOCK does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1428: error: GL_COND_OBJ_SIGPROCMASK does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1484: error: GL_COND_OBJ_STAT does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1508: error: GL_GENERATE_STDCKDINT_H does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1529: error: GL_GENERATE_STDDEF_H does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1558: error: GL_GENERATE_STDINT_H does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1738: error: GL_COND_OBJ_STDIO_READ does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1741: error: GL_COND_OBJ_STDIO_WRITE does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1926: error: GL_COND_OBJ_STRERROR does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:1934: error: GL_COND_OBJ_STRERROR_OVERRIDE does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:2069: error: GL_COND_OBJ_STRNLEN does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:2083: error: GL_COND_OBJ_STRTOUL does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:2372: error: LIBUNISTRING_COMPILE_UNICASE_TOLOWER does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:2539: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_ALNUM does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:2549: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_ALPHA does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:2559: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_BLANK does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:2569: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_CNTRL does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:2579: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_DIGIT does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:2589: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_GRAPH does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:2599: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_LOWER does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:2609: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_PRINT does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:2619: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_PUNCT does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:2629: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_SPACE does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:2639: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_UPPER does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:2649: error: LIBUNISTRING_COMPILE_UNICTYPE_CTYPE_XDIGIT does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:2909: error: LIBUNISTRING_COMPILE_UNISTR_U8_MBTOUCR does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:2917: error: LIBUNISTRING_COMPILE_UNISTR_U8_UCTOMB does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:2951: error: LIBUNISTRING_COMPILE_UNIWIDTH_WIDTH does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:3159: error: GL_COND_OBJ_WCWIDTH does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:3167: error: GL_COND_OBJ_WINDOWS_MUTEX does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:3177: error: GL_COND_OBJ_WINDOWS_ONCE does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:3187: error: GL_COND_OBJ_WINDOWS_RECMUTEX does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:3197: error: GL_COND_OBJ_WINDOWS_RWLOCK does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:3238: error: GL_GENERATE_HEADERS does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:3242: error: GL_GENERATE_DIFFMARK does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:3246: error: GL_GENERATE_NANOSLEEP does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:3250: error: GL_GENERATE_OBSTACK does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:3254: error: GL_COND_OBJ_HEADERS does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:3258: error: GL_COND_OBJ_DIFFMARK does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:3262: error: GL_COND_OBJ_GETOPT does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:3266: error: GL_COND_OBJ_GETPROGNAME does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:3270: error: GL_COND_OBJ_SNPRINTF does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:3274: error: GL_COND_OBJ_STRDUP does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:3278: error: GL_COND_OBJ_ICONV_OPEN does not appear in AM_CONDITIONAL
+gnulib-lib/Makefile.am:3282: error: GL_COND_OBJ_WCWIDTH does not appear in AM_CONDITIONAL
+(수정)
+/c/libidn2/gettext-0.22.5/gettext/gettext-runtime/src/Makefile.am 수정
+if GL_GENERATE_ALLOCA_H
+alloca.h: alloca.in.h $(top_builddir)/config.status
+	$(gl_V_at)$(SED_HEADER_STDOUT) \
+	  -e 's|@''HAVE_ALLOCA_H''@|$(HAVE_ALLOCA_H)|g' \
+	  $(srcdir)/alloca.in.h > $@-t
+	$(AM_V_at)mv $@-t $@
+else
+alloca.h: $(top_builddir)/config.status
+	rm -f $@
+endif
+
+(오류)
+./configure: line 5042: GL_MODULES(alloca assert canonicalize_lgpl close dup2 errno getopt iconv iswblank iswdigit iswpunct iswxdigit limits locale mbrtoc32 mbrtowc mbinit mbpcpy msvc raise reallocarray setlocale sigprocmask stat stdckdint stddef stdint strerror wcwidth windows_mutex windows_once windows_recmutex windows_rwlock): command not found
+(수정)
+C:\libidn2\gettext-0.22.5\gettext\gettext-runtime\configure.ac 
+# Gnulib 모듈을 초기화합니다.
+GL_INIT
+
+# 필요한 Gnulib 모듈들을 지정합니다.
+GL_MODULES alloca assert canonicalize_lgpl close dup2 errno getopt iconv iswblank iswdigit iswpunct iswxdigit limits locale mbrtoc32 mbrtowc mbinit mbpcpy msvc raise reallocarray setlocale sigprocmask stat stdckdint stddef stdint strerror wcwidth windows_mutex windows_once windows_recmutex windows_rwlock
+
+
+(오류)
+../src/Makefile.am:49: error: RELOCATABLE_VIA_LD does not appear in AM_CONDITIONAL
+(수정)
+C:\libidn2\gettext-0.22.5\gettext\gettext-runtime\gnulib-lib\configure.ac 수정
+# relocatable-ld 옵션을 사용할 수 있게 설정
+AC_ARG_ENABLE([relocatable-ld],
+  [AS_HELP_STRING([--enable-relocatable-ld], [Enable relocatable LD])],
+  [relocatable_ld=$enableval], [relocatable_ld=no])
+
+# relocatable-ld 옵션이 활성화된 경우에만 RELOCATABLE_VIA_LD 정의
+if test "x$relocatable_ld" = "xyes"; then
+  AM_CONDITIONAL([RELOCATABLE_VIA_LD], [true])
+  AC_DEFINE([RELOCATABLE_VIA_LD], [1], [Define if we use relocatable LD])
+else
+  AM_CONDITIONAL([RELOCATABLE_VIA_LD], [false])
+fi
+C:\libidn2\gettext-0.22.5\gettext\gettext-runtime\src\Makefile.am 수정
+# Source dependencies.
+gettext_SOURCES = gettext.c escapes.h
+ngettext_SOURCES = ngettext.c escapes.h
+envsubst_SOURCES = envsubst.c
+
+# Link dependencies.
+# Need @LTLIBICONV@ because striconv.c uses iconv().
+LDADD = ../gnulib-lib/libgrt.a @LTLIBINTL@ @LTLIBICONV@ $(WOE32_LDADD)
+
+# RELOCATABLE_VIA_LD 조건을 사용하기 전에 정의
+if RELOCATABLE_VIA_LD
+  LDADD += -lrelocatable
+  gettext_LDFLAGS = $(RELOCATABLE_LDFLAGS) $(bindir)
+  ngettext_LDFLAGS = $(RELOCATABLE_LDFLAGS) $(bindir)
+  envsubst_LDFLAGS = $(RELOCATABLE_LDFLAGS) $(bindir)
+endif
+
+(오류)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib
+# make distclean
+Makefile:2512: *** 분리 기호가 빠졌음.  멈춤.
+(수정)
+C:\libidn2\gettext-0.22.5\gettext\gettext-runtime\gnulib-lib\Makefile
+@GL_GENERATE_ALLOCA_H_TRUE@alloca.h: alloca.in.h $(top_builddir)/config.status
+@GL_GENERATE_ALLOCA_H_TRUE@	$(gl_V_at)$(SED_HEADER_STDOUT) \ <--2512 line 
+@GL_GENERATE_ALLOCA_H_TRUE@	  -e 's|@''HAVE_ALLOCA_H''@|$(HAVE_ALLOCA_H)|g' \
+@GL_GENERATE_ALLOCA_H_TRUE@	  $(srcdir)/alloca.in.h > $@-t
+@GL_GENERATE_ALLOCA_H_TRUE@	$(AM_V_at)mv $@-t $@
+@GL_GENERATE_ALLOCA_H_FALSE@alloca.h: $(top_builddir)/config.status
+@GL_GENERATE_ALLOCA_H_FALSE@	rm -f $@
+
+C:\libidn2\gettext-0.22.5\gettext\gettext-runtime\gnulib-lib\Makefile.am
+## begin gnulib module alloca-opt
+#BUILT_SOURCES += $(ALLOCA_H)
+# We need the following in order to create <alloca.h> when the system
+# doesn't have one that works with the given compiler.
+#if GL_GENERATE_ALLOCA_H
+#alloca.h: alloca.in.h $(top_builddir)/config.status
+#	$(gl_V_at)$(SED_HEADER_STDOUT) \
+#	  -e 's|@''HAVE_ALLOCA_H''@|$(HAVE_ALLOCA_H)|g' \
+#	  $(srcdir)/alloca.in.h > $@-t
+#	$(AM_V_at)mv $@-t $@
+#else
+#alloca.h: $(top_builddir)/config.status
+#	rm -f $@
+#endif
+#MOSTLYCLEANFILES += alloca.h alloca.h-t
+#EXTRA_DIST += alloca.in.h
+## end   gnulib module alloca-opt
+(오류)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib
+# aclocal && autoconf && automake --add-missing && ./configure
+configure: loading site script /etc/config.site
+configure: error: cannot find required auxiliary files: compile
+(수정)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib
+# aclocal && autoconf && automake --add-missing --copy && ./configure
+# gnulib-tool --import
+
+(오류)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib
+# make distclean
+Makefile:2511: *** 분리 기호가 빠졌음.  멈춤.
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib
+# aclocal && autoconf && automake --add-missing --copy && ./configure
+configure: loading site script /etc/config.site
+configure: error: cannot find required auxiliary files: compile
+
+미해결
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/gettext
+# aclocal -I /c/libidn2/gettext-0.22.5/gettext/gnulib-m4 &&
+autoconf -I /c/libidn2/gettext-0.22.5/gettext/gnulib-m4 &&
+autoheader -I /c/libidn2/gettext-0.22.5/gettext/gnulib-m4 &&
+automake --add-missing &&
+ ./configure CFLAGS="-std=c11" --verbose --host=x86_64-w64-mingw32 
+(오류)
+configure.ac:90: warning: AM_PROG_AR was called before gl_PROG_AR_RANLIB
+aclocal.m4:5260: gl_PROG_AR_RANLIB is expanded from...
+configure.ac:90: the top level
+configure.ac:90: warning: LT_INIT was called before AM_PROG_AR
+aclocal.m4:627: AM_PROG_AR is expanded from...
+aclocal.m4:5260: gl_PROG_AR_RANLIB is expanded from...
+configure.ac:90: the top level
+(수정)
+configure.ac 파일에서 LT_INIT 매크로가 AM_PROG_AR 매크로보다 먼저 호출되지 않아서 발생한 것
+계속오류가난다면 Libtool 및 Automake 매크로 충돌 문제일 수 있어 둘중하나를 제거
+gl_PROG_AR_RANLIB이 충분하다면 AM_PROG_AR을 제거하는 것
+
+# Libtool AR, RANLIB 설정 (gl_PROG_AR_RANLIB 호출)
+gl_PROG_AR_RANLIB
+
+# 아카이브 툴 확인 (AM_PROG_AR 호출)
+#AM_PROG_AR
+
+# Libtool 초기화 (LT_INIT 호출)
+LT_INIT([win32-dll], [dlopen disable-static])
+
+(컴파일)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# aclocal -I /c/libidn2/gettext-0.22.5/gettext/gnulib-m4 && 
+autoconf -I /c/libidn2/gettext-0.22.5/gettext/gnulib-m4 && 
+autoheader -I /c/libidn2/gettext-0.22.5/gettext/gnulib-m4 && 
+automake --add-missing &&
+./configure CFLAGS="-std=c11" --verbose --host=x86_64-w64-mingw32 2>&1 | grep -E "(no|not found|undefine|error|warning)"
+
+XML, .desktop 파일, .glade 파일 등에서 번역 가능한 문자열을 추출하고, 
+번역 작업을 쉽게 할 수 있도록 돕는 도구입니다. 
+gettext와 함께 사용되며, 국제화된 소프트웨어를 만들 때 유용
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# intltoolize --version
+intltoolize (GNU intltool) 0.51.0
+C:\libidn2\gettext-0.22.5\libtextstyle\configure.ac 수정
+IT_PROG_INTLTOOL([0.51.0]) # intltool의 버전을 확인하고 필요한 경우 설치
+
+(오류)
+config.status: error: input file config.h.in:config.h does not exist - skip generating libtextstyle-config.h
+(수정)
+config.status 스크립트가 config.h.in 파일을 찾으려고 했으나, 해당 파일이 존재하지 않아서 libtextstyle-config.h 파일 생성을 건너뛰었다는 것을 의미
+config.h.in 파일은 일반적으로 configure.ac에서 생성된 템플릿 파일이며, 이 파일이 없으면 config.h도 제대로 생성되지 않음
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l /c/libidn2/gettext-0.22.5/libtextstyle/config.h
+-rw-r--r-- 1 nayou nayou 64453 10월 21 18:42 /c/libidn2/gettext-0.22.5/libtextstyle/config.h
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l /c/libidn2/gettext-0.22.5/libtextstyle/lib/argz.h
+-rw-r--r-- 1 nayou nayou 5294 10월 11 14:15 /c/libidn2/gettext-0.22.5/libtextstyle/lib/argz.h
+C:\libidn2\gettext-0.22.5\libtextstyle\configure.ac 수정
+AC_CONFIG_HEADERS([config.h lib/argz.h])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
