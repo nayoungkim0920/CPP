@@ -30037,32 +30037,235 @@ nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
 C:\libidn2\gettext-0.22.5\libtextstyle\configure.ac 수정
 AC_CONFIG_HEADERS([config.h lib/argz.h])
 
+(컴파일) { rm -f po/Makefile.in.in; } &&  제거
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# { autopoint --force; } 2>&1 | tee ./log/autopoint.log && 
+{ rm -rf autom4te.cache; } && 
+{ aclocal -I m4 -I gnulib-m4 -I /usr/share/aclocal; } 2>&1 | tee ./log/aclocal.log && 
+{ libtoolize --copy --force --verbose; } 2>&1 | tee ./log/libtoolize.log && 
+{ cp /usr/share/aclocal/ltdl.m4 ./m4/; } && 
+{ autoconf; } 2>&1 | tee ./log/autoconf.log && 
+{ autoheader; } 2>&1 | tee ./log/autoheader.log && 
+{ automake --add-missing --force-missing; } 2>&1 | tee ./log/automake.log && 
+{ ./configure CFLAGS="-std=c11" --verbose --host=x86_64-w64-mingw32; } 2>&1 | tee ./log/configure.log  | grep -E "(no|not found|undefine|error|warning)"
 
+(오류)
+autopoint: *** The AM_GNU_GETTEXT_VERSION declaration in your configure.ac
+               file requires the infrastructure from gettext-external but this version
+               is older. Please upgrade to gettext-external or newer.
+autopoint: *** Stop.
+(수정)
+configure.ac 파일에 있는 AM_GNU_GETTEXT_VERSION 선언이 현재 설치된 
+gettext 버전보다 더 최신 버전의 gettext-external 인프라를 필요로 하고 있습니다. 
+configure.ac 수정
+AM_GNU_GETTEXT_VERSION([0.22.5]) # gettext --version 0.22.5
+AM_GNU_GETTEXT([external]) # gettext는 external 인자 없이 사용할 수 없음
 
+(오류)
+config.status: error: po/Makefile.in.in was not created by intltoolize.
+(수정)
+intltoolize 명령어가 필요한 파일인 po/Makefile.in.in을 생성하지 못했다
+intltool 패키지 누락: intltool 패키지가 시스템에 설치되어 있지 않거나, 
+버전이 너무 오래되어 필요한 파일을 생성하지 못할 수 있음
 
+~/.bashrc 수정
+# LIBINTL
+export libintl_prefix="/c/msys64/mingw64"
 
+configure.ac 수정
+AC_ARG_WITH([libintl-prefix],
+            [AS_HELP_STRING([--with-libintl-prefix=DIR],
+                            [Specify the installation directory of libintl])],
+            [libintl_prefix="$withval"], [libintl_prefix="$libintl_prefix"])
 
+intltoolize 버전확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# intltoolize --version
+intltoolize (GNU intltool) 0.51.0
 
+configure.ac intl 관련 확인
+IT_PROG_INTLTOOL([0.51.0]) # intltool의 버전을 확인하고 필요한 경우 설치
+AC_ARG_WITH([libintl-prefix],
+            [AS_HELP_STRING([--with-libintl-prefix=DIR],
+                            [Specify the installation directory of libintl])],
+            [libintl_prefix="$withval"], [libintl_prefix="$libintl_prefix"])
+PKG_CHECK_MODULES(
+    [ITL], 
+    [libintl], 
+    [have_libintl=yes], 
+    [have_libintl=no]
+)
+AC_SUBST([INTL_CFLAGS], [$INTL_CFLAGS])
+AC_SUBST([INTL_LIBS], [$INTL_LIBS])
 
+po/Makefile.in.in 파일을 생성
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# libtoolize --copy --force;
 
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l po/Makefile.in.in
+-rw-r--r-- 1 nayou nayou 7150 10월 22 10:35 po/Makefile.in.in
 
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# gettextize -f
+po/Makevars 파일 생성
+cp po/Makevars.template po/Makevars
+aclocal 명령을 실행하여 aclocal.m4 파일을 재생성
+aclocal -I m4
+configure.ac 파일을 기반으로 프로젝트를 설정하는 configure 파일생성
+autoconf
 
+(오류)
+configure.ac:46: warning: AC_COMPILE_IFELSE was called before AC_USE_SYSTEM_EXTENSIONS
+(수정)
+AC_USE_SYSTEM_EXTENSIONS 매크로가 가장 먼저 호출되지 않아서 발생
+configure.ac 수정
+AC_INIT([libtextstyle], [1.0], [bug-libtextstyle@example.com]) # 프로젝트 초기화
+AC_USE_SYSTEM_EXTENSIONS # 시스템 확장 기능 활성화
 
+gettext.h 파일 복사
+cp /c/libidn2/gettext-0.22.5/gettext/gnulib/lib/gettext.h /c/msys64/mingw64/include 
 
+내부적으로 aclocal, autoconf, automake, autoheader 등의 도구를 호출하여 빌드에 필요한 모든 파일을 준비
+--install:프로젝트에 필요한 기본적인 빌드 보조 파일들을 자동으로 build-aux/ 디렉토리 등에 복사
+config.guess, config.sub, install-sh, missing, mkinstalldirs 등
+--force:강제로 덮어씀
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# autoreconf --install --force
 
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l po/Makefile.in.in
+-rw-r--r-- 1 nayou nayou 7150 10월 22 11:52 po/Makefile.in.in
 
+(빌드)
+{ autopoint --force; } 2>&1 | tee ./log/autopoint.log && 
+{ rm -rf autom4te.cache; } && 
+{ autoreconf --install --force; } 2>&1 | tee ./log/autoreconf.log && 
+{ cp /usr/share/aclocal/ltdl.m4 ./m4/; } && 
+{ ./configure CFLAGS="-std=c11" --verbose --host=x86_64-w64-mingw32; } 2>&1 | tee ./log/configure.log | grep -E "(no|not found|undefine|error|warning)"
 
+(오류)
+checking for glib-2.0 >= 2.10.0 gobject-2.0 >= 2.10.0... no
+(수정)
+glib-2.0 라이브러리가 필요하지만 찾을 수 없
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -S mingw-w64-x86_64-glib2
 
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -Q | grep glib2
+glib2 2.82.1-1
+mingw-w64-x86_64-glib2 2.82.1-1
 
+/mingw64/lib/pkgconfig/glib-2.0.pc
 
+(오류)
+checking for libintl... no
+(수정)
+libintl 라이브러리(주로 gettext와 함께 사용됨)가 필요하지만 찾을 수 없다
+~/.bashrc 수정
+# pkg-config 경로 설정
+export PKG_CONFIG_PATH="/mingw64/lib/pkgconfig"
+export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:/usr/lib/pkgconfig"
+# library 경로 설정
+export LD_LIBRARY_PATH="/mingw64/lib"
+export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/mingw64/bin"
 
+pkg-config로 설치 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pkg-config --libs gettext
+Package ncurses was not found in the pkg-config search path.
+Perhaps you should add the directory containing `gettext.pc'
+to the PKG_CONFIG_PATH environment variable
+Package 'gettext' not found
 
+gettext.pc 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l /mingw64/lib/pkgconfig/gettext.pc
+ls: cannot access '/mingw64/lib/pkgconfig/gettext.pc': No such file or directory
 
+gettext.pc 검색 & 복사
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# find / -name "gettext.pc" 2>/dev/null (오류 메시지, 파일 순환 등 무시하고 검색)
+/mingw64-backup-11.2.0/lib/pkgconfig/gettext.pc
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# cp /mingw64-backup-11.2.0/lib/pkgconfig/gettext.pc /mingw64/lib/pkgconfig/
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l /mingw64/lib/pkgconfig/gettext.pc
+-rw-r--r-- 1 nayou nayou 238 10월 22 20:18 /mingw64/lib/pkgconfig/gettext.pc
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pkg-config --libs --cflags gettext
+ -lgettext -lgcc -lgcc_eh
 
+(오류)
+checking for ncurses... no
+(수정)
+ncurses 라이브러리가 필요하지만 찾을 수 없다는 의미(ncurses는 텍스트 기반의 UI를 만들기 위해 사용)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -Q | grep ncurses
+mingw-w64-x86_64-ncurses 6.5.20240831-1
+ncurses 6.5.20240831-2
+환경변수확인
+# pkg-config 경로 설정
+export PKG_CONFIG_PATH="/mingw64/lib/pkgconfig"
+export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:/usr/lib/pkgconfig"
+# 라이브러리 경로 설정
+export LD_LIBRARY_PATH="/mingw64/lib"
+export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/mingw64/bin"
+export LIBRARY_PATH="/mingw64/lib"
+export LIBRARY_PATH="$LIBRARY_PATH:/usr/lib"
+export LIBRARY_PATH="$LIBRARY_PATH:/mingw64/bin"
+export LIBRARY_PATH="$LIBRARY_PATH:/mingw64/x86_64-w64-mingw32/lib"
 
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pkg-config --libs ncurses
+Package ncurses was not found in the pkg-config search path.
+Perhaps you should add the directory containing `ncurses.pc'
+to the PKG_CONFIG_PATH environment variable
+Package 'ncurses' not found
 
+ncurses.pc 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l /mingw64/lib/pkgconfig/ncurses.pc
+ls: cannot access '/mingw64/lib/pkgconfig/ncurses.pc': No such file or directory
 
+ncurses.pc 검색 & 복사
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# find / -name "ncurses.pc" 2>/dev/null
+/mingw64-backup-11.2.0/lib/pkgconfig/ncurses.pc
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# cp /mingw64-backup-11.2.0/lib/pkgconfig/ncurses.pc /mingw64/lib/pkgconfig/
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l /mingw64/lib/pkgconfig/ncurses.pc
+-rw-r--r-- 1 nayou nayou 219 10월 22 20:31 /mingw64/lib/pkgconfig/ncurses.pc
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pkg-config --libs --cflags ncurses
+ -lncurses
 
+(오류)
+checking for GNU gettext in libc... no
+checking for GNU gettext in libintl... no
+checking whether to use NLS... no
+(수정)
+gettext 및 국제화(NLS, Native Language Support) 기능을 찾을 수 없음
+libintl 설치 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -S mingw-w64-x86_64-gettext
+경고: mingw-w64-x86_64-gettext-tools-0.22.5-2는 최신 버전입니다. -- 재설치
 
+환경 변수
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# echo $PKG_CONFIG_PATH
+/mingw64/lib/pkgconfig:/usr/lib/pkgconfig
+
+libintl 포함된 gettext 라이브러리 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pkg-config --libs --cflags libintl
+Package libintl was not found in the pkg-config search path.
+Perhaps you should add the directory containing `libintl.pc'
+to the PKG_CONFIG_PATH environment variable
+Package 'libintl' not found
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# find / -name "*intl.pc" 2>/dev/null
 
 
