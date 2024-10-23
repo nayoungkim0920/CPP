@@ -30474,3 +30474,11 @@ config.status: executing libtextstyle-config.h commands
 config.status: creating libtextstyle-config.h - prefix LIBTEXTSTYLE for config.h defines
 config.status: libtextstyle-config.h is unchanged
 config.status: executing po/stamp-it commands
+
+(git update)
+c:\libidn2 폴더 > 우측마우스버튼 > 추가옵션표시 > open Git Bash Here
+git config --global user.name ""
+git config --global user.email ""
+git add .
+git commit -m "commit 20241023"
+git push origin master
