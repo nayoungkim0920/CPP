@@ -27,7 +27,7 @@ $
 초기설정
 nayou@kimnayooung MINGW64 /c/libidn2 (master)
 $ git config --global user.name "nayoungkim"
-git config --global user.email "nayoungkim0920@gmail.com"
+git config --global user.email ""
 
 github의 초기화를 진행
 nayou@kimnayooung MINGW64 /c/libidn2 (master)
