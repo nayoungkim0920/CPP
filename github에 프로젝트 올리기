@@ -26,8 +26,12 @@ $
 
 초기설정
 nayou@kimnayooung MINGW64 /c/libidn2 (master)
-$ git config --global user.name "nayoungkim"
+$ git config --global user.name ""
 git config --global user.email ""
+
+정보 확인
+nayou@kimnayooung MINGW64 /c/libidn2 (master)
+$ git config --list
 
 github의 초기화를 진행
 nayou@kimnayooung MINGW64 /c/libidn2 (master)
@@ -52,12 +56,15 @@ $ git remote -v
 nayou@kimnayooung MINGW64 /c/libidn2 (master)
 $ git remote add origin https://github.com/nayoungkim0920/libidn2.git
 
+추가할 파일 더하기(. : 모든파일, test.c: test.c)
 nayou@kimnayooung MINGW64 /c/libidn2 (master)
 $ git add .
 
+상태확인
 nayou@kimnayooung MINGW64 /c/libidn2 (master)
 $ git status
 
+히스토리만들기
 nayou@kimnayooung MINGW64 /c/libidn2 (master)
 $ git commit -m "comment 20241023"
 ...
@@ -77,9 +84,48 @@ To https://github.com/nayoungkim0920/libidn2.git
  * [new branch]        master -> master
 branch 'master' set up to track 'origin/master'.
 
+추가/수정 후 업데이트하기
+nayou@kimnayooung MINGW64 /c/libidn2 (master)
+$ git add .
+
+히스토리만들기
+nayou@kimnayooung MINGW64 /c/libidn2 (master)
+$ git commit -m "commit 20241023"
+
+업로드
+nayou@kimnayooung MINGW64 /c/libidn2 (master)
+$ git push origin master
+To https://github.com/nayoungkim0920/libidn2.git
+ ! [rejected]          master -> master (fetch first)
+error: failed to push some refs to 'https://github.com/nayoungkim0920/libidn2.git'
+hint: Updates were rejected because the remote contains work that you do not
+hint: have locally. This is usually caused by another repository pushing to
+hint: the same ref. If you want to integrate the remote changes, use
+hint: 'git pull' before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+
+=> 깃허브에서 readme파일을 수정했더니 오류가남
+
+nayou@kimnayooung MINGW64 /c/libidn2 (master)
+$ git push origin +master
+Enumerating objects: 27640, done.
+Counting objects: 100% (27640/27640), done.
+Delta compression using up to 16 threads
+Compressing objects: 100% (9518/9518), done.
+Writing objects: 100% (27640/27640), 73.10 MiB | 174.08 MiB/s, done.
+Total 27640 (delta 16617), reused 27399 (delta 16399), pack-reused 0 (from 0)
+remote: Resolving deltas: 100% (16617/16617), done.
+To https://github.com/nayoungkim0920/libidn2.git
+ + a48938c7...b1411084 master -> master (forced update)
+
+혹은
+git init
+git remote add origin https://github.com/nayoungkim0920/libidn2.git
+git pull origin master
+후에 
+push를 진행한다.
+
 끝.
-
-
 
 
 
