@@ -1,0 +1,91 @@
+PC에 다운로드 & 설치
+https://git-scm.com/downloads
+Download for Windows
+Click here to download the latest (2.47.0) 64-bit version of Git for Windows. 
+This is the most recent maintained build. It was released 15 days ago, on 2024-10-08.
+Latest source Release
+2.47.0
+Release Notes (2024-10-06)
+Download for Windows
+Git-2.47.0-64-bit.exe
+
+웹 깃허브에서 신규 레포지터리 생성
+https://github.com/nayoungkim0920
++ -> create new -> new repository
+name : libidn2
+create repository
+생성된 저장소의 주소
+http => https://github.com/nayoungkim0920/libidn2.git
+SSH => git@github.com:nayoungkim0920/libidn2.git
+
+pc에서 업로드 
+업로드하고싶은 폴더 -> 마우스 우클릭 -> 추가옵션표시 -> open Git Bash Here
+MINGW64:/c/libidn2 창이 열린다.
+nayou@kimnayooung MINGW64 /c/libidn2 (master)
+$
+
+초기설정
+nayou@kimnayooung MINGW64 /c/libidn2 (master)
+$ git config --global user.name "nayoungkim"
+git config --global user.email "nayoungkim0920@gmail.com"
+
+github의 초기화를 진행
+nayou@kimnayooung MINGW64 /c/libidn2 (master)
+$ git init
+Reinitialized existing Git repository in C:/libidn2/.git/
+
+원격 remote 주소의 버전을 확인
+nayou@kimnayooung MINGW64 /c/libidn2 (master)
+$ git remote -v
+origin  https://gitlab.com/libidn/libidn2.git (fetch)
+origin  https://gitlab.com/libidn/libidn2.git (push)
+
+remote repository 주소를 해제하는 명령어
+nayou@kimnayooung MINGW64 /c/libidn2 (master)
+$ git remote rm origin
+
+디렉토리에 remote repository 가 해제 된 것 확인
+nayou@kimnayooung MINGW64 /c/libidn2 (master)
+$ git remote -v
+
+연결하고자 하는 주소를 입력하면 작업하고 있는 디렉토리에 remote repository 연결 됨
+nayou@kimnayooung MINGW64 /c/libidn2 (master)
+$ git remote add origin https://github.com/nayoungkim0920/libidn2.git
+
+nayou@kimnayooung MINGW64 /c/libidn2 (master)
+$ git add .
+
+nayou@kimnayooung MINGW64 /c/libidn2 (master)
+$ git status
+
+nayou@kimnayooung MINGW64 /c/libidn2 (master)
+$ git commit -m "comment 20241023"
+...
+create mode 100644 로컬 디스크 (C).lnk
+
+업로드
+nayou@kimnayooung MINGW64 /c/libidn2 (master)
+$ git push -u origin master
+Enumerating objects: 27615, done.
+Counting objects: 100% (27615/27615), done.
+Delta compression using up to 16 threads
+Compressing objects: 100% (9495/9495), done.
+Writing objects: 100% (27615/27615), 72.62 MiB | 369.96 MiB/s, done.
+Total 27615 (delta 16598), reused 27409 (delta 16399), pack-reused 0 (from 0)
+remote: Resolving deltas: 100% (16598/16598), done.
+To https://github.com/nayoungkim0920/libidn2.git
+ * [new branch]        master -> master
+branch 'master' set up to track 'origin/master'.
+
+끝.
+
+
+
+
+
+
+
+
+
+
+
