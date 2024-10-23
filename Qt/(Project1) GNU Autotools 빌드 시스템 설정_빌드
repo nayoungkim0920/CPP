@@ -30267,5 +30267,91 @@ Package 'libintl' not found
 
 nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
 # find / -name "*intl.pc" 2>/dev/null
+2 : 표준오류(standard error, stderr)
+>/dev/null : 오류메시지를 아무데도 출력하지 않고 무시
+예외) 순환참조(Circular directory reference) 오류시 검색 중지 깊에제한을 둬서 검색
+find / -maxdepth 3 -name "*intl.pc" 2>/dev/null
+
+(빌드)
+{ autopoint --force; } 2>&1 | tee ./log/autopoint.log && 
+{ rm -rf autom4te.cache; } && 
+{ autoreconf --install --force; } 2>&1 | tee ./log/autoreconf.log && 
+{ cp /usr/share/aclocal/ltdl.m4 ./m4/; } && 
+{ ./configure CFLAGS="-std=c11" --verbose --host=x86_64-w64-mingw32; } 2>&1 | tee ./log/configure.log | grep -E "(no|not found|undefine|error|warning)"
+
+
+(오류)
+config.status: error: po/Makefile.in.in was not created by intltoolize.
+(수정)
+명령어 재실행(필수 파일들을 강제로 다시 복사하고, 손실된 파일들을 복구)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# intltoolize --force --copy --automake
+
+autotools를 설정하고 필요한 파일을 다시 생성
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ./autogen.sh
+*** Subdirectory 'gnulib' does not yet exist. Use './gitsub.sh pull' to create it, 
+or set the environment variable GNULIB_SRCDIR.
+환경변수수정
+~/.bashrc 수정
+export GNULIB_SRCDIR="/c/gnulib"
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ./autogen.sh
+
+gettext와 관련된 파일들 복구(백업)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# cp po/Makefile.in.in po/Makefile.in.in.bak
+gettextize -f
+
+Please run 'aclocal -I m4' to regenerate the aclocal.m4 file.
+You need aclocal from GNU automake 1.9 (or newer) to do this.
+Then run 'autoconf' to regenerate the configure file.
+
+You might also want to copy the convenience header file gettext.h
+from the /mingw64/share/gettext directory into your package.
+It is a wrapper around <libintl.h> that implements the configure --disable-nls
+option.
+
+Press Return to acknowledge the previous two paragraphs.
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# find /mingw64/include/ -name "gettext.h"
+/mingw64/include/gettext.h
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# cp /mingw64/include/gettext.h /mingw64/share/gettext/
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l /mingw64/share/gettext/gettext.h
+-rw-r--r-- 1 nayou nayou 10765 10월 23 08:02 /mingw64/share/gettext/gettext.h
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# find /c/libidn2/gettext-0.22.5/ -name "gitsub.sh"
+/c/libidn2/gettext-0.22.5/gettext/gitsub.sh
+/c/libidn2/gettext-0.22.5/gettext/gnulib/top/gitsub.sh
+
+환경변수추가
+~/.bashrc 수정
+export PATH="$PATH:/c/libidn2/gettext-0.22.5/gettext"
+
+서브모듈을 초기화하고, 필요한 파일들을 가져옴
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# gitsub.sh pull
+
+서브모듈 초기화
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# git submodule init
+
+서브모듈 업데이트
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# git submodule update
+
+
+
+
+
+
+
+
 
 
