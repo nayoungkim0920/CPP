@@ -30285,7 +30285,7 @@ config.status: error: po/Makefile.in.in was not created by intltoolize.
 (수정)
 명령어 재실행(필수 파일들을 강제로 다시 복사하고, 손실된 파일들을 복구)
 nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
-# intltoolize --force --copy --automake
+#  --force --copy --automake
 
 autotools를 설정하고 필요한 파일을 다시 생성
 nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
@@ -30346,12 +30346,131 @@ nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
 nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
 # git submodule update
 
+(빌드)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# { autopoint --force; } 2>&1 | tee ./log/autopoint.log &&
+{ rm -f po/Makefile.in.in; } &&
+{ rm -rf autom4te.cache; } &&
+{ aclocal -I m4 -I gnulib-m4 -I /usr/share/aclocal; } 2>&1 | tee ./log/aclocal.log &&
+{ libtoolize --copy --force --verbose --automake; } 2>&1 | tee ./log/libtoolize.log &&
+{ cp /usr/share/aclocal/ltdl.m4 ./m4/; } &&
+{ autoconf --verbose; } 2>&1 | tee ./log/autoconf.log &&
+{ autoheader; } 2>&1 | tee ./log/autoheader.log &&
+{ automake --add-missing --force-missing; } 2>&1 | tee ./log/automake.log &&
+{ ./configure CFLAGS="-std=c11" --verbose --host=x86_64-w64-mingw32; } 2>&1 | tee ./log/configure.log
 
+(오류)
+config.status: error: po/Makefile.in.in was not created by intltoolize.
+(수정)
+설치확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -Ss intltool
+msys/intltool 0.51.0-3 [설치함]
+    The internationalization tool collection
 
+intltoolize 수동 실행(po/Makefile.in.in 파일을 강제로 생성)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# intltoolize --force --copy --automake
 
+파일생성확
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l po/Makefile*
+-rw-r--r-- 1 nayou nayou 7150 10월 23 12:26 po/Makefile.in.in
 
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# autopoint --force
+Copying file po/Makefile.in.in
 
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# autoreconf -fi
 
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ./configure CFLAGS="-std=c11" --verbose --host=x86_64-w64-mingw32;
 
+(오류)
+libtoolize: Not copying 'm4/ltargz.m4', libltdl not used.
+libtoolize: Not copying 'm4/ltdl.m4', libltdl not used.
+config.status: error: po/Makefile.in.in was not created by intltoolize.
+(수정)
+configure.ac 확인
+IT_PROG_INTLTOOL([0.51.0])
 
+LINGUAS, POTFILES.in, Makevars 같은 파일들이 누락되면 intltoolize가 제대로 동작하지 않을 수 있음
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l po/LINGUAS po/POTFILES.in po/MAkevars
+ls: cannot access 'po/LINGUAS': No such file or directory
+-rw-r--r-- 1 nayou nayou 3564 10월 22 11:13 po/MAkevars
+-rw-r--r-- 1 nayou nayou  154 10월  1 20:15 po/POTFILES.in
 
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# echo "en_US ko ja" > po/LINGUAS
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l po/LINGUAS po/POTFILES.in po/MAkevars
+-rw-r--r-- 1 nayou nayou   12 10월 23 15:10 po/LINGUAS
+-rw-r--r-- 1 nayou nayou 3564 10월 22 11:13 po/MAkevars
+-rw-r--r-- 1 nayou nayou  154 10월  1 20:15 po/POTFILES.in
+
+(오류)
+config.status: error: po/Makefile.in.in was not created by intltoolize.
+(수정)
+intltoolize는 po/Makefile.in.in 파일을 생성하는 도구. 국제화 설정을 초기화
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# intltoolize --force --copy --automake
+
+configure.ac 수정
+#AC_PROG_LIBTOOL # 동적 라이브러리 및 정적 라이브러리 생성을 관리 => LT_INIT
+AM_PROG_CC_C_O # C 컴파일러를 체크하고, -c 및 -o 옵션이 잘 동작하는지 확인
+AC_CONFIG_FILES([po/Makefile.in])
+
+configure.ac 파일 내에서 더 이상 사용되지 않는 매크로들을 자동으로 최신으로 업데이트
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# autoupdate
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# autoreconf -fi
+Copying file po/Makefile.in.in
+libtoolize: putting auxiliary files in AC_CONFIG_AUX_DIR, 'build-aux'.
+libtoolize: copying file 'build-aux/ltmain.sh'
+libtoolize: putting macros in AC_CONFIG_MACRO_DIRS, 'm4'.
+libtoolize: copying file 'm4/libtool.m4'
+libtoolize: copying file 'm4/ltoptions.m4'
+libtoolize: copying file 'm4/ltsugar.m4'
+libtoolize: copying file 'm4/ltversion.m4'
+libtoolize: copying file 'm4/lt~obsolete.m4'
+configure.ac:125: installing 'build-aux/missing'
+adhoc-tests/Makefile.am: installing 'build-aux/depcomp'
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l po/Makefile.in*
+-rw-r--r-- 1 nayou nayou 20110 10월 23 16:47 po/Makefile.in
+-rw-r--r-- 1 nayou nayou  7150 10월 23 17:44 po/Makefile.in.in
+-rw-r--r-- 1 nayou nayou  7150 10월 23 16:59 po/Makefile.in.in~
+
+(빌드)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+#  ./configure CFLAGS="-std=c11" --verbose --host=x86_64-w64-mingw32; 
+...
+configure: creating ./config.status
+config.status: creating Makefile
+config.status: creating doc/Makefile
+config.status: creating lib/Makefile
+config.status: creating lib/exported.sh
+config.status: creating lib/textstyle/version.h
+config.status: creating lib/textstyle/woe32dll.h
+config.status: creating tests/Makefile
+config.status: creating adhoc-tests/Makefile
+config.status: creating po/Makefile.in
+config.status: creating config.h
+config.status: config.h is unchanged
+config.status: creating lib/argz.h
+config.status: lib/argz.h is unchanged
+config.status: executing po-directories commands
+config.status: creating po/POTFILES
+config.status: creating po/Makefile
+config.status: executing libtool commands
+config.status: executing depfiles commands
+config.status: executing libtextstyle-config.h commands
+config.status: creating libtextstyle-config.h - prefix LIBTEXTSTYLE for config.h defines
+config.status: libtextstyle-config.h is unchanged
+config.status: executing po/stamp-it commands
