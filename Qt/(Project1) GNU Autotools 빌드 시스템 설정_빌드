@@ -30634,12 +30634,45 @@ nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
 # pkg-config --libs glib-2.0 gobject-2.0
 -lgobject-2.0 -lglib-2.0 -lintl
 성공!
+=> checking for glib-2.0 >= 2.10.0 gobject-2.0 >= 2.10.0... yes
+
+(빌드) { rm -f po/Makefile.in.in; } && 제거
+{ autopoint --force; } 2>&1 | tee ./log/autopoint.log &&
+{ rm -rf autom4te.cache; } &&
+{ aclocal -I m4 -I gnulib-m4 -I /usr/share/aclocal; } 2>&1 | tee ./log/aclocal.log &&
+{ libtoolize --copy --force --verbose --automake; } 2>&1 | tee ./log/libtoolize.log &&
+{ cp /usr/share/aclocal/ltdl.m4 ./m4/; } &&
+{ autoconf --verbose; } 2>&1 | tee ./log/autoconf.log &&
+{ autoheader; } 2>&1 | tee ./log/autoheader.log &&
+{ automake --add-missing --force-missing; } 2>&1 | tee ./log/automake.log &&
+{ ./configure CFLAGS="-std=c11" --verbose --host=x86_64-w64-mingw32; } 2>&1 | tee ./log/configure.log
+
+(오류)
+libtoolize: Not copying 'm4/ltargz.m4', libltdl not used.
+libtoolize: Not copying 'm4/ltdl.m4', libltdl not used.
+(수정)
+검색
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# find / -name "ltargz.m4" -o -name "ltdl.m4" 2>/dev/null
+...
+/c/libidn2/libtool-2.4.6/m4/ltargz.m4
+/c/libidn2/libtool-2.4.6/m4/ltdl.m4
+...
+
+환경병수등록
+~/.bashrc 수정
+export PATH="$PATH:/c/libidn2/libtool-2.4.6"
 
 
 
-
-
-
-
+(오류)
+checking for x86_64-w64-mingw32-gcc option to enable C23 features... unsupported
+checking for x86_64-w64-mingw32-gcc option to enable C11 features... unsupported
+checking for x86_64-w64-mingw32-gcc option to enable C99 features... unsupported
+checking for x86_64-w64-mingw32-gcc option to enable C89 features... unsupported
+(수정)
+./configure CFLAGS="-std=c11" 
+configure.ac 수정
+#CFLAGS="$CFLAGS -std=c11"  # C11 플래그 추가 # ./configure CFLAGS="-std=c11"
 
 
