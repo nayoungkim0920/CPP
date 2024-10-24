@@ -30659,11 +30659,54 @@ nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
 /c/libidn2/libtool-2.4.6/m4/ltdl.m4
 ...
 
-환경병수등록
+libtool 설치 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# libtool --version
+libtool (GNU libtool) 2.4.7
+Written by Gordon Matzigkeit, 1996
+Copyright (C) 2014 Free Software Foundation, Inc.
+
+libltdl 라이브러리 파일을 확인( libltdl.a, libltdl.so, libltdl.dll 등)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# find / -name "libltdl*"
+/mingw64-backup-11.2.0/bin/libltdl-7.dll
+/mingw64-backup-11.2.0/include/libltdl
+/mingw64-backup-11.2.0/lib/libltdl.a
+/mingw64-backup-11.2.0/lib/libltdl.dll.a
+/mingw64-backup-11.2.0/lib/libltdl.la
+/mingw64-backup-11.2.0/share/libtool/libltdl
+/usr/include/libltdl
+/usr/lib/libltdl.a
+/usr/lib/libltdl.dll.a
+/usr/share/libtool/libltdl
+...
+=> /mingw64-backup-11.2.0/bin (DLLs)
+=> /mingw64-backup-11.2.0/include/libltdl (header files)
+=> /mingw64-backup-11.2.0/lib (library files)
+
 ~/.bashrc 수정
-export PATH="$PATH:/c/libidn2/libtool-2.4.6"
+export PATH="$PATH:/mingw64-backup-11.2.0/bin" # libltdl-7.dll
+export C_INCLUDE_PATH="$C_INCLUDE_PATH:/mingw64-backup-11.2.0/include/libltdl" # libltdl
+export LIBRARY_PATH="$LIBRARY_PATH:/mingw64-backup-11.2.0/lib" # libltdl.a, libltdl.dll.a, libltdl.la
 
+configure.ac 수정
+LT_INIT([win32-dll], [dlopen disable-static])
+AC_CONFIG_SUBDIRS([libltdl]) # libltdl을 사용
+AC_CONFIG_MACRO_DIRS([m4])
 
+빌드옵션수정 { libtoolize --ltdl --copy --force --verbose --automake; } # --ltdl : 서브디렉터리 생성, 관련파일 복사
+{ autopoint --force; } 2>&1 | tee ./log/autopoint.log &&
+{ rm -rf autom4te.cache; } &&
+{ aclocal -I m4 -I gnulib-m4 -I /usr/share/aclocal; } 2>&1 | tee ./log/aclocal.log &&
+{ libtoolize --ltdl --copy --force --verbose --automake; } 2>&1 | tee ./log/libtoolize.log &&
+{ cp /usr/share/aclocal/ltdl.m4 ./m4/; } &&
+{ autoconf --verbose; } 2>&1 | tee ./log/autoconf.log &&
+{ autoheader; } 2>&1 | tee ./log/autoheader.log &&
+{ automake --add-missing --force-missing; } 2>&1 | tee ./log/automake.log &&
+{ ./configure CFLAGS="-std=c11" --verbose --host=x86_64-w64-mingw32; } 2>&1 | tee ./log/configure.log
+
+Makefile.am 수정
+SUBDIRS = libltdl po lib tests adhoc-tests doc
 
 (오류)
 checking for x86_64-w64-mingw32-gcc option to enable C23 features... unsupported
@@ -30674,5 +30717,65 @@ checking for x86_64-w64-mingw32-gcc option to enable C89 features... unsupported
 ./configure CFLAGS="-std=c11" 
 configure.ac 수정
 #CFLAGS="$CFLAGS -std=c11"  # C11 플래그 추가 # ./configure CFLAGS="-std=c11"
+
+(오류)
+
+(수정)
+configure.ac 수정
+AM_GNU_GETTEXT_VERSION([0.22.5]) # gettext --version 0.22.5
+AM_GNU_GETTEXT([external]) # gettext는 external 인자 없이 사용할 수 없음
+
+gettext 및 intltool 도구 설치 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -S gettext intltool
+경고: gettext-0.22.4-1는 최신 버전입니다. -- 재설치
+경고: intltool-0.51.0-3는 최신 버전입니다. -- 재설치
+
+po 디렉터리에서 필요한 파일들을 자동으로 생성(특히, po/Makefile.in.in)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# intltoolize --force --copy --automake
+
+파일확인(intltoolize가 제대로 실행되면 이 파일들이 자동으로 생성)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l po/Makevars po/Makefile.in.in
+-rw-r--r-- 1 nayou nayou 19868 10월 24 10:41 po/Makefile.in.in
+-rw-r--r-- 1 nayou nayou  3564 10월 22 11:13 po/Makevars
+
+자동화된 빌드 시스템 파일들을 갱신
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# autoreconf --force --install
+
+(오류)
+libtoolize: Remember to add 'LTDL_INIT' to configure.ac.
+libtoolize: Consider adding 'AC_CONFIG_MACRO_DIRS([../m4])' to configure.ac,
+libtoolize: and rerunning libtoolize and aclocal.
+libtoolize: copying file 'm4/ltargz.m4'
+libtoolize: You should add the contents of 'm4/ltargz.m4' to 'aclocal.m4'.
+libtoolize: copying file 'm4/ltdl.m4'
+libtoolize: You should add the contents of 'm4/ltdl.m4' to 'aclocal.m4'.
+libtoolize: Remember to add 'LTDL_INIT' to configure.ac.
+libtoolize: Remember to add 'LT_CONFIG_LTDL_DIR([libltdl])' to 'configure.ac'.
+
+(수정)
+configure.ac 수정
+LTDL_INIT
+LT_CONFIG_LTDL_DIR([libltdl])
+AC_CONFIG_MACRO_DIRS([../m4])
+
+m4/ltargz.m4와 m4/ltdl.m4의 내용을 aclocal.m4에 추가
+"C:\libidn2\gettext-0.22.5\libtextstyle\m4\ltargz.m4"
+"C:\libidn2\gettext-0.22.5\libtextstyle\m4\ltdl.m4"
+"C:\libidn2\gettext-0.22.5\libtextstyle\aclocal.m4"
+
+
+
+
+
+
+
+
+
+
+
 
 
