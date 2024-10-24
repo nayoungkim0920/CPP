@@ -30482,3 +30482,164 @@ git config --global user.email ""
 git add .
 git commit -m "commit 20241023"
 git push origin master
+
+(오류)
+checking for working alloca.h... no
+(수정)
+스택에 동적 메모리를 할당할 때 사용
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# find / -name "alloca.h"
+...
+"C:\libidn2\gettext-0.22.5\gettext\gettext-runtime\gnulib-lib\alloca.h"
+"C:\libidn2\gettext-0.22.5\gettext\gettext-runtime\intl\gnulib-lib\alloca.h"
+"C:\libidn2\gettext-0.22.5\gettext\gettext-runtime\libasprintf\gnulib-lib\alloca.h"
+"C:\libidn2\gettext-0.22.5\gettext\libtextstyle\lib\alloca.h"
+"C:\libidn2\gettext-0.22.5\gettext-runtime\gnulib-lib\alloca.h"
+"C:\libidn2\gettext-0.22.5\gettext-runtime\intl\gnulib-lib\alloca.h"
+"C:\libidn2\gettext-0.22.5\gettext-runtime\libasprintf\gnulib-lib\alloca.h"
+"C:\libidn2\gettext-0.22.5\libtextstyle\lib\alloca.h"
+...
+
+환경변수등록
+~/.bashrc 수정
+export PATH="$PATH:/c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib"
+export PATH="$PATH:/c/libidn2/gettext-0.22.5/gettext/gettext-runtime/intl/gnulib-lib"
+export PATH="$PATH:/c/libidn2/gettext-0.22.5/gettext/gettext-runtime/libasprintf/gnulib-lib"
+export PATH="$PATH:/c/libidn2/gettext-0.22.5/gettext/libtextstyle/lib"
+export PATH="$PATH:/c/libidn2/gettext-0.22.5/gettext-runtime/gnulib-lib"
+export PATH="$PATH:/c/libidn2/gettext-0.22.5/gettext-runtime/intl/gnulib-lib"
+export PATH="$PATH:/c/libidn2/gettext-0.22.5/gettext-runtime/libasprintf/gnulib-lib"
+export PATH="$PATH:/c/libidn2/gettext-0.22.5/libtextstyle/lib"
+
+(오류)
+checking for glib-2.0 >= 2.10.0 gobject-2.0 >= 2.10.0... no
+(수정)
+최신패키지 업데이트
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -Syu
+
+MSYS2에서 설치
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -S mingw-w64-x86_64-glib2
+경고: mingw-w64-x86_64-glib2-2.82.2-1는 최신 버전입니다. -- 재설치
+
+MSYS2에서 버전 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pkg-config --modversion glib-2.0 gobject-2.0
+2.82.1
+2.82.1
+
+pkg-config가 해당 라이브러리를 찾을 수 있음 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pkg-config --libs glib-2.0 gobject-2.0
+-lgobject-2.0 -lglib-2.0 -lintl
+
+컴파일러 플래그(CFLAGS)도 정상적으로 설정되어 있는지 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pkg-config --cflags glib-2.0 gobject-2.0
+(오류)
+Package libpcre2-8 was not found in the pkg-config search path.
+Perhaps you should add the directory containing `libpcre2-8.pc'
+to the PKG_CONFIG_PATH environment variable
+Package 'libpcre2-8', required by 'glib-2.0', not found
+Package 'libffi', required by 'gobject-2.0', not found
+(수정)
+glib-2.0와 gobject-2.0 라이브러리가 **libpcre2-8**와 libffi 라이브러리들을 의존
+시스템에 설치되어 있지 않거나 pkg-config에서 해당 패키지를 찾지 못하고 있다
+ **libpcre2-8**과 **libffi**를 설치하고, 설치된 경로를 PKG_CONFIG_PATH에 추가
+
+패키지명검색
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -Ss pcre2
+...
+msys/libpcre2_8 10.44-1 (libraries) [설치함]
+mingw64/mingw-w64-x86_64-pcre2 10.44-1 [설치함]
+...
+
+pcre2 설치확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -S mingw-w64-x86_64-pcre2
+경고: mingw-w64-x86_64-pcre2-10.44-1는 최신 버전입니다. -- 재설치
+
+libffi 설치확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -S mingw-w64-x86_64-libffi
+경고: mingw-w64-x86_64-libffi-3.4.6-1는 최신 버전입니다. -- 재설치
+
+pc파일 위치 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# find / -name "libffi*.pc" -o -name "pcre*.pc" -o -name "libpcre*.pc"
+/mingw64/lib/pkgconfig/libpcre.pc
+/mingw64/lib/pkgconfig/libpcre16.pc
+/mingw64/lib/pkgconfig/libpcre32.pc
+/mingw64/lib/pkgconfig/libpcrecpp.pc
+/mingw64/lib/pkgconfig/libpcreposix.pc
+/mingw64-backup-11.2.0/lib/pkgconfig/libffi.pc
+/mingw64-backup-11.2.0/lib/pkgconfig/libpcre2-16.pc
+/mingw64-backup-11.2.0/lib/pkgconfig/libpcre2-32.pc
+/mingw64-backup-11.2.0/lib/pkgconfig/libpcre2-8.pc
+/mingw64-backup-11.2.0/lib/pkgconfig/libpcre2-posix.pc
+복사
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# cp /mingw64-backup-11.2.0/lib/pkgconfig/libffi.pc /mingw64/lib/pkgconfig/
+cp /mingw64-backup-11.2.0/lib/pkgconfig/libpcre2-16.pc /mingw64/lib/pkgconfig/
+cp /mingw64-backup-11.2.0/lib/pkgconfig/libpcre2-32.pc /mingw64/lib/pkgconfig/
+cp /mingw64-backup-11.2.0/lib/pkgconfig/libpcre2-8.pc /mingw64/lib/pkgconfig/
+cp /mingw64-backup-11.2.0/lib/pkgconfig/libpcre2-posix.pc /mingw64/lib/pkgconfig/
+
+파일확인
+nayou@kimnayooung MINGW64 /mingw64/lib/pkgconfig
+# ls -l libpcre.pc  libpcre2-8.pc libffi.pc glib-2.0.pc gobject-2.0.pc
+-rw-r--r-- 1 nayou nayou 566 10월 19 21:12 glib-2.0.pc
+-rw-r--r-- 1 nayou nayou 289 10월 19 21:12 gobject-2.0.pc
+-rw-r--r-- 1 nayou nayou 270 10월 24 10:16 libffi.pc
+-rw-r--r-- 1 nayou nayou 321  7월 27  2021 libpcre.pc
+-rw-r--r-- 1 nayou nayou 339 10월 24 10:17 libpcre2-8.pc
+
+환경변수등록
+~/.bashrc 수정
+export PKG_CONFIG=/mingw64/bin/pkg-config     # pkg-config 경로 설정
+# pkg-config 경로 설정
+export PKG_CONFIG_PATH="/mingw64/lib/pkgconfig"
+export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:/usr/lib/pkgconfig"
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l /mingw64/lib/pkgconfig/glib-2.0.pc
+-rw-r--r-- 1 nayou nayou 566  9월 20 15:04 /mingw64/lib/pkgconfig/glib-2.0.pc
+
+configure.ac 수정
+# PKG_CHECK_MODULES(
+#     [GLIB], 
+#     [glib-2.0 gobject-2.0], 
+#     [have_glib=yes], 
+#     [have_glib=no]
+# )
+
+PKG_CHECK_MODULES([GLIB], [glib-2.0 >= 2.10.0 gobject-2.0 >= 2.10.0], 
+    [have_glib=yes], 
+    [have_glib=no])
+
+if test "x$have_glib" = "xno"; then
+    AC_MSG_ERROR([GLib 2.10.0 or higher is required])
+fi
+
+AC_SUBST([GLIB_CFLAGS])
+AC_SUBST([GLIB_LIBS])
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pkg-config --cflags glib-2.0 gobject-2.0
+-IC:/msys64/mingw64/include/glib-2.0 -IC:/msys64/mingw64/lib/glib-2.0/include
+성공!
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pkg-config --libs glib-2.0 gobject-2.0
+-lgobject-2.0 -lglib-2.0 -lintl
+성공!
+
+
+
+
+
+
+
+
+
