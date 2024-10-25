@@ -30767,15 +30767,106 @@ m4/ltargz.m4와 m4/ltdl.m4의 내용을 aclocal.m4에 추가
 "C:\libidn2\gettext-0.22.5\libtextstyle\m4\ltdl.m4"
 "C:\libidn2\gettext-0.22.5\libtextstyle\aclocal.m4"
 
+(오류)
+libtoolize: Remember to add 'LTDL_INIT' to configure.ac.
+libtoolize: Consider adding 'AC_CONFIG_MACRO_DIRS([../m4])' to configure.ac,
+libtoolize: and rerunning libtoolize and aclocal.
+libtoolize:   error: AC_CONFIG_MACRO_DIRS([../m4]) conflicts with ACLOCAL_AMFLAGS=-I m4.
+(수정)
+configure.ac 
+AC_CONFIG_MACRO_DIRS([../m4])
 
+Makefile.am
+ACLOCAL_AMFLAGS = -I m4 -I gnulib-m4 -I /mingw64/share/aclocal
 
+~/.bashrc
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# echo $ACLOCAL_PATH
+/c/libidn2/gettext-0.22.5/gettext/gnulib-m4:
+/usr/share/aclocal:
+/c/libidn2/gettext-0.22.5/libtextstyle/lib/ltdl:
+/c/libidn2/gettext-0.22.5/libtextstyle/lib/ltdl/m4:
+/c/msys64/usr/share/aclocal:
+/mingw64/share/aclocal:
+/c/libidn2/m4
 
+=> 두 설정이 충돌 
+=> 이미 환경 변수로 설정한 경로는 ACLOCAL_AMFLAGS에서 제거
 
+configure.ac 수정
+AC_CONFIG_MACRO_DIRS([../m4 gnulib-m4])
 
+Makefile.am
+# ACLOCAL_AMFLAGS = -I m4 -I gnulib-m4 -I /mingw64/share/aclocal
 
+(오류)
+libtoolize: Remember to add 'LTDL_INIT' to configure.ac.
+libtoolize: Consider adding 'AC_CONFIG_MACRO_DIRS([../m4])' to configure.ac,
+libtoolize: and rerunning libtoolize and aclocal.
+libtoolize: You should add the contents of '../m4/ltargz.m4' to 'aclocal.m4'.
+libtoolize: You should add the contents of '../m4/ltdl.m4' to 'aclocal.m4'.
+libtoolize: Consider adding '-I ../m4' to ACLOCAL_AMFLAGS in Makefile.am.
+configure.ac:23: warning: LTDL_INIT was called before LT_CONFIG_LTDL_DIR
+../m4/ltdl.m4:17: LT_CONFIG_LTDL_DIR is expanded from...
+configure.ac:23: the top level
+configure.ac:25: warning: AC_COMPILE_IFELSE was called before AC_USE_SYSTEM_EXTENSIONS
+../autoconf-2.72/lib/autoconf/specific.m4:541: AC_USE_SYSTEM_EXTENSIONS is expanded from...
+configure.ac:25: the top level
+configure.ac:25: warning: AC_LINK_IFELSE was called before AC_USE_SYSTEM_EXTENSIONS
+../autoconf-2.72/lib/autoconf/specific.m4:541: AC_USE_SYSTEM_EXTENSIONS is expanded from...
+configure.ac:25: the top level
+configure.ac:25: warning: AC_CHECK_INCLUDES_DEFAULT was called before AC_USE_SYSTEM_EXTENSIONS
+../autoconf-2.72/lib/autoconf/specific.m4:541: AC_USE_SYSTEM_EXTENSIONS is expanded from...
+configure.ac:25: the top level
+configure.ac:100: warning: LTDL_INIT was called before LT_INIT
+../m4/libtool.m4:62: LT_INIT is expanded from...
+configure.ac:100: the top level
 
+(수정)
+갱신이안될경우
+버전확인 => 최신버전으로 유지
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# autoconf --version
+automake --version
+libtool --version
+Autoconf: 2.72 (2023년 버전)
+Automake: 1.16.5 (2021년 버전)
+Libtool: 2.4.7 (2014년 버전).
 
+캐시 파일 및 설정 파일 강제 재생성(aclocal.m4 파일이 자동으로 갱신 따로 복사해줄필요없음)
+rm -f aclocal.m4 &&
+rm -rf autom4te.cache/ &&
+aclocal -I ../m4 -I gnulib-m4 &&
+libtoolize --force --copy --automake &&
+autoreconf --force --install
 
+다른파일을 컴파일하는지 체크
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -rn --include="configure.ac" "AC_USE_SYSTEM_EXTENSIONS" /
+...
+/c/libidn2/gettext-0.22.5/libtextstyle/configure.ac:45:AC_USE_SYSTEM_EXTENSIONS # 시스템 확장 기능 활성화
+...
 
+Makefile.am 수정
+# -I gnulib-m4 -I /mingw64/share/aclocal configure.ac 충돌로 주석처리
+ACLOCAL_AMFLAGS = -I m4 -I ../m4 -I gnulib-m4
 
+configure.ac 수정
+AC_INIT([libtextstyle], [1.0], [bug-libtextstyle@example.com]) # 프로젝트 초기화
+AC_USE_SYSTEM_EXTENSIONS
 
+LT_CONFIG_LTDL_DIR([libltdl])
+
+LT_INIT([win32-dll], [dlopen disable-static])
+LTDL_INIT
+
+AC_PREREQ([2.72])  # autoconf --version
+
+AM_GNU_GETTEXT_VERSION([0.22.5]) # gettext --version 0.22.5
+AM_GNU_GETTEXT([external]) # gettext는 external 인자 없이 사용할 수 없음
+
+AC_CONFIG_MACRO_DIRS([m4] [../m4] [gnulib-m4])
+
+LT_LANG([C])
+LT_LANG([C++])
+LT_LANG([Windows Resource])
