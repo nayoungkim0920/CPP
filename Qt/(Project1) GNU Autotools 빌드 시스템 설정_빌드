@@ -30883,9 +30883,11 @@ libtoolize: and rerunning libtoolize and aclocal.
 { automake --add-missing --force-missing; } 2>&1 | tee ./log/automake.log &&
 { ./configure CFLAGS="-std=c11" --verbose --host=x86_64-w64-mingw32; } 2>&1 | tee ./log/configure.log | grep -E "(no|not found|undefine|error|warning)"
 
+config.log
 (오류)
-./configure: line 35898: AC_CROSS_COMPILER: command not found
+configure:5027: x86_64-w64-mingw32-gcc -V >&5
+x86_64-w64-mingw32-gcc.exe: error: unrecognized command-line option '-V'
+x86_64-w64-mingw32-gcc.exe: fatal error: no input files
+compilation terminated.
 (수정)
-configure.ac 수정
-# AC_CROSS_COMPILER # command not found
-# m4_pattern_allow([AC_CROSS_COMPILER]) # command not found
+
