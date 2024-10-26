@@ -30866,7 +30866,26 @@ AM_GNU_GETTEXT_VERSION([0.22.5]) # gettext --version 0.22.5
 AM_GNU_GETTEXT([external]) # gettext는 external 인자 없이 사용할 수 없음
 
 AC_CONFIG_MACRO_DIRS([m4] [../m4] [gnulib-m4])
+(보류)
+libtoolize: Remember to add 'LTDL_INIT' to configure.ac.
+libtoolize: Consider adding 'AC_CONFIG_MACRO_DIRS([../m4])' to configure.ac,
+libtoolize: and rerunning libtoolize and aclocal.
+계속해서 수정을 해도 나오는 메시지
 
-LT_LANG([C])
-LT_LANG([C++])
-LT_LANG([Windows Resource])
+(빌드)
+{ autopoint --force; } 2>&1 | tee ./log/autopoint.log &&
+{ rm -rf autom4te.cache; } &&
+{ aclocal -I m4 -I gnulib-m4 -I /usr/share/aclocal; } 2>&1 | tee ./log/aclocal.log &&
+{ libtoolize --ltdl --copy --force --verbose --automake; } 2>&1 | tee ./log/libtoolize.log &&
+{ cp /usr/share/aclocal/ltdl.m4 ./m4/; } &&
+{ autoconf --verbose; } 2>&1 | tee ./log/autoconf.log &&
+{ autoheader; } 2>&1 | tee ./log/autoheader.log &&
+{ automake --add-missing --force-missing; } 2>&1 | tee ./log/automake.log &&
+{ ./configure CFLAGS="-std=c11" --verbose --host=x86_64-w64-mingw32; } 2>&1 | tee ./log/configure.log | grep -E "(no|not found|undefine|error|warning)"
+
+(오류)
+./configure: line 35898: AC_CROSS_COMPILER: command not found
+(수정)
+configure.ac 수정
+# AC_CROSS_COMPILER # command not found
+# m4_pattern_allow([AC_CROSS_COMPILER]) # command not found
