@@ -31014,7 +31014,9 @@ else
 fi
 
 
-
+해야할것
+configure 파일에서 
+sed 's/-V//g; s/-qversion//g; s/-version//g' 제거할것
 
 
 
