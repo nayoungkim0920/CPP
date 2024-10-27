@@ -30883,15 +30883,6 @@ libtoolize: and rerunning libtoolize and aclocal.
 { automake --add-missing --force-missing; } 2>&1 | tee ./log/automake.log &&
 { ./configure CFLAGS="-std=c11" --verbose --host=x86_64-w64-mingw32; } 2>&1 | tee ./log/configure.log | grep -E "(no|not found|undefine|error|warning)"
 
-config.log
-(오류)
-configure:5027: x86_64-w64-mingw32-gcc -V >&5
-x86_64-w64-mingw32-gcc.exe: error: unrecognized command-line option '-V'
-x86_64-w64-mingw32-gcc.exe: fatal error: no input files
-compilation terminated.
-(수정)
-
-
 (Git 업로드)
 c:\libidn2\myupload.sh 생성
 #!/bin/bash
@@ -30917,3 +30908,163 @@ $ chmod +x myupload.sh
 
 nayou@kimnayooung MINGW64 /c/libidn2 (master)
 $ ./myupload.sh
+
+config.log 오류 처리
+(오류)
+configure:5027: x86_64-w64-mingw32-gcc -V >&5
+x86_64-w64-mingw32-gcc.exe: error: unrecognized command-line option '-V'
+x86_64-w64-mingw32-gcc.exe: fatal error: no input files
+compilation terminated.
+(수정)
+configure 파일 확인
+for ac_option in --version -v -V -qversion -version; do
+=> for ac_option in --version -v; do 이렇게 되어야함
+
+configure.ac 수정
+컴파일러 버전을 확인할 때 사용할 옵션을 제한하는 매크로를 추가하여 -V와 같은 옵션을 사용하지 않도록 함
+AC_PROG_CC 호출 전에 직접 컴파일러 버전을 확인하는 매크로를 작성
+# unrecognized command-line option '-V -qversion -version' 방지
+AC_LANG([C])
+# C 컴파일러 버전 확인
+AC_MSG_CHECKING([for C compiler version])
+for ac_option in --version -v; do
+  if $CC $ac_option >/dev/null 2>&1; then
+    $CC $ac_option
+    break
+  fi
+done
+AC_PROG_CC
+
+(오류)
+configure:5027: x86_64-w64-mingw32-gcc -V >&5
+x86_64-w64-mingw32-gcc.exe: error: unrecognized command-line option '-V'
+x86_64-w64-mingw32-gcc.exe: fatal error: no input files
+compilation terminated.
+configure:5038: $? = 1
+configure:5027: x86_64-w64-mingw32-gcc -qversion >&5
+x86_64-w64-mingw32-gcc.exe: error: unrecognized command-line option '-qversion'; did you mean '--version'?
+x86_64-w64-mingw32-gcc.exe: fatal error: no input files
+compilation terminated.
+configure:5038: $? = 1
+configure:5027: x86_64-w64-mingw32-gcc -version >&5
+x86_64-w64-mingw32-gcc.exe: error: unrecognized command-line option '-version'
+x86_64-w64-mingw32-gcc.exe: fatal error: no input files
+compilation terminated.
+configure:19256: x86_64-w64-mingw32-gcc -V >&5
+x86_64-w64-mingw32-gcc.exe: error: unrecognized command-line option '-V'
+x86_64-w64-mingw32-gcc.exe: fatal error: no input files
+compilation terminated.
+configure:19267: $? = 1
+configure:19256: x86_64-w64-mingw32-gcc -qversion >&5
+x86_64-w64-mingw32-gcc.exe: error: unrecognized command-line option '-qversion'; did you mean '--version'?
+x86_64-w64-mingw32-gcc.exe: fatal error: no input files
+compilation terminated.
+configure:19267: $? = 1
+configure:19256: x86_64-w64-mingw32-gcc -version >&5
+x86_64-w64-mingw32-gcc.exe: error: unrecognized command-line option '-version'
+x86_64-w64-mingw32-gcc.exe: fatal error: no input files
+configure:32032: x86_64-w64-mingw32-g++ -V >&5
+x86_64-w64-mingw32-g++.exe: error: unrecognized command-line option '-V'
+x86_64-w64-mingw32-g++.exe: fatal error: no input files
+compilation terminated.
+configure:32043: $? = 1
+configure:32032: x86_64-w64-mingw32-g++ -qversion >&5
+x86_64-w64-mingw32-g++.exe: error: unrecognized command-line option '-qversion'; did you mean '--version'?
+x86_64-w64-mingw32-g++.exe: fatal error: no input files
+configure:36792: x86_64-w64-mingw32-g++ -o conftest.exe -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -O2 -DDEBUG -DVERSION="1.0.0" -std=c++17 -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0 -L/mingw64/lib -L/usr/lib -L/mingw64/x86_64-w64-mingw32/lib -Wl,-rpath,/mingw64/bin -no-undefined -export-dynamic conftest.cpp -ltextstyle >&5
+x86_64-w64-mingw32-g++.exe: error: unrecognized command-line option '-no-undefined'
+configure:36792: checking for fsync
+configure:36792: x86_64-w64-mingw32-g++ -o conftest.exe -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -O2 -DDEBUG -DVERSION="1.0.0" -std=c++17 -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0 -L/mingw64/lib -L/usr/lib -L/mingw64/x86_64-w64-mingw32/lib -Wl,-rpath,/mingw64/bin -no-undefined -export-dynamic conftest.cpp -ltextstyle >&5
+x86_64-w64-mingw32-g++.exe: error: unrecognized command-line option '-no-undefined' 
+configure:36807: checking for xmalloc
+configure:36807: x86_64-w64-mingw32-g++ -o conftest.exe -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -O2 -DDEBUG -DVERSION="1.0.0" -std=c++17 -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0 -L/mingw64/lib -L/usr/lib -L/mingw64/x86_64-w64-mingw32/lib -Wl,-rpath,/mingw64/bin -no-undefined -export-dynamic conftest.cpp -ltextstyle >&5
+x86_64-w64-mingw32-g++.exe: error: unrecognized command-line option '-no-undefined'
+(수정)
+AC_PROG_CC와 같은 자동화된 매크로가 컴파일러 버전 확인을 위해 기본적으로 여러 옵션을 시도하기 때문
+AC_PROG_CC를 사용하지 않고, 직접 컴파일러를 확인하는 로직을 추가
+
+예)
+fsync를 예로 들면
+
+configure.ac
+GNULIB_MODULES="fsync"
+gl_MODULES([fsync])
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([#include <unistd.h>
+                                   int main() {
+                                       int fd = 0; 
+                                       fsync(fd);
+                                       return 0;
+                                   }])],
+[AC_DEFINE([HAVE_FSYNC], [1], [Define to 1 if you have the fsync' function.])],
+[AC_DEFINE([HAVE_FLUSH_FILE_BUFFERS], [1], [Define to 1 if using FlushFileBuffers on Windows.])])
+AC_CHECK_FUNCS([getprogname printf malloc fsync], [GL_COND_OBJ_FSYNC=1])
+AC_LIBOBJ([fsync])
+
+config.log
+configure:35427: x86_64-w64-mingw32-gcc -c -std=c11 -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 conftest.c >&5
+conftest.c: In function 'main':
+conftest.c:147:40: error: implicit declaration of function 'fsync' [-Wimplicit-function-declaration]
+  147 |                                        fsync(fd);
+      |                                        ^~~~~ 
+| /* end confdefs.h.  */
+| #include <unistd.h>
+|                                    int main() {
+|                                        int fd = 0;
+|                                        fsync(fd);
+|                                        return 0;
+|                                    }
+configure:35805: checking for fsync
+configure:35805: x86_64-w64-mingw32-gcc -o conftest.exe -std=c11 -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0 -L/mingw64/lib -L/usr/lib -L/mingw64/x86_64-w64-mingw32/lib -Wl,-rpath,/mingw64/bin -no-undefined -export-dynamic conftest.c -ltextstyle >&5
+x86_64-w64-mingw32-gcc.exe: error: unrecognized command-line option '-no-undefined'
+| /* end confdefs.h.  */
+| /* Define fsync to an innocuous variant, in case <limits.h> declares fsync.
+|    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
+| #define fsync innocuous_fsync
+| 
+| /* System header to define __stub macros and hopefully few prototypes,
+|    which can conflict with char fsync (void); below.  */
+| 
+| #include <limits.h>
+| #undef fsync
+| 
+| /* Override any GCC internal prototype to avoid an error.
+|    Use char because int might match the return type of a GCC
+|    builtin and then its argument prototype would still apply.  */
+| #ifdef __cplusplus
+| extern "C"
+| #endif
+| char fsync (void);
+| /* The GNU C library defines this for functions which it implements
+|     to always fail with ENOSYS.  Some functions are actually named
+|     something starting with __ and the normal name is an alias.  */
+| #if defined __stub_fsync || defined __stub___fsync
+| choke me
+| #endif
+| 
+| int
+| main (void)
+| {
+| return fsync ();
+|   ;
+|   return 0;
+| }
+ac_cv_func_fsync=no
+GL_GNULIB_FSYNC='0'
+HAVE_FSYNC='1'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
