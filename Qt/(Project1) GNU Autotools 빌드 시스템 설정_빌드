@@ -30920,137 +30920,99 @@ configure 파일 확인
 for ac_option in --version -v -V -qversion -version; do
 => for ac_option in --version -v; do 이렇게 되어야함
 
+(오류)
+config.log
+configure:35404: x86_64-w64-mingw32-gcc -c -std=c11 -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 conftest.c >&5
+conftest.c: In function 'main':
+conftest.c:148:8: error: parameter names (without types) in function declaration [-Wdeclaration-missing-parameter-type]
+  148 |        void* xmalloc(size_t) __attribute__((__alloc_size__(1)));
+      |        ^~~~
+(수정)
 configure.ac 수정
-컴파일러 버전을 확인할 때 사용할 옵션을 제한하는 매크로를 추가하여 -V와 같은 옵션을 사용하지 않도록 함
-AC_PROG_CC 호출 전에 직접 컴파일러 버전을 확인하는 매크로를 작성
-# unrecognized command-line option '-V -qversion -version' 방지
-AC_LANG([C])
-# C 컴파일러 버전 확인
-AC_MSG_CHECKING([for C compiler version])
-for ac_option in --version -v; do
-  if $CC $ac_option >/dev/null 2>&1; then
-    $CC $ac_option
-    break
-  fi
-done
-AC_PROG_CC
+파라미터 이름만 지정하고 자료형을 생략한 점으로 인해 발생
+AC_COMPILE_IFELSE( 
+   [AC_LANG_PROGRAM([[]], [[
+       #void* xmalloc(size_t) __attribute__((__alloc_size__(1)));
+       void* xmalloc(size_t size) __attribute__((__alloc_size__(1)));
+   ]])],
+   [AC_DEFINE([_GL_HAS_ATTRIBUTE_ALLOC_SIZE], [1], [Define if compiler supports __attribute__((__alloc_size__))])],
+   [AC_DEFINE([_GL_HAS_ATTRIBUTE_ALLOC_SIZE], [0], [Define if compiler does not support __attribute__((__alloc_size__))])]
+)
 
 (오류)
-configure:5027: x86_64-w64-mingw32-gcc -V >&5
+configure:4904: x86_64-w64-mingw32-gcc -V >&5
 x86_64-w64-mingw32-gcc.exe: error: unrecognized command-line option '-V'
 x86_64-w64-mingw32-gcc.exe: fatal error: no input files
 compilation terminated.
-configure:5038: $? = 1
-configure:5027: x86_64-w64-mingw32-gcc -qversion >&5
-x86_64-w64-mingw32-gcc.exe: error: unrecognized command-line option '-qversion'; did you mean '--version'?
-x86_64-w64-mingw32-gcc.exe: fatal error: no input files
-compilation terminated.
-configure:5038: $? = 1
-configure:5027: x86_64-w64-mingw32-gcc -version >&5
-x86_64-w64-mingw32-gcc.exe: error: unrecognized command-line option '-version'
-x86_64-w64-mingw32-gcc.exe: fatal error: no input files
-compilation terminated.
-configure:19256: x86_64-w64-mingw32-gcc -V >&5
-x86_64-w64-mingw32-gcc.exe: error: unrecognized command-line option '-V'
-x86_64-w64-mingw32-gcc.exe: fatal error: no input files
-compilation terminated.
-configure:19267: $? = 1
-configure:19256: x86_64-w64-mingw32-gcc -qversion >&5
-x86_64-w64-mingw32-gcc.exe: error: unrecognized command-line option '-qversion'; did you mean '--version'?
-x86_64-w64-mingw32-gcc.exe: fatal error: no input files
-compilation terminated.
-configure:19267: $? = 1
-configure:19256: x86_64-w64-mingw32-gcc -version >&5
-x86_64-w64-mingw32-gcc.exe: error: unrecognized command-line option '-version'
-x86_64-w64-mingw32-gcc.exe: fatal error: no input files
-configure:32032: x86_64-w64-mingw32-g++ -V >&5
+
+configure:31050: x86_64-w64-mingw32-g++ -V >&5
 x86_64-w64-mingw32-g++.exe: error: unrecognized command-line option '-V'
 x86_64-w64-mingw32-g++.exe: fatal error: no input files
 compilation terminated.
-configure:32043: $? = 1
-configure:32032: x86_64-w64-mingw32-g++ -qversion >&5
+configure:31061: $? = 1
+configure:31050: x86_64-w64-mingw32-g++ -qversion >&5
 x86_64-w64-mingw32-g++.exe: error: unrecognized command-line option '-qversion'; did you mean '--version'?
 x86_64-w64-mingw32-g++.exe: fatal error: no input files
-configure:36792: x86_64-w64-mingw32-g++ -o conftest.exe -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -O2 -DDEBUG -DVERSION="1.0.0" -std=c++17 -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0 -L/mingw64/lib -L/usr/lib -L/mingw64/x86_64-w64-mingw32/lib -Wl,-rpath,/mingw64/bin -no-undefined -export-dynamic conftest.cpp -ltextstyle >&5
-x86_64-w64-mingw32-g++.exe: error: unrecognized command-line option '-no-undefined'
-configure:36792: checking for fsync
-configure:36792: x86_64-w64-mingw32-g++ -o conftest.exe -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -O2 -DDEBUG -DVERSION="1.0.0" -std=c++17 -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0 -L/mingw64/lib -L/usr/lib -L/mingw64/x86_64-w64-mingw32/lib -Wl,-rpath,/mingw64/bin -no-undefined -export-dynamic conftest.cpp -ltextstyle >&5
-x86_64-w64-mingw32-g++.exe: error: unrecognized command-line option '-no-undefined' 
-configure:36807: checking for xmalloc
-configure:36807: x86_64-w64-mingw32-g++ -o conftest.exe -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -O2 -DDEBUG -DVERSION="1.0.0" -std=c++17 -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0 -L/mingw64/lib -L/usr/lib -L/mingw64/x86_64-w64-mingw32/lib -Wl,-rpath,/mingw64/bin -no-undefined -export-dynamic conftest.cpp -ltextstyle >&5
-x86_64-w64-mingw32-g++.exe: error: unrecognized command-line option '-no-undefined'
-(수정)
-AC_PROG_CC와 같은 자동화된 매크로가 컴파일러 버전 확인을 위해 기본적으로 여러 옵션을 시도하기 때문
-AC_PROG_CC를 사용하지 않고, 직접 컴파일러를 확인하는 로직을 추가
-
-예)
-fsync를 예로 들면
-
-configure.ac
-GNULIB_MODULES="fsync"
-gl_MODULES([fsync])
-AC_COMPILE_IFELSE([AC_LANG_SOURCE([#include <unistd.h>
-                                   int main() {
-                                       int fd = 0; 
-                                       fsync(fd);
-                                       return 0;
-                                   }])],
-[AC_DEFINE([HAVE_FSYNC], [1], [Define to 1 if you have the fsync' function.])],
-[AC_DEFINE([HAVE_FLUSH_FILE_BUFFERS], [1], [Define to 1 if using FlushFileBuffers on Windows.])])
-AC_CHECK_FUNCS([getprogname printf malloc fsync], [GL_COND_OBJ_FSYNC=1])
-AC_LIBOBJ([fsync])
-
-config.log
-configure:35427: x86_64-w64-mingw32-gcc -c -std=c11 -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 conftest.c >&5
-conftest.c: In function 'main':
-conftest.c:147:40: error: implicit declaration of function 'fsync' [-Wimplicit-function-declaration]
-  147 |                                        fsync(fd);
-      |                                        ^~~~~ 
-| /* end confdefs.h.  */
-| #include <unistd.h>
-|                                    int main() {
-|                                        int fd = 0;
-|                                        fsync(fd);
-|                                        return 0;
-|                                    }
+compilation terminated. 
+configure:35805: checking for getprogname
+configure:35805: result: no
+configure:35805: checking for printf
+configure:35805: x86_64-w64-mingw32-gcc -o conftest.exe -std=c11 -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0 -L/mingw64/lib -L/usr/lib -L/mingw64/x86_64-w64-mingw32/lib -Wl,-rpath,/mingw64/bin -no-undefined -export-dynamic conftest.c -ltextstyle >&5
+x86_64-w64-mingw32-gcc.exe: error: unrecognized command-line option '-no-undefined'
+configure:35805: $? = 1configure:4915: $? = 1 
+configure:4904: x86_64-w64-mingw32-gcc -qversion >&5
+x86_64-w64-mingw32-gcc.exe: error: unrecognized command-line option '-qversion'; did you mean '--version'?
+x86_64-w64-mingw32-gcc.exe: fatal error: no input files
+compilation terminated.
+configure:4915: $? = 1
+configure:4904: x86_64-w64-mingw32-gcc -version >&5
+x86_64-w64-mingw32-gcc.exe: error: unrecognized command-line option '-version'
+x86_64-w64-mingw32-gcc.exe: fatal error: no input files
+compilation terminated.
+configure:35805: checking for malloc
+configure:35805: x86_64-w64-mingw32-gcc -o conftest.exe -std=c11 -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0 -L/mingw64/lib -L/usr/lib -L/mingw64/x86_64-w64-mingw32/lib -Wl,-rpath,/mingw64/bin -no-undefined -export-dynamic conftest.c -ltextstyle >&5
+x86_64-w64-mingw32-gcc.exe: error: unrecognized command-line option '-no-undefined'
 configure:35805: checking for fsync
 configure:35805: x86_64-w64-mingw32-gcc -o conftest.exe -std=c11 -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0 -L/mingw64/lib -L/usr/lib -L/mingw64/x86_64-w64-mingw32/lib -Wl,-rpath,/mingw64/bin -no-undefined -export-dynamic conftest.c -ltextstyle >&5
 x86_64-w64-mingw32-gcc.exe: error: unrecognized command-line option '-no-undefined'
-| /* end confdefs.h.  */
-| /* Define fsync to an innocuous variant, in case <limits.h> declares fsync.
-|    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
-| #define fsync innocuous_fsync
-| 
-| /* System header to define __stub macros and hopefully few prototypes,
-|    which can conflict with char fsync (void); below.  */
-| 
-| #include <limits.h>
-| #undef fsync
-| 
-| /* Override any GCC internal prototype to avoid an error.
-|    Use char because int might match the return type of a GCC
-|    builtin and then its argument prototype would still apply.  */
-| #ifdef __cplusplus
-| extern "C"
-| #endif
-| char fsync (void);
-| /* The GNU C library defines this for functions which it implements
-|     to always fail with ENOSYS.  Some functions are actually named
-|     something starting with __ and the normal name is an alias.  */
-| #if defined __stub_fsync || defined __stub___fsync
-| choke me
-| #endif
-| 
-| int
-| main (void)
-| {
-| return fsync ();
-|   ;
-|   return 0;
-| }
-ac_cv_func_fsync=no
-GL_GNULIB_FSYNC='0'
-HAVE_FSYNC='1'
+configure:35820: checking for xmalloc
+configure:35820: x86_64-w64-mingw32-gcc -o conftest.exe -std=c11 -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0 -L/mingw64/lib -L/usr/lib -L/mingw64/x86_64-w64-mingw32/lib -Wl,-rpath,/mingw64/bin -no-undefined -export-dynamic conftest.c -ltextstyle >&5
+x86_64-w64-mingw32-gcc.exe: error: unrecognized command-line option '-no-undefined'
+(수정)
+configure 스크립트가 잘못된 컴파일러 옵션(-V, -qversion, -no-undefined)을 사용하면서 발생
+Unix/Linux 환경에서 사용하는 것이고, MinGW 환경에서 GCC 컴파일러가 인식하지 못하는 옵션들임.
+configure.ac가 Windows용 컴파일러의 특성을 고려하지 않고 일반적인 POSIX 환경에서 사용할 수 있는 옵션을 넣어 발생
+AC_PROG_CC나 AC_PROG_CXX는 configure 스크립트에서 컴파일러를 설정하고, 각 컴파일러의 버전 확인을 위해 기본적으로 여러 옵션을 시도
+configure.ac 수정
+if test "$host_os" in  mingw* | cygwin*; then
+    # mingw32가 감지되면 WOE32DLL과 WOE32를 활성화
+    AM_CONDITIONAL([WOE32DLL], true)
+    AM_CONDITIONAL([WOE32], true)
+    echo "WOE32DLL과 WOE32가 활성화되었습니다."
+    # mingw32에서 동적 내보내기(export-dynamic)를 위해 LDFLAGS 설정
+    # LDFLAGS="$LDFLAGS -no-undefined -export-dynamic"
+	# LDFLAGS="$LDFLAGS -export-dynamic"
+
+    # MinGW에서 불필요한 버전 확인 옵션 및 링커 옵션 제거
+    AC_MSG_NOTICE([Configuring for MinGW environment])
+
+    # MinGW에서 비호환 옵션을 피하기 위해 LDFLAGS 수정
+    LDFLAGS=$(echo "$LDFLAGS" | sed 's/-no-undefined//g; s/-export-dynamic//g')
+
+    # 컴파일러 버전 확인 시 불필요한 옵션을 피하도록 설정
+    # autoconf 기본 매크로로 인해 비호환 옵션이 시도되는 것을 방지
+    CC="$CC --version"
+    CXX="$CXX --version"
+
+else
+    # mingw32가 아닌 경우 WOE32DLL과 WOE32를 비활성화
+    AM_CONDITIONAL([WOE32DLL], false)
+    AM_CONDITIONAL([WOE32], false)
+    echo "WOE32DLL과 WOE32가 비활성화되었습니다."
+    # non-mingw32 시스템에서는 정의되지 않은 심볼을 허용하지 않도록 LDFLAGS 설정
+    # LDFLAGS="$LDFLAGS -no-undefined"
+fi
+
 
 
 
