@@ -30992,18 +30992,6 @@ if test "$host_os" in  mingw* | cygwin*; then
     # mingw32에서 동적 내보내기(export-dynamic)를 위해 LDFLAGS 설정
     # LDFLAGS="$LDFLAGS -no-undefined -export-dynamic"
 	# LDFLAGS="$LDFLAGS -export-dynamic"
-
-    # MinGW에서 불필요한 버전 확인 옵션 및 링커 옵션 제거
-    AC_MSG_NOTICE([Configuring for MinGW environment])
-
-    # MinGW에서 비호환 옵션을 피하기 위해 LDFLAGS 수정
-    LDFLAGS=$(echo "$LDFLAGS" | sed 's/-no-undefined//g; s/-export-dynamic//g')
-
-    # 컴파일러 버전 확인 시 불필요한 옵션을 피하도록 설정
-    # autoconf 기본 매크로로 인해 비호환 옵션이 시도되는 것을 방지
-    CC="$CC --version"
-    CXX="$CXX --version"
-
 else
     # mingw32가 아닌 경우 WOE32DLL과 WOE32를 비활성화
     AM_CONDITIONAL([WOE32DLL], false)
@@ -31013,22 +31001,241 @@ else
     # LDFLAGS="$LDFLAGS -no-undefined"
 fi
 
+config.site 파일을 생성해 옵션을 줄수도 있음(사용하지않음)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# touch config.site
+#ac_cv_prog_cc_c99="gcc --version"
+#ac_cv_prog_cxx_cxx11="g++ --version"
+=> ./configure CONFIG_SITE=./config.site 
 
-해야할것
-configure 파일에서 
-sed 's/-V//g; s/-qversion//g; s/-version//g' 제거할것
+(빌드명령어 수정) { sed -i 's/-V\| -qversion\| -version/ --version/g' configure; } 수동으로 제거 추가
+{ autopoint --force; } 2>&1 | tee ./log/autopoint.log && 
+{ rm -rf autom4te.cache; } && 
+{ aclocal -I m4 -I gnulib-m4 -I /usr/share/aclocal; } 2>&1 | tee ./log/aclocal.log && 
+{ libtoolize --ltdl --copy --force --verbose --automake; } 2>&1 | tee ./log/libtoolize.log && 
+{ cp /usr/share/aclocal/ltdl.m4 ./m4/; } && 
+{ autoconf --verbose; } 2>&1 | tee ./log/autoconf.log && 
+{ autoheader; } 2>&1 | tee ./log/autoheader.log && 
+{ automake --add-missing --force-missing; } 2>&1 | tee ./log/automake.log && 
+{ sed -i 's/-V\| -qversion\| -version/ --version/g' configure; } &&
+{ ./configure CFLAGS="-std=c11" --verbose --host=x86_64-w64-mingw32; } 2>&1 | tee ./log/configure.log | grep -E "(no|not found|undefine|error|warning)"
+
+(오류)
+checking for x86_64-w64-mingw32-gcc options needed to detect all undeclared functions... cannot detect
+configure: error: in '/c/libidn2/gettext-0.22.5/libtextstyle':
+configure: error: cannot make x86_64-w64-mingw32-gcc report undeclared builtins
+(수정)
+./configure CFLAGS="-std=c11" 반드시 이 옵션을 넣어줘야함
+
+(오류)
+checking for BSD- or MS-compatible name lister (nm)... no
+checking for x86_64-w64-mingw32-dumpbin... no
+checking for x86_64-w64-mingw32-link... no
+checking for x86_64-w64-mingw32-file... no
+checking for x86_64-w64-mingw32-objdump... no
+checking for x86_64-w64-mingw32-dlltool... no
+checking for x86_64-w64-mingw32-strip... no
+checking for x86_64-w64-mingw32-ranlib... no
+(수정)
+크로스 컴파일 툴의 누락
+MinGW-w64 환경에서 제공되는 도구가 설치되어 있는지 확인하고, 환경 변수에 올바른 경로가 설정되었는지 검토
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -S mingw-w64-x86_64-binutils mingw-w64-x86_64-gcc mingw-w64-x86_64-gcc-libs
+경고: mingw-w64-x86_64-binutils-2.43.1-1는 최신 버전입니다. -- 재설치
+경고: mingw-w64-x86_64-gcc-14.2.0-1는 최신 버전입니다. -- 재설치
+경고: mingw-w64-x86_64-gcc-libs-14.2.0-1는 최신 버전입니다. -- 재설치
+
+환경변수확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# echo $PATH
+/c/libidn2/gettext-0.22.5/gettext-runtime/src:/mingw64/x86_64-w64-mingw32/bin:/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++:/c/msys64/mingw64/include:/mingw64/include:/c/libidn2/gettext-0.22.5/libtextstyle/lib:/mingw64/bin:/c/gnulib:/c/msys64/mingw64/bin:/usr/bin:/bin:/usr/share/aclocal:/mingw64/share/aclocal:/c/libidn2/autoconf-2.72/bin:/c/libidn2/libtool-2.4.6:/c/Program Files/Java/jdk-21/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0:/usr/bin/vendor_perl:/usr/bin/core_perl:/c/Users/nayou/AppData/Local/Programs/Python/Python312:/c/Program Files/Java/jdk-21/bin:/c/apache-ant-1.10.15/bin:/c/Users/nayou/vcpkg/downloads/tools/perl/5.38.0.1/c/libexec/gcc/x86_64-w64-mingw32/13.1.0:/c/Users/nayou/vcpkg/downloads/tools/perl/5.38.0.1/c/bin:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0:/mingw64/lib:/mingw64/x86_64-w64-mingw32/lib:/c/curl/lib:/c/gnulib/lib:/c/libidn2/gettext-0.22.5/gettext/gettext-runtime:/c/libidn2/gettext-0.22.5/gettext:/c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib:/c/libidn2/gettext-0.22.5/gettext/gettext-runtime/intl/gnulib-lib:/c/libidn2/gettext-0.22.5/gettext/gettext-runtime/libasprintf/gnulib-lib:/c/libidn2/gettext-0.22.5/gettext/libtextstyle/lib:/c/libidn2/gettext-0.22.5/gettext-runtime/gnulib-lib:/c/libidn2/gettext-0.22.5/gettext-runtime/intl/gnulib-lib:/c/libidn2/gettext-0.22.5/gettext-runtime/libasprintf/gnulib-lib:/c/libidn2/gettext-0.22.5/libtextstyle/lib:/mingw64-backup-11.2.0/bin
+=>/c/msys64/mingw64/bin 최우선이 되게 수정
+=>export PATH="/c/msys64/mingw64/bin" # 64비트 MinGW 도구의 바이너리 디렉토리 추가
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# echo $CC
+x86_64-w64-mingw32-gcc
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# echo $CXX
+x86_64-w64-mingw32-g++
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# echo $CPP
+/mingw64/bin/cpp
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# echo $PKG_CONFIG_PATH
+/mingw64/lib/pkgconfig:/usr/lib/pkgconfig
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pkg-config --cflags gettext
+
+반환되는게 없음 찾아야함 gettext.pc
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l /mingw64/lib/pkgconfig/gettext.pc /usr/lib/pkgconfig/gettext.pc /mingw64/share/pkgconfig/gettext.pc
+ls: cannot access '/usr/lib/pkgconfig/gettext.pc': No such file or directory
+ls: cannot access '/mingw64/share/pkgconfig/gettext.pc': No such file or directory
+-rw-r--r-- 1 nayou nayou 238 10월 22 20:18 /mingw64/lib/pkgconfig/gettext.pc
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# find /mingw64 -name "gettext*.pc"
+/mingw64/lib/pkgconfig/gettext.pc
+이미 설정되어 있음 => 반환값이 그래도 없음 (확인해야함)
+
+(오류)
+checking for xalloc.h... no
+checking for lib/xgethostname.h... no
+checking for lib/xgetaname-impl.h... no
+checking for textstyle/woe32dll.h... no
+checking for x86_64-w64-mingw32-windres... no
+(수정)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# find / -name "xalloc.h" -o -name "xgethostname.h" -o -name "xgettname-impl.h"
+-o -name "woe32dll.h" -o -name "x86_64-w64-mingw32-windres"
+/mingw64-backup-11.2.0/include/textstyle/woe32dll.h
+/c/libidn2/gettext-0.22.5/libtextstyle/lib/textstyle/woe32dll.h
+/c/libidn2/gettext-0.22.5/gettext/libtextstyle/lib/textstyle/woe32dll.h
+/c/gnulib/lib/xalloc.h
+/c/libidn2/gettext-0.22.5/gettext/gettext-runtime/gnulib-lib/xalloc.h
+/c/libidn2/gettext-0.22.5/gettext/gettext-tools/gnulib-lib/xalloc.h
+/c/libidn2/gettext-0.22.5/gettext/gettext-tools/libgettextpo/xalloc.h
+/c/libidn2/gettext-0.22.5/gettext/gnulib/lib/xalloc.h
+/c/libidn2/gettext-0.22.5/gettext/libtextstyle/lib/xalloc.h
+/c/libidn2/gettext-0.22.5/gettext-runtime/gnulib-lib/xalloc.h
+/c/libidn2/gettext-0.22.5/gettext-tools/gnulib-lib/xalloc.h
+/c/libidn2/gettext-0.22.5/gettext-tools/libgettextpo/xalloc.h
+/c/libidn2/gettext-0.22.5/libtextstyle/lib/xalloc.h
+/c/libidn2/gnulib/lib/xalloc.h
+/c/gnulib/lib/xgethostname.h
+/c/libidn2/gettext-0.22.5/gettext/gnulib/lib/xgethostname.h
+/c/libidn2/gettext-0.22.5/gettext/libtextstyle/lib/xgethostname.h
+/c/libidn2/gettext-0.22.5/libtextstyle/lib/xgethostname.h
+/c/libidn2/gnulib/lib/xgethostname.h
+=>xgettname-impl.h, x86_64-w64-mingw32-windres 못찾음
+환경변수등록
+~/.bashrc 수정
+export C_INCLUDE_PATH="$C_INCLUDE_PATH:/c/libidn2/gettext-0.22.5/libtextstyle/lib" # woe32dll.h
+export C_INCLUDE_PATH="$C_INCLUDE_PATH:/c/gnulib/lib"  # xalloc.h
+export C_INCLUDE_PATH="$C_INCLUDE_PATH:/c/gnulib" # xgethostname.h
+
+패키지재설치
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -S mingw-w64-x86_64-binutils mingw-w64-x86_64-gcc mingw-w64-x86_64-gcc-libs --overwrite "*"
+경고: mingw-w64-x86_64-binutils-2.43.1-1는 최신 버전입니다. -- 재설치
+경고: mingw-w64-x86_64-gcc-14.2.0-1는 최신 버전입니다. -- 재설치
+경고: mingw-w64-x86_64-gcc-libs-14.2.0-1는 최신 버전입니다. -- 재설치
 
 
+(오류)
+checking whether we are cross compiling... no
+(수정)
+빌드명령어 수정 => --build=x86_64-pc-linux-gnu; 추가
+{ autopoint --force; } 2>&1 | tee ./log/autopoint.log && 
+{ rm -rf autom4te.cache; } && 
+{ aclocal -I m4 -I gnulib-m4 -I /usr/share/aclocal; } 2>&1 | tee ./log/aclocal.log && 
+{ libtoolize --ltdl --copy --force --verbose --automake; } 2>&1 | tee ./log/libtoolize.log && 
+{ cp /usr/share/aclocal/ltdl.m4 ./m4/; } && 
+{ autoconf --verbose; } 2>&1 | tee ./log/autoconf.log && 
+{ autoheader; } 2>&1 | tee ./log/autoheader.log && 
+{ automake --add-missing --force-missing; } 2>&1 | tee ./log/automake.log && 
+{ sed -i 's/-V\| -qversion\| -version/ --version/g' configure; } &&
+{ ./configure CFLAGS="-std=c11" --verbose --host=x86_64-w64-mingw32 --build=x86_64-pc-linux-gnu; } 2>&1 | tee ./log/configure.log | grep -E "(no|not found|undefine|error|warning)"
 
+(오류)
+checking for x86_64-w64-mingw32-gcc... no
+(수정)
+configure가 x86_64-w64-mingw32-gcc 컴파일러를 찾을 수 없다
+크로스 컴파일러가 제대로 설치되지 않았거나 PATH에 포함되지 않았을 때 발생
+MinGW64 크로스 컴파일러 패키지가 설치되어 있는지 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -S mingw-w64-x86_64-toolchain
+:: 13 개의 구성원이 mingw-w64-x86_64-toolchain 모음에 있습니다:
+:: mingw64 저장소
+   1) mingw-w64-x86_64-binutils  2) mingw-w64-x86_64-crt-git  3) mingw-w64-x86_64-gcc
+   4) mingw-w64-x86_64-gdb  5) mingw-w64-x86_64-gdb-multiarch  6) mingw-w64-x86_64-headers-git
+   7) mingw-w64-x86_64-libmangle-git  8) mingw-w64-x86_64-libwinpthread-git
+   9) mingw-w64-x86_64-make  10) mingw-w64-x86_64-pkgconf  11) mingw-w64-x86_64-tools-git
+   12) mingw-w64-x86_64-winpthreads-git  13) mingw-w64-x86_64-winstorecompat-git
 
-
-
-
-
-
-
-
-
-
-
-
+(메세지)
+-checking for x86_64-w64-mingw32-gcc option to enable C11 features... none needed
+x86_64-w64-mingw32-gcc 컴파일러가 기본적으로 C11 표준을 지원하고 있어, C11 기능을 활성화하기 위한 추가적인 옵션이 필요하지 않다
+CFLAGS="-std=c11"을 통해 표준을 명시해도 괜찮
+-checking whether the compiler is clang... no
+configure가 현재 설정된 컴파일러가 clang인지 확인하는 단계, clang이 아니라 gcc가 사용되고 있음을 알려 줌. gcc가 사용되는 상황에서는 문제가 없음
+-checking for compiler option needed when checking for declarations... none
+configure가 함수나 변수 선언을 확인하기 위해 필요한 컴파일러 옵션을 검사하는 단계. 현재 컴파일러 설정에서 특별한 옵션이 필요하지 않다는 의미
+-checking for minix/config.h... no
+configure 스크립트가 minix/config.h 파일을 찾고 있는데, 이는 Minix 시스템에서 사용하는 구성 파일. MinGW는 Minix가 아니므로, 이 파일이 없다고 나오는 것은 정상.
+-checking whether _XOPEN_SOURCE should be defined... no
+configure 스크립트가 _XOPEN_SOURCE 매크로 정의가 필요한지 여부를 확인하는 단계. 이 매크로는 POSIX 및 X/Open 표준 기능을 활성화하기 위해 사용되지만, MinGW에서는 필요하지 않기 때문에 정의할 필요 없음.
+-checking for a sed that does not truncate output... /usr/bin/sed
+sed는 텍스트 스트림을 처리하는 명령어이며, configure 스크립트에서 필요. sed가 설치되어 있으며 경로가 /usr/bin/sed임을 나타내는 메시지
+-checking for BSD- or MS-compatible name lister (nm)... no
+nm은 바이너리 파일에서 심볼 목록을 확인하는 데 사용하는 도구. MS나 BSD 호환 nm 프로그램을 찾지 못한 경우.
+MinGW에서 nm이 없는 경우, 이를 무시하고 진행할 수 있지만 binutils 패키지 설치로 해결할 수 있음
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -S mingw-w64-x86_64-binutils
+경고: mingw-w64-x86_64-binutils-2.43.1-1는 최신 버전입니다. -- 재설치
+-checking for x86_64-w64-mingw32-dumpbin... no
+dumpbin은 MSVC에서 사용되는 Windows 전용 도구로, 심볼과 코드 내용을 덤프하는 기능을 제공. configure 스크립트에서 이 도구를 사용하려고 했지만, MinGW 환경에는 존재하지 않아 발견되지 않음.
+MinGW에서는 dumpbin 대신 objdump를 사용할 수 있으며, 특별한 조치가 필요하지 않음. MSVC를 사용하는 경우에는 dumpbin을 설치할 수 있음.
+-checking for x86_64-w64-mingw32-link... no
+x86_64-w64-mingw32-link는 MSVC 환경에서 사용하는 링커(linker) 도구로, configure가 찾으려 했으나 발견되지 않음. MinGW에서는 x86_64-w64-mingw32-ld가 대신 사용되므로 별도의 조치는 필요하지 않음.
+-checking for dumpbin... no
+configure 스크립트가 기본 이름으로 dumpbin이 설치되었는지 다시 확인했지만, 역시 발견되지 않았음. 
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -S mingw-w64-x86_64-binutils
+경고: mingw-w64-x86_64-binutils-2.43.1-1는 최신 버전입니다. -- 재설치
+configure: WARNING: using cross tools not prefixed with host triplet
+일부 크로스 컴파일 도구가 host triplet(예: x86_64-w64-mingw32-) 접두사 없이 설치되었을 수 있음을 의미. 
+/usr/bin/에 접두사로 시작하는 바이너리가 있는지 확인하고, 없다면 관련 도구를 설치
+-checking whether ln -s works... no, using cp -pR
+ln -s 명령어는 심볼릭 링크를 만드는 데 사용되지만, MinGW에서 이 기능이 잘 지원되지 않기 때문에 cp -pR 명령어로 대체해 사용.
+MinGW에서는 심볼릭 링크 기능을 제대로 지원하지 않으므로 이 방식으로 대체되는 것이 일반적
+-checking for x86_64-w64-mingw32-file... no
+file 명령은 파일의 유형을 확인하는 유틸리티. configure 스크립트가 x86_64-w64-mingw32- 접두사가 붙은 file 명령을 찾지 못한 경우
+일반적으로 MinGW 환경에서는 file 유틸리티가 필수는 아니므로, 추가 조치 없이 넘어가도 무방
+-checking for x86_64-w64-mingw32-objdump... no
+objdump는 오브젝트 파일 정보를 추출하는 도구로, configure에서 필요할 수 있지만 발견되지 않은 경우
+objdump는 필수 요소는 아니지만, 설치하려면 다음 명령으로 binutils 패키지를 설치
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -S mingw-w64-x86_64-binutils
+경고: mingw-w64-x86_64-binutils-2.43.1-1는 최신 버전입니다. -- 재설치
+-checking for x86_64-w64-mingw32-dlltool... no
+dlltool은 MinGW와 같은 Windows 환경에서 .dll 파일을 만드는 데 사용하는 도구.configure에서 해당 도구를 찾지 못한 경우
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -S mingw-w64-x86_64-binutils
+경고: mingw-w64-x86_64-binutils-2.43.1-1는 최신 버전입니다. -- 재설치
+-checking for x86_64-w64-mingw32-strip... no
+strip은 바이너리 파일에서 디버깅 정보를 제거하는 도구로, 컴파일 시 필요할 수 있음
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -S mingw-w64-x86_64-binutils
+경고: mingw-w64-x86_64-binutils-2.43.1-1는 최신 버전입니다. -- 재설치
+-checking for x86_64-w64-mingw32-ranlib... no
+ranlib는 아카이브된 라이브러리의 인덱스를 업데이트하는 도구. MinGW용 ranlib이 발견되지 않은 경우
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -S mingw-w64-x86_64-binutils
+경고: mingw-w64-x86_64-binutils-2.43.1-1는 최신 버전입니다. -- 재설치
+-checking for sysroot... no
+sysroot는 컴파일 환경에서 기본 시스템 경로를 설정하는 기능. MinGW에서는 sysroot 기능이 일반적으로 필요하지 않으며, configure에서 무시
+-checking for x86_64-w64-mingw32-mt... no
+mt는 MSVC에서 사용하는 매니페스트 툴(manifest tool). MinGW에서는 필요하지 않음
+-checking for dlfcn.h... no
+dlfcn.h는 Unix 시스템에서 동적 라이브러리 관련 기능(dlopen, dlsym)을 정의하는 헤더 파일입니다. 
+Windows에서는 이 파일이 없기 때문에 configure가 이를 찾지 못한 경우
+MinGW 환경에서는 dlfcn.h 대신 LoadLibrary와 같은 Windows 전용 API를 사용하므로, 무시
+-checking for library containing dlopen... no
+dlopen은 동적 라이브러리를 로드하기 위해 Unix 기반 시스템에서 사용되는 함수
+MinGW에서는 Windows API의 LoadLibrary로 대체되며, 이 때문에 찾지 못한 경우
+Windows에서는 dlopen이 필요하지 않으므로 무시
+-checking for argz_add, argz_append, argz_count... no
+argz_* 함수는 GNU C 라이브러리의 기능으로 문자열 배열을 다루는 데 유용한 함수들. MinGW에는 이 함수들이 기본적으로 포함되지 않음.
+-checking for working alloca.h... no
+alloca.h는 동적으로 메모리를 할당하기 위한 함수를 포함한 헤더 파일. 이 파일이 MinGW에는 없어서 찾지 못한 경우
+MinGW의 경우 alloca 함수 없이 컴파일할 수 있으며, 무시해도 무방
+-checking for fchdir... no
+fchdir는 파일 디스크립터를 통해 디렉터리를 변경하는 함수로 Unix 기반에서 주로 사용
+MinGW에서는 해당 함수가 필요하지 않음
+-configure: error: Failed to define necessary memory allocation functions
+필수 메모리 할당 함수가 정의되지 않았다는 오류. xmalloc, malloc, realloc과 같은 함수가 정의되지 않아서 발생할 수 있음
+xmalloc과 같은 함수들이 프로젝트 내에서 정의되지 않았거나, MinGW 환경에서 인식되지 않는 경우 발생
+소스 코드를 수정하여 필요한 메모리 할당 함수를 추가하거나, libmalloc 등을 사용하여 해결해야 할 수 있음.
