@@ -31239,3 +31239,722 @@ MinGW에서는 해당 함수가 필요하지 않음
 필수 메모리 할당 함수가 정의되지 않았다는 오류. xmalloc, malloc, realloc과 같은 함수가 정의되지 않아서 발생할 수 있음
 xmalloc과 같은 함수들이 프로젝트 내에서 정의되지 않았거나, MinGW 환경에서 인식되지 않는 경우 발생
 소스 코드를 수정하여 필요한 메모리 할당 함수를 추가하거나, libmalloc 등을 사용하여 해결해야 할 수 있음.
+
+(오류)
+-checking for BSD- or MS-compatible name lister (nm)... no
+-checking for dumpbin... no
+-checking for x86_64-w64-mingw32-objdump... no
+-checking for x86_64-w64-mingw32-dlltool... no
+-checking for x86_64-w64-mingw32-strip... no
+-checking for x86_64-w64-mingw32-ranlib... no
+(수정)
+컴파일 과정에서 nm 명령이 필요한데, 이를 찾을 수 없다는 메시지
+nm은 개체 파일의 심볼을 표시해주는 도구로, 링크 단계에서 필요한 정보를 제공
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -S mingw-w64-x86_64-binutils --noconfirm --needed
+경고: mingw-w64-x86_64-binutils-2.43.1-1는 최신 버전입니다 -- 건너뜀
+ 할 일이 없습니다
+
+MinGW64 환경 변수 설정 확인하기
+export PATH="/c/msys64/mingw64/bin" 
+
+도구별 개별 설치 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -S mingw-w64-x86_64-toolchain
+:: 13 개의 구성원이 mingw-w64-x86_64-toolchain 모음에 있습니다:
+:: mingw64 저장소
+   1) mingw-w64-x86_64-binutils  2) mingw-w64-x86_64-crt-git  3) mingw-w64-x86_64-gcc
+   4) mingw-w64-x86_64-gdb  5) mingw-w64-x86_64-gdb-multiarch
+   6) mingw-w64-x86_64-headers-git  7) mingw-w64-x86_64-libmangle-git
+   8) mingw-w64-x86_64-libwinpthread-git  9) mingw-w64-x86_64-make
+   10) mingw-w64-x86_64-pkgconf  11) mingw-w64-x86_64-tools-git
+   12) mingw-w64-x86_64-winpthreads-git  13) mingw-w64-x86_64-winstorecompat-git
+
+설치 확인
+- nm (x86_64-w64-mingw32-nm 또는 nm.exe)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# nm --help
+Usage: C:\msys64\mingw64\bin\nm.exe [option(s)] [file(s)]
+ List symbols in [file(s)] (a.out by default).
+ The options are:
+  -a, --debug-syms       Display debugger-only symbols
+  -A, --print-file-name  Print name of the input file before every symbol
+  -B                     Same as --format=bsd
+  -C, --demangle[=STYLE] Decode mangled/processed symbol names
+                           STYLE can be "none", "auto", "gnu-v3", "java",
+                           "gnat", "dlang", "rust"
+      --no-demangle      Do not demangle low-level symbol names
+      --recurse-limit    Enable a demangling recursion limit.  (default)
+      --no-recurse-limit Disable a demangling recursion limit.
+  -D, --dynamic          Display dynamic symbols instead of normal symbols
+  -e                     (ignored)
+  -f, --format=FORMAT    Use the output format FORMAT.  FORMAT can be `bsd',
+                           `sysv', `posix' or 'just-symbols'.
+                           The default is `bsd'
+  -g, --extern-only      Display only external symbols
+    --ifunc-chars=CHARS  Characters to use when displaying ifunc symbols
+  -j, --just-symbols     Same as --format=just-symbols
+  -l, --line-numbers     Use debugging information to find a filename and
+                           line number for each symbol
+  -n, --numeric-sort     Sort symbols numerically by address
+  -o                     Same as -A
+  -p, --no-sort          Do not sort the symbols
+  -P, --portability      Same as --format=posix
+  -r, --reverse-sort     Reverse the sense of the sort
+      --plugin NAME      Load the specified plugin
+  -S, --print-size       Print size of defined symbols
+  -s, --print-armap      Include index for symbols from archive members
+      --quiet            Suppress "no symbols" diagnostic
+      --size-sort        Sort symbols by size
+      --special-syms     Include special symbols in the output
+      --synthetic        Display synthetic symbols as well
+  -t, --radix=RADIX      Use RADIX for printing symbol values
+      --target=BFDNAME   Specify the target object format as BFDNAME
+  -u, --undefined-only   Display only undefined symbols
+  -U, --defined-only     Display only defined symbols
+      --unicode={default|show|invalid|hex|escape|highlight}
+                         Specify how to treat UTF-8 encoded unicode characters
+  -W, --no-weak          Ignore weak symbols
+      --without-symbol-versions  Do not display version strings after symbol names
+  -X 32_64               (ignored)
+  @FILE                  Read options from FILE
+  -h, --help             Display this information
+  -V, --version          Display this program's version number
+C:\msys64\mingw64\bin\nm.exe: supported targets: pe-x86-64 pei-x86-64 pe-bigobj-x86-64 elf64-x86-64 pe-i386 pei-i386 elf32-i386 elf32-iamcu pdb elf64-little elf64-big elf32-little elf32-big srec symbolsrec verilog tekhex binary ihex plugin
+Report bugs to <https://sourceware.org/bugzilla/>.
+
+- dumpbin
+주로 Windows 개발 환경(Visual Studio)에서 사용하는 도구로, 개체 파일의 정보를 출력
+MSYS 환경에서는 제공되지 않으므로 Visual Studio Developer Command Prompt에서 확인
+C:\Windows\System32>dumpbin
+Microsoft (R) COFF/PE Dumper Version 14.29.30154.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+사용법: DUMPBIN [options] [files]
+
+   옵션:
+
+      /ALL
+      /ARCHIVEMEMBERS
+      /CLRHEADER
+      /DEPENDENTS
+      /DIRECTIVES
+      /DISASM[:{BYTES|NOBYTES}]
+      /ERRORREPORT:{NONE|PROMPT|QUEUE|SEND}
+      /EXPORTS
+      /FPO
+      /HEADERS
+      /IMPORTS[:filename]
+      /LINENUMBERS
+      /LINKERMEMBER[:{1|2|4|8|16|32}]
+      /LOADCONFIG
+      /NOLOGO
+      /NOPDB
+      /OUT:filename
+      /PDATA
+      /PDBPATH[:VERBOSE]
+      /RANGE:vaMin[,vaMax]
+      /RAWDATA[:{NONE|1|2|4|8}[,#]]
+      /RELOCATIONS
+      /SECTION:name
+      /SUMMARY
+      /SYMBOLS
+(계속하려면 <return> 키를 누르십시오.)
+C:\Windows\System32>where dumpbin
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\bin\Hostx86\x86\dumpbin.exe
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\bin\Hostx64\x64\dumpbin.exe
+
+- objdump  (x86_64-w64-mingw32-objdump 또는 objdump.exe)
+개체 파일을 분석하여 다양한 정보를 출력하는 도구로, 디버깅 시 유용
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# dlltool --help
+Usage C:\msys64\mingw64\bin\dlltool.exe <option(s)> <object-file(s)>
+   -m --machine <machine>    Create as DLL for <machine>.  [default: i386:x86-64]
+        possible <machine>: arm[_interwork], arm64, i386, mcore[-elf]{-le|-be}, thumb
+   -e --output-exp <outname> Generate an export file.
+   -l --output-lib <outname> Generate an interface library.
+   -y --output-delaylib <outname> Create a delay-import library.
+      --deterministic-libraries
+                             Use zero for timestamps and uids/gids in output libraries (default)
+      --non-deterministic-libraries
+                             Use actual timestamps and uids/gids in output libraries
+   -a --add-indirect         Add dll indirects to export file.
+   -D --dllname <name>       Name of input dll to put into interface lib.
+   -d --input-def <deffile>  Name of .def file to be read in.
+   -z --output-def <deffile> Name of .def file to be created.
+      --export-all-symbols   Export all symbols to .def
+      --no-export-all-symbols  Only export listed symbols
+      --exclude-symbols <list> Don't export <list>
+      --no-default-excludes  Clear default exclude symbols
+   -b --base-file <basefile> Read linker generated base file.
+   -x --no-idata4            Don't generate idata$4 section.
+   -c --no-idata5            Don't generate idata$5 section.
+      --use-nul-prefixed-import-tables Use zero prefixed idata$4 and idata$5.
+   -U --add-underscore       Add underscores to all symbols in interface library.
+      --add-stdcall-underscore Add underscores to stdcall symbols in interface library.
+      --no-leading-underscore All symbols shouldn't be prefixed by an underscore.
+      --leading-underscore   All symbols should be prefixed by an underscore.
+   -k --kill-at              Kill @<n> from exported names.
+   -A --add-stdcall-alias    Add aliases without @<n>.
+   -p --ext-prefix-alias <prefix> Add aliases with <prefix>.
+   -S --as <name>            Use <name> for assembler.
+   -f --as-flags <flags>     Pass <flags> to the assembler.
+   -C --compat-implib        Create backward compatible import library.
+   -n --no-delete            Keep temp files (repeat for extra preservation).
+   -t --temp-prefix <prefix> Use <prefix> to construct temp file names.
+   -I --identify <implib>    Report the name of the DLL associated with <implib>.
+      --identify-strict      Causes --identify to report error when multiple DLLs.
+   -v --verbose              Be verbose.
+   -V --version              Display the program version.
+   -h --help                 Display this information.
+   @<file>                   Read options from <file>.
+Report bugs to <https://sourceware.org/bugzilla/>
+
+- strip (x86_64-w64-mingw32-strip 또는 strip.exe)
+실행 파일이나 개체 파일에서 디버깅 심볼을 제거하여 파일 크기를 줄이는 데 사용
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# strip --help
+Usage: C:\msys64\mingw64\bin\strip.exe <option(s)> in-file(s)
+ Removes symbols and sections from files
+ The options are:
+  -I --input-target=<bfdname>      Assume input file is in format <bfdname>
+  -O --output-target=<bfdname>     Create an output file in format <bfdname>
+  -F --target=<bfdname>            Set both input and output format to <bfdname>
+  -p --preserve-dates              Copy modified/access timestamps to the output
+  -D --enable-deterministic-archives
+                                   Produce deterministic output when stripping archives (default)
+  -U --disable-deterministic-archives
+                                   Disable -D behavior
+  -R --remove-section=<name>       Also remove section <name> from the output
+     --remove-relocations <name>   Remove relocations from section <name>
+     --strip-section-headers       Strip section headers from the output
+  -s --strip-all                   Remove all symbol and relocation information
+  -g -S -d --strip-debug           Remove all debugging symbols & sections
+     --strip-dwo                   Remove all DWO sections
+     --strip-unneeded              Remove all symbols not needed by relocations
+     --only-keep-debug             Strip everything but the debug information
+  -M  --merge-notes                Remove redundant entries in note sections (default)
+      --no-merge-notes             Do not attempt to remove redundant notes
+  -N --strip-symbol=<name>         Do not copy symbol <name>
+     --keep-section=<name>         Do not strip section <name>
+  -K --keep-symbol=<name>          Do not strip symbol <name>
+     --keep-section-symbols        Do not strip section symbols
+     --keep-file-symbols           Do not strip file symbol(s)
+  -w --wildcard                    Permit wildcard in symbol comparison
+  -x --discard-all                 Remove all non-global symbols
+  -X --discard-locals              Remove any compiler-generated symbols
+  -v --verbose                     List all object files modified
+  -V --version                     Display this program's version number
+  -h --help                        Display this output
+     --info                        List object formats & architectures supported
+  -o <file>                        Place stripped output into <file>
+C:\msys64\mingw64\bin\strip.exe: supported targets: pe-x86-64 pei-x86-64 pe-bigobj-x86-64 elf64-x86-64 pe-i386 pei-i386 elf32-i386 elf32-iamcu pdb elf64-little elf64-big elf32-little elf32-big srec symbolsrec verilog tekhex binary ihex plugin
+Report bugs to <https://sourceware.org/bugzilla/>
+
+- ranlib (x86_64-w64-mingw32-ranlib 또는 ranlib.exe)
+라이브러리 파일(.a 확장자)을 인덱싱하여 빠른 접근을 가능하게 함. 정적 라이브러리에서 필수적
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ranlib --help
+Usage: C:\msys64\mingw64\bin\ranlib.exe [options] archive
+ Generate an index to speed access to archives
+ The options are:
+  @<file>                      Read options from <file>
+  --plugin <name>              Load the specified plugin
+  -D                           Use zero for symbol map timestamp (default)
+  -U                           Use an actual symbol map timestamp
+  -t                           Update the archive's symbol map timestamp
+  -h --help                    Print this help message
+  -v --version                 Print version information
+C:\msys64\mingw64\bin\ranlib.exe: supported targets: pe-x86-64 pei-x86-64 pe-bigobj-x86-64 elf64-x86-64 pe-i386 pei-i386 elf32-i386 elf32-iamcu pdb elf64-little elf64-big elf32-little elf32-big srec symbolsrec verilog tekhex binary ihex plugin
+Report bugs to <https://sourceware.org/bugzilla/>
+
+
+C:\msys64\mingw64\bin\nm.exe
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\bin\Hostx86\x86\dumpbin.exe
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\bin\Hostx64\x64\dumpbin.exe
+C:\msys64\mingw64\bin\dlltool.exe
+C:\msys64\mingw64\bin\strip.exe
+C:\msys64\mingw64\bin\ranlib.exe
+=> dumpbin 빼고 전부 C:\msys64\mingw64\bin 디렉토리 안에 존재함
+
+- ./configure 옵션추가
+./configure --with-binutils=/c/msys64/mingw64/bin
+checking for x86_64-w64-mingw32-file... no
+checking for x86_64-w64-mingw32-objdump... no
+checking for x86_64-w64-mingw32-dlltool... no
+checking for x86_64-w64-mingw32-strip... no
+checking for x86_64-w64-mingw32-ranlib... no
+
+-nm.exe를 x86_64-w64-mingw32-nm.exe로 복사하거나, 심볼릭 링크를 만들어줌
+cp /c/msys64/mingw64/bin/nm.exe /c/msys64/mingw64/bin/x86_64-w64-mingw32-nm.exe
+cp /c/msys64/mingw64/bin/objdump.exe /c/msys64/mingw64/bin/x86_64-w64-mingw32-objdump.exe
+cp /c/msys64/mingw64/bin/dlltool.exe /c/msys64/mingw64/bin/x86_64-w64-mingw32-dlltool.exe
+cp /c/msys64/mingw64/bin/strip.exe /c/msys64/mingw64/bin/x86_64-w64-mingw32-strip.exe
+cp /c/msys64/mingw64/bin/ranlib.exe /c/msys64/mingw64/bin/x86_64-w64-mingw32-ranlib.exe
+
+-dumpbin 경로 추가
+Visual Studio 경로를 PATH에 추가
+~/.bashrc 수정
+export PATH="$PATH:/c/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64" # dumpbin.exe
+
+(오류)
+checking for argz_add... no
+checking for argz_append... no
+checking for argz_count... no
+checking for argz_create_sep... no
+checking for argz_insert... no
+checking for argz_next... no
+checking for argz_stringify... no
+checking for ltdl.h... no
+checking for dl.h... no
+checking for sys/dl.h... no
+checking for dld.h... no
+checking for mach-o/dyld.h... no
+checking for strlcat... no
+checking for strlcpy... no
+(수정)
+argz_* 함수 관련 오류 (argz_add, argz_append, argz_count, 등)
+argz_* 함수들은 GNU C Library의 확장 기능으로, 주로 Linux/Unix 환경에서 제공
+libargz 라이브러리를 설치하여 argz_* 함수들을 사용할 수 있게 
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# find / -name "libintl.h"
+...
+/usr/include/libintl.h
+...
+
+Gnulib을 사용하고 있다면 argz 모듈을 추가
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# gnulib-tool --add-import argz
+(오류)
+gnulib-tool: warning: module xmalloc doesn't exist
+gnulib-tool: warning: module xrealloc doesn't exist
+(수정)
+xmalloc과 xrealloc 모듈이 존재하지 않는다는 경고
+gnulib-comp.m4 파일에 대한 오류가 발생
+
+gnulib 디렉토리에서 사용할 수 있는 모듈 목록을 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# gnulib-tool --list
+
+configure.ac 수정
+AC_CONFIG_MACRO_DIRS([m4] [gnulib-m4])
+Makefile.am 수정
+ACLOCAL_AMFLAGS = -I m4 -I gnulib-m4
+
+xalloc 모듈 추가
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# gnulib-tool --add-import xalloc
+gnulib-tool: warning: module xmalloc doesn't exist
+gnulib-tool: warning: module xrealloc doesn't exist
+
+gnulib의 경로를 C_INCLUDE_PATH, PATH 환경변수에 추가
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# echo $C_INCLUDE_PATH
+...
+export C_INCLUDE_PATH="$C_INCLUDE_PATH:/c/libidn2/gettext-0.22.5/libtextstyle/lib" # woe32dll.h
+export C_INCLUDE_PATH="$C_INCLUDE_PATH:/c/gnulib/lib"  # xalloc.h, xmalloca.h
+export C_INCLUDE_PATH="$C_INCLUDE_PATH:/c/gnulib" # xgethostname.h
+...
+export PATH="$PATH:/c/libidn2/gettext-0.22.5/libtextstyle/lib" # woe32dll.h
+export PATH="$PATH:/c/gnulib/lib"  # xalloc.h, xmalloca.h
+export PATH="$PATH:/c/gnulib" # xgethostname.h
+
+xmalloc과 xrealloc 모듈이 존재하는지 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# gnulib-tool --list | grep xmalloc
+gnulib-tool --list | grep xrealloc
+xmalloca
+
+설치
+git clone https://git.savannah.gnu.org/git/gnulib.git
+
+삭제 후 설치
+rm -rf gnulib
+git clone https://git.savannah.gnu.org/git/gnulib.git
+
+업데이트
+cd /c/gnulib
+git pull origin master
+
+xalloc xmalloc xrealloc 모듈 추가
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# gnulib-tool --import xalloc xmalloc xrealloc
+gnulib-tool: warning: module xmalloc doesn't exist
+gnulib-tool: warning: module xrealloc doesn't exist
+
+모듈이름확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# gnulib-tool --list
+...
+xalignalloc
+xalloc
+xalloc-die
+xalloc-oversized
+xbinary-io
+xconcat-filename
+xfreopen
+xgetcwd
+xgetdomainname
+xgetgroups
+xgethostname
+xhash
+xlist
+xmalloca
+xmap
+xmemcoll
+xmemdup0
+xnanosleep
+xomap
+xoset
+xprintf
+xprintf-gnu
+xprintf-posix
+xreadlink
+xreadlinkat
+xset
+xsetenv
+xsize
+xstdopen
+xstrerror
+xstriconv
+xstriconveh
+xstring-buffer
+xstring-desc
+xstrndup
+xstrtod
+xstrtoimax
+xstrtol
+xstrtol-error
+xstrtold
+xstrtoll
+xstrtoumax
+xsublist
+xvasprintf
+xvasprintf-gnu
+xvasprintf-posix
+...
+=> xmalloc과 xrealloc 대신 xmalloca와 같은 대체 모듈이 포함되어 있음
+
+xmalloca를 포함하여 필요한 모듈을 가져오기
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# gnulib-tool --import xalloc xmalloca xalloc-die
+
+argz 관련기능 모듈 가져오기
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# gnulib-tool --import argz
+
+configure.ac 확인
+# GNULIB 관련 매크로 정의
+GNULIB_MODULES="
+    argz
+"
+
+(오류)
+/usr/share/automake-1.16/am/remake-hdr.am: warning: argz.h was already defined in condition !GL_GENERATE_ARGZ_H, which is included in condition TRUE ... 
+lib/Makefile.am:85: ... 'argz.h' previously defined here
+(수정)
+argz.h가 중복으로 정의확인
+configure.ac 그대로 유
+GNULIB_MODULES="argz"
+AC_CONFIG_HEADERS([config.h lib/argz.h])
+AC_LIBOBJ([lt__argz])
+
+Makefile.am
+libltdlc_la_SOURCES = \
+  libltdl/lt__argz.c 
+
+# AC_LIBOBJ([lt__argz]) # configure.ac에서 선언
+
+lib/argz.h: lib/argz.h.in
+	cp lib/argz.h.in lib/argz.h
+EXTRA_DIST = \
+  lib\argz.h.in 
+
+lib/Makefile.am 수정
+## begin gnulib module argz
+
+# BUILT_SOURCES += $(ARGZ_H)
+
+# # We need the following in order to create <argz.h> when the system
+# # doesn't have one that works with the given compiler.
+# if GL_GENERATE_ARGZ_H
+# argz.h: argz.in.h $(top_builddir)/config.status
+# 	$(gl_V_at)$(SED_HEADER_TO_AT_t) $(srcdir)/argz.in.h
+# 	$(AM_V_at)mv $@-t $@
+# else
+# argz.h: $(top_builddir)/config.status
+# 	rm -f $@
+# endif
+# MOSTLYCLEANFILES += argz.h argz.h-t
+
+# if GL_COND_OBJ_ARGZ
+# libgnu_a_SOURCES += argz.c
+# endif
+
+# EXTRA_DIST += argz.in.h
+
+if GL_COND_OBJ_ARGZ
+libgnu_a_SOURCES += argz.c
+endif
+
+## end   gnulib module argz
+
+(오류)
+checking for argz_add... no
+checking for argz_append... no
+checking for argz_count... no
+checking for argz_create_sep... no
+checking for argz_insert... no
+checking for argz_next... no
+checking for argz_stringify... no
+(수정)
+GNULIB 모듈 확인
+configure.ac
+GNULIB_MODULES="argz"
+
+configure.ac 파일 수정 후에는 항상 autoreconf -i 명령어를 실행하여 configure 스크립트를 재생성
+
+Makefile.am 수정 여부 확인
+Makefile.am에서 argz 관련 설정이 잘 되어 있는지 확인
+
+환경 변수 설정
+C_INCLUDE_PATH 등에서 gnulib의 헤더 파일 경로가 제대로 설정되어 있는지 확인
+argz.h가 포함된 경로가 C_INCLUDE_PATH에 포함
+
+configure.ac 수정
+# gnulib 설정을 위한 초기화
+m4_include([gnulib-m4/gnulib-comp.m4])
+AC_LIBOBJ([argz])
+
+lib/Makefile.am 수정
+# argz 헤더 파일 생성 설정
+BUILT_SOURCES += argz.h
+
+# 시스템에 <argz.h>가 없는 경우 생성 규칙 설정
+if GL_GENERATE_ARGZ_H
+argz.h: argz.in.h $(top_builddir)/config.status
+	$(gl_V_at)$(SED_HEADER_TO_AT_t) $(srcdir)/argz.in.h
+	$(AM_V_at)mv $@-t $@
+else
+argz.h: $(top_builddir)/config.status
+	rm -f $@
+endif
+
+# argz 소스 파일 포함
+if GL_COND_OBJ_ARGZ
+libgnu_a_SOURCES += argz.c
+endif
+
+# 정리 대상 및 배포 파일 설정
+MOSTLYCLEANFILES += argz.h argz.h-t
+EXTRA_DIST += argz.in.h
+
+gnulib을 통해 argz 모듈 가져오기
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# gnulib-tool --import argz
+Module list with included dependencies (indented):
+    absolute-header
+  argz
+
+=> lib/Makefile.am 내용이 변경됨
+
+configure.ac 수정
+AC_SUBST([ARGZ_H], ["lib/argz.h"]) 
+
+gnulib 모듈 추가 확인(argz 관련 소스와 헤더 파일들이 프로젝트에 추가)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# gnulib-tool --add-import argz
+(오류)
+1 out of 1 hunk FAILED -- saving rejects to file /tmp/glpy26jsljw7/lib/exitfail.h.rej
+/c/gnulib/gnulib-tool.py: *** patch file lib/exitfail.h didn't apply cleanly
+/c/gnulib/gnulib-tool.py: *** Stop.
+(수정)
+gnulib-tool을 실행하는 동안 패치 파일 lib/exitfail.h가 올바르게 적용되지 않아 오류가 발생
+프로젝트 디렉토리에 이미 존재하는 lib/exitfail.h 파일이 gnulib의 패치와 충돌하거나, 버전 차이로 인해 패치가 호환되지 않는 경우에 발생
+lib/exitfail.h 파일 백업 및 제거
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l lib/exitfail*
+-rw-r--r-- 1 nayou nayou 877 10월 29 17:56 lib/exitfail.c
+-rw-r--r-- 1 nayou nayou 877 10월  7 20:30 lib/exitfail.c~
+-rw-r--r-- 1 nayou nayou 859 10월  7 20:30 lib/exitfail.h~
+=> exitfail.h는 없고 백업파일인 lib/exitfail.c~, exitfail.h~ 파일 삭제
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# rm lib/exitfail.c~ lib/exitfail.h~
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l lib/exitfail*
+-rw-r--r-- 1 nayou nayou 877 10월 29 17:56 lib/exitfail.c
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# gnulib-tool --add-import argz
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l lib/exitfail*
+-rw-r--r-- 1 nayou nayou 877 10월 29 17:56 lib/exitfail.c.bak
+
+/c/gnulib 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l /c/gnulib/lib/exitfail*
+-rw-r--r-- 1 nayou nayou 877 10월  7 20:41 /c/gnulib/lib/exitfail.c
+-rw-r--r-- 1 nayou nayou 859 10월  7 20:41 /c/gnulib/lib/exitfail.h
+
+exitfail.h 파일의 백업을 생성
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# cp /c/gnulib/lib/exitfail.h /c/gnulib/lib/exitfail.h.bak
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l /c/gnulib/lib/exitfail*
+-rw-r--r-- 1 nayou nayou 877 10월  7 20:41 /c/gnulib/lib/exitfail.c
+-rw-r--r-- 1 nayou nayou 859 10월  7 20:41 /c/gnulib/lib/exitfail.h
+-rw-r--r-- 1 nayou nayou 859 10월 29 18:28 /c/gnulib/lib/exitfail.h.bak
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# find / -name "exitfail*.diff"
+...
+/c/libidn2/gettext-0.22.5/gnulib-local/lib/exitfail.h.diff
+...
+
+/c/libidn2/gettext-0.22.5/gnulib-local/lib/exitfail.h.diff 보고 lib/exitfail.h 파일을 직접 수정
+/c/libidn2/gettext-0.22.5/gnulib-local/lib/exitfail.h.diff
+*** gnulib/lib/exitfail.h	2005-05-14 08:03:58.000000000 +0200
+--- gettext-tools/lib/exitfail.h	2006-07-22 16:35:58.000000000 +0200
+***************
+*** 15,18 ****
+     You should have received a copy of the GNU General Public License
+     along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
+  
+! extern int volatile exit_failure;
+--- 15,18 ----
+     You should have received a copy of the GNU General Public License
+     along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
+  
+! extern DLL_VARIABLE int volatile exit_failure;
+
+변경 전 코드
+extern int volatile exit_failure;
+변경 후 코드
+extern DLL_VARIABLE int volatile exit_failure;
+
+lib/exitfail.h 수정
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
+//extern int volatile exit_failure;
+extern DLL_VARIABLE int volatile exit_failure;
+
+#ifdef __cplusplus
+}
+#endif
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# python /c/gnulib/gnulib-tool.py
+gnulib-tool.py: *** python3 is too old (minimum required version is 3.7); try setting GNULIB_TOOL_IMPL=sh
+gnulib-tool.py: *** Stop.
+
+GNULIB_TOOL_IMPL=sh 환경 변수 설정(업그레이드불가상황일경우)
+~/.bashrc 수정
+#환경 변수를 설정하여 셸 스크립트를 사용하도록 강제
+export GNULIB_TOOL_IMPL=sh
+
+python-3.13.0-amd64.exe 설치
+
+시스템환경변수설정 > PATH 
+C:\Users\nayou\AppData\Local\Programs\Python\Python313
+C:\Users\nayou\AppData\Local\Programs\Python\Python313\Scripts\
+
+시스템에서 어떤 Python 3 버전이 사용되고 있는지 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# where python3
+C:\msys64\usr\bin\python3.exe
+C:\msys64\mingw64-backup-11.2.0\bin\python3.exe
+
+MSYS2 Python 설치 확인
+MSYS2의 패키지 목록을 업데이트
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -Syu
+Python 3 설치
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -S python
+
+Mingw64로 python 설치
+https://www.python.org/downloads/release/python-3130/
+Gzipped source tarball (Source release) 다운로드
+Python-3.13.0.tgz
+Python을 빌드하기 위해 필요한 패키지를 설치
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -S base-devel mingw-w64-x86_64-toolchain mingw-w64-x86_64-openssl mingw-w64-x86_64-zlib mingw-w64-x86_64-bzip2 mingw-w64-x86_64-xz mingw-w64-x86_64-readline
+경고: base-devel-2022.12-2는 최신 버전입니다. -- 재설치
+:: 13 개의 구성원이 mingw-w64-x86_64-toolchain 모음에 있습니다:
+:: mingw64 저장소
+   1) mingw-w64-x86_64-binutils  2) mingw-w64-x86_64-crt-git
+   3) mingw-w64-x86_64-gcc  4) mingw-w64-x86_64-gdb
+   5) mingw-w64-x86_64-gdb-multiarch  6) mingw-w64-x86_64-headers-git
+   7) mingw-w64-x86_64-libmangle-git  8) mingw-w64-x86_64-libwinpthread-git
+   9) mingw-w64-x86_64-make  10) mingw-w64-x86_64-pkgconf
+   11) mingw-w64-x86_64-tools-git  12) mingw-w64-x86_64-winpthreads-git
+   13) mingw-w64-x86_64-winstorecompat-git
+
+선택을 입력하십시오. (기본값=all):
+
+MSYS2의 기본 홈 디렉토리는 C:\msys64\home\nayou
+C:\msys64\home\nayou 로 압축파일 이동
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# cd /home/nayou
+nayou@kimnayooung MINGW64 ~
+# ls
+_bazel_nayou  build_output.log  ltmain.sh  Python-3.13.0.tgz  test.c
+nayou@kimnayooung MINGW64 ~
+# tar -xvf Python-3.13.0.tgz
+
+Configure 스크립트 실행
+nayou@kimnayooung MINGW64 ~
+# cd Python-3.13.0/
+nayou@kimnayooung MINGW64 ~/Python-3.13.0
+# ./configure --enable-optimizations --prefix=/mingw64
+nayou@kimnayooung MINGW64 ~/Python-3.13.0
+# make
+(오류)
+cc1.exe: warning: command-line option '-std=c++17' is valid for C++/ObjC++ but not for C
+cc1.exe: warning: command-line option '-std=c++17' is valid for C++/ObjC++ but not for C
+(수정)
+~/.bashrc 수정
+# CFLAGS 초기화
+#export CFLAGS="-std=c11"                              # CFLAGS 초기화
+export CFLAGS=""
+# CPPFLAGS 초기화
+#export CPPFLAGS="-std=c++17"                            # CPPFLAGS 초기화
+export CPPFLAGS=""
+(오류)
+Python/initconfig.c: In function 'config_init_env_warnoptions':
+Python/initconfig.c:2633:18: error: too many arguments to function 'wcstok'
+ 2633 | #  define WCSTOK wcstok
+      |                  ^~~~~~
+Python/initconfig.c:2656:20: note: in expansion of macro 'WCSTOK'
+ 2656 |     for (warning = WCSTOK(env, L",", &context);
+      |                    ^~~~~~
+In file included from ./Include/Python.h:24,
+                 from Python/initconfig.c:1:
+C:\msys64\mingw64\x86_64-w64-mingw32\include/wchar.h:1316:20: note: declared here
+ 1316 |   wchar_t *__cdecl wcstok(wchar_t * __restrict__ _Str,const wchar_t * __restrict__ _Delim) __MINGW_ATTRIB_DEPRECATED_SEC_WARN;
+      |                    ^~~~~~
+Python/initconfig.c:2633:18: error: too many arguments to function 'wcstok'
+ 2633 | #  define WCSTOK wcstok
+      |                  ^~~~~~
+Python/initconfig.c:2658:20: note: in expansion of macro 'WCSTOK'
+ 2658 |          warning = WCSTOK(NULL, L",", &context))
+      |                    ^~~~~~
+C:\msys64\mingw64\x86_64-w64-mingw32\include/wchar.h:1316:20: note: declared here
+ 1316 |   wchar_t *__cdecl wcstok(wchar_t * __restrict__ _Str,const wchar_t * __restrict__ _Delim) __MINGW_ATTRIB_DEPRECATED_SEC_WARN;
+      |                    ^~~~~~
+make[2]: *** [Makefile:3028: Python/initconfig.o] 오류 1
+make[2]: 디렉터리 '/home/nayou/Python-3.13.0' 나감
+make[1]: *** [Makefile:877: profile-gen-stamp] 오류 2
+make[1]: 디렉터리 '/home/nayou/Python-3.13.0' 나감
+make: *** [Makefile:889: profile-run-stamp] 오류 2
+
+
+(수정)
+
+make install
