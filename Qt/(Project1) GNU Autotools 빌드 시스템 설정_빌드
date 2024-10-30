@@ -31907,54 +31907,456 @@ nayou@kimnayooung MINGW64 ~
 _bazel_nayou  build_output.log  ltmain.sh  Python-3.13.0.tgz  test.c
 nayou@kimnayooung MINGW64 ~
 # tar -xvf Python-3.13.0.tgz
+패치를 깔아보는것도 있지만 공식사이트의 설치인스톨이 가장 안정적
+MINGW-packages /mingw-w64-python/
+https://github.com/msys2/MINGW-packages/tree/master/mingw-w64-python
 
-Configure 스크립트 실행
-nayou@kimnayooung MINGW64 ~
-# cd Python-3.13.0/
-nayou@kimnayooung MINGW64 ~/Python-3.13.0
-# ./configure --enable-optimizations --prefix=/mingw64
-nayou@kimnayooung MINGW64 ~/Python-3.13.0
-# make
-(오류)
-cc1.exe: warning: command-line option '-std=c++17' is valid for C++/ObjC++ but not for C
-cc1.exe: warning: command-line option '-std=c++17' is valid for C++/ObjC++ but not for C
-(수정)
+환경변수설정
 ~/.bashrc 수정
-# CFLAGS 초기화
-#export CFLAGS="-std=c11"                              # CFLAGS 초기화
-export CFLAGS=""
-# CPPFLAGS 초기화
-#export CPPFLAGS="-std=c++17"                            # CPPFLAGS 초기화
-export CPPFLAGS=""
+export PATH="$PATH:/c/Users/nayou/AppData/Local/Programs/Python/Python313"  # Python 디렉토리 추가
+export PATH="$PATH:/c/Users/nayou/AppData/Local/Programs/Python/Python313/Scripts"  # Python 디렉토리 추가
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# python /c/gnulib/gnulib-tool.py
+gnulib-tool.py: *** python3 is too old (minimum required version is 3.7); try setting GNULIB_TOOL_IMPL=sh
+gnulib-tool.py: *** Stop.
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# python --version
+Python 3.12.7
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# where python
+C:\msys64\usr\bin\python.exe
+C:\Users\nayou\AppData\Local\Programs\Python\Python313\python.exe
+C:\msys64\mingw64-backup-11.2.0\bin\python.exe
+
+환경변수위치를 바꿔줘야함
+C:\msys64\usr\bin 보다 위로 설정
+~/.bashrc 수정
+export PATH="/c/Users/nayou/AppData/Local/Programs/Python/Python313"  # Python 디렉토리 추가
+export PATH="$PATH:/c/Users/nayou/AppData/Local/Programs/Python/Python313/Scripts"  # Python 디렉토리 추가
+export PATH="$PATH:/c/msys64/mingw64/bin" # 64비트 MinGW 도구의 바이너리 디렉토리 추가
+...
+make install
+
+python3을 입력하면 /c/Users/nayou/AppData/Local/Programs/Python/Python313/python.exe 연동되게 하려면
+심볼릭 링크 설정
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ln -sf /c/Users/nayou/AppData/Local/Programs/Python/Python313/python.exe /usr/bin/python3
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# python3
+Python 3.13.0 (tags/v3.13.0:60403a5, Oct  7 2024, 09:38:07) [MSC v.1941 64 bit (AMD64)] on win32
+Type "help", "copyright", "credits" or "license" for more information.
+>>>
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# python3 /c/gnulib/gnulib-tool.py
+gnulib-tool.py: *** python3 is too old (minimum required version is 3.7); try setting GNULIB_TOOL_IMPL=sh
+gnulib-tool.py: *** Stop.
+
+~/.bashrc 수정
+# 환경 변수를 설정하여 셸 스크립트를 사용하도록 강제(스크립트가 sh 방식으로 실행되도록 우회 설정)
+export GNULIB_TOOL_IMPL=sh
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# python3 /c/gnulib/gnulib-tool.py
+gnulib-tool.py: *** python3 is too old (minimum required version is 3.7); try setting GNULIB_TOOL_IMPL=sh
+gnulib-tool.py: *** Stop.
+
+/c/gnulib/gnulib-tool.py 직접수정
+...
+if python_version.startswith("Python 3.0") or python_version.startswith("Python 3.1") or python_version.startswith("Python 3.2") or python_version.startswith("Python 3.3") or python_version.startswith("Python 3.4") or python_version.startswith("Python 3.5") or python_version.startswith("Python 3.6"):
+        func_fatal_error("python3 is too old (minimum required version is 3.7); try setting GNULIB_TOOL_IMPL=sh")  # 버전 오류 메시지
+    elif python_version.startswith("Python 3."):
+        pass  # 버전이 적합한 경우
+    else:
+        func_fatal_error("python3 version is unsupported")  # 지원되지 않는 버전 메시지
+...
+Python 3.13이 "Python 3.1"로 시작하는 것처럼 인식되는 문제는 버전 문자열 비교 방식 때문에 발생
+Python 3.13을 지원하려면 "Python 3.10", "Python 3.11", "Python 3.12" 이후 버전들이 
+"Python 3.1" 조건에 걸리지 않도록 조건을 수정
+# Check the Python version.
+#try:
+#    python_version = os.popen("python3 --version").read().strip()  # Python 버전 확인
+#
+#    if python_version.startswith("Python 3.0") or python_version.startswith("Python 3.1") or python_version.startswith("Python 3.2") #or python_version.startswith("Python 3.3") or python_version.startswith("Python 3.4") or python_version.startswith("Python 3.5") or #python_version.startswith("Python 3.6"):
+#        func_fatal_error("python3 is too old (minimum required version is 3.7); try setting GNULIB_TOOL_IMPL=sh")  # 버전 오류 메시지
+#    elif python_version.startswith("Python 3."):
+#        pass  # 버전이 적합한 경우
+#    else:
+#        func_fatal_error("python3 version is unsupported")  # 지원되지 않는 버전 메시지
+#
+#except Exception as e:
+#    func_fatal_error(f"python3 not found; try setting GNULIB_TOOL_IMPL=sh")  # 예외 처리
+
+# Python 버전을 숫자로 변환하여 체크 20241030
+try:
+    # "Python 3.13.0"에서 "3.13.0"만 가져와서 숫자로 변환
+    version_str = python_version.split()[1]
+    major, minor, _ = map(int, version_str.split("."))
+
+    # Python 3.7 이상인지 확인
+    if major < 3 or (major == 3 and minor < 7):
+        func_fatal_error("python3 is too old (minimum required version is 3.7); try setting GNULIB_TOOL_IMPL=sh")
+
+except Exception as e:
+    func_fatal_error("python3 not found or version check failed; try setting GNULIB_TOOL_IMPL=sh")
+
 (오류)
-Python/initconfig.c: In function 'config_init_env_warnoptions':
-Python/initconfig.c:2633:18: error: too many arguments to function 'wcstok'
- 2633 | #  define WCSTOK wcstok
-      |                  ^~~~~~
-Python/initconfig.c:2656:20: note: in expansion of macro 'WCSTOK'
- 2656 |     for (warning = WCSTOK(env, L",", &context);
-      |                    ^~~~~~
-In file included from ./Include/Python.h:24,
-                 from Python/initconfig.c:1:
-C:\msys64\mingw64\x86_64-w64-mingw32\include/wchar.h:1316:20: note: declared here
- 1316 |   wchar_t *__cdecl wcstok(wchar_t * __restrict__ _Str,const wchar_t * __restrict__ _Delim) __MINGW_ATTRIB_DEPRECATED_SEC_WARN;
-      |                    ^~~~~~
-Python/initconfig.c:2633:18: error: too many arguments to function 'wcstok'
- 2633 | #  define WCSTOK wcstok
-      |                  ^~~~~~
-Python/initconfig.c:2658:20: note: in expansion of macro 'WCSTOK'
- 2658 |          warning = WCSTOK(NULL, L",", &context))
-      |                    ^~~~~~
-C:\msys64\mingw64\x86_64-w64-mingw32\include/wchar.h:1316:20: note: declared here
- 1316 |   wchar_t *__cdecl wcstok(wchar_t * __restrict__ _Str,const wchar_t * __restrict__ _Delim) __MINGW_ATTRIB_DEPRECATED_SEC_WARN;
-      |                    ^~~~~~
-make[2]: *** [Makefile:3028: Python/initconfig.o] 오류 1
-make[2]: 디렉터리 '/home/nayou/Python-3.13.0' 나감
-make[1]: *** [Makefile:877: profile-gen-stamp] 오류 2
-make[1]: 디렉터리 '/home/nayou/Python-3.13.0' 나감
-make: *** [Makefile:889: profile-run-stamp] 오류 2
+python3: can't open file 'C:\\libidn2\\gettext-0.22.5\\libtextstyle\\.gnulib-tool.py': 
+[Errrno 2] No such file or directory
+(수정)
+#'C:\\libidn2\\gettext-0.22.5\\libtextstyle\\.gnulib-tool.py' => 'C:\\gnulib\\gnulib-tool.py' 20241030
+if '/' in progname and not os.path.islink(progname):
+    func_gnulib_dir()    
+    prog = os.path.join(gnulib_dir, "gnulib-tool.py")
+else:
+    #prog = os.path.join(os.path.dirname(progname), "gnulib-tool.py")
+    prog = os.path.join("C:\\gnulib\\", "gnulib-tool.py")
 
+성공
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# python3 /c/gnulib/gnulib-tool.py
+성공
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# python /c/gnulib/gnulib-tool.py
 
+(오류)
+Gnulib의 버전이 오래된 경우, 최신 버전으로 업데이트
+nayou@kimnayooung MINGW64 /c/gnulib
+# git pull
+모듈가져오기
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# gnulib-tool --add-import argz
+/c/gnulib/gnulib-tool.sh: *** Ambiguity: to which directory should the modules be added? Please specify at least --m4-base=...
+/c/gnulib/gnulib-tool.sh: *** Stop.
+(수정)
+--m4-base와 --source-base 디렉터리를 지정하여 gnulib-tool이 모듈과 M4 파일을 어디에 추가할지 알려주어야 함
+build-aux/m4 폴더가 없다면 생성 & 권한부
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# mkdir -p build-aux/m4
+chmod +w build-aux/m4
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l /c/gnulib/gnulib-tool.sh
+-rwxr-xr-x 1 nayou nayou 284455 10월  7 20:41 /c/gnulib/gnulib-tool.sh
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# gnulib-tool --import --m4-base=build-aux/m4 --source-base=lib --doc-base=doc --tests-base=tests --dir=. argz
+Module list with included dependencies (indented):
+    absolute-header
+  argz
+...
+--m4-base=build-aux/m4: M4 파일을 추가할 디렉터리를 지정
+--source-base=lib: 소스 코드 모듈을 추가할 디렉터리를 지정
+--doc-base=doc: 문서 파일을 위한 디렉터리
+--tests-base=tests: 테스트 파일을 위한 디렉터리
+(결과)
+Don't forget to
+  - add "lib/Makefile" to AC_CONFIG_FILES in ./configure.ac,
+  - mention "lib" in SUBDIRS in Makefile.am,
+  - mention "-I build-aux/m4" in ACLOCAL_AMFLAGS in Makefile.am
+    or add an AC_CONFIG_MACRO_DIRS([build-aux/m4]) invocation in ./configure.ac,
+  - mention "build-aux/m4/gnulib-cache.m4" in EXTRA_DIST in Makefile.am,
+  - invoke gl_EARLY in ./configure.ac, right after AC_PROG_CC,
+  - invoke gl_INIT in ./configure.ac.
+(수정)
+AC_CONFIG_FILES에 lib/Makefile 추가
+configure.ac 수정
+AC_PROG_CC
+gl_EARLY
+gl_INIT
+gl_ARGZ
+AC_CONFIG_FILES([lib/Makefile])
+AC_CONFIG_MACRO_DIRS([m4] [gnulib-m4] [build-aux/m4])
+
+Makefile.am 수정
+SUBDIRS = lib
+ACLOCAL_AMFLAGS = -I m4 -I gnulib-m4 -I build-aux/m4
+EXTRA_DIST = build-aux/m4/gnulib-cache.m4
+#argz 라이브러리 링크 확인
+libtextstyle_la_LDFLAGS = -largz -shared -Wl,--out-implib=libtextstyle.dll.a -lltdl #DLL을 생성하기 위한 필수 플래그를 추가
+
+(빌드)
+{ autopoint --force; } 2>&1 | tee ./log/autopoint.log && 
+{ rm -rf autom4te.cache; } && 
+{ aclocal -I m4 -I gnulib-m4 -I /usr/share/aclocal; } 2>&1 | tee ./log/aclocal.log && 
+{ libtoolize --ltdl --copy --force --verbose --automake; } 2>&1 | tee ./log/libtoolize.log && 
+{ cp /usr/share/aclocal/ltdl.m4 ./m4/; } && 
+{ autoconf --verbose; } 2>&1 | tee ./log/autoconf.log && 
+{ autoheader; } 2>&1 | tee ./log/autoheader.log && 
+{ automake --add-missing --force-missing; } 2>&1 | tee ./log/automake.log && 
+{ sed -i 's/-V\| -qversion\| -version/ --version/g' configure; } &&
+{ ./configure CFLAGS="-std=c11" --verbose --host=x86_64-w64-mingw32 --build=x86_64-pc-linux-gnu; } 2>&1 | tee ./log/configure.log | grep -E "(no|not found|undefine|error|warning)"
+
+(오류) 빌드오류 & config.log 오류
+checking for argz_add... no
+checking for argz_append... no
+checking for argz_count... no
+checking for argz_create_sep... no
+checking for argz_insert... no
+checking for argz_next... no
+checking for argz_stringify... no
+config.log 
+configure:14923: checking for argz.h
+configure:14923: x86_64-w64-mingw32-gcc -c -std=c11  -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 conftest.c >&5
+configure:14923: $? = 0
+configure:14923: result: yes
+
+configure:14958: checking for argz_add
+configure:14958: x86_64-w64-mingw32-gcc -o conftest.exe -std=c11  -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0 -L/mingw64/lib -L/usr/lib -L/mingw64/x86_64-w64-mingw32/lib -Wl,-rpath,/mingw64/bin conftest.c  >&5
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cc4vovgc.o:conftest.c:(.text.startup+0xa): undefined reference to argz_add'
+collect2.exe: error: ld returned 1 exit status
+configure:14958: $? = 1
+configure: failed program was:
+
+| #define HAVE_ARGZ_H 1
+
+| /* end confdefs.h.  */
+| /* Define argz_add to an innocuous variant, in case <limits.h> declares argz_add.
+|    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
+| #define argz_add innocuous_argz_add
+| 
+| /* System header to define __stub macros and hopefully few prototypes,
+|    which can conflict with char argz_add (void); below.  */
+| 
+| #include <limits.h>
+| #undef argz_add
+| 
+| /* Override any GCC internal prototype to avoid an error.
+|    Use char because int might match the return type of a GCC
+|    builtin and then its argument prototype would still apply.  */
+| #ifdef __cplusplus
+| extern "C"
+| #endif
+| char argz_add (void);
+| /* The GNU C library defines this for functions which it implements
+|     to always fail with ENOSYS.  Some functions are actually named
+|     something starting with __ and the normal name is an alias.  */
+| #if defined __stub_argz_add || defined __stub___argz_add
+| choke me
+| #endif
+| 
+| int
+| main (void)
+| {
+| return argz_add ();
+|   ;
+|   return 0;
+| }
+configure:14958: result: no
+configure:14958: checking for argz_append
+configure:14958: x86_64-w64-mingw32-gcc -o conftest.exe -std=c11  -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0 -L/mingw64/lib -L/usr/lib -L/mingw64/x86_64-w64-mingw32/lib -Wl,-rpath,/mingw64/bin conftest.c  >&5
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccgAbhej.o:conftest.c:(.text.startup+0xa): undefined reference to argz_append'
+collect2.exe: error: ld returned 1 exit status
+configure:14958: $? = 1 
+
+configure:14958: checking for argz_append
+configure:14958: x86_64-w64-mingw32-gcc -o conftest.exe -std=c11  -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0 -L/mingw64/lib -L/usr/lib -L/mingw64/x86_64-w64-mingw32/lib -Wl,-rpath,/mingw64/bin conftest.c  >&5
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccgAbhej.o:conftest.c:(.text.startup+0xa): undefined reference to argz_append'
+collect2.exe: error: ld returned 1 exit status
+configure:14958: $? = 1
+...
+(수정)
+argz_add, argz_append, 등의 함수에 대한 "undefined reference" 오류는 해당 함수들이 포함된 라이브러리가 링크되지 않았기 때문
+Gnulib에서 argz 모듈 포함 확인
+configure.ac
+AC_PROG_CC
+gl_EARLY
+gl_INIT
+gl_ARGZ
+
+Makefile.am
+lib_LTLIBRARIES = libtextstyle.la libltdlc.la
+libtextstyle_la_SOURCES = \
+$(GNULIB_SRCS)
+
+config.log
+configure:14923: checking for argz.h
+| #define HAVE_ARGZ_H 1
+| #if defined(HAVE_ARGZ_H)
+| #  include <argz.h>
+configure:14958: checking for argz_add
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccwP0JCq.o:conftest.c:(.text.startup+0xa): undefined reference to `argz_add`
+| #define HAVE_ARGZ_H 1
+| /* Define argz_add to an innocuous variant, in case <limits.h> declares argz_add.
+| #define argz_add innocuous_argz_add
+|    which can conflict with char argz_add (void); below.  */
+| #undef argz_add
+| char argz_add (void);
+| #if defined __stub_argz_add || defined __stub___argz_add
+| return argz_add ();
+configure:14958: checking for argz_append
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccw8cwBs.o:conftest.c:(.text.startup+0xa): undefined reference to `argz_append`
+| #define HAVE_ARGZ_H 1
+| /* Define argz_append to an innocuous variant, in case <limits.h> declares argz_append.
+| #define argz_append innocuous_argz_append
+|    which can conflict with char argz_append (void); below.  */
+| #undef argz_append
+| char argz_append (void);
+| #if defined __stub_argz_append || defined __stub___argz_append
+| return argz_append ();
+configure:14958: checking for argz_count
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccCd279F.o:conftest.c:(.text.startup+0xa): undefined reference to `argz_count`
+| #define HAVE_ARGZ_H 1
+| /* Define argz_count to an innocuous variant, in case <limits.h> declares argz_count.
+| #define argz_count innocuous_argz_count
+|    which can conflict with char argz_count (void); below.  */
+| #undef argz_count
+| char argz_count (void);
+| #if defined __stub_argz_count || defined __stub___argz_count
+| return argz_count ();
+configure:14958: checking for argz_create_sep
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cc23oAWD.o:conftest.c:(.text.startup+0xa): undefined reference to `argz_create_sep`
+| #define HAVE_ARGZ_H 1
+| /* Define argz_create_sep to an innocuous variant, in case <limits.h> declares argz_create_sep.
+| #define argz_create_sep innocuous_argz_create_sep
+|    which can conflict with char argz_create_sep (void); below.  */
+| #undef argz_create_sep
+| char argz_create_sep (void);
+| #if defined __stub_argz_create_sep || defined __stub___argz_create_sep
+| return argz_create_sep ();
+configure:14958: checking for argz_insert
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cc2bVgfN.o:conftest.c:(.text.startup+0xa): undefined reference to `argz_insert`
+(수정)
+argz_add, argz_append, argz_count, argz_create_sep, 및 argz_insert 함수에 대한 정의를 찾지 못했을 때 발생
+argz 라이브러리를 포함하도록 라이브러리 경로를 설정하거나 argz 함수가 포함된 다른 라이브러리를 링크해야함
+Gnulib는 argz 함수 같은 GNU 라이브러리 기능을 포함하며, 이 기능을 다른 운영 체제에서도 사용할 수 있게 해주는 라이브러리
+Gnulib을 사용하고 있다면 argz 모듈을 추가하여 이를 프로젝트에 포함시킬 수 있음
+argz 함수의 구현을 gnulib에서 가져와 프로젝트 내에서 사용할 수 있게 됨
+gnulib-tool을 사용하여 필요한 모듈을 가져옴
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# python /c/gnulib/gnulib-tool.py --add-import argz error malloc-gnu
+argz 파일 목록 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l ./lib/argz*
+-rw-r--r-- 1 nayou nayou 10091 10월 29 11:45 ./lib/argz.c
+-rw-r--r-- 1 nayou nayou 10091  8월 30 11:54 ./lib/argz.c~
+-rw-r--r-- 1 nayou nayou  5290 10월 21 20:35 ./lib/argz.h
+-rw-r--r-- 1 nayou nayou   404 10월 11 11:34 ./lib/argz.h.bak
+-rw-r--r-- 1 nayou nayou  5231 10월 21 20:30 ./lib/argz.h.in
+-rw-r--r-- 1 nayou nayou 70459 10월 11 10:35 ./lib/argz.h~
+-rw-r--r-- 1 nayou nayou  5190 10월 29 11:45 ./lib/argz.in.h
+-rw-r--r-- 1 nayou nayou  5190  8월 30 11:54 ./lib/argz.in.h~
+argz.h와 argz.c 파일이 실제로 존재하는데도 불구하고 undefined reference 오류가 발생하는 이유
+링크 과정에서의 경로 문제
+argz.c 파일이 포함된 라이브러리가 링커에 제대로 지정되지 않았을 수 있음
+Makefile.am 수정
+# -largz 추가
+libtextstyle_la_LIBS = -lncurses $(GNULIB_LIBS) $(GL_LIBOBJS) $(LTDLIBS) $(LT_LIBOBJS) -lltdl -largz # libtextstyle 라이브러리에 링크할 라이브러리들
+(오류)
+configure.ac:65: error: possibly undefined macro: gl_ARGZ
+      If this token and others are legitimate, please use m4_pattern_allow.
+      See the Autoconf documentation.
+/usr/share/automake-1.16/am/remake-hdr.am: warning: argz.h was already defined in condition !GL_GENERATE_ARGZ_H, which is included in condition TRUE ...
+lib/Makefile.am:85: ... 'argz.h' previously defined here
+(수정)
+configure.ac 수정
+# Define if we want to generate argz.h
+AC_DEFINE([GL_GENERATE_ARGZ_H], [1], [Define if we want to generate argz.h])
+# argz 필요한 함수들을 체크
+AC_CHECK_FUNCS([argz_add argz_append argz_count argz_create_sep argz_insert argz_next argz_stringify])
+
+Makefile.am 수정
+# Here is where to add the argz module
+# Begin Gnulib module argz
+BUILT_SOURCES += argz.h
+
+# We need the following in order to create <argz.h> when the system
+# doesn't have one that works with the given compiler.
+if GL_GENERATE_ARGZ_H
+argz.h: argz.in.h $(top_builddir)/config.status
+	$(gl_V_at)$(SED_HEADER_TO_AT_t) $(srcdir)/argz.in.h
+	$(AM_V_at)mv $@-t $@
+else
+argz.h: $(top_builddir)/config.status
+	rm -f $@
+endif
+
+MOSTLYCLEANFILES += argz.h argz.h-t
+
+# Conditionally include argz.c
+if GL_COND_OBJ_ARGZ
+libtextstyle_la_SOURCES += lib/argz.c
+endif
+
+EXTRA_DIST += argz.in.h
+
+# End Gnulib module argz
+
+lib/Makefile.am 수정
+## begin gnulib module argz
+
+# Only generate argz.h if GL_GENERATE_ARGZ_H is defined
+if GL_GENERATE_ARGZ_H
+BUILT_SOURCES += argz.h
+
+argz.h: argz.in.h $(top_builddir)/config.status
+	$(gl_V_at)$(SED_HEADER_TO_AT_t) $(srcdir)/argz.in.h
+	$(AM_V_at)mv $@-t $@
+else
+# Ensure that we remove argz.h if we do not generate it
+argz.h: $(top_builddir)/config.status
+	rm -f $@
+endif
+
+MOSTLYCLEANFILES += argz.h argz.h-t
+
+# Conditionally compile argz.c if GL_COND_OBJ_ARGZ is defined
+if GL_COND_OBJ_ARGZ
+libgnu_a_SOURCES += argz.c
+endif
+
+EXTRA_DIST += argz.in.h
+
+## end   gnulib module argz
+(오류)
+configure.ac:65: error: possibly undefined macro: gl_ARGZ
+      If this token and others are legitimate, please use m4_pattern_allow.
+      See the Autoconf documentation.
+(수정)
+Automake 버전 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# automake --version
+automake (GNU automake) 1.16.5
+Copyright (C) 2021 Free Software Foundation, Inc.
+License GPLv2+: GNU GPL version 2 or later <https://gnu.org/licenses/gpl-2.0.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+Written by Tom Tromey <tromey@redhat.com>
+       and Alexandre Duret-Lutz <adl@gnu.org>.
+
+configure.ac 수정
+AC_INIT([libtextstyle], [1.0], [bug-libtextstyle@example.com]) # 프로젝트 초기화
+AM_INIT_AUTOMAKE([1.16.5 gnu no-dependencies subdir-objects])
+AC_USE_SYSTEM_EXTENSIONS
+
+# Allow Gnulib macros
+m4_pattern_allow([gl_ARGZ])
+
+# Gnulib modules
+AC_GNU_LIB_TOOL
+
+# GNULIB 모듈 활성화
+gl_MODULES([argz])
+
+(오류)
+autom4te-2.72: 'configure' is updated
+automake-1.16: error: global options already processed
+automake-1.16: Please contact <bug-automake@gnu.org>.
+ at /usr/share/automake-1.16/Automake/Channels.pm line 655, <GEN0> line 911.
+        Automake::Channels::msg("automake", "", "global options already processed") called at /usr/share/automake-1.16/Automake/ChannelDefs.pm line 226
+        Automake::ChannelDefs::prog_error("global options already processed") called at /usr/share/automake-1.16/Automake/Options.pm line 424
+        Automake::Options::process_global_option_list(HASH(0xa00ae18c0), HASH(0xa00ae1d10)) called at /usr/bin/automake-1.16 line 5464
+        Automake::scan_autoconf_traces("configure.ac") called at /usr/bin/automake-1.16 line 5564
+        Automake::scan_autoconf_files() called at /usr/bin/automake-1.16 line 8447
+checking for x86_64-w64-mingw32-gcc option to enable C11 features... none needed
 (수정)
 
-make install
+
+
+
+
+
+
