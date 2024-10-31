@@ -32559,32 +32559,157 @@ nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
 
 정적 라이브러리를 생성
 nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
-# ar rcs libargz.a argz.o
+# ar rcs libargz.la argz.o
 
 생성된 라이브러리 확인
 nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
-# ls -l libargz.a
+# ls -l libargz.la
 -rw-r--r-- 1 nayou nayou 131772 10월 31 11:36 libargz.a
 
-(빌드)
-{ autopoint --force; } 2>&1 | tee ./log/autopoint.log && 
-{ rm -rf autom4te.cache; } && 
-{ aclocal -I m4 -I gnulib-m4 -I /usr/share/aclocal; } 2>&1 | tee ./log/aclocal.log && 
-{ libtoolize --ltdl --copy --force --verbose --automake; } 2>&1 | tee ./log/libtoolize.log && 
-{ cp /usr/share/aclocal/ltdl.m4 ./m4/; } && 
-{ autoconf --verbose; } 2>&1 | tee ./log/autoconf.log && 
-{ autoheader; } 2>&1 | tee ./log/autoheader.log && 
-{ automake --add-missing --force-missing; } 2>&1 | tee ./log/automake.log && 
-{ sed -i 's/-V\| -qversion\| -version/ --version/g' configure; } &&
-{ ./configure CFLAGS="-std=c11" --verbose --host=x86_64-w64-mingw32 --build=x86_64-pc-linux-gnu; } 2>&1 | tee ./log/configure.log | grep -E "(no|not found|undefine|error|warning)"
+configure.ac
+m4_pattern_allow([gl_ARGZ])
+gl_ARGZ
+gl_MODULES([argz])
+AC_CONFIG_HEADERS([config.h lib/argz.h])
+AC_CHECK_HEADERS([argz.h], [
+  AM_CONDITIONAL([HAVE_SYSTEM_ARGZ_H], [true])
+], [
+  AM_CONDITIONAL([HAVE_SYSTEM_ARGZ_H], [false])
+])
+AC_SUBST([ARGZ_H], ["lib/argz.h"])
+AC_SUBST([LIBARGZ], [libargz.la])
+AC_DEFINE([GL_GENERATE_ARGZ_H], [1], [Define if we want to generate argz.h])
+AC_CHECK_FUNCS([argz_add argz_append argz_count argz_create_sep argz_insert argz_next argz_stringify])
+m4_ifdef([gl_ARGZ], [gl_ARGZ])
+AC_CHECK_LIB([argz], [argz_create_sep], [], [AC_MSG_ERROR([argz library not found])])
+AC_LIBOBJ([lt__argz])
+AC_LIBOBJ([argz])
 
+Makefile.am
+lib_LTLIBRARIES = libtextstyle.la libltdlc.la # libargz.la 제거 중복선언
+noinst_LTLIBRARIES = libargz.la 
+libargz_la_SOURCES = lib/argz.c
+libltdlc_la_SOURCES = libltdl/lt__argz.c
+libtextstyle_la_SOURCES = \ #라이브러리에 포함될 소스 파일 목록을 나열
+	lib/color.c \
+	lib/gl_array_list.c \
+	lib/term-ostream.c \
+	lib/ostream.c \
+	lib/concat-filename.c \
+	lib/xconcat-filename.c \
+    lib/xsize.c \
+	lib/error.c \
+	lib/full-write.c \
+	lib/term-style-control.c \
+	lib/fsync.c \
+	lib/xstrdup.c \
+	lib/xgethostname.c \
+	lib/argz.c \
+	$(GNULIB_SRCS)
 
+# Here is where to add the argz module
+# Begin Gnulib module argz
+# BUILT_SOURCES = lib/argz.h
+# EXTRA_DIST = lib/argz.in.h lib/argz.h.in # 중복정의
 
+if GL_GENERATE_ARGZ_H
+lib/argz.h: lib/argz.in.h $(top_builddir)/config.status
+	$(gl_V_at)$(SED_HEADER_TO_AT_t) $(srcdir)/lib/argz.in.h
+	$(AM_V_at)mv $@-t $@
+else
+lib/argz.h: $(top_builddir)/config.status
+	rm -f $@
+endif
 
+MOSTLYCLEANFILES = lib/argz.h lib/argz.h-t
 
+# Conditionally include argz.c
+if GL_COND_OBJ_ARGZ
+libtextstyle_la_SOURCES += lib/argz.c
+endif
 
+# End Gnulib module argz
 
+libtextstyle_la_LIBS = -lncurses $(GNULIB_LIBS) $(GL_LIBOBJS) $(LTDLIBS) $(LT_LIBOBJS) -lltdl -largz # libtextstyle 라이브러리에 링크할 라이브러리들
 
+libltdlc_la_SOURCES += \
+  libltdl/lt__alloc.c \
+  libltdl/lt__argz.c \
+  libltdl/lt_dlloader.c \
+  libltdl/lt_error.c \
+  libltdl/ltdl.c \
+  libltdl/slist.c
+#AC_LIBOBJ([lt__argz]) # configure.ac에서 선언
+# Add this rule to copy argz.in.h to argz.h
+#lib/argz.h: lib/argz.h.in
+#	cp lib/argz.h.in lib/argz.h
+
+EXTRA_DIST = \
+  lib/argz.in.h \
+  lib/argz.h.in \
+
+lib/Makefile.am
+## begin gnulib module argz
+
+# Only generate argz.h if GL_GENERATE_ARGZ_H is defined
+if GL_GENERATE_ARGZ_H
+# Ensure argz.h is in BUILT_SOURCES for correct build order
+BUILT_SOURCES += argz.h
+
+argz.h: argz.in.h $(top_builddir)/config.status
+	$(gl_V_at)$(SED_HEADER_TO_AT_t) $(srcdir)/argz.in.h
+	$(AM_V_at)mv $@-t $@
+else
+# Ensure that we remove argz.h if we do not generate it
+argz.h: $(top_builddir)/config.status
+	rm -f $@
+endif
+
+MOSTLYCLEANFILES += argz.h argz.h-t
+
+# Conditionally compile argz.c if GL_COND_OBJ_ARGZ is defined
+if GL_COND_OBJ_ARGZ
+libgnu_a_SOURCES += argz.c
+endif
+
+## end gnulib module argz
+
+(오류)
+오류
+/usr/share/automake-1.16/am/remake-hdr.am: warning: argz.h was already defined in condition !GL_GENERATE_ARGZ_H, which is included in condition TRUE ...
+lib/Makefile.am:85: ... 'argz.h' previously defined here
+
+config.log
+configure:14962: checking for argz_count
+configure:14962: x86_64-w64-mingw32-gcc -o conftest.exe -std=c11  -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0 -L/mingw64/lib -L/usr/lib -L/mingw64/x86_64-w64-mingw32/lib -L/c/libidn2/gettext-0.22.5/libtextstyle/lib -Wl,-rpath,/mingw64/bin conftest.c  >&5
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccsMkYJU.o:conftest.c:(.text.startup+0xa): undefined reference to `argz_count'
+collect2.exe: error: ld returned 1 exit status
+configure:14962: checking for argz_create_sep
+configure:14962: x86_64-w64-mingw32-gcc -o conftest.exe -std=c11  -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0 -L/mingw64/lib -L/usr/lib -L/mingw64/x86_64-w64-mingw32/lib -L/c/libidn2/gettext-0.22.5/libtextstyle/lib -Wl,-rpath,/mingw64/bin conftest.c  >&5
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cc6XIRuL.o:conftest.c:(.text.startup+0xa): undefined reference to `argz_create_sep'
+collect2.exe: error: ld returned 1 exit status
+configure:14962: checking for argz_insert
+configure:14962: x86_64-w64-mingw32-gcc -o conftest.exe -std=c11  -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0 -L/mingw64/lib -L/usr/lib -L/mingw64/x86_64-w64-mingw32/lib -L/c/libidn2/gettext-0.22.5/libtextstyle/lib -Wl,-rpath,/mingw64/bin conftest.c  >&5
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccotmpYW.o:conftest.c:(.text.startup+0xa): undefined reference to `argz_insert'
+collect2.exe: error: ld returned 1 exit status
+configure:14962: checking for argz_next
+configure:14962: x86_64-w64-mingw32-gcc -o conftest.exe -std=c11  -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0 -L/mingw64/lib -L/usr/lib -L/mingw64/x86_64-w64-mingw32/lib -L/c/libidn2/gettext-0.22.5/libtextstyle/lib -Wl,-rpath,/mingw64/bin conftest.c  >&5
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccOjRj8L.o:conftest.c:(.text.startup+0xa): undefined reference to `argz_next'
+collect2.exe: error: ld returned 1 exit status
+configure:14927: checking for argz.h
+configure:14927: x86_64-w64-mingw32-gcc -c -std=c11  -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 conftest.c >&5
+configure:14927: $? = 0
+configure:14962: checking for argz_add
+configure:14962: x86_64-w64-mingw32-gcc -o conftest.exe -std=c11  -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0 -L/mingw64/lib -L/usr/lib -L/mingw64/x86_64-w64-mingw32/lib -L/c/libidn2/gettext-0.22.5/libtextstyle/lib -Wl,-rpath,/mingw64/bin conftest.c  >&5
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccOQAZSa.o:conftest.c:(.text.startup+0xa): undefined reference to `argz_add'
+configure:14962: checking for argz_append
+configure:14962: x86_64-w64-mingw32-gcc -o conftest.exe -std=c11  -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0 -L/mingw64/lib -L/usr/lib -L/mingw64/x86_64-w64-mingw32/lib -L/c/libidn2/gettext-0.22.5/libtextstyle/lib -Wl,-rpath,/mingw64/bin conftest.c  >&5
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cc6Gfgk5.o:conftest.c:(.text.startup+0xa): undefined reference to `argz_append'
+collect2.exe: error: ld returned 1 exit status
+configure:14962: checking for argz_count
+configure:14962: x86_64-w64-mingw32-gcc -o conftest.exe -std=c11  -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0 -L/mingw64/lib -L/usr/lib -L/mingw64/x86_64-w64-mingw32/lib -L/c/libidn2/gettext-0.22.5/libtextstyle/lib -Wl,-rpath,/mingw64/bin conftest.c  >&5
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccsMkYJU.o:conftest.c:(.text.startup+0xa): undefined reference to `argz_count'
+collect2.exe: error: ld returned 1 exit status
 
 
 
