@@ -32329,7 +32329,6 @@ Written by Tom Tromey <tromey@redhat.com>
 
 configure.ac 수정
 AC_INIT([libtextstyle], [1.0], [bug-libtextstyle@example.com]) # 프로젝트 초기화
-AM_INIT_AUTOMAKE([1.16.5 gnu no-dependencies subdir-objects])
 AC_USE_SYSTEM_EXTENSIONS
 
 # Allow Gnulib macros
@@ -32342,17 +32341,247 @@ AC_GNU_LIB_TOOL
 gl_MODULES([argz])
 
 (오류)
-autom4te-2.72: 'configure' is updated
-automake-1.16: error: global options already processed
-automake-1.16: Please contact <bug-automake@gnu.org>.
- at /usr/share/automake-1.16/Automake/Channels.pm line 655, <GEN0> line 911.
-        Automake::Channels::msg("automake", "", "global options already processed") called at /usr/share/automake-1.16/Automake/ChannelDefs.pm line 226
-        Automake::ChannelDefs::prog_error("global options already processed") called at /usr/share/automake-1.16/Automake/Options.pm line 424
-        Automake::Options::process_global_option_list(HASH(0xa00ae18c0), HASH(0xa00ae1d10)) called at /usr/bin/automake-1.16 line 5464
-        Automake::scan_autoconf_traces("configure.ac") called at /usr/bin/automake-1.16 line 5564
-        Automake::scan_autoconf_files() called at /usr/bin/automake-1.16 line 8447
-checking for x86_64-w64-mingw32-gcc option to enable C11 features... none needed
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# grep -i "argz" config.log
+config.log(argz)
+configure:14926: checking for argz.h
+| #define HAVE_ARGZ_H 1
+| #if defined(HAVE_ARGZ_H)
+| #  include <argz.h>
+configure:14961: checking for argz_add
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccO8wFux.o:conftest.c:(.text.startup+0xa): undefined reference to argz_add'
+| #define HAVE_ARGZ_H 1
+| /* Define argz_add to an innocuous variant, in case <limits.h> declares argz_add.
+| #define argz_add innocuous_argz_add
+|    which can conflict with char argz_add (void); below.  */
+| #undef argz_add
+| char argz_add (void);
+| #if defined __stub_argz_add || defined __stub___argz_add
+| return argz_add ();
+configure:14961: checking for argz_append
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cckNLx9y.o:conftest.c:(.text.startup+0xa): undefined reference to argz_append'
+| #define HAVE_ARGZ_H 1
+| /* Define argz_append to an innocuous variant, in case <limits.h> declares argz_append.
+| #define argz_append innocuous_argz_append
+|    which can conflict with char argz_append (void); below.  */
+| #undef argz_append
+| char argz_append (void);
+| #if defined __stub_argz_append || defined __stub___argz_append
+| return argz_append ();
+configure:14961: checking for argz_count
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccu2QCIr.o:conftest.c:(.text.startup+0xa): undefined reference to argz_count'
+| #define HAVE_ARGZ_H 1
+| /* Define argz_count to an innocuous variant, in case <limits.h> declares argz_count.
+| #define argz_count innocuous_argz_count
+|    which can conflict with char argz_count (void); below.  */
+| #undef argz_count
+| char argz_count (void);
+| #if defined __stub_argz_count || defined __stub___argz_count
+| return argz_count ();
+configure:14961: checking for argz_create_sep
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccyL5QyU.o:conftest.c:(.text.startup+0xa): undefined reference to argz_create_sep'
+| #define HAVE_ARGZ_H 1
+| /* Define argz_create_sep to an innocuous variant, in case <limits.h> declares argz_create_sep.
+| #define argz_create_sep innocuous_argz_create_sep
+|    which can conflict with char argz_create_sep (void); below.  */
+| #undef argz_create_sep
+| char argz_create_sep (void);
+| #if defined __stub_argz_create_sep || defined __stub___argz_create_sep
+| return argz_create_sep ();
+configure:14961: checking for argz_insert
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cc8ngAmS.o:conftest.c:(.text.startup+0xa): undefined reference to argz_insert'
+| #define HAVE_ARGZ_H 1
+| /* Define argz_insert to an innocuous variant, in case <limits.h> declares argz_insert.
+| #define argz_insert innocuous_argz_insert
+|    which can conflict with char argz_insert (void); below.  */
+| #undef argz_insert
+| char argz_insert (void);
+| #if defined __stub_argz_insert || defined __stub___argz_insert
+| return argz_insert ();
+configure:14961: checking for argz_next
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccSG2YHB.o:conftest.c:(.text.startup+0xa): undefined reference to argz_next'
+| #define HAVE_ARGZ_H 1
+| /* Define argz_next to an innocuous variant, in case <limits.h> declares argz_next.
+| #define argz_next innocuous_argz_next
+|    which can conflict with char argz_next (void); below.  */
+| #undef argz_next
+| char argz_next (void);
+| #if defined __stub_argz_next || defined __stub___argz_next
+| return argz_next ();
+configure:14961: checking for argz_stringify
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccwfapFN.o:conftest.c:(.text.startup+0xa): undefined reference to argz_stringify'
+| #define HAVE_ARGZ_H 1
+| /* Define argz_stringify to an innocuous variant, in case <limits.h> declares argz_stringify.
+| #define argz_stringify innocuous_argz_stringify
+|    which can conflict with char argz_stringify (void); below.  */
+| #undef argz_stringify
+| char argz_stringify (void);
+| #if defined __stub_argz_stringify || defined __stub___argz_stringify
+| return argz_stringify ();
+configure:26460: checking for argz.h
+configure:26491: checking for argz_replace
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccMlxiqs.o:conftest.cpp:(.text.startup+0xa): undefined reference to argz_replace'
+configure:27755: checking for argz.h
+configure:27793: checking for argz_add
+configure:27799: checking for argz_append
+configure:27805: checking for argz_count
+configure:27811: checking for argz_create_sep
+configure:27817: checking for argz_insert
+configure:27823: checking for argz_next
+configure:27829: checking for argz_stringify
 (수정)
+Python이 MinGW64/MSYS2 환경에서 빌드될 때 GNU 라이브러리에 포함된 argz 함수들(argz_add, argz_append 등)을 찾지 못해서 발생
+argz 함수들은 일반적으로 glibc의 일부로 제공되며, 일부 시스템에서는 argz 관련 함수들을 직접 지원하지 않기도 함
+argz 관련 파일 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# find ./lib -name "*argz*"
+./lib/argz.c
+./lib/argz.c~
+./lib/argz.h
+./lib/argz.h.bak
+./lib/argz.h.in
+./lib/argz.h~
+./lib/argz.in.h
+./lib/argz.in.h~
+./lib/ltdl/libltdl/libltdl/lt__argz_.h
+./lib/ltdl/libltdl/lt__argz.c
+./lib/ltdl/libltdl/lt__argz_.h
+./lib/ltdl/lt__argz.c
+./lib/ltdl/lt__argz.lo
+./lib/ltdl/lt__argz.o
+./lib/ltdl/m4/ltargz.m4
+
+환경변수설정
+# C 인클루드 경로 설정
+export C_INCLUDE_PATH="/c/msys64/mingw64/x86_64-w64-mingw32/include"  # string.h, stdlib.h, error.h
+export C_INCLUDE_PATH="$C_INCLUDE_PATH:/c/msys64/mingw64/include"
+export C_INCLUDE_PATH="$C_INCLUDE_PATH:/mingw64/include"
+export C_INCLUDE_PATH="$C_INCLUDE_PATH:/usr/share/gettext"
+export C_INCLUDE_PATH="$C_INCLUDE_PATH:/mingw64/include"
+export C_INCLUDE_PATH="$C_INCLUDE_PATH:/mingw64/include/glib-2.0"
+export C_INCLUDE_PATH="$C_INCLUDE_PATH:/mingw64-backup-11.2.0/include/libltdl"
+export C_INCLUDE_PATH="$C_INCLUDE_PATH:/c/libidn2/gettext-0.22.5/libtextstyle/lib" # woe32dll.h, argz.h, argz.h.in
+export C_INCLUDE_PATH="$C_INCLUDE_PATH:/c/gnulib/lib"  # xalloc.h, xmalloca.h
+export C_INCLUDE_PATH="$C_INCLUDE_PATH:/c/gnulib" # xgethostname.h
+export C_INCLUDE_PATH="$C_INCLUDE_PATH:/c/libidn2/gettext-0.22.5/libtextstyle" # config.h
+
+# C++ 인클루드 경로 설정
+export CXX_INCLUDE_PATH="/c/msys64/mingw64/x86_64-w64-mingw32/include" # string.h, stdlib.h, error.h
+export CXX_INCLUDE_PATH="$CXX_INCLUDE_PATH:/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++"  # C++ 인클루드 경로
+export CXX_INCLUDE_PATH="$CXX_INCLUDE_PATH:/c/libidn2/gettext-0.22.5/libtextstyle/lib" # woe32dll.h
+export CXX_INCLUDE_PATH="$CXX_INCLUDE_PATH:/c/gnulib/lib"  # xalloc.h
+export CXX_INCLUDE_PATH="$CXX_INCLUDE_PATH:/c/gnulib" # xgethostname.h
+export CXX_INCLUDE_PATH="$CXX_INCLUDE_PATH:/c/libidn2/gettext-0.22.5/libtextstyle" # config.h
+
+libargz.a 생성하기
+필요한 파일
+/c/libidn2/gettext-0.22.5/libtextstyle/lib/argz.h
+/c/libidn2/gettext-0.22.5/libtextstyle/lib/argz.c
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# gcc -std=c11 -c ./lib/argz.c -o argz.o
+./lib/argz.c: In function 'argz_create':
+./lib/argz.c:271:13: error: implicit declaration of function 'stpcpy'; did you mean 'strcpy'? [-Wimplicit-function-declaration]
+  271 |         p = stpcpy (p, *ap);
+      |             ^~~~~~
+      |             strcpy
+./lib/argz.c:271:11: error: assignment to 'char *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
+  271 |         p = stpcpy (p, *ap);
+      |           ^
+./lib/argz.c: In function 'argz_replace':
+./lib/argz.c:346:26: error: implicit declaration of function 'strndup'; did you mean 'strdup'? [-Wimplicit-function-declaration]
+  346 |               char *to = strndup (arg, to_len);
+      |                          ^~~~~~~
+      |                          strdup
+./lib/argz.c:346:26: error: initialization of 'char *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
+
+=> ./lib/argz.c 에 stpcpy, strndup 구현
+#define _GNU_SOURCE //GNU 표준 라이브러리 포함 => 실패
+stpcpy와 strndup 함수는 C11 표준에 추가된 함수들로, MinGW-w64 같은 일부 환경에서는 지원되지 않기 때문에 직접 구현하거나 대체하는 방법을 사용
+
+argz.h 수정
+//20241031 지원되지 않기 때문에 직접 구현
+char *my_stpcpy(char *dest, const char *src);
+char *my_strndup(const char *s, size_t n);
+
+argz.c 수정
+char *my_stpcpy(char *dest, const char *src) { //20241031 지원되지 않기 때문에 직접 구현
+    while ((*dest++ = *src++));
+    return dest - 1; // 마지막 널 문자를 가리키는 포인터 반환
+}
+
+char *my_strndup(const char *s, size_t n) { //20241031 지원되지 않기 때문에 직접 구현
+    size_t len = strnlen(s, n); // 문자열의 길이를 계산
+    char *copy = (char *)malloc(len + 1); // 새로운 메모리 할당
+    if (copy) {
+        strncpy(copy, s, len); // 문자열 복사
+        copy[len] = '\0'; // 널 문자 추가
+    }
+    return copy; // 복사된 문자열 반환
+}
+
+argz_create (char *const argv[], char **argz, size_t *len)
+{
+    ...
+    for (p = *argz, ap = argv; *ap; ++ap, ++p)
+        //p = stpcpy (p, *ap); 
+        p = my_stpcpy (p, *ap); //20241031
+    ...
+}
+
+error_t
+argz_replace (char **argz, size_t *argz_len, const char *str, const char *with,
+                unsigned *replace_count)
+{
+    ...
+    //char *to = strndup (arg, to_len); 
+    char *to = my_strndup (arg, to_len); //20241031
+    ...
+}
+
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# gcc -std=c11 -o argz.o lib/argz.c
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/msys64/mingw64/lib/../lib/libmingw32.a(lib64_libmingw32_a-crtexewin.o): in function `main':
+C:/M/B/src/mingw-w64/mingw-w64-crt/crt/crtexewin.c:67:(.text.startup+0xc5): undefined reference to `WinMain'
+collect2.exe: error: ld returned 1 exit status
+
+MinGW에서 WinMain을 찾을 수 없음
+argz.c 파일에 main 함수가 정의되어 있는지 확인
+argz.c 수정
+//undefined reference to WinMain 20241031
+int main(int argc, char *argv[]) {
+    return 0;
+}
+
+컴파일
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# gcc -std=c11 -o argz.o lib/argz.c
+
+정적 라이브러리를 생성
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ar rcs libargz.a argz.o
+
+생성된 라이브러리 확인
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# ls -l libargz.a
+-rw-r--r-- 1 nayou nayou 131772 10월 31 11:36 libargz.a
+
+(빌드)
+{ autopoint --force; } 2>&1 | tee ./log/autopoint.log && 
+{ rm -rf autom4te.cache; } && 
+{ aclocal -I m4 -I gnulib-m4 -I /usr/share/aclocal; } 2>&1 | tee ./log/aclocal.log && 
+{ libtoolize --ltdl --copy --force --verbose --automake; } 2>&1 | tee ./log/libtoolize.log && 
+{ cp /usr/share/aclocal/ltdl.m4 ./m4/; } && 
+{ autoconf --verbose; } 2>&1 | tee ./log/autoconf.log && 
+{ autoheader; } 2>&1 | tee ./log/autoheader.log && 
+{ automake --add-missing --force-missing; } 2>&1 | tee ./log/automake.log && 
+{ sed -i 's/-V\| -qversion\| -version/ --version/g' configure; } &&
+{ ./configure CFLAGS="-std=c11" --verbose --host=x86_64-w64-mingw32 --build=x86_64-pc-linux-gnu; } 2>&1 | tee ./log/configure.log | grep -E "(no|not found|undefine|error|warning)"
+
+
+
+
+
 
 
 
