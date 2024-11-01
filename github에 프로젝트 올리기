@@ -153,11 +153,49 @@ $ ./myupload.sh
 
 끝.
 
+(오류)
+MINGW64 /c/gcc-build (main)
+$ git push -u origin master
+error: src refspec master does not match any
+error: failed to push some refs to 'https://github.com/nayoungkim0920/gcc-build.git'
 
+MINGW64 /c/gcc-build (main)
+$ git push origin master
+error: src refspec master does not match any
+error: failed to push some refs to 'https://github.com/nayoungkim0920/gcc-build.git'
 
+MINGW64 /c/gcc-build (main)
+$ git push origin master --force
+error: src refspec master does not match any
+error: failed to push some refs to 'https://github.com/nayoungkim0920/gcc-build.git'
 
+(수정)
+master 브랜치가 존재하지 않아서 발생하는 경우가 많음
+Git에서 초기화 후 커밋을 생성하지 않았거나, 브랜치 이름이 main으로 되어 있을 가능성이 큼
+2020년 이후로 GitHub는 기본 브랜치 이름을 master에서 main으로 변경함
 
+로컬 브랜치 이름 확인
+$ git branch
+* main
 
+*-u 옵션을 한 번 설정해 두면 매번 git push origin main과 같이 긴 명령어를 사용할 필요 없이 간단히 git push만 입력해도 됨
+또 git pull을 입력하면 origin/main 브랜치에서 자동으로 변경 사항을 가져오게 됨.
 
+MINGW64 /c/gcc-build (main)
+$ git push -u origin main
+Enumerating objects: 47, done.
+Counting objects: 100% (47/47), done.
+Delta compression using up to 16 threads
+Compressing objects: 100% (40/40), done.
+Writing objects: 100% (47/47), 405.95 KiB | 7.00 MiB/s, done.
+Total 47 (delta 7), reused 0 (delta 0), pack-reused 0 (from 0)
+remote: Resolving deltas: 100% (7/7), done.
+To https://github.com/nayoungkim0920/gcc-build.git
+ * [new branch]      main -> main
+branch 'main' set up to track 'origin/main'.
+
+만약 브랜치 이름을 master로 사용하고 싶다면, 로컬 브랜치 이름을 master로 변경한 후 원격에 푸시
+$ git branch -m main master
+$ git push -u origin master
 
 
