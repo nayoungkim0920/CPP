@@ -32578,6 +32578,8 @@ AC_CHECK_HEADERS([argz.h], [
 ])
 AC_SUBST([ARGZ_H], ["lib/argz.h"])
 AC_SUBST([LIBARGZ], [libargz.la])
+LIBS="$LIBS -liberty -ltextstyle"
+AC_SUBST([LIBS])
 AC_DEFINE([GL_GENERATE_ARGZ_H], [1], [Define if we want to generate argz.h])
 AC_CHECK_FUNCS([argz_add argz_append argz_count argz_create_sep argz_insert argz_next argz_stringify])
 m4_ifdef([gl_ARGZ], [gl_ARGZ])
@@ -32590,6 +32592,8 @@ lib_LTLIBRARIES = libtextstyle.la libltdlc.la # libargz.la 제거 중복선언
 noinst_LTLIBRARIES = libargz.la 
 libargz_la_SOURCES = lib/argz.c
 libltdlc_la_SOURCES = libltdl/lt__argz.c
+LIBS = -liberty -ltextstyle
+AM_LIBS = $(ITL_LIBS) $(NCURSES_LIBS) $(GLIB_LIBS) $(LIBS)  # LIBS 포함
 libtextstyle_la_SOURCES = \ #라이브러리에 포함될 소스 파일 목록을 나열
 	lib/color.c \
 	lib/gl_array_list.c \
@@ -32651,18 +32655,16 @@ EXTRA_DIST = \
 lib/Makefile.am
 ## begin gnulib module argz
 
-# Only generate argz.h if GL_GENERATE_ARGZ_H is defined
 if GL_GENERATE_ARGZ_H
-# Ensure argz.h is in BUILT_SOURCES for correct build order
-BUILT_SOURCES += argz.h
-
-argz.h: argz.in.h $(top_builddir)/config.status
-	$(gl_V_at)$(SED_HEADER_TO_AT_t) $(srcdir)/argz.in.h
-	$(AM_V_at)mv $@-t $@
+# GL_GENERATE_ARGZ_H가 참일 때 실행할 명령어 또는 변수 설정
+BUILT_SOURCES += lib/argz.h
+lib/argz.h: lib/argz.in.h $(top_builddir)/config.status
+    $(gl_V_at)$(SED_HEADER_TO_AT_t) $(srcdir)/lib/argz.in.h
+    $(AM_V_at)mv $@-t $@
 else
-# Ensure that we remove argz.h if we do not generate it
-argz.h: $(top_builddir)/config.status
-	rm -f $@
+# GL_GENERATE_ARGZ_H가 거짓일 때 실행할 명령어 또는 변수 설정
+lib/argz.h: $(top_builddir)/config.status
+    rm -f $@
 endif
 
 MOSTLYCLEANFILES += argz.h argz.h-t
@@ -32710,6 +32712,232 @@ configure:14962: checking for argz_count
 configure:14962: x86_64-w64-mingw32-gcc -o conftest.exe -std=c11  -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0 -L/mingw64/lib -L/usr/lib -L/mingw64/x86_64-w64-mingw32/lib -L/c/libidn2/gettext-0.22.5/libtextstyle/lib -Wl,-rpath,/mingw64/bin conftest.c  >&5
 C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccsMkYJU.o:conftest.c:(.text.startup+0xa): undefined reference to `argz_count'
 collect2.exe: error: ld returned 1 exit status
+
+(수정)
+nayou@kimnayooung MINGW64 /c/libidn2/gettext-0.22.5/libtextstyle
+# pacman -S mingw-w64-x86_64-gcc
+경고: mingw-w64-x86_64-gcc-14.2.0-1는 최신 버전입니다. -- 재설치
+의존성 해결 중...
+꾸러미 충돌을 찾는 중...
+
+꾸러미 (1) mingw-w64-x86_64-gcc-14.2.0-1
+
+총 설치 크기:          224.83 MiB
+알짜 업그레이드 크기:    0.00 MiB
+
+:: 설치를 진행하시겠습니까? [Y/n] y
+(1/1) 키링의 키를 검사 중                                [#############################] 100%
+(1/1) 꾸러미 무결성 검사 중                              [#############################] 100%
+(1/1) 꾸러미 파일 불러오는 중                            [#############################] 100%
+(1/1) 파일 충돌 검사 중                                  [#############################] 100%
+(1/1) 사용 가능한 디스크 공간 검사 중                    [#############################] 100%
+:: 꾸러미 변경사항을 처리 중...
+(1/1) 재설치 중 mingw-w64-x86_64-gcc                     [#############################] 100%
+
+=> pacman 명령을 통해 mingw-w64-x86_64-gcc 패키지를 설치하면, GCC 컴파일러와 관련된 바이너리 파일이 설치되며 소스 코드는 포함되지 않음
+libiberty를 비롯한 GCC 소스 디렉터리를 사용할 수 없음
+GCC 소스를 별도로 다운로드하여 압축을 풀어 사용해야 함
+https://ftp.gnu.org/gnu/gcc/gcc-14.2.0/
+[   ]	gcc-14.2.0.tar.gz	2024-08-01 04:57	153M
+
+압축풀기
+c:\gcc-14.2.0
+빌드디렉터리생성
+c:\gcc-build
+설치디렉터리지정
+/usr/local
+
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0
+# cd /c/gcc-build
+nayou@kimnayooung MINGW64 /c/gcc-build
+# ../gcc-14.2.0/configure --prefix=/usr/local
+nayou@kimnayooung MINGW64 /c/gcc-build
+# make
+nayou@kimnayooung MINGW64 /c/gcc-build
+# make install
+
+(오류)
+nayou@kimnayooung MINGW64 /c/gcc-build
+# ../gcc-14.2.0/configure --prefix=/usr/local --enable-threads=win32 2>&1 | grep -E 'error|undefined|warning'  
+nayou@kimnayooung MINGW64 /c/gcc-build
+# make CXXFLAGS="-Wno-include-next" 2>&1 | grep -E 'error|undefined|warning'
+checking for library containing strerror... (cached) none required
+checking for strerror... (cached) yes
+echo ./regex.o ./cplus-dem.o ./cp-demangle.o ./md5.o ./sha1.o ./alloca.o ./argv.o ./bsearch_r.o ./choose-temp.o ./concat.o ./cp-demint.o ./crc32.o ./d-demangle.o ./dwarfnames.o ./dyn-string.o ./fdmatch.o ./fibheap.o ./filedescriptor.o ./filename_cmp.o ./floatformat.o ./fnmatch.o ./fopen_unlocked.o ./getopt.o ./getopt1.o ./getpwd.o ./getruntime.o ./hashtab.o ./hex.o ./lbasename.o ./lrealpath.o ./make-relative-prefix.o ./make-temp-file.o ./objalloc.o ./obstack.o ./partition.o ./pexecute.o ./physmem.o ./pex-common.o ./pex-one.o ./pex-win32.o ./vprintf-support.o ./rust-demangle.o ./safe-ctype.o ./simple-object.o ./simple-object-coff.o ./simple-object-elf.o ./simple-object-mach-o.o ./simple-object-xcoff.o ./sort.o ./spaces.o ./splay-tree.o ./stack-limit.o ./strerror.o ./strsignal.o ./timeval-utils.o ./unlink-if-ordinary.o ./xasprintf.o ./xatexit.o ./xexit.o ./xmalloc.o ./xmemdup.o ./xstrdup.o ./xstrerror.o ./xstrndup.o ./xvasprintf.o > required-list
+checking for ferror_unlocked... (cached) no
+checking whether ferror_unlocked is declared... (cached) no
+checking for library containing strerror... (cached) none required
+checking for strerror... (cached) yes
+echo ./regex.o ./cplus-dem.o ./cp-demangle.o ./md5.o ./sha1.o ./alloca.o ./argv.o ./bsearch_r.o ./choose-temp.o ./concat.o ./cp-demint.o ./crc32.o ./d-demangle.o ./dwarfnames.o ./dyn-string.o ./fdmatch.o ./fibheap.o ./filedescriptor.o ./filename_cmp.o ./floatformat.o ./fnmatch.o ./fopen_unlocked.o ./getopt.o ./getopt1.o ./getpwd.o ./getruntime.o ./hashtab.o ./hex.o ./lbasename.o ./lrealpath.o ./make-relative-prefix.o ./make-temp-file.o ./objalloc.o ./obstack.o ./partition.o ./pexecute.o ./physmem.o ./pex-common.o ./pex-one.o ./pex-win32.o ./vprintf-support.o ./rust-demangle.o ./safe-ctype.o ./simple-object.o ./simple-object-coff.o ./simple-object-elf.o ./simple-object-mach-o.o ./simple-object-xcoff.o ./sort.o ./spaces.o ./splay-tree.o ./stack-limit.o ./strerror.o ./strsignal.o ./timeval-utils.o ./unlink-if-ordinary.o ./xasprintf.o ./xatexit.o ./xexit.o ./xmalloc.o ./xmemdup.o ./xstrdup.o ./xstrerror.o ./xstrndup.o ./xvasprintf.o > required-list
+checking for ferror_unlocked... (cached) no
+checking whether ferror_unlocked is declared... (cached) no
+checking for ferror_unlocked... (cached) no
+checking whether ferror_unlocked is declared... (cached) no
+checking for strerror... (cached) yes
+checking for ferror_unlocked... (cached) no
+checking whether ferror_unlocked is declared... (cached) no
+checking adding -Wl,--no-undefined to linker... ok
+x86_64-w64-mingw32-g++ -std=c++11   -g -D__USE_MINGW_ACCESS -DIN_GCC    -fno-exceptions -fno-rtti -fasynchronous-unwind-tables -W -Wall -Wno-narrowing -Wwrite-strings -Wcast-qual -Wno-format -Wmissing-format-attribute -Wconditionally-supported -Woverloaded-virtual -pedantic -Wno-long-long -Wno-variadic-macros -Wno-overlength-strings -fno-common  -DHAVE_CONFIG_H  -DGENERATOR_FILE -static-libstdc++ -static-libgcc -L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0 -L/mingw64/lib -L/usr/lib -L/mingw64/x86_64-w64-mingw32/lib -L/c/libidn2/gettext-0.22.5/libtextstyle/lib -Wl,-rpath,/mingw64/bin -Wl,--stack,12582912 -Wl,--undefined=HOST_EXTRA_OBJS_SYMBOL -o build/genpreds.exe \
+    build/genpreds.o build/rtl.o build/read-rtl.o build/ggc-none.o build/vec.o build/min-insn-modes.o build/gensupport.o build/print-rtl.o build/hash-table.o build/sort.o build/read-md.o build/errors.o ../build-x86_64-w64-mingw32/libiberty/libiberty.a
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0\libstdc++.a(guard.o):(.text$_ZN12_GLOBAL__N_1L16init_static_condEv+0x30): undefined reference to __gthr_win32_cond_init_function'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0\libstdc++.a(guard.o):(.text$_ZN12_GLOBAL__N_1L4initEv+0x30): undefined reference to __gthr_win32_mutex_init_function'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0\libstdc++.a(guard.o):(.text$__cxa_guard_acquire+0x42): undefined reference to __gthr_win32_once'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0\libstdc++.a(guard.o):(.text$__cxa_guard_acquire+0x83): undefined reference to __gthr_win32_once'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0\libstdc++.a(guard.o):(.text$__cxa_guard_acquire+0x9b): undefined reference to __gthr_win32_once'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0\libstdc++.a(guard.o):(.text$__cxa_guard_acquire+0xaa): undefined reference to __gthr_win32_cond_wait'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0\libstdc++.a(guard.o):(.text$__cxa_guard_acquire+0xcb): undefined reference to __gthr_win32_mutex_unlock'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0\libstdc++.a(guard.o):(.text$__cxa_guard_acquire+0x158): undefined reference to __gthr_win32_mutex_lock'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0\libstdc++.a(guard.o):(.text$__cxa_guard_acquire+0x1be): undefined reference to __gthr_win32_mutex_unlock'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0\libstdc++.a(guard.o):(.text$__cxa_guard_abort+0x37): undefined reference to __gthr_win32_once'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0\libstdc++.a(guard.o):(.text$__cxa_guard_abort+0x5c): undefined reference to __gthr_win32_once'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0\libstdc++.a(guard.o):(.text$__cxa_guard_abort+0x6e): undefined reference to __gthr_win32_cond_broadcast'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0\libstdc++.a(guard.o):(.text$__cxa_guard_abort+0x84): undefined reference to __gthr_win32_mutex_unlock'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0\libstdc++.a(guard.o):(.text$__cxa_guard_abort+0xc8): undefined reference to __gthr_win32_mutex_lock'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0\libstdc++.a(guard.o):(.text$__cxa_guard_release+0x3f): undefined reference to __gthr_win32_once'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0\libstdc++.a(guard.o):(.text$__cxa_guard_release+0x67): undefined reference to __gthr_win32_once'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0\libstdc++.a(guard.o):(.text$__cxa_guard_release+0x79): undefined reference to __gthr_win32_cond_broadcast'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0\libstdc++.a(guard.o):(.text$__cxa_guard_release+0x8f): undefined reference to __gthr_win32_mutex_unlock'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0\libstdc++.a(guard.o):(.text$__cxa_guard_release+0xd0): undefined reference to __gthr_win32_mutex_lock'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0\libstdc++.a(eh_alloc.o):(.text$__tcf_0+0x28): undefined reference to __gthr_win32_mutex_destroy'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0\libstdc++.a(eh_alloc.o):(.text$_ZN12_GLOBAL__N_14pool8allocateEy.constprop.0+0xa5): undefined reference to __gthr_win32_mutex_unlock'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0\libstdc++.a(eh_alloc.o):(.text$_ZN12_GLOBAL__N_14pool8allocateEy.constprop.0+0xe0): undefined reference to __gthr_win32_mutex_lock'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0\libstdc++.a(eh_alloc.o):(.text$_ZN12_GLOBAL__N_14pool4freeEPv.constprop.0+0x78): undefined reference to __gthr_win32_mutex_lock'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0\libstdc++.a(eh_alloc.o):(.text$_ZN12_GLOBAL__N_14pool4freeEPv.constprop.0+0x14c): undefined reference to __gthr_win32_mutex_unlock'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0\libstdc++.a(eh_alloc.o):(.text.startup._GLOBAL__sub_I__ZN9__gnu_cxx9__freeresEv+0x1a0): undefined reference to __gthr_win32_mutex_init_function'
+collect2.exe: error: ld returned 1 exit status
+(수정)
+Win32 스레드 관련 함수들이 undefined reference 오류로 인해 링크되지 않고 있음
+GCC가 Windows 환경에서 다중 스레드를 지원하기 위해 Win32 스레드 라이브러리 함수에 의존하지만, 현재 설치된 라이브러리나 헤더 파일이 제대로 링크되지 않은 것으로 보임
+mingw-w64 업데이트
+nayou@kimnayooung MINGW64 /c/gcc-build
+# pacman -Syu
+gthr-win32 라이브러리 직접 링크(gthr-win32를 수동으로 지정하여 빌드, -lgthr-win32 옵션을 추가하여 라이브러리를 명시적으로 링크)
+nayou@kimnayooung MINGW64 /c/gcc-build
+# ../gcc-14.2.0/configure --prefix=/usr/local --enable-threads=win32 2>&1 | grep -E 'error|undefined|warning'  
+nayou@kimnayooung MINGW64 /c/gcc-build
+# make CXXFLAGS="-Wno-include-next -lgthr-win32" 2>&1 | grep -E 'error|undefined|warning'
+MSYS2의 기본 POSIX 스레드 설정 사용
+nayou@kimnayooung MINGW64 /c/gcc-build
+# ../gcc-14.2.0/configure --prefix=/usr/local --enable-threads=posix 2>&1 | grep -E 'error|undefined|warning' 
+nayou@kimnayooung MINGW64 /c/gcc-build
+# make CXXFLAGS="-Wno-include-next" 2>&1 | grep -E 'error|undefined|warning'
+
+환경변수설정
+nayou@kimnayooung MINGW64 ~
+# find / -name "libgcc.a" -o -name "libgcc_s.a" -o -name "libstdc++.a" -o -name "libstdc++_s.a" -o -name "libwinpthread.a" -o -name "libm.a" -o -name "libgthr-win32.a" -o -name "crtbegin.o" -o -name "crtend.o"
+export LIBRARY_PATH="/mingw64/lib" # libstdc++.a, libwinpthread.a, libm.a, crtbegin.o, crtend.o
+export LIBRARY_PATH="$LIBRARY_PATH:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0" # libstdc++.a, crtbegin.o, crtend.o
+export LIBRARY_PATH="$LIBRARY_PATH:/mingw64/lib/gcc/x86_64-w64-mingw32/lib" # crtbegin.o, crtend.o
+export LIBRARY_PATH="$LIBRARY_PATH:/mingw64/x86_64-w64-mingw32/lib" # libgcc_s.a, libm.a
+export LIBRARY_PATH="$LIBRARY_PATH:/c/gstreamer/1.0/msvc_x86_64/lib" # libstdc++.a
+export LIBRARY_PATH="$LIBRARY_PATH:/usr/lib"
+export LIBRARY_PATH="$LIBRARY_PATH:/mingw64/bin"
+export LIBRARY_PATH="$LIBRARY_PATH:/mingw64/x86_64-w64-mingw32/lib"
+export LIBRARY_PATH="$LIBRARY_PATH:/mingw64-backup-11.2.0/lib" # libltdl.a, libltdl.dll.a, libltdl.la
+
+nayou@kimnayooung MINGW64 ~
+# find / -name "stdio.h" -o -name "stdlib.h" -o -name "math.h" -o -name "string.h" -o -name "iostream" -o -name "vector" -o -name "string" -o -name "windows.h" -o -name "pthread.h" -o -name "inttypes.h" -o -name "stdint.h" -o -name "c++/version" -o -name "bits"
+/mingw64/include/c++/14.2.0/bits
+/mingw64/include/c++/14.2.0/debug/string
+/mingw64/include/c++/14.2.0/debug/vector
+/mingw64/include/c++/14.2.0/experimental/bits
+/mingw64/include/c++/14.2.0/experimental/string
+/mingw64/include/c++/14.2.0/experimental/vector
+/mingw64/include/c++/14.2.0/iostream
+/mingw64/include/c++/14.2.0/math.h
+/mingw64/include/c++/14.2.0/stdlib.h
+/mingw64/include/c++/14.2.0/string
+/mingw64/include/c++/14.2.0/tr1/inttypes.h
+/mingw64/include/c++/14.2.0/tr1/math.h
+/mingw64/include/c++/14.2.0/tr1/stdint.h
+/mingw64/include/c++/14.2.0/tr1/stdio.h
+/mingw64/include/c++/14.2.0/tr1/stdlib.h
+/mingw64/include/c++/14.2.0/vector
+/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits
+/mingw64/include/inttypes.h
+/mingw64/include/isl/stdint.h
+/mingw64/include/math.h
+/mingw64/include/pthread.h
+/mingw64/include/stdint.h
+/mingw64/include/stdio.h
+/mingw64/include/stdlib.h
+/mingw64/include/string.h
+/mingw64/include/windows.h
+/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++/bits
+/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++/debug/string
+/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++/debug/vector
+/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++/experimental/bits
+/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++/experimental/string
+/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++/experimental/vector
+/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++/iostream
+/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++/math.h
+/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++/stdlib.h
+/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++/string
+/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++/tr1/inttypes.h
+/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++/tr1/math.h
+/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++/tr1/stdint.h
+/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++/tr1/stdio.h
+/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++/tr1/stdlib.h
+/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++/vector
+/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++/x86_64-w64-mingw32/bits
+/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/stdint.h
+/mingw64/x86_64-w64-mingw32/include/inttypes.h
+/mingw64/x86_64-w64-mingw32/include/math.h
+/mingw64/x86_64-w64-mingw32/include/pthread.h
+/mingw64/x86_64-w64-mingw32/include/stdint.h
+/mingw64/x86_64-w64-mingw32/include/stdio.h
+/mingw64/x86_64-w64-mingw32/include/stdlib.h
+/mingw64/x86_64-w64-mingw32/include/string.h
+/mingw64/x86_64-w64-mingw32/include/windows.h
+/c/bazel/third_party/zlib/contrib/iostream
+/c/darknet/3rdparty/pthreads/include/pthread.h
+/c/Dart/runtime/bin/stdio.h
+/c/Dart/tests/language/string
+/c/flatbuffers/include/flatbuffers/string.h
+
+# C++ 인클루드 경로 설정
+export CXX_INCLUDE_PATH="/c/msys64/mingw64/x86_64-w64-mingw32/include" # string.h, stdlib.h, error.h
+export CXX_INCLUDE_PATH="$CXX_INCLUDE_PATH:/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++"  # C++ 인클루드 경로
+export CXX_INCLUDE_PATH="$CXX_INCLUDE_PATH:/c/libidn2/gettext-0.22.5/libtextstyle/lib" # woe32dll.h
+export CXX_INCLUDE_PATH="$CXX_INCLUDE_PATH:/c/gnulib/lib"  # xalloc.h
+export CXX_INCLUDE_PATH="$CXX_INCLUDE_PATH:/c/gnulib" # xgethostname.h
+export CXX_INCLUDE_PATH="$CXX_INCLUDE_PATH:/c/libidn2/gettext-0.22.5/libtextstyle" # config.h
+export CXX_INCLUDE_PATH="$CXX_INCLUDE_PATH:/mingw64/include/c++/14.2.0"
+export CXX_INCLUDE_PATH="$CXX_INCLUDE_PATH:/mingw64/include/c++/14.2.0/bits"
+export CXX_INCLUDE_PATH="$CXX_INCLUDE_PATH:/mingw64/include/c++/14.2.0/debug"
+export CXX_INCLUDE_PATH="$CXX_INCLUDE_PATH:/mingw64/include/c++/14.2.0/experimental"
+export CXX_INCLUDE_PATH="$CXX_INCLUDE_PATH:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32"
+export CXX_INCLUDE_PATH="$CXX_INCLUDE_PATH:/mingw64/include"
+export CXX_INCLUDE_PATH="$CXX_INCLUDE_PATH:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++"
+export CXX_INCLUDE_PATH="$CXX_INCLUDE_PATH:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include"
+export CXX_INCLUDE_PATH="$CXX_INCLUDE_PATH:/mingw64/x86_64-w64-mingw32/include"
+
+# C++ 전처리기 설정
+export CPLUS_INCLUDE_PATH="/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++"  # C++ 인클루드 경로
+export CPLUS_INCLUDE_PATH="$CPLUS_INCLUDE_PATH:/mingw64/include/c++/14.2.0"
+export CPLUS_INCLUDE_PATH="$CPLUS_INCLUDE_PATH:/mingw64/include/c++/14.2.0/bits"
+export CPLUS_INCLUDE_PATH="$CPLUS_INCLUDE_PATH:/mingw64/include/c++/14.2.0/debug"
+export CPLUS_INCLUDE_PATH="$CPLUS_INCLUDE_PATH:/mingw64/include/c++/14.2.0/experimental"
+export CPLUS_INCLUDE_PATH="$CPLUS_INCLUDE_PATH:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32"
+export CPLUS_INCLUDE_PATH="$CPLUS_INCLUDE_PATH:/mingw64/include"
+export CPLUS_INCLUDE_PATH="$CPLUS_INCLUDE_PATH:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++"
+export CPLUS_INCLUDE_PATH="$CPLUS_INCLUDE_PATH:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include"
+export CPLUS_INCLUDE_PATH="$CPLUS_INCLUDE_PATH:/mingw64/x86_64-w64-mingw32/include"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
