@@ -33264,14 +33264,42 @@ mingw32-make[1]: *** [Makefile:23649: stage2-bubble] Error 2
 mingw32-make[1]: Leaving directory 'C:/gcc-build'
 mingw32-make: *** [Makefile:1113: all] Error 2
 (수정)
+nayou@kimnayooung MINGW64 /c/gcc-build
+# dos2unix ../gcc-14.2.0/configure
+dos2unix: 이진 심볼 0x07을(를) 19878번째 행에서 찾았습니다
+dos2unix: ../gcc-14.2.0/configure 이진 파일 건너뜀
+"이진 파일 건너뜀"이라는 메시지가 나타난 것은 configure 파일이 이진 파일로 인식되었기 때문
+일반적으로 파일이 잘못된 형식이나 인코딩으로 되어 있음을 나타냄
+파일 유형 확인
+nayou@kimnayooung MINGW64 /c/gcc-build
+# file ../gcc-14.2.0/configure
+../gcc-14.2.0/configure: POSIX shell script, ASCII text executable
+줄 끝 형식 확인 : configure 파일의 줄 끝 형식이 LF로 설정되어 있는지 확인
+LF는 줄 끝에서 $ 기호로 표시됨
 
+nayou@kimnayooung MINGW64 /c/gcc-build
+# cat -A ../gcc-14.2.0/configure
+...
+$
+nayou@kimnayooung MINGW64 /c/gcc-build
+=>configure 파일의 줄 끝이 LF로 되어 있다는 것 확인
 
+nayou@kimnayooung MINGW64 /c/gcc-build
+# make clean
+make[1]: 디렉터리 '/c/gcc-build' 들어감
+make[1]: 디렉터리 '/c/gcc-build' 나감
+rm -f *.a TEMP errs core *.o *~ \#* TAGS *.E *.log
 
-
-
-
-
-
+/c/gcc-build/Makefile 수정
+configure-stage2-lto-plugin:
+...
+unset CFLAGS
+unset CXXFLAGS
+unset STAGE2_CFLAGS
+export CFLAGS="-g"
+export CXXFLAGS="-g"
+export STAGE2_CFLAGS="-g"
+...
 
 
 
