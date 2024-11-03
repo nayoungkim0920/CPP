@@ -33301,22 +33301,24 @@ export CXXFLAGS="-g"
 export STAGE2_CFLAGS="-g"
 ...
 
+nayou@kimnayooung MINGW64 /c/gcc-build
+# mingw32-make
+(오류)
+mingw32-make[2]: *** [Makefile:116652: all-stage1-lto-plugin] Error 2
+mingw32-make[2]: *** [Makefile:15546: all-stage1-lto-plugin] Error 2
+mingw32-make[4]: *** [Makefile:488: lto-plugin.lo] Error 1
+mingw32-make: *** [Makefile:1110: all] Error 2
+(수정)
+/c/gcc-build/Makefile
+11652 : @r=`${PWD_COMMAND}`; export r; \
+24581 : @r=`${PWD_COMMAND}`; export r; \
+1110 : @r=`${PWD_COMMAND}`; export r; \
+환경설정
+export MSYS2_PATH_TYPE=inherit
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/c/gcc-14.2.0/Makefile.in 수정
+@r=`${PWD_COMMAND}`; export r; \
+=>@r=`${pwd}`; export r; \
 
 
 
