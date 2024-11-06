@@ -33290,37 +33290,42 @@ make[1]: 디렉터리 '/c/gcc-build' 들어감
 make[1]: 디렉터리 '/c/gcc-build' 나감
 rm -f *.a TEMP errs core *.o *~ \#* TAGS *.E *.log
 
-/c/gcc-build/Makefile 수정
-configure-stage2-lto-plugin:
-...
-unset CFLAGS
-unset CXXFLAGS
-unset STAGE2_CFLAGS
-export CFLAGS="-g"
-export CXXFLAGS="-g"
-export STAGE2_CFLAGS="-g"
-...
-
 nayou@kimnayooung MINGW64 /c/gcc-build
-# mingw32-make
-(오류)
-mingw32-make[2]: *** [Makefile:116652: all-stage1-lto-plugin] Error 2
-mingw32-make[2]: *** [Makefile:15546: all-stage1-lto-plugin] Error 2
-mingw32-make[4]: *** [Makefile:488: lto-plugin.lo] Error 1
-mingw32-make: *** [Makefile:1110: all] Error 2
-(수정)
-/c/gcc-build/Makefile
-11652 : @r=`${PWD_COMMAND}`; export r; \
-24581 : @r=`${PWD_COMMAND}`; export r; \
-1110 : @r=`${PWD_COMMAND}`; export r; \
-환경설정
-export MSYS2_PATH_TYPE=inherit
+# ../gcc-14.2.0/configure --prefix=/mingw64 && mingw32-make
 
 /c/gcc-14.2.0/Makefile.in 수정
-@r=`${PWD_COMMAND}`; export r; \
-=>@r=`${pwd}`; export r; \
+all-stage1-libiberty: configure-stage1-libiberty
+	@[ $(current_stage) = stage1 ] || $(MAKE) stage1-start
+	@r=`${PWD_COMMAND}`; export r; 
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; 
+	TFLAGS="$(STAGE1_TFLAGS)"; 
+	$(HOST_EXPORTS)  
+	cd $(HOST_SUBDIR)/libiberty  
+	 
+	$(MAKE) $(BASE_FLAGS_TO_PASS) 
+		CFLAGS="$(STAGE1_CFLAGS)" \
+		GENERATOR_CFLAGS="$(STAGE1_GENERATOR_CFLAGS)" 
+		CXXFLAGS="$(STAGE1_CXXFLAGS)" 
+		LIBCFLAGS="$(LIBCFLAGS)" 
+		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" 
+		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" 
+		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" 
+		$(EXTRA_HOST_FLAGS) 
+		$(STAGE1_FLAGS_TO_PASS) 
+		TFLAGS="$(STAGE1_TFLAGS)" 
+		$(TARGET-stage1-libiberty)
 
-
+.PHONY: stage1-bubble
+stage1-bubble:: 
+	@r=`${PWD_COMMAND}`; export r;
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s;
+	if test -f stage1-lean;	then \
+		echo Skipping rebuild of stage1; \
+	else \
+		$(MAKE) stage1-start; $(MAKE) $(RECURSE_FLAGS_TO_PASS) all-stage1; \
+	fi
+.PHONY: all-stage1 clean-stage1
+do-clean: clean-stage1
 
 
 
