@@ -33319,5 +33319,58 @@ awk '{
 CFLAGS_FOR_BUILD="-I/c/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -O2" # "빠짐수정 20241107
 CXXFLAGS_FOR_BUILD="-I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -O2 -DDEBUG -DVERSION=1.0.0" # "빠짐수정 20241107
 
+(오류)
+[ -f stage_final ] || echo stage3 > stage_final
+mingw32-make: *** unknown output-sync type '2'.  Stop.
+mingw32-make: *** [Makefile:1115: all] Error 2
+(수정)
+mingw32-make에서 output-sync 설정을 지원하지 않아서 발생하는 문제
+make 명령어가 병렬 실행 중 출력 동기화를 제어하는 옵션을 인식하지 못하는 경우에 발생
+
+MSYS2 패키지 데이터베이스 업데이트
+nayou@kimnayooung MINGW64 /c/gcc-build
+# pacman -Syu
+
+mingw32-make를 최신 버전으로 설치하거나 업그레이드
+nayou@kimnayooung MINGW64 /c/gcc-build
+# pacman -S mingw-w64-x86_64-make
+경고: mingw-w64-x86_64-make-4.4.1-3는 최신 버전입니다. -- 재설치
+
+-32비트
+nayou@kimnayooung MINGW64 /c/gcc-build
+# pacman -S mingw-w64-i686-make
+
+업그레이드 확인
+nayou@kimnayooung MINGW64 /c/gcc-build
+# mingw32-make --version
+GNU Make 4.4.1
+Built for Windows32
+Copyright (C) 1988-2023 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+nayou@kimnayooung MINGW64 /c/gcc-build
+# pacman -S make
+경고: make-4.4.1-2는 최신 버전입니다. -- 재설치
+의존성 해결 중...
+꾸러미 충돌을 찾는 중...
+
+꾸러미 (1) make-4.4.1-2
+
+nayou@kimnayooung MINGW64 /c/msys64/home/nayou/Python-3.13.0 (=/home/nayou/Python-3.13.0)
+# ls -l config*
+-rwxr-xr-x 1 nayou nayou   49348 10월  7 14:02 config.guess
+-rw-r--r-- 1 nayou nayou 1941693 10월 30 11:44 config.log
+-rwxr-xr-x 1 nayou nayou   53290 10월 30 11:44 config.status
+-rwxr-xr-x 1 nayou nayou   37009 10월  7 14:02 config.sub
+-rwxr-xr-x 1 nayou nayou  886347 10월  7 14:02 configure
+-rw-r--r-- 1 nayou nayou  250537 10월  7 14:02 configure.ac
+
+
+
+
+
+
 
 
