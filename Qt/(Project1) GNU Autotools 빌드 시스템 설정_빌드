@@ -33291,41 +33291,33 @@ make[1]: 디렉터리 '/c/gcc-build' 나감
 rm -f *.a TEMP errs core *.o *~ \#* TAGS *.E *.log
 
 nayou@kimnayooung MINGW64 /c/gcc-build
-# ../gcc-14.2.0/configure --prefix=/mingw64 && mingw32-make
-
-/c/gcc-14.2.0/Makefile.in 수정
-all-stage1-libiberty: configure-stage1-libiberty
-	@[ $(current_stage) = stage1 ] || $(MAKE) stage1-start
-	@r=`${PWD_COMMAND}`; export r; 
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; 
-	TFLAGS="$(STAGE1_TFLAGS)"; 
-	$(HOST_EXPORTS)  
-	cd $(HOST_SUBDIR)/libiberty  
-	 
-	$(MAKE) $(BASE_FLAGS_TO_PASS) 
-		CFLAGS="$(STAGE1_CFLAGS)" \
-		GENERATOR_CFLAGS="$(STAGE1_GENERATOR_CFLAGS)" 
-		CXXFLAGS="$(STAGE1_CXXFLAGS)" 
-		LIBCFLAGS="$(LIBCFLAGS)" 
-		CFLAGS_FOR_TARGET="$(CFLAGS_FOR_TARGET)" 
-		CXXFLAGS_FOR_TARGET="$(CXXFLAGS_FOR_TARGET)" 
-		LIBCFLAGS_FOR_TARGET="$(LIBCFLAGS_FOR_TARGET)" 
-		$(EXTRA_HOST_FLAGS) 
-		$(STAGE1_FLAGS_TO_PASS) 
-		TFLAGS="$(STAGE1_TFLAGS)" 
-		$(TARGET-stage1-libiberty)
-
-.PHONY: stage1-bubble
-stage1-bubble:: 
-	@r=`${PWD_COMMAND}`; export r;
-	s=`cd $(srcdir); ${PWD_COMMAND}`; export s;
-	if test -f stage1-lean;	then \
-		echo Skipping rebuild of stage1; \
-	else \
-		$(MAKE) stage1-start; $(MAKE) $(RECURSE_FLAGS_TO_PASS) all-stage1; \
-	fi
-.PHONY: all-stage1 clean-stage1
-do-clean: clean-stage1
+# ../gcc-14.2.0/configure --prefix=/mingw64 && mingw32-make 2>&1 | tee build.log
+# 연달아나오는 출력을 한줄씩으로 만들기
+awk '{
+    count += gsub(/"/, "\"");
+    if (count % 2 != 0) 
+        print NR ": " $0;
+}' build_modified.log
+# 닫힘이없는 메시지만 고르기
+awk '{
+    count += gsub(/"/, "\"");
+    if (count % 2 != 0) 
+        print NR ": " $0;
+}' build_modified.log > build_modified_result.log
+(오류)
+1200: "CFLAGS=-IC:/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -O2
+1337: "CFLAGS=-IC:/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -O2
+1482: "CFLAGS=-IC:/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -O2
+1619: "CFLAGS=-IC:/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -O2
+1764: "CFLAGS=-IC:/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -O2
+1766: "CXXFLAGS=-IC:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -O2 -DDEBUG -DVERSION=1.0.0
+1902: "CFLAGS=-IC:/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -O2
+1904: "CXXFLAGS=-IC:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -O2 -DDEBUG -DVERSION=1.0.0
+/c/msys64/usr/bin/sh: -c: 줄 2: 문법 오류: 예기치 않은 파일의 끝
+(수정)
+/c/gcc-14.2.0/Makefile.in 추가
+CFLAGS_FOR_BUILD="-I/c/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -O2" # "빠짐수정 20241107
+CXXFLAGS_FOR_BUILD="-I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -O2 -DDEBUG -DVERSION=1.0.0" # "빠짐수정 20241107
 
 
 
