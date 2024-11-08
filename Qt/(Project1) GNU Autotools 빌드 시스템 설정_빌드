@@ -33367,10 +33367,169 @@ nayou@kimnayooung MINGW64 /c/msys64/home/nayou/Python-3.13.0 (=/home/nayou/Pytho
 -rwxr-xr-x 1 nayou nayou  886347 10월  7 14:02 configure
 -rw-r--r-- 1 nayou nayou  250537 10월  7 14:02 configure.ac
 
+(오류)
+/c/msys64/usr/bin/sh: -c: 줄 6: 문법 오류: 예기치 않은 파일의 끝
+(수정)
+오류가나는 구간에 환경변수 출력 디버깅
+.PHONY: install-fixincludes maybe-install-fixincludes
+maybe-install-fixincludes:
+@if fixincludes
+maybe-install-fixincludes: install-fixincludes
 
+(오류)
+install-fixincludes: installdirs
+	CFLAGS_FOR_BUILD="-I/c/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib"
+	CXXFLAGS_FOR_BUILD="-I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -DDEBUG -DVERSION=1.0.0"
+	CFLAGS="-I/c/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib"
+	CXXFLAGS="-I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -DDEBUG -DVERSION=1.0.0"
+	@echo "install-fixincludes: installdirs=========================================="
+	@echo "CFLAGS:$(CFLAGS)"
+	@echo "CXXFLAGS:$(CXXFLAGS)"
+	@echo "CFLAGS_FOR_BUILD:$(CFLAGS_FOR_BUILD)"
+	@echo "CXXFLAGS_FOR_BUILD:$(CXXFLAGS_FOR_BUILD)"
+	@echo "=========================================================================="
+	@: $(MAKE); $(unstage)
+	@r=`${PWD_COMMAND}`; export r; \  (에러가나는 구간)\
+(출력)
+install-fixincludes: installdirs==========================================
+CFLAGS:-IC:/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -O2
+CXXFLAGS:-IC:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -O2 -DDEBUG -DVERSION=1.0.0
+CFLAGS_FOR_BUILD:-IC:/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -O2
+CXXFLAGS_FOR_BUILD:-I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -O2 -DDEBUG -DVERSION=1.0.0
+==========================================================================
+(수정)
+설정한대로 환경변수가 출력되지않음
+/c/gcc-14.2.0/Makefile.in 수정
+.PHONY: install-fixincludes maybe-install-fixincludes
 
+# 전역 변수로 설정하고 override로 강제 할당
+override CFLAGS_FOR_BUILD := "-I/c/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib"
+override CXXFLAGS_FOR_BUILD := "-I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -DDEBUG -DVERSION=1.0.0"
+override CFLAGS := "-I/c/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib"
+override CXXFLAGS := "-I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -DDEBUG -DVERSION=1.0.0"
 
+maybe-install-fixincludes:
+@if fixincludes
+maybe-install-fixincludes: install-fixincludes
 
+install-fixincludes: installdirs
+	@echo "install-fixincludes: installdirs=========================================="
+	@echo "CFLAGS: $(CFLAGS)"
+	@echo "CXXFLAGS: $(CXXFLAGS)"
+	@echo "CFLAGS_FOR_BUILD: $(CFLAGS_FOR_BUILD)"
+	@echo "CXXFLAGS_FOR_BUILD: $(CXXFLAGS_FOR_BUILD)"
+	@echo "=========================================================================="
+	@: $(MAKE); $(unstage)
+	@r=`${PWD_COMMAND}`; export r; \
+	s=`cd $(srcdir); ${PWD_COMMAND}`; export s; \
+	$(HOST_EXPORTS) \
+	(cd $(HOST_SUBDIR)/fixincludes && \
+	  $(MAKE) $(FLAGS_TO_PASS) install)
 
+@endif fixincludes
+(출력)
+install-fixincludes: installdirs==========================================
+CFLAGS: -I/c/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib
+CXXFLAGS: -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -DDEBUG -DVERSION=1.0.0
+CFLAGS_FOR_BUILD: -I/c/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib
+CXXFLAGS_FOR_BUILD: -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -DDEBUG -DVERSION=1.0.0
+==========================================================================
 
+(오류)
+nayou@kimnayooung MINGW64 /c/gcc-build
+# ../gcc-14.2.0/configure --prefix=/mingw64 && mingw32-make && mingw32-make install
+Checking Environment Variables
+CFLAGS: -I/c/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib
+LDFLAGS: -L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0 -L/mingw64/lib -L/usr/lib -L/mingw64/x86_64-w64-mingw32/lib -L/c/libidn2/gettext-0.22.5/libtextstyle/lib -Wl,-rpath,/mingw64/bin -Wl,--stack,12582912
+PATH: C:\Users\nayou\AppData\Local\Programs\Python\Python313;C:\Users\nayou\AppData\Local\Programs\Python\Python313\Scripts;C:\msys64\mingw64\bin;C:\libidn2\gettext-0.22.5\gettext-runtime\src;C:\msys64\mingw64\x86_64-w64-mingw32\bin;C:\msys64\mingw64\lib\gcc\x86_64-w64-mingw32\14.2.0\include\c++;C:\msys64\mingw64\include;C:\msys64\mingw64\include;C:\libidn2\gettext-0.22.5\libtextstyle\lib;C:\msys64\mingw64\bin;C:\gnulib;C:\msys64\usr\bin;C:\msys64\usr\bin;C:\msys64\usr\share\aclocal;C:\msys64\mingw64\share\aclocal;C:\libidn2\autoconf-2.72\bin;C:\libidn2\libtool-2.4.6;C:\Program Files\Java\jdk-21\bin;C:\Windows\System32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0;C:\msys64\usr\bin\vendor_perl;C:\msys64\usr\bin\core_perl;C:\Program Files\Java\jdk-21\bin;C:\apache-ant-1.10.15\bin;C:\Users\nayou\vcpkg\downloads\tools\perl\5.38.0.1\c\libexec\gcc\x86_64-w64-mingw32\13.1.0;C:\Users\nayou\vcpkg\downloads\tools\perl\5.38.0.1\c\bin;C:\msys64\mingw64\lib\gcc\x86_64-w64-mingw32\14.2.0;C:\msys64\mingw64\lib;C:\msys64\mingw64\x86_64-w64-mingw32\lib;C:\curl\lib;C:\gnulib\lib;C:\libidn2\gettext-0.22.5\gettext\gettext-runtime;C:\libidn2\gettext-0.22.5\gettext;C:\libidn2\gettext-0.22.5\gettext\gettext-runtime\gnulib-lib;C:\libidn2\gettext-0.22.5\gettext\gettext-runtime\intl\gnulib-lib;C:\libidn2\gettext-0.22.5\gettext\gettext-runtime\libasprintf\gnulib-lib;C:\libidn2\gettext-0.22.5\gettext\libtextstyle\lib;C:\libidn2\gettext-0.22.5\gettext-runtime\gnulib-lib;C:\libidn2\gettext-0.22.5\gettext-runtime\intl\gnulib-lib;C:\libidn2\gettext-0.22.5\gettext-runtime\libasprintf\gnulib-lib;C:\libidn2\gettext-0.22.5\libtextstyle\lib;C:\msys64\mingw64-backup-11.2.0\bin;C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\bin\Hostx64\x64;C:\libidn2\gettext-0.22.5\libtextstyle\lib;C:\gnulib\lib;C:\gnulib
+CC: x86_64-w64-mingw32-gcc
+CXX: x86_64-w64-mingw32-g++ -std=c++11
+SHELL: C:/msys64/usr/bin/sh.exe
+HOME: C:\msys64\home\nayou
+PWD: C:/gcc-build
+install:===================================================================
+CFLAGS: -I/c/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib
+CXXFLAGS: -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -DDEBUG -DVERSION=1.0.0
+CFLAGS_FOR_BUILD: -I/c/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib
+CXXFLAGS_FOR_BUILD: -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -DDEBUG -DVERSION=1.0.0
+MAKE: C:/msys64/mingw64/bin/mingw32-make.exe
+unstage: if [ -f stage_last ]; then [ -f stage_current ] || C:/msys64/mingw64/bin/mingw32-make.exe stage1-start || exit 1; else :; fi
+RECURSE_FLAGS_TO_PASS: DESTDIR= RPATH_ENVVAR=PATH TARGET_SUBDIR=x86_64-w64-mingw32 bindir=/mingw64/bin datadir=/mingw64/share exec_prefix=/mingw64 includedir=/mingw64/include datarootdir=/mingw64/share docdir=/mingw64/share/doc/ infodir=/mingw64/share/info pdfdir=/mingw64/share/doc/ htmldir=/mingw64/share/doc/ libdir=/mingw64/lib libexecdir=/mingw64/libexec lispdir= localstatedir=/mingw64/var mandir=/mingw64/share/man oldincludedir=/usr/include prefix=/mingw64 sbindir=/mingw64/sbin sharedstatedir=/mingw64/com sysconfdir=/mingw64/etc tooldir=/mingw64/x86_64-w64-mingw32 build_tooldir=/mingw64/x86_64-w64-mingw32 target_alias=x86_64-w64-mingw32 AWK=gawk BISON=bison CC_FOR_BUILD=x86_64-w64-mingw32-gcc CFLAGS_FOR_BUILD=-I/c/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib CXX_FOR_BUILD=x86_64-w64-mingw32-g++ -std=c++11 EXPECT=expect FLEX=flex INSTALL=/usr/bin/install -c INSTALL_DATA=/usr/bin/install -c -m 644 INSTALL_PROGRAM=/usr/bin/install -c INSTALL_SCRIPT=/usr/bin/install -c LDFLAGS_FOR_BUILD=-L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0 -L/mingw64/lib -L/usr/lib -L/mingw64/x86_64-w64-mingw32/lib -L/c/libidn2/gettext-0.22.5/libtextstyle/lib -Wl,-rpath,/mingw64/bin LEX=flex M4=/usr/bin/m4 MAKE=C:/msys64/mingw64/bin/mingw32-make.exe RUNTEST=runtest RUNTESTFLAGS= SED=/usr/bin/sed SHELL=C:/msys64/usr/bin/sh.exe YACC=bison -y XFOO= ADA_CFLAGS= AR_FLAGS=rc BOOT_ADAFLAGS=-gnatpg BOOT_CFLAGS=-g -O2 -D__USE_MINGW_ACCESS -Wno-pedantic-ms-format BOOT_LDFLAGS=-Wl,--stack,12582912 CFLAGS=-I/c/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib CXXFLAGS=-I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -DDEBUG -DVERSION=1.0.0 LDFLAGS=-L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0 -L/mingw64/lib -L/usr/lib -L/mingw64/x86_64-w64-mingw32/lib -L/c/libidn2/gettext-0.22.5/libtextstyle/lib -Wl,-rpath,/mingw64/bin -Wl,--stack,12582912 LIBCFLAGS=-I/c/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib LIBCXXFLAGS=-I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -DDEBUG -DVERSION=1.0.0 -fno-implicit-templates STAGE1_CHECKING=--enable-checking=yes,types STAGE1_LANGUAGES=c,c++,lto GNATBIND=no GNATMAKE=no GDC=no GDCFLAGS=-I/c/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -O2 GUILE=guile AR_FOR_TARGET=/mingw64/x86_64-w64-mingw32/bin/ar AS_FOR_TARGET=/mingw64/x86_64-w64-mingw32/bin/as CC_FOR_TARGET= /./gcc/xgcc -B/./gcc/ CFLAGS_FOR_TARGET=-g -I/c/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -O2 CPPFLAGS_FOR_TARGET= CXXFLAGS_FOR_TARGET=-g -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -O2 -DDEBUG -DVERSION=1.0.0 DLLTOOL_FOR_TARGET=/mingw64/x86_64-w64-mingw32/bin/dlltool DSYMUTIL_FOR_TARGET=dsymutil FLAGS_FOR_TARGET=-L/mingw64/x86_64-w64-mingw32/lib -L/mingw64/mingw/lib -isystem /mingw64/x86_64-w64-mingw32/include -isystem /mingw64/mingw/include -B/mingw64/x86_64-w64-mingw32/bin/ -B/mingw64/x86_64-w64-mingw32/lib/ -isystem /mingw64/x86_64-w64-mingw32/include -isystem /mingw64/x86_64-w64-mingw32/sys-include GFORTRAN_FOR_TARGET= /./gcc/gfortran -B/./gcc/ GOC_FOR_TARGET=  GOCFLAGS_FOR_TARGET=-O2 -g GDC_FOR_TARGET= no GDCFLAGS_FOR_TARGET=-O2 -g GM2_FOR_TARGET=  GM2FLAGS_FOR_TARGET=-O2 -g LD_FOR_TARGET=/mingw64/x86_64-w64-mingw32/bin/ld LIPO_FOR_TARGET=lipo LDFLAGS_FOR_TARGET= LIBCFLAGS_FOR_TARGET=-g -I/c/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -O2 LIBCXXFLAGS_FOR_TARGET=-g -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -O2 -DDEBUG -DVERSION=1.0.0 -fno-implicit-templates NM_FOR_TARGET=/mingw64/x86_64-w64-mingw32/bin/nm OBJDUMP_FOR_TARGET=/mingw64/x86_64-w64-mingw32/bin/objdump OBJCOPY_FOR_TARGET=/mingw64/x86_64-w64-mingw32/bin/objcopy RANLIB_FOR_TARGET=/mingw64/x86_64-w64-mingw32/bin/ranlib READELF_FOR_TARGET=/mingw64/x86_64-w64-mingw32/bin/readelf STRIP_FOR_TARGET=/mingw64/x86_64-w64-mingw32/bin/strip WINDRES_FOR_TARGET=windres WINDMC_FOR_TARGET=windmc BUILD_CONFIG=bootstrap-debug XFOO= LEAN=false STAGE1_CFLAGS=-g STAGE1_CXXFLAGS=-g -D__USE_MINGW_ACCESS STAGE1_GENERATOR_CFLAGS= STAGE1_TFLAGS= -fno-checking STAGE2_CFLAGS=-g -O2 -D__USE_MINGW_ACCESS -Wno-pedantic-ms-format -fno-checking -gtoggle STAGE2_CXXFLAGS=-g -O2 -D__USE_MINGW_ACCESS -Wno-pedantic-ms-format -fno-checking -gtoggle -D__USE_MINGW_ACCESS STAGE2_GENERATOR_CFLAGS= STAGE2_TFLAGS= -fno-checking STAGE3_CFLAGS=-g -O2 -D__USE_MINGW_ACCESS -Wno-pedantic-ms-format -fchecking=1 STAGE3_CXXFLAGS=-g -O2 -D__USE_MINGW_ACCESS -Wno-pedantic-ms-format -fchecking=1 -D__USE_MINGW_ACCESS STAGE3_GENERATOR_CFLAGS= STAGE3_TFLAGS= -fchecking=1 STAGE4_CFLAGS=-g -O2 -D__USE_MINGW_ACCESS -Wno-pedantic-ms-format STAGE4_CXXFLAGS=-g -O2 -D__USE_MINGW_ACCESS -Wno-pedantic-ms-format -D__USE_MINGW_ACCESS STAGE4_GENERATOR_CFLAGS= STAGE4_TFLAGS= STAGEprofile_CFLAGS=-g -O2 -D__USE_MINGW_ACCESS -Wno-pedantic-ms-format -fno-checking -gtoggle -fprofile-generate STAGEprofile_CXXFLAGS=-g -O2 -D__USE_MINGW_ACCESS -Wno-pedantic-ms-format -fno-checking -gtoggle -fprofile-generate STAGEprofile_GENERATOR_CFLAGS= STAGEprofile_TFLAGS= -fno-checking STAGEtrain_CFLAGS=-g -O2 -D__USE_MINGW_ACCESS -Wno-pedantic-ms-format STAGEtrain_CXXFLAGS=-g -O2 -D__USE_MINGW_ACCESS -Wno-pedantic-ms-format STAGEtrain_GENERATOR_CFLAGS= STAGEtrain_TFLAGS= STAGEfeedback_CFLAGS=-g -O2 -D__USE_MINGW_ACCESS -Wno-pedantic-ms-format -fprofile-use -fprofile-reproducible=parallel-runs STAGEfeedback_CXXFLAGS=-g -O2 -D__USE_MINGW_ACCESS -Wno-pedantic-ms-format -fprofile-use -fprofile-reproducible=parallel-runs STAGEfeedback_GENERATOR_CFLAGS= STAGEfeedback_TFLAGS= STAGEautoprofile_CFLAGS=-g -O2 -D__USE_MINGW_ACCESS -Wno-pedantic-ms-format -fno-checking -g STAGEautoprofile_CXXFLAGS=-g -O2 -D__USE_MINGW_ACCESS -Wno-pedantic-ms-format -fno-checking -g STAGEautoprofile_GENERATOR_CFLAGS= STAGEautoprofile_TFLAGS= -fno-checking STAGEautofeedback_CFLAGS=-g -O2 -D__USE_MINGW_ACCESS -Wno-pedantic-ms-format -fchecking=1 STAGEautofeedback_CXXFLAGS=-g -O2 -D__USE_MINGW_ACCESS -Wno-pedantic-ms-format -fchecking=1 STAGEautofeedback_GENERATOR_CFLAGS= STAGEautofeedback_TFLAGS= -fchecking=1  TFLAGS= CONFIG_SHELL=C:/msys64/usr/bin/sh.exe MAKEINFO=makeinfo --split-size=5000000
+C:\msys64\mingw64\bin\mingw32-make.exe: invalid option -- D
+C:\msys64\mingw64\bin\mingw32-make.exe: invalid option -- D
+C:\msys64\mingw64\bin\mingw32-make.exe: invalid option -- D
+C:\msys64\mingw64\bin\mingw32-make.exe: invalid option -- V
+C:\msys64\mingw64\bin\mingw32-make.exe: invalid option -- D
+C:\msys64\mingw64\bin\mingw32-make.exe: invalid option -- D
+C:\msys64\mingw64\bin\mingw32-make.exe: invalid option -- D
+C:\msys64\mingw64\bin\mingw32-make.exe: invalid option -- V
+Usage: mingw32-make [options] [target] ...
+Options:
+  -b, -m                      Ignored for compatibility.
+  -B, --always-make           Unconditionally make all targets.
+  -C DIRECTORY, --directory=DIRECTORY
+                              Change to DIRECTORY before doing anything.
+  -d                          Print lots of debugging information.
+  --debug[=FLAGS]             Print various types of debugging information.
+  -e, --environment-overrides
+                              Environment variables override makefiles.
+  -E STRING, --eval=STRING    Evaluate STRING as a makefile statement.
+  -f FILE, --file=FILE, --makefile=FILE
+                              Read FILE as a makefile.
+  -h, --help                  Print this message and exit.
+  -i, --ignore-errors         Ignore errors from recipes.
+  -I DIRECTORY, --include-dir=DIRECTORY
+                              Search DIRECTORY for included makefiles.
+  -j [N], --jobs[=N]          Allow N jobs at once; infinite jobs with no arg.
+  --jobserver-style=STYLE     Select the style of jobserver to use.
+  -k, --keep-going            Keep going when some targets can't be made.
+  -l [N], --load-average[=N], --max-load[=N]
+                              Don't start multiple jobs unless load is below N.
+  -L, --check-symlink-times   Use the latest mtime between symlinks and target.
+  -n, --just-print, --dry-run, --recon
+                              Don't actually run any recipe; just print them.
+  -o FILE, --old-file=FILE, --assume-old=FILE
+                              Consider FILE to be very old and don't remake it.
+  -O[TYPE], --output-sync[=TYPE]
+                              Synchronize output of parallel jobs by TYPE.
+  -p, --print-data-base       Print make's internal database.
+  -q, --question              Run no recipe; exit status says if up to date.
+  -r, --no-builtin-rules      Disable the built-in implicit rules.
+  -R, --no-builtin-variables  Disable the built-in variable settings.
+  --shuffle[={SEED|random|reverse|none}]
+                              Perform shuffle of prerequisites and goals.
+  -s, --silent, --quiet       Don't echo recipes.
+  --no-silent                 Echo recipes (disable --silent mode).
+  -S, --no-keep-going, --stop
+                              Turns off -k.
+  -t, --touch                 Touch targets instead of remaking them.
+  --trace                     Print tracing information.
+  -v, --version               Print the version number of make and exit.
+  -w, --print-directory       Print the current directory.
+  --no-print-directory        Turn off -w, even if it was turned on implicitly.
+  -W FILE, --what-if=FILE, --new-file=FILE, --assume-new=FILE
+                              Consider FILE to be infinitely new.
+  --warn-undefined-variables  Warn when an undefined variable is referenced.
 
+This program built for Windows32
+Report bugs to <bug-make@gnu.org>
+mingw32-make: *** [Makefile:2728: install] Error 2
+(수정)
+$(MAKE) $(RECURSE_FLAGS_TO_PASS) installdirs install-host install-target <- 이 라인에서 오류발생
+디버깅
+@echo "MAKE: $(MAKE)"
+@echo "RECURSE_FLAGS_TO_PASS: $(RECURSE_FLAGS_TO_PASS)"
+출력
+MAKE: C:/msys64/mingw64/bin/mingw32-make.exe
+RECURSE_FLAGS_TO_PASS: DESTDIR= RPATH_ENVVAR=PATH TARGET_SUBDIR=x86_64-w64-mingw32 bindir=/mingw64/bin datadir=/mingw64/share exec_prefix=/mingw64 includedir=/mingw64/include datarootdir=/mingw64/share docdir=/mingw64/share/doc/ infodir=/mingw64/share/info pdfdir=/mingw64/share/doc/ htmldir=/mingw64/share/doc/ libdir=/mingw64/lib libexecdir=/mingw64/libexec lispdir= localstatedir=/mingw64/var mandir=/mingw64/share/man oldincludedir=/usr/include prefix=/mingw64 sbindir=/mingw64/sbin sharedstatedir=/mingw64/com sysconfdir=/mingw64/etc tooldir=/mingw64/x86_64-w64-mingw32 build_tooldir=/mingw64/x86_64-w64-mingw32 target_alias=x86_64-w64-mingw32 AWK=gawk BISON=bison CC_FOR_BUILD=x86_64-w64-mingw32-gcc CFLAGS_FOR_BUILD=-I/c/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib CXX_FOR_BUILD=x86_64-w64-mingw32-g++ -std=c++11 EXPECT=expect FLEX=flex INSTALL=/usr/bin/install -c INSTALL_DATA=/usr/bin/install -c -m 644 INSTALL_PROGRAM=/usr/bin/install -c INSTALL_SCRIPT=/usr/bin/install -c LDFLAGS_FOR_BUILD=-L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0 -L/mingw64/lib -L/usr/lib -L/mingw64/x86_64-w64-mingw32/lib -L/c/libidn2/gettext-0.22.5/libtextstyle/lib -Wl,-rpath,/mingw64/bin LEX=flex M4=/usr/bin/m4 MAKE=C:/msys64/mingw64/bin/mingw32-make.exe RUNTEST=runtest RUNTESTFLAGS= SED=/usr/bin/sed SHELL=C:/msys64/usr/bin/sh.exe YACC=bison -y XFOO= ADA_CFLAGS= AR_FLAGS=rc BOOT_ADAFLAGS=-gnatpg BOOT_CFLAGS=-g -O2 -D__USE_MINGW_ACCESS -Wno-pedantic-ms-format BOOT_LDFLAGS=-Wl,--stack,12582912 CFLAGS=-I/c/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib CXXFLAGS=-I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -DDEBUG -DVERSION=1.0.0 LDFLAGS=-L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0 -L/mingw64/lib -L/usr/lib -L/mingw64/x86_64-w64-mingw32/lib -L/c/libidn2/gettext-0.22.5/libtextstyle/lib -Wl,-rpath,/mingw64/bin -Wl,--stack,12582912 LIBCFLAGS=-I/c/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib LIBCXXFLAGS=-I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -DDEBUG -DVERSION=1.0.0 -fno-implicit-templates STAGE1_CHECKING=--enable-checking=yes,types STAGE1_LANGUAGES=c,c++,lto GNATBIND=no GNATMAKE=no GDC=no GDCFLAGS=-I/c/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -O2 GUILE=guile AR_FOR_TARGET=/mingw64/x86_64-w64-mingw32/bin/ar AS_FOR_TARGET=/mingw64/x86_64-w64-mingw32/bin/as CC_FOR_TARGET= /./gcc/xgcc -B/./gcc/ CFLAGS_FOR_TARGET=-g -I/c/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -O2 CPPFLAGS_FOR_TARGET= CXXFLAGS_FOR_TARGET=-g -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -O2 -DDEBUG -DVERSION=1.0.0 DLLTOOL_FOR_TARGET=/mingw64/x86_64-w64-mingw32/bin/dlltool DSYMUTIL_FOR_TARGET=dsymutil FLAGS_FOR_TARGET=-L/mingw64/x86_64-w64-mingw32/lib -L/mingw64/mingw/lib -isystem /mingw64/x86_64-w64-mingw32/include -isystem /mingw64/mingw/include -B/mingw64/x86_64-w64-mingw32/bin/ -B/mingw64/x86_64-w64-mingw32/lib/ -isystem /mingw64/x86_64-w64-mingw32/include -isystem /mingw64/x86_64-w64-mingw32/sys-include GFORTRAN_FOR_TARGET= /./gcc/gfortran -B/./gcc/ GOC_FOR_TARGET=  GOCFLAGS_FOR_TARGET=-O2 -g GDC_FOR_TARGET= no GDCFLAGS_FOR_TARGET=-O2 -g GM2_FOR_TARGET=  GM2FLAGS_FOR_TARGET=-O2 -g LD_FOR_TARGET=/mingw64/x86_64-w64-mingw32/bin/ld LIPO_FOR_TARGET=lipo LDFLAGS_FOR_TARGET= LIBCFLAGS_FOR_TARGET=-g -I/c/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -O2 LIBCXXFLAGS_FOR_TARGET=-g -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -O2 -DDEBUG -DVERSION=1.0.0 -fno-implicit-templates NM_FOR_TARGET=/mingw64/x86_64-w64-mingw32/bin/nm OBJDUMP_FOR_TARGET=/mingw64/x86_64-w64-mingw32/bin/objdump OBJCOPY_FOR_TARGET=/mingw64/x86_64-w64-mingw32/bin/objcopy RANLIB_FOR_TARGET=/mingw64/x86_64-w64-mingw32/bin/ranlib READELF_FOR_TARGET=/mingw64/x86_64-w64-mingw32/bin/readelf STRIP_FOR_TARGET=/mingw64/x86_64-w64-mingw32/bin/strip WINDRES_FOR_TARGET=windres WINDMC_FOR_TARGET=windmc BUILD_CONFIG=bootstrap-debug XFOO= LEAN=false STAGE1_CFLAGS=-g STAGE1_CXXFLAGS=-g -D__USE_MINGW_ACCESS STAGE1_GENERATOR_CFLAGS= STAGE1_TFLAGS= -fno-checking STAGE2_CFLAGS=-g -O2 -D__USE_MINGW_ACCESS -Wno-pedantic-ms-format -fno-checking -gtoggle STAGE2_CXXFLAGS=-g -O2 -D__USE_MINGW_ACCESS -Wno-pedantic-ms-format -fno-checking -gtoggle -D__USE_MINGW_ACCESS STAGE2_GENERATOR_CFLAGS= STAGE2_TFLAGS= -fno-checking STAGE3_CFLAGS=-g -O2 -D__USE_MINGW_ACCESS -Wno-pedantic-ms-format -fchecking=1 STAGE3_CXXFLAGS=-g -O2 -D__USE_MINGW_ACCESS -Wno-pedantic-ms-format -fchecking=1 -D__USE_MINGW_ACCESS STAGE3_GENERATOR_CFLAGS= STAGE3_TFLAGS= -fchecking=1 STAGE4_CFLAGS=-g -O2 -D__USE_MINGW_ACCESS -Wno-pedantic-ms-format STAGE4_CXXFLAGS=-g -O2 -D__USE_MINGW_ACCESS -Wno-pedantic-ms-format -D__USE_MINGW_ACCESS STAGE4_GENERATOR_CFLAGS= STAGE4_TFLAGS= STAGEprofile_CFLAGS=-g -O2 -D__USE_MINGW_ACCESS -Wno-pedantic-ms-format -fno-checking -gtoggle -fprofile-generate STAGEprofile_CXXFLAGS=-g -O2 -D__USE_MINGW_ACCESS -Wno-pedantic-ms-format -fno-checking -gtoggle -fprofile-generate STAGEprofile_GENERATOR_CFLAGS= STAGEprofile_TFLAGS= -fno-checking STAGEtrain_CFLAGS=-g -O2 -D__USE_MINGW_ACCESS -Wno-pedantic-ms-format STAGEtrain_CXXFLAGS=-g -O2 -D__USE_MINGW_ACCESS -Wno-pedantic-ms-format STAGEtrain_GENERATOR_CFLAGS= STAGEtrain_TFLAGS= STAGEfeedback_CFLAGS=-g -O2 -D__USE_MINGW_ACCESS -Wno-pedantic-ms-format -fprofile-use -fprofile-reproducible=parallel-runs STAGEfeedback_CXXFLAGS=-g -O2 -D__USE_MINGW_ACCESS -Wno-pedantic-ms-format -fprofile-use -fprofile-reproducible=parallel-runs STAGEfeedback_GENERATOR_CFLAGS= STAGEfeedback_TFLAGS= STAGEautoprofile_CFLAGS=-g -O2 -D__USE_MINGW_ACCESS -Wno-pedantic-ms-format -fno-checking -g STAGEautoprofile_CXXFLAGS=-g -O2 -D__USE_MINGW_ACCESS -Wno-pedantic-ms-format -fno-checking -g STAGEautoprofile_GENERATOR_CFLAGS= STAGEautoprofile_TFLAGS= -fno-checking STAGEautofeedback_CFLAGS=-g -O2 -D__USE_MINGW_ACCESS -Wno-pedantic-ms-format -fchecking=1 STAGEautofeedback_CXXFLAGS=-g -O2 -D__USE_MINGW_ACCESS -Wno-pedantic-ms-format -fchecking=1 STAGEautofeedback_GENERATOR_CFLAGS= STAGEautofeedback_TFLAGS= -fchecking=1  TFLAGS= CONFIG_SHELL=C:/msys64/usr/bin/sh.exe MAKEINFO=makeinfo --split-size=5000000
+-D, -V 필터링
+/c/gcc-14.2.0/Makefile.in 수정
+# $(MAKE) $(RECURSE_FLAGS_TO_PASS) installdirs install-host install-target
+$(MAKE) $(filter-out -D% -V%, $(RECURSE_FLAGS_TO_PASS)) installdirs install-host install-target
+(오류)
+C:\msys64\mingw64\bin\mingw32-make.exe: invalid option -- g
+C:\msys64\mingw64\bin\mingw32-make.exe: invalid option -- g
+(수정)
+/c/gcc-14.2.0/Makefile.in 수정
+# $(MAKE) $(RECURSE_FLAGS_TO_PASS) installdirs install-host install-target
+$(MAKE) $(filter-out -D% -V% -g% -O%, $(RECURSE_FLAGS_TO_PASS)) installdirs install-host install-target
