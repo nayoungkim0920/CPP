@@ -33566,3 +33566,76 @@ for flag in $(RECURSE_FLAGS_TO_PASS); do \
 	fi; \
 done; \
 echo '"';
+
+2주동안 Makefile.in 설정...
+
+(빌드)
+nayou@kimnayooung MINGW64 /c/gcc-build
+# rm config.cache && ../gcc-14.2.0/configure && mingw32-make && mingw32-make install
+configure: error: Building GCC requires GMP 4.2+, MPFR 3.1.0+ and MPC 0.8.0+.
+Try the --with-gmp, --with-mpfr and/or --with-mpc options to specify
+their locations.  Source code for these libraries can be found at
+their respective hosting sites as well as at
+https://gcc.gnu.org/pub/gcc/infrastructure/.  See also
+http://gcc.gnu.org/install/prerequisites.html for additional info.  If
+you obtained GMP, MPFR and/or MPC from a vendor distribution package,
+make sure that you have installed both the libraries and the header
+files.  They may be located in separate packages.
+(수정)
+GMP, MPFR, MPC 라이브러리가 필요하다는 오류가 발생
+MSYS2에서 GMP, MPFR, MPC 설치
+nayou@kimnayooung MINGW64 /c/gcc-build
+# pacman -S mingw-w64-x86_64-gmp mingw-w64-x86_64-mpfr mingw-w64-x86_64-mpc
+경고: mingw-w64-x86_64-gmp-6.3.0-2는 최신 버전입니다. -- 재설치
+경고: mingw-w64-x86_64-mpfr-4.2.1-2는 최신 버전입니다. -- 재설치
+경고: mingw-w64-x86_64-mpc-1.3.1-2는 최신 버전입니다. -- 재설치
+
+라이브러리 경로 확인
+GMP 관련 파일 확인
+nayou@kimnayooung MINGW64 /c/gcc-build
+# ls -l /mingw64/include/gmp.h /mingw64/lib/libgmp.a
+-rw-r--r-- 1 nayou nayou   84402  9월 15  2023 /mingw64/include/gmp.h
+-rw-r--r-- 1 nayou nayou 1359544  9월 15  2023 /mingw64/lib/libgmp.a
+MPFR 관련 파일 확인
+nayou@kimnayooung MINGW64 /c/gcc-build
+# ls -l /mingw64/include/mpfr.h /mingw64/lib/libmpfr.a
+-rw-r--r-- 1 nayou nayou   57443  9월 13  2023 /mingw64/include/mpfr.h
+-rw-r--r-- 1 nayou nayou 1125632  9월 13  2023 /mingw64/lib/libmpfr.a
+MPC 관련 파일 확인
+nayou@kimnayooung MINGW64 /c/gcc-build
+# ls -l /mingw64/include/mpc.h /mingw64/lib/libmpc.a
+-rw-r--r-- 1 nayou nayou  16949  9월 13  2023 /mingw64/include/mpc.h
+-rw-r--r-- 1 nayou nayou 236366  9월 13  2023 /mingw64/lib/libmpc.a
+
+빌드명령어 수정
+nayou@kimnayooung MINGW64 /c/gcc-build
+# rm config.cache && ../gcc-14.2.0/configure --with-gmp=/mingw64 --with-mpfr=/mingw64 --with-mpc=/mingw64 && mingw32-make && mingw32-make install
+
+(오류)
+Configuring stage 1 in c:/gcc-build/libiberty
+configure: loading site script /usr/local/etc/config.site
+configure: loading cache ./config.cache
+configure: error: `CFLAGS' has changed since the previous run:
+configure:   former value:  `-I/c/libidn2/gettext-0.22.5/libtextstyle/lib  '
+configure:   current value: `'
+configure: error: `LDFLAGS' was set to `-static-libstdc++ -static-libgcc -LC:/msys64/usr/lib' in the previous run
+configure: error: in `/c/gcc-build/libiberty':
+configure: error: changes in the environment can compromise the build
+configure: error: run `make distclean' and/or `rm ./config.cache' and start over
+mingw32-make[2]: *** [Makefile:11565: configure-stage1-libiberty] Error 1
+mingw32-make[2]: Leaving directory 'C:/gcc-build'
+mingw32-make[1]: *** [Makefile:25061: stage1-bubble] Error 2
+mingw32-make[1]: Leaving directory 'C:/gcc-build'
+mingw32-make: *** [Makefile:1150: all] Error 2
+
+
+
+
+
+
+
+
+
+
+
+
