@@ -33628,14 +33628,363 @@ mingw32-make[1]: *** [Makefile:25061: stage1-bubble] Error 2
 mingw32-make[1]: Leaving directory 'C:/gcc-build'
 mingw32-make: *** [Makefile:1150: all] Error 2
 
+(수정)
+configure.ac에서 불러오는 환경변수 출처 확인
+`CFLAGS' was set to `-I/c/libidn2/gettext-0.22.5/libtextstyle/lib  ' in the previous run
+`LDFLAGS' was set to `-L/c/libidn2/gettext-0.22.5/libtextstyle/lib' in the previous run
 
+nayou@kimnayooung MINGW64 /c/gcc-build
+# cat ~/.bash_profile | grep -E 'CFLAGS|LDFLAGS'
+nayou@kimnayooung MINGW64 /c/gcc-build
+# cat ~/.profile | grep -E 'CFLAGS|LDFLAGS'
+nayou@kimnayooung MINGW64 /c/gcc-build
+# cat /etc/profile | grep -E 'CFLAGS|LDFLAGS'
+nayou@kimnayooung MINGW64 /c/gcc-build
+# cat /etc/bash.bashrc | grep -E 'CFLAGS|LDFLAGS'
+nayou@kimnayooung MINGW64 /c/gcc-build
+# cat ~/.bashrc | grep -E 'CFLAGS|LDFLAGS'
+# CFLAGS 초기화
+export CFLAGS=""
+export CFLAGS="$CFLAGS -I/c/msys64/mingw64/include"  # MSYS2 MinGW 64-bit 기본 include 디렉토리
+export CFLAGS="$CFLAGS -I/mingw64/include"   # MinGW 기본 include 디렉토리
+export CFLAGS="$CFLAGS -I/c/libidn2/gettext-0.22.5/libtextstyle/lib"  # libidn2의 gettext 라이브러리 헤더 파일 디렉토리, argz.h
+export CFLAGS="$CFLAGS -O2"                   # 최적화 레벨 2 설정
+export LDFLAGS="-L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0" # libgcc.a
+export LDFLAGS="$LDFLAGS -L/mingw64/lib"
+export LDFLAGS="$LDFLAGS -L/usr/lib"
+export LDFLAGS="$LDFLAGS -L/mingw64/x86_64-w64-mingw32/lib"
+export LDFLAGS="$LDFLAGS -L/c/libidn2/gettext-0.22.5/libtextstyle/lib" # argz.h
+export LDFLAGS="$LDFLAGS -Wl,-rpath,/mingw64/bin"
+=> 일치하는값 없음
 
+nayou@kimnayooung MINGW64 /c/gcc-build
+# env | grep -E 'CFLAGS|LDFLAGS'
+=> 일치하는값 없음
 
+강제 초기화
+nayou@kimnayooung MINGW64 /c/gcc-build
+# unset CFLAGS
+unset LDFLAGS
+export CFLAGS=
+export LDFLAGS=
 
+비어있는 값으로 호출
+nayou@kimnayooung MINGW64 /c/gcc-build
+# ../gcc-14.2.0/configure --with-gmp=/mingw64 --with-mpfr=/mingw64 --with-mpc=/mingw64 CFLAGS= LDFLAGS= && mingw32-make && mingw32-make install
 
+config.cache 삭제
+nayou@kimnayooung MINGW64 /c/gcc-build
+# rm config.cache && ../gcc-14.2.0/configure --with-gmp=/mingw64 --with-mpfr=/mingw64 --with-mpc=/mingw64 CFLAGS= LDFLAGS= && mingw32-make && mingw32-make install
 
+(오류)
+configure: loading site script /usr/local/etc/config.site
+configure: error: `CFLAGS' has changed since the previous run:
+configure:   former value:  `-I/c/libidn2/gettext-0.22.5/libtextstyle/lib  '
+configure:   current value: `'
+configure: error: `LDFLAGS' has changed since the previous run:
+configure:   former value:  `-static-libstdc++ -static-libgcc -LC:/msys64/usr/lib'
+configure:   current value: `-L/c/libidn2/gettext-0.22.5/libtextstyle/lib'
 
+(수정)
+configure: loading site script /usr/local/etc/config.site 가 CFLAGS, LDFLAGS값에 간섭을 할 수 도 있음
+빌드명령어 수정하여 /etc/config.site가 불필요하게 로드되는 것을 차단
+nayou@kimnayooung MINGW64 /c/gcc-build
+# rm config.cache && ../gcc-14.2.0/configure CONFIG_SITE=  --with-gmp=/mingw64 --with-mpfr=/mingw64 --with-mpc=/mingw64 CFLAGS= LDFLAGS= && mingw32-make && mingw32-make install 
 
+(오류)
+Configuring stage 1 in c:/gcc-build/libiberty
+configure: loading site script /usr/local/etc/config.site
+configure: loading cache ./config.cache
+configure: error: `CFLAGS' has changed since the previous run:
+configure:   former value:  `-I/c/libidn2/gettext-0.22.5/libtextstyle/lib  '
+configure:   current value: `'
+configure: error: `LDFLAGS' has changed since the previous run:
+configure:   former value:  `-static-libstdc++ -static-libgcc -LC:/msys64/usr/lib'
+configure:   current value: `-L/c/libidn2/gettext-0.22.5/libtextstyle/lib'
+configure: error: in `/c/gcc-build/libiberty':
+configure: error: changes in the environment can compromise the build
+configure: error: run `make distclean' and/or `rm ./config.cache' and start over
 
+(수정)
+빌드명령어에 CFLAGS, LDFLAGS값 대입
+nayou@kimnayooung MINGW64 /c/gcc-build
+# rm config.cache && ../gcc-14.2.0/configure CONFIG_SITE=  --with-gmp=/mingw64 --with-mpfr=/mingw64 --with-mpc=/mingw64 CFLAGS="-I/c/libidn2/gettext-0.22.5/libtextstyle/lib" LDFLAGS="-L/c/libidn2/gettext-0.22.5/libtextstyle/lib" && mingw32-make && mingw32-make install
 
+(오류)
+Configuring stage 1 in c:/gcc-build/libiberty
+configure: loading site script /usr/local/etc/config.site
+configure: loading cache ./config.cache
+configure: error: `CFLAGS' has changed since the previous run:
+configure:   former value:  `-I/c/libidn2/gettext-0.22.5/libtextstyle/lib  '
+configure:   current value: `'
+configure: error: `LDFLAGS' has changed since the previous run:
+configure:   former value:  `-static-libstdc++ -static-libgcc -LC:/msys64/usr/lib'
+configure:   current value: `-L/c/libidn2/gettext-0.22.5/libtextstyle/lib'
+configure: error: in `/c/gcc-build/libiberty':
+configure: error: changes in the environment can compromise the build
+configure: error: run `make distclean' and/or `rm ./config.cache' and start over
+(수정)
+빌드폴더에서 잘못된 former value값 검색
+nayou@kimnayooung MINGW64 /c/gcc-build
+# grep -rn '\-static-libstdc++ -static-libgcc -LC:/msys64/usr/lib' /c/gcc-build
+/c/gcc-build/libiberty/config.cache:29:ac_cv_env_LDFLAGS_value='-static-libstdc++ -static-libgcc -LC:/msys64/usr/lib'
+/c/gcc-build/libiberty/config.log:99:configure:2432:   former value:  `-static-libstdc++ -static-libgcc -LC:/msys64/usr/lib'
+/c/gcc-build/libiberty/config.log:124:ac_cv_env_LDFLAGS_value='-static-libstdc++ -static-libgcc -LC:/msys64/usr/lib'
+/c/gcc-build/libiberty/config.status:430:ac_cs_config="'--srcdir=../../gcc-14.2.0/libiberty' '--cache-file=./config.cache' '--prefix=/mingw64' '--enable-bootstrap' '--enable-languages=c,c++,fortran,lto,objc' '--program-transform-name=s,y,y,' '--disable-option-checking' '--build=x86_64-w64-mingw32' '--host=x86_64-w64-mingw32' '--target=x86_64-w64-mingw32' '--enable-shared' 'build_alias=x86_64-w64-mingw32' 'host_alias=x86_64-w64-mingw32' 'target_alias=x86_64-w64-mingw32' 'CC=x86_64-w64-mingw32-gcc' 'CFLAGS=-I/c/libidn2/gettext-0.22.5/libtextstyle/lib  ' 'LDFLAGS=-static-libstdc++ -static-libgcc -LC:/msys64/usr/lib' 'CPPFLAGS= -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2' 'CPP=C:/msys64/mingw64/bin/cpp'"
+/c/gcc-build/libiberty/config.status:520:  set X C:/msys64/usr/bin/sh.exe '/c/gcc-14.2.0/libiberty/configure'  '--srcdir=../../gcc-14.2.0/libiberty' '--cache-file=./config.cache' '--prefix=/mingw64' '--enable-bootstrap' '--enable-languages=c,c++,fortran,lto,objc' '--program-transform-name=s,y,y,' '--disable-option-checking' '--build=x86_64-w64-mingw32' '--host=x86_64-w64-mingw32' '--target=x86_64-w64-mingw32' '--enable-shared' 'build_alias=x86_64-w64-mingw32' 'host_alias=x86_64-w64-mingw32' 'target_alias=x86_64-w64-mingw32' 'CC=x86_64-w64-mingw32-gcc' 'CFLAGS=-I/c/libidn2/gettext-0.22.5/libtextstyle/lib  ' 'LDFLAGS=-static-libstdc++ -static-libgcc -LC:/msys64/usr/lib' 'CPPFLAGS= -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2' 'CPP=C:/msys64/mingw64/bin/cpp' $ac_configure_extra_args --no-create --no-recursion
+/c/gcc-build/libiberty/config.status:545:ac_configure_args="--enable-multilib  '--srcdir=../../gcc-14.2.0/libiberty' '--cache-file=./config.cache' '--prefix=/mingw64' '--enable-bootstrap' '--enable-languages=c,c++,fortran,lto,objc' '--program-transform-name=s,y,y,' '--disable-option-checking' '--build=x86_64-w64-mingw32' '--host=x86_64-w64-mingw32' '--target=x86_64-w64-mingw32' '--enable-shared' 'build_alias=x86_64-w64-mingw32' 'host_alias=x86_64-w64-mingw32' 'target_alias=x86_64-w64-mingw32' 'CC=x86_64-w64-mingw32-gcc' 'CFLAGS=-I/c/libidn2/gettext-0.22.5/libtextstyle/lib  ' 'LDFLAGS=-static-libstdc++ -static-libgcc -LC:/msys64/usr/lib' 'CPPFLAGS= -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2' 'CPP=C:/msys64/mingw64/bin/cpp'"
+/c/gcc-build/libiberty/config.status:679:S["LDFLAGS"]="-static-libstdc++ -static-libgcc -LC:/msys64/usr/lib"
+/c/gcc-build/lto-plugin/config.cache:27:ac_cv_env_LDFLAGS_value='-static-libstdc++ -static-libgcc -LC:/msys64/usr/lib'
+/c/gcc-build/lto-plugin/config.log:111:configure:2339:   former value:  `-static-libstdc++ -static-libgcc -LC:/msys64/usr/lib'
+/c/gcc-build/lto-plugin/config.log:134:ac_cv_env_LDFLAGS_value='-static-libstdc++ -static-libgcc -LC:/msys64/usr/lib'
+/c/gcc-build/lto-plugin/config.status:430:ac_cs_config="'--srcdir=../../gcc-14.2.0/lto-plugin' '--cache-file=./config.cache' '--prefix=/mingw64' '--enable-bootstrap' '--enable-languages=c,c++,fortran,lto,objc' '--program-transform-name=s,y,y,' '--disable-option-checking' '--build=x86_64-w64-mingw32' '--host=x86_64-w64-mingw32' '--target=x86_64-w64-mingw32' '--enable-shared' 'build_alias=x86_64-w64-mingw32' 'host_alias=x86_64-w64-mingw32' 'target_alias=x86_64-w64-mingw32' 'CC=x86_64-w64-mingw32-gcc' 'CFLAGS=-I/c/libidn2/gettext-0.22.5/libtextstyle/lib  ' 'LDFLAGS=-static-libstdc++ -static-libgcc -LC:/msys64/usr/lib' 'CPPFLAGS= -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2' 'CPP=C:/msys64/mingw64/bin/cpp'"
+/c/gcc-build/lto-plugin/config.status:522:  set X C:/msys64/usr/bin/sh.exe '/c/gcc-14.2.0/lto-plugin/configure'  '--srcdir=../../gcc-14.2.0/lto-plugin' '--cache-file=./config.cache' '--prefix=/mingw64' '--enable-bootstrap' '--enable-languages=c,c++,fortran,lto,objc' '--program-transform-name=s,y,y,' '--disable-option-checking' '--build=x86_64-w64-mingw32' '--host=x86_64-w64-mingw32' '--target=x86_64-w64-mingw32' '--enable-shared' 'build_alias=x86_64-w64-mingw32' 'host_alias=x86_64-w64-mingw32' 'target_alias=x86_64-w64-mingw32' 'CC=x86_64-w64-mingw32-gcc' 'CFLAGS=-I/c/libidn2/gettext-0.22.5/libtextstyle/lib  ' 'LDFLAGS=-static-libstdc++ -static-libgcc -LC:/msys64/usr/lib' 'CPPFLAGS= -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2' 'CPP=C:/msys64/mingw64/bin/cpp' $ac_configure_extra_args --no-create --no-recursion
+/c/gcc-build/lto-plugin/config.status:876:S["LDFLAGS"]="-static-libstdc++ -static-libgcc -LC:/msys64/usr/lib"
+=> configure 과정에서 LDFLAGS 값이 여러 위치에서 정의되고 있으며, 명령어로 전달한 값이 일부 설정과 충돌
+=> config.log와 config.status에서의 기록 여러 구성 요소 (libiberty, lto-plugin)의 configure 실행 로그와 결과 파일에서, LDFLAGS가 명시적으로 이전 값으로 설정되어 있음
+=> libiberty와 lto-plugin에서 서로 다르게 정의
+
+파일삭제
+nayou@kimnayooung MINGW64 /c/gcc-build
+# rm config.cache && rm config.status && \
+rm libiberty/config.cache && rm libiberty/config.status && \
+rm lto-plugin/config.cache && rm lto-plugin/config.status
+
+빌드
+../gcc-14.2.0/configure && mingw32-make && mingw32-make install
+성공!
+
+(오류)
+mingw32-make[4]: Entering directory 'C:/gcc-build/libiberty/testsuite'
+mingw32-make[4]: Nothing to be done for 'all'.
+mingw32-make[4]: Leaving directory 'C:/gcc-build/libiberty/testsuite'
+mingw32-make[3]: Leaving directory 'C:/gcc-build/libiberty'
+mingw32-make[3]: Entering directory 'C:/gcc-build/lto-plugin'
+mingw32-make[3]: *** No rule to make target 'all'.  Stop.
+mingw32-make[3]: Leaving directory 'C:/gcc-build/lto-plugin'
+mingw32-make[2]: *** [Makefile:16026: all-stage1-lto-plugin] Error 2
+mingw32-make[2]: Leaving directory 'C:/gcc-build'
+mingw32-make[1]: *** [Makefile:25061: stage1-bubble] Error 2
+mingw32-make[1]: Leaving directory 'C:/gcc-build'
+mingw32-make: *** [Makefile:1150: all] Error 2
+
+(수정)
+nayou@kimnayooung MINGW64 /c/gcc-build
+# mingw32-make clean
+Makefile:26: *** missing separator.  Stop.
+
+(오류)
+Makefile:26: *** missing separator.  Stop.
+(수정)
+# First, test for a proper version of make, but only where one is required.
+
+@if gcc <- 26 라인
+	ifeq (,$(.VARIABLES)) # The variable .VARIABLES, new with 3.80, is never empty.
+		$(error GNU make version 3.80 or newer is required.)
+	endif
+@endif gcc
+
+make 버전 확인
+nayou@kimnayooung MINGW64 /c/gcc-build
+# make --version
+GNU Make 4.4.1
+x86_64-pc-msys 빌드
+Copyright (C) 1988-2023 Free Software Foundation, Inc.
+라이선스 GPLv3+: GNU GPL 버전 3 또는 이후 <https://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+명령어 수정
+nayou@kimnayooung MINGW64 /c/gcc-build
+# ../gcc-14.2.0/configure && mingw32-make clean
+nayou@kimnayooung MINGW64 /c/gcc-build
+# ../gcc-14.2.0/configure && mingw32-make distclean
+성공!!
+
+(오류)
+configure: creating ./config.status
+config.status: creating Makefile
+mingw32-make[1]: Entering directory 'C:/gcc-build'
+rm -f stage_current
+mingw32-make[1]: Leaving directory 'C:/gcc-build'
+rm -rf stage1-*
+cat: stage_last: No such file or directory
+rm -rf stage2-*
+cat: stage_last: No such file or directory
+rm -rf stage3-* compare
+cat: stage_last: No such file or directory
+rm -rf stage4-* compare3
+cat: stage_last: No such file or directory
+rm -rf stageprofile-*
+cat: stage_last: No such file or directory
+rm -rf stagetrain-*
+cat: stage_last: No such file or directory
+rm -rf stagefeedback-*
+cat: stage_last: No such file or directory
+rm -rf stageautoprofile-*
+cat: stage_last: No such file or directory
+rm -rf stageautofeedback-*
+export r=c:/gcc-build; \
+export s=c:/gcc-14.2.0; \
+C:/msys64/mingw64/bin/mingw32-make.exe PROGRAM_VERSION=14.0.2 DESTDIR= RPATH_ENVVAR=PATH lispdir= LDFLAGS=-L/c/libidn2/gettext-0.22.5/libtextstyle/lib oldincludedir=/usr/include LIBCXXFLAGS=-fno-implicit-templates CFLAGS_FOR_BUILD=-I/c/libidn2/gettext-0.22.5/libtextstyle/lib LDFLAGS_FOR_BUILD=-L/c/libidn2/gettext-0.22.5/libtextstyle/lib -Wl,-rpath LIBCFLAGS=-I/c/libidn2/gettext-0.22.5/libtextstyle/lib CFLAGS_FOR_TARGET=-I/c/libidn2/gettext-0.22.5/libtextstyle/lib LDFLAGS_FOR_TARGET=-L/usr/lib -Wl,-rpath target_alias=x86_64-w64-mingw32 SHELL=C:/msys64/usr/bin/sh.exe MAKEINFO=makeinfo STAGE1_CHECKING=--enable-checking=yes,types STAGE1_LANGUAGES=c,c++,lto STAGE1_CFLAGS= STAGE1_CXXFLAGS=-D__USE_MINGW_ACCESS STAGE2_CFLAGS=-D__USE_MINGW_ACCESS -Wno-pedantic-ms-format STAGE2_CXXFLAGS=-D__USE_MINGW_ACCESS -Wno-pedantic-ms-format STAGE3_CFLAGS=-D__USE_MINGW_ACCESS -Wno-pedantic-ms-format STAGE3_CXXFLAGS=-D__USE_MINGW_ACCESS -Wno-pedantic-ms-format AWK=gawk BISON=bison FLEX=flex LEX=flex EXPECT=expect INSTALL=/usr/bin/install INSTALL_DATA=/usr/bin/install INSTALL_PROGRAM=/usr/bin/install INSTALL_SCRIPT=/usr/bin/install M4=/usr/bin/m4 SED=/usr/bin/sed distclean-host \
+        distclean-target
+mingw32-make[1]: Entering directory 'C:/gcc-build'
+/c/msys64/usr/bin/sh: -c: 줄 5: 예기치 않은 토큰 `do' 근처에서 문법 오류
+/c/msys64/usr/bin/sh: -c: 줄 5: `for flag in AR=/mingw64/x86_64-w64-mingw32/bin/ar.exe AS=as CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ DLLTOOL=dlltool DSYMUTIL=dsymutil GFORTRAN= GOC= GDC=no GM2= LD=/mingw64/x86_64-w64-mingw32/bin/ld.exe LIPO=lipo NM=nm OBJDUMP=objdump OTOOL=otool RANLIB=ranlib READELF=readelf STRIP=strip WINDRES=windres WINDMC=windmc CREATE_GCOV=create_gcov PROFILE_MERGER=profile_merger ; do \'
+mingw32-make[1]: *** [Makefile:4532: distclean-fixincludes] Error 2
+mingw32-make[1]: Leaving directory 'C:/gcc-build'
+mingw32-make: *** [Makefile:2352: do-distclean] Error 2
+
+(수정)
+Makefile.in
+.PHONY: distclean-stage1
+distclean-stage1::
+	@: $(MAKE); $(stage)
+	@test "`cat stage_last`" != stage1 || rm -f stage_last
+	rm -rf stage1-*
+
+.PHONY: distclean-stage2
+distclean-stage2::
+	@: $(MAKE); $(stage)
+	@test "`cat stage_last`" != stage2 || rm -f stage_last
+	rm -rf stage2-* 
+
+.PHONY: distclean-stage3
+distclean-stage3::
+	@: $(MAKE); $(stage)
+	@test "`cat stage_last`" != stage3 || rm -f stage_last
+	rm -rf stage3-* compare 
+
+.PHONY: distclean-stage4
+distclean-stage4::
+	@: $(MAKE); $(stage)
+	@test "`cat stage_last`" != stage4 || rm -f stage_last
+	rm -rf stage4-* compare3
+
+.PHONY: distclean-stageprofile
+distclean-stageprofile::
+	@: $(MAKE); $(stage)
+	@test "`cat stage_last`" != stageprofile || rm -f stage_last
+	rm -rf stageprofile-* 
+
+.PHONY: distclean-stagefeedback
+distclean-stagefeedback::
+	@: $(MAKE); $(stage)
+	@test "`cat stage_last`" != stagefeedback || rm -f stage_last
+	rm -rf stagefeedback-*
+
+.PHONY: distclean-stageautoprofile
+distclean-stageautoprofile::
+	@: $(MAKE); $(stage)
+	@test "`cat stage_last`" != stageautoprofile || rm -f stage_last
+	rm -rf stageautoprofile-*
+
+.PHONY: maybe-distclean-libcpp distclean-libcpp
+maybe-distclean-libcpp:
+@if libcpp
+maybe-distclean-libcpp: distclean-libcpp
+
+(오류)
+/c/msys64/usr/bin/sh: 줄 2: @[: 명령어를 찾을 수 없음
+Doing distclean in libbacktrace
+/c/msys64/usr/bin/sh: 행 5번: cd: c:/gcc-build/libbacktrace: No such file or directory
+mingw32-make[1]: *** [Makefile:8393: distclean-libbacktrace] Error 1
+mingw32-make[1]: Leaving directory 'C:/gcc-build'
+mingw32-make: *** [Makefile:2352: do-distclean] Error 2
+
+(수정)
+Makefile.in
+distclean-libcpp:
+	echo distclean-libcpp============================================; \
+	@[ -f ./libcpp/Makefile ] || exit 0; \
+	export r=c:/gcc-build; \
+	export s=c:/gcc-14.2.0; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing distclean in libcpp"; \
+	(cd $(HOST_SUBDIR)/libcpp && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" "WINDMC=$${WINDMC}" \
+	          distclean) \
+	  || exit 1
+
+@endif libcpp
+
+디렉토리생성
+nayou@kimnayooung MINGW64 /c/gcc-build
+# mkdir -p c:/gcc-build/libbacktrace
+
+빌드정리재실행
+nayou@kimnayooung MINGW64 /c/gcc-build
+# ../gcc-14.2.0/configure && mingw32-make distclean
+
+(오류)
+mingw32-make[2]: Entering directory 'C:/gcc-build/libbacktrace'
+mingw32-make[2]: *** No rule to make target 'distclean'.  Stop.
+mingw32-make[2]: Leaving directory 'C:/gcc-build/libbacktrace'
+mingw32-make[1]: *** [Makefile:8393: distclean-libbacktrace] Error 1
+mingw32-make[1]: Leaving directory 'C:/gcc-build'
+mingw32-make: *** [Makefile:2352: do-distclean] Error 2
+(수정)
+Makefile.in
+.PHONY: maybe-distclean-libbacktrace distclean-libbacktrace
+maybe-distclean-libbacktrace:
+@if libbacktrace
+maybe-distclean-libbacktrace: distclean-libbacktrace
+
+distclean-libbacktrace: 
+	echo distclean-libbacktrace=================================; \
+	@[ -f ./libbacktrace/Makefile ] || exit 0; \
+	export r=c:/gcc-build; \
+	export s=c:/gcc-14.2.0; \
+	$(HOST_EXPORTS) \	
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing distclean in libbacktrace"; \
+	(cd $(HOST_SUBDIR)/libbacktrace && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" "WINDMC=$${WINDMC}" \
+	          distclean) \
+	  || exit 1
+
+@endif libbacktrace
+
+@[ -f ./libbacktrace/Makefile ] || exit 0; \
+[ 명령어가 쉘에서 올바르게 해석되지 않기 때문, MSYS 환경에서는 test 명령어를 사용
+test -f ./libbacktrace/Makefile || exit 0; \
+
+No rule to make target 'distclean'
+c:/gcc-build/libbacktrace 디렉토리에 Makefile이 없거나, distclean 타겟이 정의되지 않아 발생한 문제
+Makefile생성
+nayou@kimnayooung MINGW64 /c/gcc-build
+# cd ../gcc-14.2.0/libbacktrace/
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libbacktrace
+# ./configure --prefix=/c/gcc-build/libbacktrace/
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libbacktrace
+# ls -l Makefile
+-rw-r--r-- 1 nayou nayou 125319 11월 27 17:59 Makefile
+libbacktrace 디렉토리의 필수 파일들을 복사
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libbacktrace
+# cp -r /c/gcc-14.2.0/libbacktrace/Makefile /c/gcc-build/libbacktrace/
+cp -r /c/gcc-14.2.0/libbacktrace/Makefile.in /c/gcc-build/libbacktrace/
+cp -r /c/gcc-14.2.0/libbacktrace/configure /c/gcc-build/libbacktrace/
+cp -r /c/gcc-14.2.0/libbacktrace/config.h /c/gcc-build/libbacktrace/
+cp -r /c/gcc-14.2.0/libbacktrace/configure.ac /c/gcc-build/libbacktrace/
+cp -r /c/gcc-14.2.0/libbacktrace/aclocal.m4 /c/gcc-build/libbacktrace/
+cp -r /c/gcc-14.2.0/libbacktrace/Makefile.def /c/gcc-build/libbacktrace/
+
+configure 재실행
+nayou@kimnayooung MINGW64 /c/gcc-build
+# ../gcc-14.2.0/configure
+
+distclean 재실행
+nayou@kimnayooung MINGW64 /c/gcc-build
+# ../gcc-14.2.0/configure && mingw32-make distclean
 
