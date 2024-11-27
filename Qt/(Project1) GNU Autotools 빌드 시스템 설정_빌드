@@ -33978,13 +33978,61 @@ cp -r /c/gcc-14.2.0/libbacktrace/configure /c/gcc-build/libbacktrace/
 cp -r /c/gcc-14.2.0/libbacktrace/config.h /c/gcc-build/libbacktrace/
 cp -r /c/gcc-14.2.0/libbacktrace/configure.ac /c/gcc-build/libbacktrace/
 cp -r /c/gcc-14.2.0/libbacktrace/aclocal.m4 /c/gcc-build/libbacktrace/
-cp -r /c/gcc-14.2.0/libbacktrace/Makefile.def /c/gcc-build/libbacktrace/
-
+cp -r /c/gcc-14.2.0/libbacktrace/config.status /c/gcc-build/libbacktrace/
+mingw32-make distclean
 configure 재실행
 nayou@kimnayooung MINGW64 /c/gcc-build
 # ../gcc-14.2.0/configure
 
 distclean 재실행
 nayou@kimnayooung MINGW64 /c/gcc-build
-# ../gcc-14.2.0/configure && mingw32-make distclean
+# mingw32-make distclean
 
+(오류)
+cat: stage_last: No such file or directory 오류
+(수정)
+stage1-*, stage2-* 등의 파일 및 중간 빌드 디렉터리를 수동으로 삭제, stage와 관련된 모든 파일을 삭제하는 명령
+nayou@kimnayooung MINGW64 /c/gcc-build
+# rm -rf stage1-* stage2-* stage3-* stageprofile-* stagetrain-* stagefeedback-* stageautoprofile-* stageautofeedback-*
+
+(오류)
+/c/msys64/usr/bin/sh: -c: 줄 6: 예기치 않은 토큰 `do' 근처에서 문법 오류
+/c/msys64/usr/bin/sh: -c: 줄 6: `for flag in AR=/mingw64/x86_64-w64-mingw32/bin/ar.exe AS=as CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ DLLTOOL=dlltool DSYMUTIL=dsymutil GFORTRAN= GOC= GDC=no GM2= LD=/mingw64/x86_64-w64-mingw32/bin/ld.exe LIPO=lipo NM=nm OBJDUMP=objdump OTOOL=otool RANLIB=ranlib READELF=readelf STRIP=strip WINDRES=windres WINDMC=windmc CREATE_GCOV=create_gcov PROFILE_MERGER=profile_merger ; do \'
+mingw32-make[1]: *** [Makefile:8450: distclean-libbacktrace] Error 2
+mingw32-make[1]: Leaving directory 'C:/gcc-build'
+mingw32-make: *** [Makefile:2352: do-distclean] Error 2
+(수정)
+.PHONY: maybe-distclean-libbacktrace distclean-libbacktrace
+maybe-distclean-libbacktrace:
+maybe-distclean-libbacktrace: distclean-libbacktrace
+
+distclean-libbacktrace: 
+	echo distclean-libbacktrace=================================; \
+	test -f ./libbacktrace/Makefile || exit 0; \
+	export r=c:/gcc-build; \
+	export s=c:/gcc-14.2.0; \
+	$(HOST_EXPORTS) \
+	for flag in $(EXTRA_HOST_FLAGS) ; do \
+	  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	done; \
+	echo "Doing distclean in libbacktrace"; \
+	(cd $(HOST_SUBDIR)/libbacktrace && \
+	  $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+	          "CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	          "RANLIB=$${RANLIB}" \
+	          "DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" "WINDMC=$${WINDMC}" \
+	          distclean) \
+	  || exit 1
+
+  eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \ 
+앞부분의 스페이스를 탭으로 바꿔줌 
+
+(오류)
+mingw32-make[2]: Entering directory 'C:/gcc-build/libbacktrace'
+C:/msys64/usr/bin/sh.exe ./config.status --recheck
+/c/msys64/usr/bin/sh: ./config.status: No such file or directory
+mingw32-make[2]: *** [Makefile:1287: config.status] Error 127
+mingw32-make[2]: Leaving directory 'C:/gcc-build/libbacktrace'
+mingw32-make[1]: *** [Makefile:8392: distclean-libbacktrace] Error 1
+mingw32-make[1]: Leaving directory 'C:/gcc-build'
+mingw32-make: *** [Makefile:2352: do-distclean] Error 2
