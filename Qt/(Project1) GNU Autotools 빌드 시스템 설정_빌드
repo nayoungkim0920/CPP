@@ -34128,3 +34128,794 @@ cp C:/gcc-14.2.0/lto-plugin/Makefile C:/gcc-build/lto-plugin && \
 mingw32-make && \
 mingw32-make distclean
 
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# sed -i 's/@SET_MAKE@/make/g' Makefile
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# grep "@SET_MAKE@" Makefile
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# grep "@SET_MAKE@" config.status
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# grep "@SET_MAK@" Makefile.in
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# make distclean
+Makefile:15: *** 분리 기호가 빠졌음.  멈춤.
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# mingw32-make distclean
+Makefile:15: *** missing separator.  Stop.
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# ../configure && mingw32-make distclean
+Makefile:15: *** missing separator.  Stop.
+
+로그파일확인
+"C:\gcc-14.2.0\lto-plugin\config.log" 내용 확인
+gcc와 g++ 옵션 관련 오류:
+x86_64-w64-mingw32-gcc.exe: error: unrecognized command-line option '-V'
+x86_64-w64-mingw32-gcc.exe: error: unrecognized command-line option '-qversion'
+입력 파일 누락 오류:
+x86_64-w64-mingw32-gcc.exe: fatal error: no input files
+x86_64-w64-mingw32-g++.exe: fatal error: no input files
+=> 기본 검증 과정을 우회
+../configure --prefix=/c/gcc-14.2.0 --enable-languages=c,c++ \
+    CC="x86_64-w64-mingw32-gcc" CXX="x86_64-w64-mingw32-g++" \
+    --disable-bootstrap
+=> configure.ac 스크립트 수정
+-V 또는 -qversion이 사용된 구문을 찾아 제거
+sed -i 's/-V//g; s/-qversion//g' configure
+빌드명령어수정
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# ../configure \
+--prefix=/c/gcc-14.2.0 \
+--enable-languages=c,c++ \
+CC="x86_64-w64-mingw32-gcc" \
+CXX="x86_64-w64-mingw32-g++" \
+--disable-bootstrap \
+&& \
+sed -i 's/-V//g; s/-qversion//g' configure && \
+mingw32-make
+Makefile:15: *** missing separator.  Stop.
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# grep "\-V" configure
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# grep "\-qversion" configure
+
+Makefile의 15번째 줄에서 들여쓰기가 탭으로 되어 있는지 확인
+@SET_MAKE@
+
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# configure
+configure: loading site script /etc/config.site
+configure: error: cannot find install-sh, install.sh, or shtool in build-aux "/c/libidn2/libtool-2.4.6"/build-aux
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# ls -l /c/libidn2/libtool-2.4.6/install-sh
+ls: cannot access '/c/libidn2/libtool-2.4.6/install-sh': No such file or directory
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# ls -l /c/libidn2/libtool-2.4.6/install.sh
+ls: cannot access '/c/libidn2/libtool-2.4.6/install.sh': No such file or directory
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# find /mingw64 -name install-sh
+/mingw64/opt/lib/python3.11/config-3.11/install-sh
+/mingw64/share/doc/gettext/examples/hello-c++-kde/admin/install-sh
+/mingw64/share/libtool/build-aux/install-sh
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# mkdir /c/gcc-14.2.0/lto-plugin/build-aux/
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# cp /mingw64/share/libtool/build-aux/install-sh /c/gcc-14.2.0/lto-plugin/build-aux/
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# configure
+configure: loading site script /etc/config.site
+/bin/sh: build-aux/git-version-gen: No such file or directory
+## ------------------------- ##
+## Configuring libtool 2.4.6 ##
+## ------------------------- ##
+checking for GNU M4 that supports accurate traces... /usr/bin/m4
+checking whether /usr/bin/m4 accepts --gnu... yes
+checking how m4 supports trace files... --debugfile
+checking for a BSD-compatible install... /usr/bin/install -c
+checking whether build environment is sane... yes
+/bin/sh: /c/gcc-14.2.0/lto-plugin/build-aux/missing: No such file or directory
+configure: WARNING: 'missing' script is too old or missing
+checking for a thread-safe mkdir -p... /usr/bin/mkdir -p
+checking for gawk... gawk
+checking whether make sets $(MAKE)... yes
+checking whether make supports nested variables... yes
+configure: error: source directory already configured; run "make distclean" there first
+(오류)
+git-version-gen 파일이 없음
+missing 스크립트가 없음
+source directory already configured; run "make distclean" first
+(수정)
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# cp /mingw64/share/libtool/build-aux/git-version-gen /c/gcc-14.2.0/lto-plugin/build-aux/
+cp /mingw64/share/libtool/build-aux/missing /c/gcc-14.2.0/lto-plugin/build-aux/
+cp: cannot stat '/mingw64/share/libtool/build-aux/git-version-gen': No such file or directory
+git-version-gen 파일을 수동으로 찾기
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# find /mingw64 -name git-version-gen
+git-version-gen 파일을 생성하는 방법
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# autoreconf --install
+git-version-gen 파일을 수동 생성하는 방법
+github에서 git-version-gen 검색
+https://github.com/search?q=git-version-gen&type=repositories
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin/build-aux
+# vim git-version-gen.sh
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin/build-aux
+# ls -l git-version-gen.sh
+-rwxr-xr-x 1 nayou nayou 3360 11월 29 11:16 git-version-gen.sh
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# configure && make distclean
+(오류)
+configure: loading site script /etc/config.site
+/bin/sh: build-aux/git-version-gen: No such file or directory
+## ------------------------- ##
+## Configuring libtool 2.4.6 ##
+## ------------------------- ##
+checking for GNU M4 that supports accurate traces... /usr/bin/m4
+checking whether /usr/bin/m4 accepts --gnu... yes
+checking how m4 supports trace files... --debugfile
+checking for a BSD-compatible install... /usr/bin/install -c
+checking whether build environment is sane... yes
+checking for a thread-safe mkdir -p... /usr/bin/mkdir -p
+checking for gawk... gawk
+checking whether make sets $(MAKE)... yes
+checking whether make supports nested variables... yes
+configure: error: source directory already configured; run "make distclean" there first
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# rm -f config.status config.log
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# rm -f config.status config.log Makefile
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# rm -rf build-aux
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# ls -l build-aux
+ls: cannot access 'build-aux': No such file or directory
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# mkdir build-aux
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# cp /mingw64/share/libtool/build-aux/missing /c/gcc-14.2.0/lto-plugin/build-aux/
+cp /mingw64/share/libtool/build-aux/install-sh /c/gcc-14.2.0/lto-plugin/build-aux/
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# ls build-aux
+install-sh  missing
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# cp /c/Users/nayou/Downloads/git-version-gen.sh /c/gcc-14.2.0/lto-plugin/build-aux/
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# ls -l /c/gcc-14.2.0/lto-plugin/build-aux/
+합계 28
+-rwxr-xr-x 1 nayou nayou  3360 11월 29 11:34 git-version-gen.sh
+-rwxr-xr-x 1 nayou nayou 15437 11월 29 11:32 install-sh
+-rwxr-xr-x 1 nayou nayou  7728 11월 29 11:32 missing
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# rm -f Makefile config.status config.log config.h
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# rm -rf build-aux
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# mkdir build-aux
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# cp /mingw64/share/libtool/build-aux/git-version-gen /c/gcc-14.2.0/lto-plugin/build-aux/
+cp /mingw64/share/libtool/build-aux/missing /c/gcc-14.2.0/lto-plugin/build-aux/
+cp /mingw64/share/libtool/build-aux/install-sh /c/gcc-14.2.0/lto-plugin/build-aux/
+
+파일삭제
+rm -rf config.status config.log Makefile.in config.h config.h.in~ autom4te.cache build-aux configure 
+목록확인
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# ls -l
+합계 101
+-rw-r--r-- 1 nayou nayou 43644  8월  1 17:18 ChangeLog
+-rw-r--r-- 1 nayou nayou  3488 11월 29 12:03 config.h.in
+-rw-r--r-- 1 nayou nayou  3755  8월  1 17:17 configure.ac
+-rw-r--r-- 1 nayou nayou 43687  8월  1 17:17 lto-plugin.c
+-rw-r--r-- 1 nayou nayou    33  8월  1 17:17 lto-plugin.map
+-rw-r--r-- 1 nayou nayou  2769  8월  1 17:17 Makefile.am
+명령어실행
+autoreconf --install --force && ./configure && make
+계속적으로 이미 configure됬다고 나와서 build 폴더를 생성해서 작업하기로 함
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# mkdir build
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# cd build
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin/build
+# ../configure
+configure: loading site script /etc/config.site
+checking build system type... x86_64-w64-mingw32
+checking host system type... x86_64-w64-mingw32
+checking target system type... x86_64-w64-mingw32
+checking for a BSD-compatible install... /usr/bin/install -c
+checking whether build environment is sane... yes
+checking for a thread-safe mkdir -p... /usr/bin/mkdir -p
+checking for gawk... gawk
+checking whether make sets $(MAKE)... yes
+checking whether make supports nested variables... yes
+configure: error: source directory already configured; run "make distclean" there first
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin/build
+# cd ..
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# make distclean
+test -z "liblto_plugin.la" || rm -f liblto_plugin.la
+rm -f ./so_locations
+rm -rf .libs _libs
+rm -f *.o
+rm -f *.lo
+rm -f *.tab.c
+test -z "" || rm -f
+test . = "." || test -z "" || rm -f
+rm -f config.h stamp-h1
+rm -f libtool config.lt
+rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
+rm -f cscope.out cscope.in.out cscope.po.out cscope.files
+rm -f config.status config.cache config.log configure.lineno config.status.lineno
+rm -f Makefile
+distclean이 성공!!
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# cd build
+
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin/build
+# ../configure
+configure: loading site script /etc/config.site
+checking build system type... x86_64-w64-mingw32
+checking host system type... x86_64-w64-mingw32
+checking target system type... x86_64-w64-mingw32
+checking for a BSD-compatible install... /usr/bin/install -c
+checking whether build environment is sane... yes
+checking for a thread-safe mkdir -p... /usr/bin/mkdir -p
+checking for gawk... gawk
+checking whether make sets $(MAKE)... yes
+checking whether make supports nested variables... yes
+checking whether to enable maintainer-specific portions of Makefiles... no
+checking for style of include used by make... GNU
+checking for gcc... x86_64-w64-mingw32-gcc
+checking whether the C compiler works... yes
+checking for C compiler default output file name... a.exe
+checking for suffix of executables... .exe
+checking whether we are cross compiling... no
+checking for suffix of object files... o
+checking whether we are using the GNU C compiler... yes
+checking whether x86_64-w64-mingw32-gcc accepts -g... yes
+checking for x86_64-w64-mingw32-gcc option to enable C23 features... unsupported
+checking for x86_64-w64-mingw32-gcc option to enable C11 features... none needed
+checking whether x86_64-w64-mingw32-gcc understands -c and -o together... yes
+checking dependency style of x86_64-w64-mingw32-gcc... none
+checking how to run the C preprocessor... /mingw64/bin/cpp
+checking for grep that handles long lines and -e... /usr/bin/grep
+checking for egrep... /usr/bin/grep -E
+checking for ANSI C header files... yes
+checking for sys/types.h... yes
+checking for sys/stat.h... yes
+checking for stdlib.h... yes
+checking for string.h... yes
+checking for memory.h... yes
+checking for strings.h... yes
+checking for inttypes.h... yes
+checking for stdint.h... yes
+checking for unistd.h... yes
+checking minix/config.h usability... no
+checking minix/config.h presence... no
+checking for minix/config.h... no
+checking whether it is safe to define __EXTENSIONS__... yes
+checking for gcc... (cached) x86_64-w64-mingw32-gcc
+checking whether we are using the GNU C compiler... (cached) yes
+checking whether x86_64-w64-mingw32-gcc accepts -g... (cached) yes
+checking for x86_64-w64-mingw32-gcc option to enable C23 features... (cached) unsupported
+checking for x86_64-w64-mingw32-gcc option to enable C11 features... (cached) none needed
+checking whether x86_64-w64-mingw32-gcc understands -c and -o together... (cached) yes
+checking dependency style of x86_64-w64-mingw32-gcc... (cached) none
+checking for x86_64-w64-mingw32-gcc option to support large files... -D_FILE_OFFSET_BITS=64
+checking whether x86_64-w64-mingw32-gcc supports -Wall... yes
+checking for -static-libgcc... yes
+checking for CET support... no
+checking whether symbol versioning is supported... gnu
+checking how to print strings... printf
+checking for a sed that does not truncate output... /usr/bin/sed
+checking for fgrep... /usr/bin/grep -F
+checking for ld used by x86_64-w64-mingw32-gcc... /mingw64/x86_64-w64-mingw32/bin/ld.exe
+checking if the linker (/mingw64/x86_64-w64-mingw32/bin/ld.exe) is GNU ld... yes
+checking for BSD- or MS-compatible name lister (nm)... /c/msys64/mingw64/bin/nm -B
+checking the name lister (/c/msys64/mingw64/bin/nm -B) interface... BSD nm
+checking whether ln -s works... no, using cp -pR
+checking the maximum length of command line arguments... 8192
+checking how to convert x86_64-w64-mingw32 file names to x86_64-w64-mingw32 format... func_convert_file_msys_to_w32
+checking how to convert x86_64-w64-mingw32 file names to toolchain format... func_convert_file_msys_to_w32
+checking for /mingw64/x86_64-w64-mingw32/bin/ld.exe option to reload object files... -r
+checking for file... file
+checking for objdump... objdump
+checking how to recognize dependent libraries... file_magic ^x86 archive import|^x86 DLL
+checking for dlltool... dlltool
+checking how to associate runtime and link libraries... func_cygming_dll_for_implib
+checking for ranlib... ranlib
+checking for archiver @FILE support... @
+checking for strip... strip
+checking command to parse /c/msys64/mingw64/bin/nm -B output from x86_64-w64-mingw32-gcc object... ok
+checking for sysroot... no
+checking for a working dd... /usr/bin/dd
+checking how to truncate binary pipes... /usr/bin/dd bs=4096 count=1
+checking for mt... no
+checking if : is a manifest tool... no
+checking for dlfcn.h... no
+checking for objdir... .libs
+checking if x86_64-w64-mingw32-gcc supports -fno-rtti -fno-exceptions... no
+checking for x86_64-w64-mingw32-gcc option to produce PIC... -DDLL_EXPORT -DPIC
+checking if x86_64-w64-mingw32-gcc PIC flag -DDLL_EXPORT -DPIC works... yes
+checking if x86_64-w64-mingw32-gcc static flag -static works... yes
+checking if x86_64-w64-mingw32-gcc supports -c -o file.o... yes
+checking if x86_64-w64-mingw32-gcc supports -c -o file.o... (cached) yes
+checking whether the x86_64-w64-mingw32-gcc linker (/mingw64/x86_64-w64-mingw32/bin/ld.exe) supports shared libraries... yes
+checking whether -lc should be explicitly linked in... yes
+checking dynamic linker characteristics... Win32 ld.exe
+checking how to hardcode library paths into programs... immediate
+checking whether stripping libraries is possible... yes
+checking if libtool supports shared libraries... yes
+checking whether to build shared libraries... yes
+checking whether to build static libraries... yes
+checking for int64_t... yes
+checking for uint64_t... yes
+checking for sys/wait.h that is POSIX.1 compatible... no
+checking that generated files are newer than configure... done
+configure: creating ./config.status
+config.status: creating Makefile
+config.status: creating config.h
+config.status: executing depfiles commands
+config.status: executing libtool commands
+configure 성공!!
+
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin/build
+# mingw32-make
+C:/msys64/mingw64/bin/mingw32-make.exe  all-am
+mingw32-make[1]: Entering directory 'C:/gcc-14.2.0/lto-plugin/build'
+C:/msys64/usr/bin/sh.exe ./libtool --tag=CC --tag=disable-static  --mode=link x86_64-w64-mingw32-gcc -Wall  -DBASE_VERSION='"14.2.0"' -I/c/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -O2 -Wc,-static-libgcc  -no-undefined -bindir "/mingw64/bin" -module -avoid-version -bindir /mingw64/libexec/gcc/x86_64-w64-mingw32/14.2.0 -Wl,--version-script=../lto-plugin.map  -Wc,../libiberty/libiberty.a  '-L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0' '-L/mingw64/lib' '-L/usr/lib' '-L/mingw64/x86_64-w64-mingw32/lib' '-L/c/libidn2/gettext-0.22.5/libtextstyle/lib' '-Wl,-rpath,/mingw64/bin' -o liblto_plugin.la -rpath /mingw64/libexec/gcc/x86_64-w64-mingw32/14.2.0 lto-plugin.lo
+libtool: link: x86_64-w64-mingw32-gcc -shared  .libs/lto-plugin.o   -L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0 -L/mingw64/lib -L/usr/lib -L/mingw64/x86_64-w64-mingw32/lib -L/c/libidn2/gettext-0.22.5/libtextstyle/lib  -O2 -static-libgcc -Wl,--version-script=../lto-plugin.map ../libiberty/libiberty.a -Wl,-rpath -Wl,/mingw64/bin   -o .libs/liblto_plugin.dll -Wl,--enable-auto-image-base -Xlinker --out-implib -Xlinker .libs/liblto_plugin.dll.a
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find ../libiberty/libiberty.a: No such file or directory
+collect2.exe: error: ld returned 1 exit status
+mingw32-make[1]: *** [Makefile:478: liblto_plugin.la] Error 1
+mingw32-make[1]: Leaving directory 'C:/gcc-14.2.0/lto-plugin/build'
+mingw32-make: *** [Makefile:389: all] Error 2
+
+(오류)
+libiberty.a 파일을 찾을 수 없음
+(수정)
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# make
+make: *** 타겟이 지정되지 않았고 메이크파일이 없습니다.  멈춤.
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# configure
+configure: loading site script /etc/config.site
+configure: error: cannot find install-sh, install.sh, or shtool in build-aux "/c/libidn2/libtool-2.4.6"/build-aux
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# mkdir build-aux
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# cp /mingw64/share/libtool/build-aux/git-version-gen /c/gcc-14.2.0/libiberty/build-aux/
+cp /mingw64/share/libtool/build-aux/missing /c/gcc-14.2.0/libiberty/build-aux/
+cp /mingw64/share/libtool/build-aux/install-sh /c/gcc-14.2.0/libiberty/build-aux/
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# mkdir build
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# ../configure
+configure: loading site script /etc/config.site
+checking whether to enable maintainer-specific portions of Makefiles... no
+checking for makeinfo... makeinfo
+checking for perl... perl
+checking build system type... x86_64-w64-mingw32
+checking host system type... x86_64-w64-mingw32
+checking for ar... /mingw64/x86_64-w64-mingw32/bin/ar.exe
+checking for ranlib... ranlib
+checking for -plugin option... checking for ar... (cached) /mingw64/x86_64-w64-mingw32/bin/ar.exe
+no
+checking whether to install libiberty headers and static library... no
+configure: target_header_dir =
+checking for gcc... x86_64-w64-mingw32-gcc
+checking whether the C compiler works... yes
+checking for C compiler default output file name... a.exe
+checking for suffix of executables... .exe
+checking whether we are cross compiling... no
+checking for suffix of object files... o
+checking whether we are using the GNU C compiler... yes
+checking whether x86_64-w64-mingw32-gcc accepts -g... yes
+checking for x86_64-w64-mingw32-gcc option to accept ISO C89... none needed
+checking how to run the C preprocessor... /mingw64/bin/cpp
+checking for grep that handles long lines and -e... /usr/bin/grep
+checking for egrep... /usr/bin/grep -E
+checking for ANSI C header files... yes
+checking for sys/types.h... yes
+checking for sys/stat.h... yes
+checking for stdlib.h... yes
+checking for string.h... yes
+checking for memory.h... yes
+checking for strings.h... yes
+checking for inttypes.h... yes
+checking for stdint.h... yes
+checking for unistd.h... yes
+checking minix/config.h usability... no
+checking minix/config.h presence... no
+checking for minix/config.h... no
+checking whether it is safe to define __EXTENSIONS__... yes
+checking for special C compiler options needed for large files... no
+checking for _FILE_OFFSET_BITS value needed for large files... 64
+checking whether x86_64-w64-mingw32-gcc supports -W... yes
+checking whether x86_64-w64-mingw32-gcc supports -Wall... yes
+checking whether x86_64-w64-mingw32-gcc supports -Wwrite-strings... yes
+checking whether x86_64-w64-mingw32-gcc supports -Wc++-compat... yes
+checking whether x86_64-w64-mingw32-gcc supports -Wstrict-prototypes... yes
+checking whether x86_64-w64-mingw32-gcc supports -Wshadow=local... yes
+checking whether x86_64-w64-mingw32-gcc supports -pedantic ... yes
+checking whether x86_64-w64-mingw32-gcc and cc understand -c and -o together... yes
+checking for an ANSI C-conforming const... yes
+checking for inline... inline
+checking whether byte ordering is bigendian... no
+checking for a BSD-compatible install... /usr/bin/install -c
+checking for CET support... no
+checking target system type... x86_64-w64-mingw32
+checking for sys/file.h... yes
+checking for sys/param.h... yes
+checking for limits.h... yes
+checking for stdlib.h... (cached) yes
+checking for malloc.h... yes
+checking for string.h... (cached) yes
+checking for unistd.h... (cached) yes
+checking for strings.h... (cached) yes
+checking for sys/time.h... yes
+checking for time.h... yes
+checking for sys/resource.h... no
+checking for sys/stat.h... (cached) yes
+checking for sys/mman.h... no
+checking for fcntl.h... yes
+checking for alloca.h... yes
+checking for sys/pstat.h... no
+checking for sys/sysmp.h... no
+checking for sys/sysinfo.h... no
+checking for machine/hal_sysinfo.h... no
+checking for sys/table.h... no
+checking for sys/sysctl.h... no
+checking for sys/systemcfg.h... no
+checking for stdint.h... (cached) yes
+checking for stdio_ext.h... no
+checking for process.h... yes
+checking for sys/prctl.h... no
+checking for spawn.h... no
+checking for sys/wait.h that is POSIX.1 compatible... no
+checking whether time.h and sys/time.h may both be included... yes
+checking whether errno must be declared... no
+checking size of int... 4
+checking size of long... 4
+checking size of size_t... 8
+checking for long long... yes
+checking size of long long... 8
+checking for a 64-bit type... uint64_t
+checking for intptr_t... yes
+checking for uintptr_t... yes
+checking for ssize_t... yes
+checking for pid_t... yes
+checking for library containing strerror... none required
+checking for asprintf... yes
+checking for atexit... yes
+checking for basename... yes
+checking for bcmp... no
+checking for bcopy... no
+checking for bsearch... yes
+checking for bzero... no
+checking for calloc... yes
+checking for clock... yes
+checking for ffs... no
+checking for getcwd... yes
+checking for getpagesize... yes
+checking for gettimeofday... yes
+checking for index... no
+checking for insque... no
+checking for memchr... yes
+checking for memcmp... yes
+checking for memcpy... yes
+checking for memmem... no
+checking for memmove... yes
+checking for mempcpy... yes
+checking for memset... yes
+checking for mkstemps... no
+checking for putenv... yes
+checking for random... no
+checking for rename... yes
+checking for rindex... no
+checking for setenv... no
+checking for snprintf... yes
+checking for sigsetmask... no
+checking for stpcpy... no
+checking for stpncpy... no
+checking for strcasecmp... yes
+checking for strchr... yes
+checking for strdup... yes
+checking for strncasecmp... yes
+checking for strndup... no
+checking for strnlen... yes
+checking for strrchr... yes
+checking for strstr... yes
+checking for strtod... yes
+checking for strtol... yes
+checking for strtoul... yes
+checking for strtoll... yes
+checking for strtoull... yes
+checking for strverscmp... no
+checking for tmpnam... yes
+checking for vasprintf... yes
+checking for vfprintf... yes
+checking for vprintf... yes
+checking for vsnprintf... yes
+checking for vsprintf... yes
+checking for waitpid... no
+checking for setproctitle... no
+checking whether alloca needs Cray hooks... no
+checking stack direction for C alloca... 1
+checking for vfork.h... no
+checking for fork... no
+checking for vfork... no
+checking for _doprnt... no
+checking for sys_errlist... (cached) yes
+checking for sys_nerr... (cached) yes
+checking for sys_siglist... no
+checking for external symbol _system_configuration... no
+checking for __fsetlocking... no
+checking for canonicalize_file_name... no
+checking for dup3... no
+checking for getrlimit... no
+checking for getrusage... no
+checking for getsysinfo... no
+checking for gettimeofday... (cached) yes
+checking for on_exit... no
+checking for pipe2... no
+checking for posix_spawn... no
+checking for posix_spawnp... no
+checking for psignal... no
+checking for pstat_getdynamic... no
+checking for pstat_getstatic... no
+checking for realpath... no
+checking for setrlimit... no
+checking for spawnve... yes
+checking for spawnvpe... yes
+checking for strerror... yes
+checking for strsignal... no
+checking for sysconf... no
+checking for sysctl... no
+checking for sysmp... no
+checking for table... no
+checking for times... no
+checking for wait3... no
+checking for wait4... no
+checking for sbrk... no
+checking whether basename is declared... no
+checking whether ffs is declared... no
+checking whether asprintf is declared... yes
+checking whether vasprintf is declared... yes
+checking whether snprintf is declared... yes
+checking whether vsnprintf is declared... yes
+checking whether calloc is declared... yes
+checking whether getenv is declared... yes
+checking whether getopt is declared... yes
+checking whether malloc is declared... yes
+checking whether realloc is declared... yes
+checking whether sbrk is declared... no
+checking whether strtol is declared... yes
+checking whether strtoul is declared... yes
+checking whether strtoll is declared... yes
+checking whether strtoull is declared... yes
+checking whether strverscmp is declared... no
+checking whether strnlen is declared... yes
+checking whether canonicalize_file_name must be declared... yes
+checking for SHA1 HW acceleration support... x86 SHA1
+checking for stdlib.h... (cached) yes
+checking for unistd.h... (cached) yes
+checking for sys/param.h... (cached) yes
+checking for getpagesize... (cached) yes
+checking for working mmap... no
+checking for working strncmp... yes
+configure: creating ./config.status
+config.status: creating Makefile
+config.status: creating testsuite/Makefile
+config.status: creating config.h
+config.status: executing default commands
+성공!!
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# make
+mingw32-make[1]: Entering directory 'C:/gcc-14.2.0/libiberty/build/testsuite'
+mingw32-make[1]: Nothing to be done for 'all'.
+mingw32-make[1]: Leaving directory 'C:/gcc-14.2.0/libiberty/build/testsuite'
+성공!!
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty/build
+# ls -l *.a
+-rw-r--r-- 1 nayou nayou 417720 11월 29 13:59 libiberty.a
+성공!!
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin/build
+# ../configure && mingw32-make
+(오류)
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin/build
+# mingw32-make
+C:/msys64/mingw64/bin/mingw32-make.exe  all-am
+mingw32-make[1]: Entering directory 'C:/gcc-14.2.0/lto-plugin/build'
+C:/msys64/usr/bin/sh.exe ./libtool --tag=CC --tag=disable-static  --mode=link x86_64-w64-mingw32-gcc -Wall  -DBASE_VERSION='"14.2.0"' -I/c/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -O2 -Wc,-static-libgcc  -no-undefined -bindir "/mingw64/bin" -module -avoid-version -bindir /mingw64/libexec/gcc/x86_64-w64-mingw32/14.2.0 -Wl,--version-script=../lto-plugin.map  -Wc,../libiberty/libiberty.a  '-L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0' '-L/mingw64/lib' '-L/usr/lib' '-L/mingw64/x86_64-w64-mingw32/lib' '-L/c/libidn2/gettext-0.22.5/libtextstyle/lib' '-Wl,-rpath,/mingw64/bin' -o liblto_plugin.la -rpath /mingw64/libexec/gcc/x86_64-w64-mingw32/14.2.0 lto-plugin.lo
+libtool: link: x86_64-w64-mingw32-gcc -shared  .libs/lto-plugin.o   -L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0 -L/mingw64/lib -L/usr/lib -L/mingw64/x86_64-w64-mingw32/lib -L/c/libidn2/gettext-0.22.5/libtextstyle/lib  -O2 -static-libgcc -Wl,--version-script=../lto-plugin.map ../libiberty/libiberty.a -Wl,-rpath -Wl,/mingw64/bin   -o .libs/liblto_plugin.dll -Wl,--enable-auto-image-base -Xlinker --out-implib -Xlinker .libs/liblto_plugin.dll.a
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot find ../libiberty/libiberty.a: No such file or directory
+collect2.exe: error: ld returned 1 exit status
+mingw32-make[1]: *** [Makefile:478: liblto_plugin.la] Error 1
+mingw32-make[1]: Leaving directory 'C:/gcc-14.2.0/lto-plugin/build'
+mingw32-make: *** [Makefile:389: all] Error 2
+(수정)
+../Makefile.in 에서 libiberty.a 경로 확인
+"C:\gcc-14.2.0\lto-plugin\Makefile.in"
+478 : liblto_plugin.la: $(liblto_plugin_la_OBJECTS) $(liblto_plugin_la_DEPENDENCIES) $(EXTRA_liblto_plugin_la_DEPENDENCIES) 
+         $(AM_V_GEN)$(liblto_plugin_la_LINK) -rpath $(libexecsubdir) $(liblto_plugin_la_OBJECTS) $(liblto_plugin_la_LIBADD) $(LIBS)
+=> liblto_plugin_la_LINK : C:/msys64/usr/bin/sh.exe ./libtool --tag=CC --tag=disable-static --mode=link x86_64-w64-mingw32-gcc -Wall -DBASE_VERSION="14.2.0" -I/c/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -O2 -Wc,-static-libgcc -no-undefined -bindir /mingw64/bin -module -avoid-version -bindir /mingw64/libexec/gcc/x86_64-w64-mingw32/14.2.0 -Wl,--version-script=../lto-plugin.map -Wc,../libiberty/libiberty.a -L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0 -L/mingw64/lib -L/usr/lib -L/mingw64/x86_64-w64-mingw32/lib -L/c/libidn2/gettext-0.22.5/libtextstyle/lib -Wl,-rpath,/mingw64/bin -o liblto_plugin.la
+=> liblto_plugin_la_LINK값 안에 ../libiberty/libiberty.a 이 값을 /c/gcc-14.2.0/libiberty/build/libiberty.a 수정해야함
+Makefile.in 검색
+liblto_plugin_la_LINK 
+=> liblto_plugin_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(liblto_plugin_la_LDFLAGS) $(LTLDFLAGS) -o $@
+liblto_plugin_la_LDFLAGS
+=> liblto_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(lt_host_flags) -module \
+	-avoid-version -bindir $(libexecsubdir) $(version_arg) $(if \
+	$(wildcard $(libiberty_noasan)),, $(if $(wildcard \
+	$(libiberty_pic)),,-Wc,$(libiberty)))
+libiberty
+=> libiberty = $(with_libiberty)/libiberty.a
+with_libiberty
+=> with_libiberty = @with_libiberty@
+
+C:\gcc-14.2.0\lto-plugin\configure.ac 수정
+AC_ARG_WITH(libiberty,
+  [AS_HELP_STRING([--with-libiberty=PATH],
+    [specify the directory where to find libiberty [/c/gcc-14.2.0/libiberty/build]])],
+  [], with_libiberty=/c/gcc-14.2.0/libiberty/build)
+AC_SUBST(with_libiberty)
+autoconf 명령어로 configure를 다시 생성
+C:\gcc-14.2.0\lto-plugin\configure 파일 확인
+# Check whether --with-libiberty was given.
+if test "${with_libiberty+set}" = set; then :
+  withval=$with_libiberty;
+else
+  with_libiberty=/c/gcc-14.2.0/libiberty/build
+fi
+빌드
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# cd build
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin/build
+# ../configure
+C:\gcc-14.2.0\lto-plugin\build\Makefile 파일 확인
+with_libiberty = /c/gcc-14.2.0/libiberty/build
+성공!!
+
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin/build
+# mingw32-make
+(오류)
+C:/msys64/mingw64/bin/mingw32-make.exe  all-am
+mingw32-make[1]: Entering directory 'C:/gcc-14.2.0/lto-plugin/build'
+echo liblto_plugin_la_OBJECTS:lto-plugin.lo; \
+echo liblto_plugin_la_DEPENDENCIES:  ../lto-plugin.map; \
+echo EXTRA_liblto_plugin_la_DEPENDENCIES:; \
+echo AM_V_GEN:; \
+echo liblto_plugin_la_LINK:C:/msys64/usr/bin/sh.exe ./libtool --tag=CC --tag=disable-static  --mode=link x86_64-w64-mingw32-gcc -Wall  -DBASE_VERSION='"14.2.0"' -I/c/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -O2 -Wc,-static-libgcc  -no-undefined -bindir "/mingw64/bin" -module -avoid-version -bindir /mingw64/libexec/gcc/x86_64-w64-mingw32/14.2.0 -Wl,--version-script=../lto-plugin.map  -Wc,/c/gcc-14.2.0/libiberty/build/libiberty.a  '-L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0' '-L/mingw64/lib' '-L/usr/lib' '-L/mingw64/x86_64-w64-mingw32/lib' '-L/c/libidn2/gettext-0.22.5/libtextstyle/lib' '-Wl,-rpath,/mingw64/bin' -o liblto_plugin.la; \
+echo libexecsubdir:/mingw64/libexec/gcc/x86_64-w64-mingw32/14.2.0; \
+echo liblto_plugin_la_OBJECTS:lto-plugin.lo; \
+echo liblto_plugin_la_LIBADD: ; \
+echo LIBS:; \
+
+liblto_plugin_la_OBJECTS:lto-plugin.lo
+liblto_plugin_la_DEPENDENCIES: ../lto-plugin.map
+EXTRA_liblto_plugin_la_DEPENDENCIES:
+AM_V_GEN:
+liblto_plugin_la_LINK:C:/msys64/usr/bin/sh.exe ./libtool --tag=CC --tag=disable-static --mode=link x86_64-w64-mingw32-gcc -Wall -DBASE_VERSION="14.2.0" -I/c/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -O2 -Wc,-static-libgcc -no-undefined -bindir /mingw64/bin -module -avoid-version -bindir /mingw64/libexec/gcc/x86_64-w64-mingw32/14.2.0 -Wl,--version-script=../lto-plugin.map -Wc,/c/gcc-14.2.0/libiberty/build/libiberty.a -L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0 -L/mingw64/lib -L/usr/lib -L/mingw64/x86_64-w64-mingw32/lib -L/c/libidn2/gettext-0.22.5/libtextstyle/lib -Wl,-rpath,/mingw64/bin -o liblto_plugin.la
+libexecsubdir:/mingw64/libexec/gcc/x86_64-w64-mingw32/14.2.0
+liblto_plugin_la_OBJECTS:lto-plugin.lo
+liblto_plugin_la_LIBADD:
+LIBS:
+lto-plugin.lo   ../lto-plugin.map
+process_begin: CreateProcess(NULL, lto-plugin.lo ../lto-plugin.map, ...) failed.
+make (e=2): 지정된 파일을 찾을 수 없습니다.
+mingw32-make[1]: *** [Makefile:479: liblto_plugin.la] Error 2
+mingw32-make[1]: Leaving directory 'C:/gcc-14.2.0/lto-plugin/build'
+mingw32-make: *** [Makefile:389: all] Error 2
+(수정)
+process_begin: CreateProcess(NULL, lto-plugin.lo ../lto-plugin.map, ...) failed.
+lto-plugin.lo가 생성되지 않음, Makefile이 lto-plugin.lo 파일 생성을 시도했으나, 관련 명령어 실행에 실패
+lto-plugin.lo ../lto-plugin.map와 같은 호출은 잘못된 명령 형식, 명령어가 잘못 호출됨
+컴파일러 명령어(gcc -c ...)를 통해 .lo 파일이 생성되어야 하는데, Makefile 내에서 누락되었거나 잘못 설정
+
+"C:\gcc-14.2.0\lto-plugin\Makefile.in"
+liblto_plugin.la: 
+	echo liblto_plugin_la_OBJECTS:$(liblto_plugin_la_OBJECTS); \
+	echo liblto_plugin_la_DEPENDENCIES:$(liblto_plugin_la_DEPENDENCIES); \
+	echo EXTRA_liblto_plugin_la_DEPENDENCIES:$(EXTRA_liblto_plugin_la_DEPENDENCIES); \
+	echo AM_V_GEN:$(AM_V_GEN); \
+	echo liblto_plugin_la_LINK:$(liblto_plugin_la_LINK); \
+	echo libexecsubdir:$(libexecsubdir); \
+	echo liblto_plugin_la_OBJECTS:$(liblto_plugin_la_OBJECTS); \
+	echo liblto_plugin_la_LIBADD:$(liblto_plugin_la_LIBADD); \
+	echo LIBS:$(LIBS); \
+
+	$(liblto_plugin_la_OBJECTS) $(liblto_plugin_la_DEPENDENCIES) $(EXTRA_liblto_plugin_la_DEPENDENCIES) 
+	$(AM_V_GEN)$(liblto_plugin_la_LINK) -rpath $(libexecsubdir) $(liblto_plugin_la_OBJECTS) $(liblto_plugin_la_LIBADD) $(LIBS)
+
+(출력)
+liblto_plugin_la_OBJECTS:lto-plugin.lo
+liblto_plugin_la_DEPENDENCIES: ../lto-plugin.map
+EXTRA_liblto_plugin_la_DEPENDENCIES:
+AM_V_GEN:
+liblto_plugin_la_LINK:C:/msys64/usr/bin/sh.exe ./libtool --tag=CC --tag=disable-static --mode=link x86_64-w64-mingw32-gcc -Wall -DBASE_VERSION="14.2.0" -I/c/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -O2 -Wc,-static-libgcc -no-undefined -bindir /mingw64/bin -module -avoid-version -bindir /mingw64/libexec/gcc/x86_64-w64-mingw32/14.2.0 -Wl,--version-script=../lto-plugin.map -Wc,/c/gcc-14.2.0/libiberty/build/libiberty.a -L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0 -L/mingw64/lib -L/usr/lib -L/mingw64/x86_64-w64-mingw32/lib -L/c/libidn2/gettext-0.22.5/libtextstyle/lib -Wl,-rpath,/mingw64/bin -o liblto_plugin.la
+libexecsubdir:/mingw64/libexec/gcc/x86_64-w64-mingw32/14.2.0
+liblto_plugin_la_OBJECTS:lto-plugin.lo
+liblto_plugin_la_LIBADD:
+LIBS:
+
+=> 이 규칙을 제거하고 두가지 규칙 추가
+lto-plugin.lo: ../lto-plugin.c
+	$(LIBTOOL) --tag=CC --mode=compile $(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
+
+liblto_plugin.la: lto-plugin.lo $(liblto_plugin_la_DEPENDENCIES)
+	@echo liblto_plugin_la_OBJECTS: $(liblto_plugin_la_OBJECTS)
+	@echo liblto_plugin_la_DEPENDENCIES: $(liblto_plugin_la_DEPENDENCIES)
+	@echo EXTRA_liblto_plugin_la_DEPENDENCIES: $(EXTRA_liblto_plugin_la_DEPENDENCIES)
+	@echo AM_V_GEN: $(AM_V_GEN)
+	@echo liblto_plugin_la_LINK: $(liblto_plugin_la_LINK)
+	@echo libexecsubdir: $(libexecsubdir)
+	@echo liblto_plugin_la_LIBADD: $(liblto_plugin_la_LIBADD)
+	@echo LIBS: $(LIBS)
+	$(AM_V_GEN)$(liblto_plugin_la_LINK) -rpath $(libexecsubdir) $(liblto_plugin_la_OBJECTS) $(liblto_plugin_la_LIBADD) $(LIBS)
+ $(LIBS)
+
+정리 후 빌드
+mingw32-make clean && \
+mingw32-make distclean && \
+../configure && \
+mingw32-make
+
+(오류)
+config.status: creating Makefile
+config.status: creating config.h
+config.status: executing depfiles commands
+config.status: executing libtool commands
+C:/msys64/mingw64/bin/mingw32-make.exe  all-am
+mingw32-make[1]: Entering directory 'C:/gcc-14.2.0/lto-plugin/build'
+C:/msys64/usr/bin/sh.exe ./libtool --tag=CC --mode=compile x86_64-w64-mingw32-gcc -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -I/c/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -O2 -c ../lto-plugin.c -o lto-plugin.lo
+libtool: compile:  x86_64-w64-mingw32-gcc -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -I/c/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -O2 -c ../lto-plugin.c  -DDLL_EXPORT -DPIC -o .libs/lto-plugin.o
+../lto-plugin.c:70:10: fatal error: libiberty.h: No such file or directory
+   70 | #include <libiberty.h>
+      |          ^~~~~~~~~~~~~
+compilation terminated.
+mingw32-make[1]: *** [Makefile:478: lto-plugin.lo] Error 1
+mingw32-make[1]: Leaving directory 'C:/gcc-14.2.0/lto-plugin/build'
+mingw32-make: *** [Makefile:389: all] Error 2
+(수정)
+libiberty.a 파일은 libiberty 라이브러리의 정적 라이브러리 파일로, 해당 파일을 포함하는 디렉토리 경로를 설정
+헤더파일경로 : :/c/gcc-14.2.0/include/libiberty.h
+라이브러리파일경로 : c/gcc-14.2.0/libiberty/build/libiberty.a
+빌드명령어수정
+mingw32-make clean && \
+mingw32-make distclean && \
+../configure CPPFLAGS="$CPPFLAGS -I/c/gcc-14.2.0/include" LDFLAGS="$LDFLAGS -L/c/gcc-14.2.0/libiberty/build" && \
+mingw32-make
+
+(오류)
+mingw32-make[1]: Entering directory 'C:/gcc-14.2.0/lto-plugin/build'
+C:/msys64/usr/bin/sh.exe ./libtool --tag=CC --mode=compile x86_64-w64-mingw32-gcc -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -I/c/gcc-14.2.0/include -I/c/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -O2 -c ../lto-plugin.c -o lto-plugin.lo
+libtool: compile:  x86_64-w64-mingw32-gcc -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -I/c/gcc-14.2.0/include -I/c/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -O2 -c ../lto-plugin.c  -DDLL_EXPORT -DPIC -o .libs/lto-plugin.o
+../lto-plugin.c: In function 'negotiate_api_version':
+../lto-plugin.c:1463:41: error: 'BASE_VERSION' undeclared (first use in this function); did you mean 'GCC_VERSION'?
+ 1463 |   api_version = get_api_version ("GCC", BASE_VERSION, LAPI_V0,
+      |                                         ^~~~~~~~~~~~
+      |                                         GCC_VERSION
+../lto-plugin.c:1463:41: note: each undeclared identifier is reported only once for each function it appears in
+mingw32-make[1]: *** [Makefile:478: lto-plugin.lo] Error 1
+mingw32-make[1]: Leaving directory 'C:/gcc-14.2.0/lto-plugin/build'
+mingw32-make: *** [Makefile:389: all] Error 2
+(수정)
+BASE_VERSION이라는 매크로가 정의되지 않아서 발생
+"C:\gcc-14.2.0\lto-plugin\configure.ac"에 BASE_VERSION 추가하여 "C:\gcc-14.2.0\lto-plugin\build\config.h" 에 생성되도록함 
+AC_INIT([LTO plugin for ld], 0.1,,[lto-plugin])
+AC_CANONICAL_SYSTEM
+
+# GCC 버전 정보 추출 (예: 14.2.0에서 14만 추출)
+AC_MSG_CHECKING([for GCC version])
+GCC_VERSION=$(gcc -dumpversion)
+AC_MSG_RESULT([$GCC_VERSION])
+
+# 주요 버전만 추출 (예: 14.2.0에서 14만 사용)
+BASE_VERSION=$(echo $GCC_VERSION | cut -d. -f1)
+
+# BASE_VERSION을 config.h에 정의
+AC_DEFINE_UNQUOTED([BASE_VERSION], [$BASE_VERSION], [Define the base version of GCC])
+
+C:\gcc-14.2.0\lto-plugin\build\config.h 확인
