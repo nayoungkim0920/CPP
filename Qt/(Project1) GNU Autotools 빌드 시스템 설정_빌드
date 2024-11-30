@@ -34903,19 +34903,31 @@ mingw32-make[1]: Leaving directory 'C:/gcc-14.2.0/lto-plugin/build'
 mingw32-make: *** [Makefile:389: all] Error 2
 (수정)
 BASE_VERSION이라는 매크로가 정의되지 않아서 발생
-"C:\gcc-14.2.0\lto-plugin\configure.ac"에 BASE_VERSION 추가하여 "C:\gcc-14.2.0\lto-plugin\build\config.h" 에 생성되도록함 
-AC_INIT([LTO plugin for ld], 0.1,,[lto-plugin])
-AC_CANONICAL_SYSTEM
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin/build
+#
+echo $CC
+$CC -dumpversion
+x86_64-w64-mingw32-gcc
+14.2.0
 
-# GCC 버전 정보 추출 (예: 14.2.0에서 14만 추출)
+"C:\gcc-14.2.0\lto-plugin\configure.ac"에 BASE_VERSION 추가하여 "C:\gcc-14.2.0\lto-plugin\build\config.h" 에 생성되도록함 
 AC_MSG_CHECKING([for GCC version])
-GCC_VERSION=$(gcc -dumpversion)
+GCC_VERSION=`$CC -dumpversion`
 AC_MSG_RESULT([$GCC_VERSION])
 
-# 주요 버전만 추출 (예: 14.2.0에서 14만 사용)
-BASE_VERSION=$(echo $GCC_VERSION | cut -d. -f1)
+BASE_VERSION=`echo $GCC_VERSION | cut -d. -f1`
+AC_MSG_NOTICE([Using BASE_VERSION: $BASE_VERSION])
 
-# BASE_VERSION을 config.h에 정의
-AC_DEFINE_UNQUOTED([BASE_VERSION], [$BASE_VERSION], [Define the base version of GCC])
+AC_SUBST(BASE_VERSION)
 
+configure 파일 재성생
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# autoconf
 C:\gcc-14.2.0\lto-plugin\build\config.h 확인
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# cd build
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin/build
+# mingw32-make clean && \
+mingw32-make distclean && \
+../configure CPPFLAGS="$CPPFLAGS -I/c/gcc-14.2.0/include" LDFLAGS="$LDFLAGS -L/c/gcc-14.2.0/libiberty/build"
+
