@@ -34918,16 +34918,35 @@ AC_MSG_RESULT([$GCC_VERSION])
 BASE_VERSION=`echo $GCC_VERSION | cut -d. -f1`
 AC_MSG_NOTICE([Using BASE_VERSION: $BASE_VERSION])
 
+AC_CHECK_HEADER(config.h,
+	[AC_DEFINE(BASE_VERSION, 14, [Define if the system provides BASE_VERSION.])])
+
 AC_SUBST(BASE_VERSION)
 
 configure 파일 재성생
-nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
-# autoconf
-C:\gcc-14.2.0\lto-plugin\build\config.h 확인
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin/build
+# cd .. && autoconf
+config.h 파일 재생성
 nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
 # cd build
 nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin/build
 # mingw32-make clean && \
 mingw32-make distclean && \
 ../configure CPPFLAGS="$CPPFLAGS -I/c/gcc-14.2.0/include" LDFLAGS="$LDFLAGS -L/c/gcc-14.2.0/libiberty/build"
-
+C:\gcc-14.2.0\lto-plugin\build\config.h 확인
+/* Define if the system provides BASE_VERSION. */
+#define BASE_VERSION 14
+성공!!
+빌드
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin/build
+# mingw32-make
+(오류)
+C:/msys64/mingw64/bin/mingw32-make.exe  all-am
+mingw32-make[1]: Entering directory 'C:/gcc-14.2.0/lto-plugin/build'
+C:/msys64/usr/bin/sh.exe ./libtool  --tag=CC --tag=disable-static  --mode=compile x86_64-w64-mingw32-gcc -DHAVE_CONFIG_H -I. -I..  -I../../include -DHAVE_CONFIG_H -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -I/c/gcc-14.2.0/include -Wall  -DBASE_VERSION='"14.2.0"' -I/c/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -O2 -c -o lto-plugin.lo ../lto-plugin.c
+libtool: compile:  x86_64-w64-mingw32-gcc -DHAVE_CONFIG_H -I. -I.. -I../../include -DHAVE_CONFIG_H -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -I/c/gcc-14.2.0/include -Wall "-DBASE_VERSION=\\14.2.0\" -I/c/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -O2 -c -o lto-plugin.lo ../lto-plugin.c"  -DDLL_EXPORT -DPIC -o .libs/lto-plugin.o
+x86_64-w64-mingw32-gcc.exe: fatal error: no input files
+compilation terminated.
+mingw32-make[1]: *** [Makefile:494: lto-plugin.lo] Error 1
+mingw32-make[1]: Leaving directory 'C:/gcc-14.2.0/lto-plugin/build'
+mingw32-make: *** [Makefile:390: all] Error 2
