@@ -34911,15 +34911,16 @@ x86_64-w64-mingw32-gcc
 14.2.0
 
 "C:\gcc-14.2.0\lto-plugin\configure.ac"에 BASE_VERSION 추가하여 "C:\gcc-14.2.0\lto-plugin\build\config.h" 에 생성되도록함 
-AC_MSG_CHECKING([for GCC version])
-GCC_VERSION=`$CC -dumpversion`
-AC_MSG_RESULT([$GCC_VERSION])
+# AC_MSG_CHECKING([for GCC version])
+# GCC_VERSION=`$CC -dumpversion`
+# AC_MSG_RESULT([$GCC_VERSION])
 
-BASE_VERSION=`echo $GCC_VERSION | cut -d. -f1`
-AC_MSG_NOTICE([Using BASE_VERSION: $BASE_VERSION])
+# BASE_VERSION=`echo $GCC_VERSION | cut -d. -f1` # 14
+# BASE_VERSION=$GCC_VERSION # 14.2.0
+# AC_MSG_NOTICE([Using BASE_VERSION: $BASE_VERSION])
 
 AC_CHECK_HEADER(config.h,
-	[AC_DEFINE(BASE_VERSION, 14, [Define if the system provides BASE_VERSION.])])
+	[AC_DEFINE(BASE_VERSION, 14.2.0, [Define if the system provides BASE_VERSION.])])
 
 AC_SUBST(BASE_VERSION)
 
@@ -34935,7 +34936,7 @@ mingw32-make distclean && \
 ../configure CPPFLAGS="$CPPFLAGS -I/c/gcc-14.2.0/include" LDFLAGS="$LDFLAGS -L/c/gcc-14.2.0/libiberty/build"
 C:\gcc-14.2.0\lto-plugin\build\config.h 확인
 /* Define if the system provides BASE_VERSION. */
-#define BASE_VERSION 14
+#define BASE_VERSION 14.2.0
 성공!!
 빌드
 nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin/build
@@ -34976,4 +34977,168 @@ C:/msys64/usr/bin/sh.exe ./config.status --recheck 인해 계속 반복 빌드�
 config.status --recheck는 configure가 변경되었거나 관련 파일의 타임스탬프가 최신 상태가 아니라고 감지할 때 실행
 "C:\gcc-14.2.0\lto-plugin\build\config.status" 파일의 ac_cs_recheck 값을 확인
 ac_cs_recheck=false
-Makefile 의존성 비활성화
+C:\gcc-14.2.0\lto-plugin\Makefile.in 수정
+#liblto_plugin_la_SOURCES = lto-plugin.c
+liblto_plugin_la_SOURCES = /c/gcc-14.2.0/lto-plugin/lto-plugin.c
+srcdir 추가한것 모두 제거
+(오류)
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin/build
+# mingw32-make V=1
+ cd . && C:/msys64/usr/bin/sh.exe ./config.status Makefile
+config.status: creating Makefile
+C:/msys64/mingw64/bin/mingw32-make.exe  all-am
+mingw32-make[1]: Entering directory 'C:/gcc-14.2.0/lto-plugin/build'
+C:/msys64/usr/bin/sh.exe ./libtool  --tag=CC --tag=disable-static  --mode=compile x86_64-w64-mingw32-gcc -DHAVE_CONFIG_H -I. -I..  -I../../include -DHAVE_CONFIG_H -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -I/c/gcc-14.2.0/include -Wall  -DBASE_VERSION='"14.2.0"' -I/c/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -O2 -c -o lto-plugin.lo /c/gcc-14.2.0/lto-plugin/../lto-plugin.c
+libtool: compile:  x86_64-w64-mingw32-gcc -DHAVE_CONFIG_H -I. -I.. -I../../include -DHAVE_CONFIG_H -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -I/c/gcc-14.2.0/include -Wall "-DBASE_VERSION=\\14.2.0\" -I/c/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -O2 -c -o lto-plugin.lo /c/gcc-14.2.0/lto-plugin/../lto-plugin.c"  -DDLL_EXPORT -DPIC -o .libs/lto-plugin.o
+x86_64-w64-mingw32-gcc.exe: fatal error: no input files
+compilation terminated.
+mingw32-make[1]: *** [Makefile:494: lto-plugin.lo] Error 1
+mingw32-make[1]: Leaving directory 'C:/gcc-14.2.0/lto-plugin/build'
+mingw32-make: *** [Makefile:390: all] Error 2
+(수정)
+출력된 명령어 메시지 확인
+x86_64-w64-mingw32-gcc 
+-DHAVE_CONFIG_H 
+-I. 
+-I.. 
+-I../../include 
+-DHAVE_CONFIG_H 
+-I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ 
+-I/c/msys64/mingw64/include 
+-I/mingw64/include 
+-I/usr/share/gettext 
+-I/mingw64/include/glib-2.0 
+-O2 
+-I/c/gcc-14.2.0/include 
+-Wall 
+-DBASE_VERSION='"14.2.0"' (문제)
+-I/c/msys64/mingw64/include 
+-I/mingw64/include 
+-I/c/libidn2/gettext-0.22.5/libtextstyle/lib 
+-O2 
+-c 
+-o lto-plugin.lo 
+/c/gcc-14.2.0/lto-plugin/../lto-plugin.c (문제)
+
+x86_64-w64-mingw32-gcc 
+-DHAVE_CONFIG_H 
+-I. 
+-I.. 
+-I../../include 
+-DHAVE_CONFIG_H 
+-I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ 
+-I/c/msys64/mingw64/include 
+-I/mingw64/include 
+-I/usr/share/gettext 
+-I/mingw64/include/glib-2.0 
+-O2 
+-I/c/gcc-14.2.0/include 
+-Wall 
+"-DBASE_VERSION=\\14.2.0\" (문제)
+-I/c/msys64/mingw64/include 
+-I/mingw64/include 
+-I/c/libidn2/gettext-0.22.5/libtextstyle/lib 
+-O2 
+-c 
+-o lto-plugin.lo 
+/c/gcc-14.2.0/lto-plugin/../lto-plugin.c" (문제)
+-DDLL_EXPORT 
+-DPIC 
+-o .libs/lto-plugin.o
+
+-DBASE_VERSION 수정
+-DBASE_VERSION='"14.2.0"', "-DBASE_VERSION=\\14.2.0\" 을 -DBASE_VERSION="14.2.0"으로 수정
+Makefile.in
+#AM_CFLAGS = @ac_lto_plugin_warn_cflags@ $(CET_HOST_FLAGS) -DBASE_VERSION='"$(gcc_version)"'
+AM_CFLAGS = @ac_lto_plugin_warn_cflags@ $(CET_HOST_FLAGS) -DBASE_VERSION='$(gcc_version)'
+Makefile.am
+#AM_CFLAGS = @ac_lto_plugin_warn_cflags@ $(CET_HOST_FLAGS) -DBASE_VERSION='"$(gcc_version)"'
+AM_CFLAGS = @ac_lto_plugin_warn_cflags@ $(CET_HOST_FLAGS) -DBASE_VERSION='$(gcc_version)'
+성공!!
+
+(오류)
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin/build
+# mingw32-make V=1
+In file included from ../lto-plugin.c:42:
+./config.h:5:9: warning: "BASE_VERSION" redefined
+    5 | #define BASE_VERSION "14.2.0"
+      |         ^~~~~~~~~~~~
+<command-line>: note: this is the location of the previous definition
+../lto-plugin.c: In function 'dump_symtab':
+../lto-plugin.c:502:19: warning: 'I' flag used with '%x' gnu_printf format [-Wformat=]
+  502 |       fprintf (f, "%u %" PRI_LL "x %s %s\n",
+      |                   ^~~~~~
+../lto-plugin.c:502:34: note: format string is defined here
+  502 |       fprintf (f, "%u %" PRI_LL "x %s %s\n",
+      |                                  ^
+../lto-plugin.c:502:19: warning: format '%x' expects argument of type 'unsigned int', but argument 4 has type 'long long unsigned int' [-Wformat=]
+  502 |       fprintf (f, "%u %" PRI_LL "x %s %s\n",
+      |                   ^~~~~~
+  503 |                (unsigned int) slot, symtab->aux[j].id,
+      |                                     ~~~~~~~~~~~~~~~~~
+      |                                                   |
+      |                                                   long long unsigned int
+../lto-plugin.c:502:34: note: format string is defined here
+  502 |       fprintf (f, "%u %" PRI_LL "x %s %s\n",
+      |                       ~~~~~~~~~~~^
+      |                                  |
+      |                                  unsigned int
+      |                       %" PRI_LL "llx
+../lto-plugin.c: In function 'process_symtab':
+../lto-plugin.c:1089:16: warning: 'I' flag used with '%x' gnu_scanf format [-Wformat=]
+ 1089 |     sscanf (s, ".%" PRI_LL "x", &obj->out->id);
+      |                ^~~~
+../lto-plugin.c:1089:29: note: format string is defined here
+ 1089 |     sscanf (s, ".%" PRI_LL "x", &obj->out->id);
+      |                             ^
+../lto-plugin.c:1089:16: warning: format '%x' expects argument of type 'unsigned int *', but argument 3 has type 'long long unsigned int *' [-Wformat=]
+ 1089 |     sscanf (s, ".%" PRI_LL "x", &obj->out->id);
+      |                ^~~~             ~~~~~~~~~~~~~
+      |                                 |
+      |                                 long long unsigned int *
+../lto-plugin.c:1089:29: note: format string is defined here
+ 1089 |     sscanf (s, ".%" PRI_LL "x", &obj->out->id);
+      |                  ~~~~~~~~~~~^
+      |                             |
+      |                             unsigned int *
+      |                  %" PRI_LL "llx
+../lto-plugin.c: In function 'process_symtab_extension':
+../lto-plugin.c:1141:16: warning: 'I' flag used with '%x' gnu_scanf format [-Wformat=]
+ 1141 |     sscanf (s, ".%" PRI_LL "x", &obj->out->id);
+      |                ^~~~
+../lto-plugin.c:1141:29: note: format string is defined here
+ 1141 |     sscanf (s, ".%" PRI_LL "x", &obj->out->id);
+      |                             ^
+../lto-plugin.c:1141:16: warning: format '%x' expects argument of type 'unsigned int *', but argument 3 has type 'long long unsigned int *' [-Wformat=]
+ 1141 |     sscanf (s, ".%" PRI_LL "x", &obj->out->id);
+      |                ^~~~             ~~~~~~~~~~~~~
+      |                                 |
+      |                                 long long unsigned int *
+../lto-plugin.c:1141:29: note: format string is defined here
+ 1141 |     sscanf (s, ".%" PRI_LL "x", &obj->out->id);
+      |                  ~~~~~~~~~~~^
+      |                             |
+      |                             unsigned int *
+      |                  %" PRI_LL "llx
+C:/msys64/usr/bin/sh.exe ./libtool --tag=CC --tag=disable-static  --mode=link x86_64-w64-mingw32-gcc -Wall  -DBASE_VERSION='14.2.0' -I/c/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -O2 -Wc,-static-libgcc  -no-undefined -bindir "/mingw64/bin" -module -avoid-version -bindir /mingw64/libexec/gcc/x86_64-w64-mingw32/14.2.0 -Wl,--version-script=../lto-plugin.map  -Wc,/c/gcc-14.2.0/libiberty/build/libiberty.a  '-L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0' '-L/mingw64/lib' '-L/usr/lib' '-L/mingw64/x86_64-w64-mingw32/lib' '-L/c/libidn2/gettext-0.22.5/libtextstyle/lib' '-Wl,-rpath,/mingw64/bin' '-L/c/gcc-14.2.0/libiberty/build' -o liblto_plugin.la -rpath /mingw64/libexec/gcc/x86_64-w64-mingw32/14.2.0 lto-plugin.lo
+libtool: link: x86_64-w64-mingw32-gcc -shared  .libs/lto-plugin.o   -L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0 -L/mingw64/lib -L/usr/lib -L/mingw64/x86_64-w64-mingw32/lib -L/c/libidn2/gettext-0.22.5/libtextstyle/lib -L/c/gcc-14.2.0/libiberty/build  -O2 -static-libgcc -Wl,--version-script=../lto-plugin.map /c/gcc-14.2.0/libiberty/build/libiberty.a -Wl,-rpath -Wl,/mingw64/bin   -o .libs/liblto_plugin.dll -Wl,--enable-auto-image-base -Xlinker --out-implib -Xlinker .libs/liblto_plugin.dll.a
+libtool: link: ( cd ".libs" && rm -f "liblto_plugin.la" && cp -pR "../liblto_plugin.la" "liblto_plugin.la" )
+libtool: install: /usr/bin/install -c .libs/liblto_plugin.dll.a /c/gcc-14.2.0/lto-plugin/build/../gcc/liblto_plugin.dll.a
+libtool: install: base_file=`basename liblto_plugin.la`
+libtool: install:  dlpath=`/bin/sh 2>&1 -c '. .libs/'liblto_plugin.la'i; echo liblto_plugin.dll'`
+libtool: install:  dldir=/c/gcc-14.2.0/lto-plugin/build/../gcc/`dirname liblto_plugin.dll`
+libtool: install:  test -d /c/gcc-14.2.0/lto-plugin/build/../gcc/. || mkdir -p /c/gcc-14.2.0/lto-plugin/build/../gcc/.
+libtool: install:  /usr/bin/install -c .libs/liblto_plugin.dll /c/gcc-14.2.0/lto-plugin/build/../gcc/./liblto_plugin.dll
+libtool: install:  chmod a+x /c/gcc-14.2.0/lto-plugin/build/../gcc/./liblto_plugin.dll
+libtool: install:  if test -n '' && test -n 'strip --strip-unneeded'; then eval 'strip --strip-unneeded /c/gcc-14.2.0/lto-plugin/build/../gcc/./liblto_plugin.dll' || exit 0; fi
+libtool: install: /usr/bin/install -c .libs/liblto_plugin.lai /c/gcc-14.2.0/lto-plugin/build/../gcc/liblto_plugin.la
+libtool: warning: remember to run 'libtool --finish /mingw64/libexec/gcc/x86_64-w64-mingw32/14.2.0'
+mingw32-make[1]: Leaving directory 'C:/gcc-14.2.0/lto-plugin/build'
+
+(수정)
+
+
+
+
+
+
