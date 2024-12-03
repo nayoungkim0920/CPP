@@ -35057,6 +35057,45 @@ AM_CFLAGS = @ac_lto_plugin_warn_cflags@ $(CET_HOST_FLAGS) -DBASE_VERSION='$(gcc_
 성공!!
 
 (오류)
+vscode에서 C:\gcc-14.2.0\lto-plugin\lto-plugin.c 오픈시 헤더파일오류
+#include <stdbool.h>
+#include <unistd.h>
+#include <libiberty.h>
+#include <hashtab.h>
+#include "simple-object.h"
+#include "plugin-api.h"
+경로검색
+"C:\gcc-14.2.0\gcc\ginclude\stdbool.h"
+"C:\gcc-14.2.0\libstdc++-v3\include\c_compatibility\stdbool.h"
+"C:\gcc-14.2.0\libstdc++-v3\include\tr1\stdbool.h"
+
+"C:\gcc-14.2.0\libssp\ssp\unistd.h"
+"C:\gcc-14.2.0\fixincludes\tests\base\unistd.h"
+
+"C:\gcc-14.2.0\include\libiberty.h"
+
+"C:\gcc-14.2.0\libgomp\hashtab.h"
+"C:\gcc-14.2.0\include\hashtab.h"
+
+"C:\gcc-14.2.0\include\simple-object.h"
+
+"C:\gcc-14.2.0\include\plugin-api.h"
+
+VSCode IntelliSense 경로 설정
+c_cpp_properties.json 파일의 includePath에 헤더 파일 경로를 추가
+파일 > preference > setttings > c/c++ include 검색 > default : include path > Add item
+찾은 경로들 하나씩 추가
+C:/gcc-14.2.0/gcc/ginclude
+C:/gcc-14.2.0/libstdc++-v3/include/c_compatibility
+C:/gcc-14.2.0/libstdc++-v3/include/tr1
+C:/gcc-14.2.0/libssp/ssp
+C:/gcc-14.2.0/fixincludes/tests/base
+C:/gcc-14.2.0/include
+C:/gcc-14.2.0/libgomp
+"Add Item"으로 추가한 내용은 VSCode의 c_cpp_properties.json에 반영 됨
+
+
+(오류)
 nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin/build
 # mingw32-make V=1
 In file included from ../lto-plugin.c:42:
@@ -35136,9 +35175,201 @@ libtool: warning: remember to run 'libtool --finish /mingw64/libexec/gcc/x86_64-
 mingw32-make[1]: Leaving directory 'C:/gcc-14.2.0/lto-plugin/build'
 
 (수정)
+C:\gcc-14.2.0\lto-plugin\configure.ac
+AC_MSG_CHECKING([whether BASE_VERSION is already defined])
+if test -z "$BASE_VERSION"; then
+    AC_DEFINE([BASE_VERSION], ["14.2.0"], [Define BASE_VERSION if not already defined])
+    AC_MSG_RESULT([not defined, set to "14.2.0"])
+else
+    AC_MSG_RESULT([already defined as $BASE_VERSION])
+fi
+AC_SUBST(BASE_VERSION)
 
+C:\gcc-14.2.0\lto-plugin\build\config.h
+/* Define if the system provides BASE_VERSION. */
+#define BASE_VERSION "14.2.0"
 
+(오류)
+./config.h:5:9: warning: "BASE_VERSION" redefined
+    5 | #define BASE_VERSION "14.2.0"
+      |         ^~~~~~~~~~~~
+<command-line>: note: this is the location of the previous definition
+../lto-plugin.c: In function 'dump_symtab':
+../lto-plugin.c:502:19: warning: 'I' flag used with '%x' gnu_printf format [-Wformat=]
+  502 |       fprintf (f, "%u %" PRI_LL "x %s %s\n",
+      |                   ^~~~~~
+../lto-plugin.c:502:34: note: format string is defined here
+  502 |       fprintf (f, "%u %" PRI_LL "x %s %s\n",
+      |                                  ^
+../lto-plugin.c:502:19: warning: format '%x' expects argument of type 'unsigned int', but argument 4 has type 'long long unsigned int' [-Wformat=]
+  502 |       fprintf (f, "%u %" PRI_LL "x %s %s\n",
+      |                   ^~~~~~
+  503 |                (unsigned int) slot, symtab->aux[j].id,
+      |                                     ~~~~~~~~~~~~~~~~~
+      |                                                   |
+      |                                                   long long unsigned int
+../lto-plugin.c:502:34: note: format string is defined here
+  502 |       fprintf (f, "%u %" PRI_LL "x %s %s\n",
+      |                       ~~~~~~~~~~~^
+      |                                  |
+      |                                  unsigned int
+      |                       %" PRI_LL "llx
+../lto-plugin.c: In function 'process_symtab':
+../lto-plugin.c:1089:16: warning: 'I' flag used with '%x' gnu_scanf format [-Wformat=]
+ 1089 |     sscanf (s, ".%" PRI_LL "x", &obj->out->id);
+      |                ^~~~
+../lto-plugin.c:1089:29: note: format string is defined here
+ 1089 |     sscanf (s, ".%" PRI_LL "x", &obj->out->id);
+      |                             ^
+../lto-plugin.c:1089:16: warning: format '%x' expects argument of type 'unsigned int *', but argument 3 has type 'long long unsigned int *' [-Wformat=]
+ 1089 |     sscanf (s, ".%" PRI_LL "x", &obj->out->id);
+      |                ^~~~             ~~~~~~~~~~~~~
+      |                                 |
+      |                                 long long unsigned int *
+../lto-plugin.c:1089:29: note: format string is defined here
+ 1089 |     sscanf (s, ".%" PRI_LL "x", &obj->out->id);
+      |                  ~~~~~~~~~~~^
+      |                             |
+      |                             unsigned int *
+      |                  %" PRI_LL "llx
+../lto-plugin.c: In function 'process_symtab_extension':
+../lto-plugin.c:1141:16: warning: 'I' flag used with '%x' gnu_scanf format [-Wformat=]
+ 1141 |     sscanf (s, ".%" PRI_LL "x", &obj->out->id);
+      |                ^~~~
+../lto-plugin.c:1141:29: note: format string is defined here
+ 1141 |     sscanf (s, ".%" PRI_LL "x", &obj->out->id);
+      |                             ^
+../lto-plugin.c:1141:16: warning: format '%x' expects argument of type 'unsigned int *', but argument 3 has type 'long long unsigned int *' [-Wformat=]
+ 1141 |     sscanf (s, ".%" PRI_LL "x", &obj->out->id);
+      |                ^~~~             ~~~~~~~~~~~~~
+      |                                 |
+      |                                 long long unsigned int *
+../lto-plugin.c:1141:29: note: format string is defined here
+ 1141 |     sscanf (s, ".%" PRI_LL "x", &obj->out->id);
+      |                  ~~~~~~~~~~~^
+      |                             |
+      |                             unsigned int *
+      |                  %" PRI_LL "llx
+C:/msys64/usr/bin/sh.exe ./libtool --tag=CC --tag=disable-static  --mode=link x86_64-w64-mingw32-gcc -Wall  -DBASE_VERSION='14.2.0' -I/c/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -O2 -Wc,-static-libgcc  -no-undefined -bindir "/mingw64/bin" -module -avoid-version -bindir /mingw64/libexec/gcc/x86_64-w64-mingw32/14.2.0 -Wl,--version-script=../lto-plugin.map  -Wc,/c/gcc-14.2.0/libiberty/build/libiberty.a  '-L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0' '-L/mingw64/lib' '-L/usr/lib' '-L/mingw64/x86_64-w64-mingw32/lib' '-L/c/libidn2/gettext-0.22.5/libtextstyle/lib' '-Wl,-rpath,/mingw64/bin' '-L/c/gcc-14.2.0/libiberty/build' -o liblto_plugin.la -rpath /mingw64/libexec/gcc/x86_64-w64-mingw32/14.2.0 lto-plugin.lo
+libtool: link: x86_64-w64-mingw32-gcc -shared  .libs/lto-plugin.o   -L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0 -L/mingw64/lib -L/usr/lib -L/mingw64/x86_64-w64-mingw32/lib -L/c/libidn2/gettext-0.22.5/libtextstyle/lib -L/c/gcc-14.2.0/libiberty/build  -O2 -static-libgcc -Wl,--version-script=../lto-plugin.map /c/gcc-14.2.0/libiberty/build/libiberty.a -Wl,-rpath -Wl,/mingw64/bin   -o .libs/liblto_plugin.dll -Wl,--enable-auto-image-base -Xlinker --out-implib -Xlinker .libs/liblto_plugin.dll.a
+libtool: link: ( cd ".libs" && rm -f "liblto_plugin.la" && cp -pR "../liblto_plugin.la" "liblto_plugin.la" )
+libtool: install: /usr/bin/install -c .libs/liblto_plugin.dll.a /c/gcc-14.2.0/lto-plugin/build/../gcc/liblto_plugin.dll.a
+libtool: install: base_file=`basename liblto_plugin.la`
+libtool: install:  dlpath=`/bin/sh 2>&1 -c '. .libs/'liblto_plugin.la'i; echo liblto_plugin.dll'`
+libtool: install:  dldir=/c/gcc-14.2.0/lto-plugin/build/../gcc/`dirname liblto_plugin.dll`
+libtool: install:  test -d /c/gcc-14.2.0/lto-plugin/build/../gcc/. || mkdir -p /c/gcc-14.2.0/lto-plugin/build/../gcc/.
+libtool: install:  /usr/bin/install -c .libs/liblto_plugin.dll /c/gcc-14.2.0/lto-plugin/build/../gcc/./liblto_plugin.dll
+libtool: install:  chmod a+x /c/gcc-14.2.0/lto-plugin/build/../gcc/./liblto_plugin.dll
+libtool: install:  if test -n '' && test -n 'strip --strip-unneeded'; then eval 'strip --strip-unneeded /c/gcc-14.2.0/lto-plugin/build/../gcc/./liblto_plugin.dll' || exit 0; fi
+libtool: install: /usr/bin/install -c .libs/liblto_plugin.lai /c/gcc-14.2.0/lto-plugin/build/../gcc/liblto_plugin.la
+libtool: warning: remember to run 'libtool --finish /mingw64/libexec/gcc/x86_64-w64-mingw32/14.2.0'
+mingw32-make[1]: Leaving directory 'C:/gcc-14.2.0/lto-plugin/build'
+(수정)
+./config.h:5:9: warning: "BASE_VERSION" redefined
+    5 | #define BASE_VERSION "14.2.0"
+      |         ^~~~~~~~~~~~
+<command-line>: note: this is the location of the previous definition
+BASE_VERSION이 두 번 정의
+config.h에서 #define BASE_VERSION "14.2.0"으로 정의.
+컴파일 명령줄에서 -DBASE_VERSION='14.2.0'으로 다시 정의.
+C:\gcc-14.2.0\lto-plugin\Makefile.in, C:\gcc-14.2.0\lto-plugin\Makefile.am
+AM_CFLAGS = @ac_lto_plugin_warn_cflags@ $(CET_HOST_FLAGS) -DBASE_VERSION='$(gcc_version)'
+ -DBASE_VERSION='$(gcc_version)' => 제거
+../lto-plugin.c: In function 'dump_symtab':
+../lto-plugin.c:502:19: warning: 'I' flag used with '%x' gnu_printf format [-Wformat=]
+%x 포맷에 부적절한 인수가 전달되었거나, long long 데이터를 처리하기 위해 잘못된 매크로를 사용
+%x는 unsigned int를 기대하지만, 코드에서 long long unsigned int 데이터를 전달
+PRI_LL 매크로가 적절히 정의되지 않았거나 사용이 잘못
+inttypes.h를 올바르게 사용하지 않거나, 포맷 문자열에서 데이터 타입을 잘못 지정한 경우 발생
+inttypes.h를 포함하여 올바른 포맷 매크로(PRIx64, SCNx64 등)를 사용
+  502 |       fprintf (f, "%u %" PRI_LL "x %s %s\n",
+      |                   ^~~~~~
+../lto-plugin.c:502:34: note: format string is defined here
+  502 |       fprintf (f, "%u %" PRI_LL "x %s %s\n",
+      |                                  ^
+../lto-plugin.c:502:19: warning: format '%x' expects argument of type 'unsigned int', but argument 4 has type 'long long unsigned int' [-Wformat=]
+  502 |       fprintf (f, "%u %" PRI_LL "x %s %s\n",
+      |                   ^~~~~~
+  503 |                (unsigned int) slot, symtab->aux[j].id,
+      |                                     ~~~~~~~~~~~~~~~~~
+      |                                                   |
+      |                                                   long long unsigned int
+../lto-plugin.c:502:34: note: format string is defined here
+  502 |       fprintf (f, "%u %" PRI_LL "x %s %s\n",
+      |                       ~~~~~~~~~~~^
+      |                                  |
+      |                                  unsigned int
+      |                       %" PRI_LL "llx
+../lto-plugin.c: In function 'process_symtab':
+../lto-plugin.c:1089:16: warning: 'I' flag used with '%x' gnu_scanf format [-Wformat=]
 
+C:\gcc-14.2.0\lto-plugin\lto-plugin.c 수정
+#include <inttypes.h> // 추
 
+static void
+dump_symtab (FILE *f, struct plugin_symtab *symtab)
+{
+  unsigned j;
 
+  for (j = 0; j < symtab->nsyms; j++)
+    {
+      uint32_t slot = symtab->aux[j].slot;
+      unsigned int resolution = symtab->syms[j].resolution;
+      
+      assert (resolution != LDPR_UNKNOWN);
+/*502:      fprintf (f, "%u %" PRI_LL "x %s %s\n",
+503:               (unsigned int) slot, symtab->aux[j].id,
+	       lto_resolution_str[resolution], 
+	       symtab->syms[j].name);*/
 
+	// PRIx64: uint64_t 타입 데이터를 16진수로 출력.
+	fprintf (f, "%u %" PRIx64 "x %s %s\n",
+		(unsigned int) slot, (uint64_t)symtab->aux[j].id,
+		symtab->aux[j].name, symtab->aux[j].type
+	);
+    }
+}
+
+1089 |     sscanf (s, ".%" PRI_LL "x", &obj->out->id);
+      |                ^~~~
+../lto-plugin.c:1089:29: note: format string is defined here
+ 1089 |     sscanf (s, ".%" PRI_LL "x", &obj->out->id);
+      |                             ^
+../lto-plugin.c:1089:16: warning: format '%x' expects argument of type 'unsigned int *', but argument 3 has type 'long long unsigned int *' [-Wformat=]
+ 1089 |     sscanf (s, ".%" PRI_LL "x", &obj->out->id);
+      |                ^~~~             ~~~~~~~~~~~~~
+      |                                 |
+      |                                 long long unsigned int *
+../lto-plugin.c:1089:29: note: format string is defined here
+ 1089 |     sscanf (s, ".%" PRI_LL "x", &obj->out->id);
+      |                  ~~~~~~~~~~~^
+      |                             |
+      |                             unsigned int *
+      |                  %" PRI_LL "llx
+../lto-plugin.c: In function 'process_symtab_extension':
+../lto-plugin.c:1141:16: warning: 'I' flag used with '%x' gnu_scanf format [-Wformat=]
+ 1141 |     sscanf (s, ".%" PRI_LL "x", &obj->out->id);
+      |                ^~~~
+../lto-plugin.c:1141:29: note: format string is defined here
+ 1141 |     sscanf (s, ".%" PRI_LL "x", &obj->out->id);
+      |                             ^
+../lto-plugin.c:1141:16: warning: format '%x' expects argument of type 'unsigned int *', but argument 3 has type 'long long unsigned int *' [-Wformat=]
+ 1141 |     sscanf (s, ".%" PRI_LL "x", &obj->out->id);
+      |                ^~~~             ~~~~~~~~~~~~~
+      |                                 |
+      |                                 long long unsigned int *
+../lto-plugin.c:1141:29: note: format string is defined here
+ 1141 |     sscanf (s, ".%" PRI_LL "x", &obj->out->id);
+      |                  ~~~~~~~~~~~^
+      |                             |
+      |                             unsigned int *
+      |                  %" PRI_LL "llx
+
+C:\gcc-14.2.0\lto-plugin\lto-plugin.c 수정
+  if (s)
+	// sscanf (s, ".%" PRI_LL "x", &obj->out->id);
+	// SCNx64: uint64_t 데이터를 16진수로 입력받음.
+	sscanf (s, ".%" SCNx64, (uint54_t*)&obj->out->id);	
+
+libtool: warning: remember to run 'libtool --finish /mingw64/libexec/gcc/x86_64-w64-mingw32/14.2.0'
+libtool 관련 경고: 설치 후 정리 단계(libtool --finish)와 관련된 알림이며, 실제 실행에는 큰 영향을 미치지 않음
