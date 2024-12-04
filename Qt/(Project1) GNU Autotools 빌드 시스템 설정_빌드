@@ -35064,6 +35064,14 @@ vscode에서 C:\gcc-14.2.0\lto-plugin\lto-plugin.c 오픈시 헤더파일오류
 #include <hashtab.h>
 #include "simple-object.h"
 #include "plugin-api.h"
+#include <assert.h>
+#include <errno.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <inttypes.h>
+#include <sys/stat.h>
+#include <unistd.h>
 경로검색
 "C:\gcc-14.2.0\gcc\ginclude\stdbool.h"
 "C:\gcc-14.2.0\libstdc++-v3\include\c_compatibility\stdbool.h"
@@ -35081,6 +35089,36 @@ vscode에서 C:\gcc-14.2.0\lto-plugin\lto-plugin.c 오픈시 헤더파일오류
 
 "C:\gcc-14.2.0\include\plugin-api.h"
 
+"C:\gcc-14.2.0\libstdc++-v3\include\c_compatibility\assert.h"
+"C:\gcc-14.2.0\fixincludes\tests\base\assert.h"
+
+"C:\gcc-14.2.0\libstdc++-v3\include\c_compatibility\errno.h"
+"C:\gcc-14.2.0\fixincludes\tests\base\errno.h"
+
+"C:\gcc-14.2.0\libstdc++-v3\include\c_compatibility\string.h"
+"C:\gcc-14.2.0\libssp\ssp\string.h"
+
+"C:\gcc-14.2.0\fixincludes\tests\base\ansi\stdlib.h"
+"C:\gcc-14.2.0\fixincludes\tests\base\stdlib.h"
+"C:\gcc-14.2.0\libstdc++-v3\include\c_compatibility\stdlib.h"
+"C:\gcc-14.2.0\libstdc++-v3\include\tr1\stdlib.h"
+
+"C:\gcc-14.2.0\fixincludes\tests\base\stdio.h"
+"C:\gcc-14.2.0\libssp\ssp\stdio.h"
+"C:\gcc-14.2.0\libstdc++-v3\include\c_compatibility\stdio.h"
+"C:\gcc-14.2.0\libstdc++-v3\include\tr1\stdio.h"
+"C:\gcc-14.2.0\fixincludes\tests\base\rtldef\stdio.h"
+
+"C:\gcc-14.2.0\libstdc++-v3\include\c_compatibility\inttypes.h"
+"C:\gcc-14.2.0\libstdc++-v3\include\tr1\inttypes.h"
+"C:\gcc-14.2.0\gcc\config\vxworks\inttypes.h"
+"C:\gcc-14.2.0\fixincludes\tests\base\inttypes.h"
+"C:\gcc-14.2.0\fixincludes\tests\base\sys\inttypes.h"
+
+"C:\gcc-14.2.0\fixincludes\tests\base\sys\stat.h"
+
+"C:\gcc-14.2.0\fixincludes\tests\base\unistd.h"
+"C:\gcc-14.2.0\libssp\ssp\unistd.h"
 VSCode IntelliSense 경로 설정
 c_cpp_properties.json 파일의 includePath에 헤더 파일 경로를 추가
 파일 > preference > setttings > c/c++ include 검색 > default : include path > Add item
@@ -35090,10 +35128,13 @@ C:/gcc-14.2.0/libstdc++-v3/include/c_compatibility
 C:/gcc-14.2.0/libstdc++-v3/include/tr1
 C:/gcc-14.2.0/libssp/ssp
 C:/gcc-14.2.0/fixincludes/tests/base
+C:/gcc-14.2.0/fixincludes/tests/base/ansi
 C:/gcc-14.2.0/include
 C:/gcc-14.2.0/libgomp
+C:/gcc-14.2.0/fixincludes/tests/base
+C:/gcc-14.2.0/gcc/config/vxworks
 "Add Item"으로 추가한 내용은 VSCode의 c_cpp_properties.json에 반영 됨
-
+성공!!
 
 (오류)
 nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin/build
@@ -35188,6 +35229,7 @@ AC_SUBST(BASE_VERSION)
 C:\gcc-14.2.0\lto-plugin\build\config.h
 /* Define if the system provides BASE_VERSION. */
 #define BASE_VERSION "14.2.0"
+성공!!
 
 (오류)
 ./config.h:5:9: warning: "BASE_VERSION" redefined
@@ -35265,111 +35307,495 @@ libtool: install: /usr/bin/install -c .libs/liblto_plugin.lai /c/gcc-14.2.0/lto-
 libtool: warning: remember to run 'libtool --finish /mingw64/libexec/gcc/x86_64-w64-mingw32/14.2.0'
 mingw32-make[1]: Leaving directory 'C:/gcc-14.2.0/lto-plugin/build'
 (수정)
-./config.h:5:9: warning: "BASE_VERSION" redefined
-    5 | #define BASE_VERSION "14.2.0"
-      |         ^~~~~~~~~~~~
-<command-line>: note: this is the location of the previous definition
-BASE_VERSION이 두 번 정의
-config.h에서 #define BASE_VERSION "14.2.0"으로 정의.
-컴파일 명령줄에서 -DBASE_VERSION='14.2.0'으로 다시 정의.
-C:\gcc-14.2.0\lto-plugin\Makefile.in, C:\gcc-14.2.0\lto-plugin\Makefile.am
-AM_CFLAGS = @ac_lto_plugin_warn_cflags@ $(CET_HOST_FLAGS) -DBASE_VERSION='$(gcc_version)'
- -DBASE_VERSION='$(gcc_version)' => 제거
-../lto-plugin.c: In function 'dump_symtab':
-../lto-plugin.c:502:19: warning: 'I' flag used with '%x' gnu_printf format [-Wformat=]
-%x 포맷에 부적절한 인수가 전달되었거나, long long 데이터를 처리하기 위해 잘못된 매크로를 사용
-%x는 unsigned int를 기대하지만, 코드에서 long long unsigned int 데이터를 전달
-PRI_LL 매크로가 적절히 정의되지 않았거나 사용이 잘못
-inttypes.h를 올바르게 사용하지 않거나, 포맷 문자열에서 데이터 타입을 잘못 지정한 경우 발생
-inttypes.h를 포함하여 올바른 포맷 매크로(PRIx64, SCNx64 등)를 사용
-  502 |       fprintf (f, "%u %" PRI_LL "x %s %s\n",
-      |                   ^~~~~~
-../lto-plugin.c:502:34: note: format string is defined here
-  502 |       fprintf (f, "%u %" PRI_LL "x %s %s\n",
-      |                                  ^
-../lto-plugin.c:502:19: warning: format '%x' expects argument of type 'unsigned int', but argument 4 has type 'long long unsigned int' [-Wformat=]
-  502 |       fprintf (f, "%u %" PRI_LL "x %s %s\n",
-      |                   ^~~~~~
-  503 |                (unsigned int) slot, symtab->aux[j].id,
-      |                                     ~~~~~~~~~~~~~~~~~
-      |                                                   |
-      |                                                   long long unsigned int
-../lto-plugin.c:502:34: note: format string is defined here
-  502 |       fprintf (f, "%u %" PRI_LL "x %s %s\n",
-      |                       ~~~~~~~~~~~^
-      |                                  |
-      |                                  unsigned int
-      |                       %" PRI_LL "llx
+// fprintf (f, "%u %" PRI_LL "x %s %s\n",
+// 	(unsigned int) slot, symtab->aux[j].id,
+// 	lto_resolution_str[resolution], 
+// 	symtab->syms[j].name);
+
+// PRIx64: uint64_t 타입 데이터를 16진수로 출력.
+fprintf(f, "%u %" PRIx64 " %s %s\n",
+	(unsigned int) slot, (uint64_t)symtab->aux[j].id,
+	lto_resolution_str[resolution], symtab->syms[j].name);
+
+  s = strrchr (name, '.');
+  if (s) {
+	// sscanf (s, ".%" PRI_LL "x", &obj->out->id);
+	// SCNx64: uint64_t 데이터를 16진수로 입력받음.
+	sscanf(s, ".%" SCNx64, &obj->out->id);
+  }
+
+(오류)
 ../lto-plugin.c: In function 'process_symtab':
-../lto-plugin.c:1089:16: warning: 'I' flag used with '%x' gnu_scanf format [-Wformat=]
-
-C:\gcc-14.2.0\lto-plugin\lto-plugin.c 수정
-#include <inttypes.h> // 추
-
-static void
-dump_symtab (FILE *f, struct plugin_symtab *symtab)
-{
-  unsigned j;
-
-  for (j = 0; j < symtab->nsyms; j++)
-    {
-      uint32_t slot = symtab->aux[j].slot;
-      unsigned int resolution = symtab->syms[j].resolution;
-      
-      assert (resolution != LDPR_UNKNOWN);
-/*502:      fprintf (f, "%u %" PRI_LL "x %s %s\n",
-503:               (unsigned int) slot, symtab->aux[j].id,
-	       lto_resolution_str[resolution], 
-	       symtab->syms[j].name);*/
-
-	// PRIx64: uint64_t 타입 데이터를 16진수로 출력.
-	fprintf (f, "%u %" PRIx64 "x %s %s\n",
-		(unsigned int) slot, (uint64_t)symtab->aux[j].id,
-		symtab->aux[j].name, symtab->aux[j].type
-	);
-    }
-}
-
-1089 |     sscanf (s, ".%" PRI_LL "x", &obj->out->id);
+../lto-plugin.c:1095:16: warning: 'I' flag used with '%x' gnu_scanf format [-Wformat=]
+ 1095 |     sscanf (s, ".%" PRI_LL "x", &obj->out->id);
       |                ^~~~
-../lto-plugin.c:1089:29: note: format string is defined here
- 1089 |     sscanf (s, ".%" PRI_LL "x", &obj->out->id);
+../lto-plugin.c:1095:29: note: format string is defined here
+ 1095 |     sscanf (s, ".%" PRI_LL "x", &obj->out->id);
       |                             ^
-../lto-plugin.c:1089:16: warning: format '%x' expects argument of type 'unsigned int *', but argument 3 has type 'long long unsigned int *' [-Wformat=]
- 1089 |     sscanf (s, ".%" PRI_LL "x", &obj->out->id);
+../lto-plugin.c:1095:16: warning: format '%x' expects argument of type 'unsigned int *', but argument 3 has type 'long long unsigned int *' [-Wformat=]
+ 1095 |     sscanf (s, ".%" PRI_LL "x", &obj->out->id);
       |                ^~~~             ~~~~~~~~~~~~~
       |                                 |
       |                                 long long unsigned int *
-../lto-plugin.c:1089:29: note: format string is defined here
- 1089 |     sscanf (s, ".%" PRI_LL "x", &obj->out->id);
+../lto-plugin.c:1095:29: note: format string is defined here
+ 1095 |     sscanf (s, ".%" PRI_LL "x", &obj->out->id);
       |                  ~~~~~~~~~~~^
       |                             |
       |                             unsigned int *
       |                  %" PRI_LL "llx
 ../lto-plugin.c: In function 'process_symtab_extension':
-../lto-plugin.c:1141:16: warning: 'I' flag used with '%x' gnu_scanf format [-Wformat=]
- 1141 |     sscanf (s, ".%" PRI_LL "x", &obj->out->id);
-      |                ^~~~
-../lto-plugin.c:1141:29: note: format string is defined here
- 1141 |     sscanf (s, ".%" PRI_LL "x", &obj->out->id);
-      |                             ^
-../lto-plugin.c:1141:16: warning: format '%x' expects argument of type 'unsigned int *', but argument 3 has type 'long long unsigned int *' [-Wformat=]
- 1141 |     sscanf (s, ".%" PRI_LL "x", &obj->out->id);
-      |                ^~~~             ~~~~~~~~~~~~~
-      |                                 |
-      |                                 long long unsigned int *
-../lto-plugin.c:1141:29: note: format string is defined here
- 1141 |     sscanf (s, ".%" PRI_LL "x", &obj->out->id);
-      |                  ~~~~~~~~~~~^
-      |                             |
-      |                             unsigned int *
-      |                  %" PRI_LL "llx
+../lto-plugin.c:1151:30: error: 'uint54_t' undeclared (first use in this function); did you mean 'uint64_t'?
+mingw32-make[1]: *** [Makefile:494: lto-plugin.lo] Error 1
+mingw32-make[1]: Leaving directory 'C:/gcc-14.2.0/lto-plugin/build'
+mingw32-make: *** [Makefile:390: all] Error 1
+(수정)
+obj->out->id가 long long unsigned int 타입이라면, %llx를 사용해야 함 
 
-C:\gcc-14.2.0\lto-plugin\lto-plugin.c 수정
-  if (s)
-	// sscanf (s, ".%" PRI_LL "x", &obj->out->id);
-	// SCNx64: uint64_t 데이터를 16진수로 입력받음.
-	sscanf (s, ".%" SCNx64, (uint54_t*)&obj->out->id);	
+if (s){
+	//sscanf (s, ".%" PRI_LL "x", &obj->out->id);
+	sscanf(s, ".%llx", &obj->out->id);
+}
+성공!!
+liblto_plugin.dll이 생성되는 단계까지 완료
 
-libtool: warning: remember to run 'libtool --finish /mingw64/libexec/gcc/x86_64-w64-mingw32/14.2.0'
-libtool 관련 경고: 설치 후 정리 단계(libtool --finish)와 관련된 알림이며, 실제 실행에는 큰 영향을 미치지 않음
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin/build
+# mingw32-make install
+mingw32-make[1]: Entering directory 'C:/gcc-14.2.0/lto-plugin/build'
+ /usr/bin/mkdir -p '/mingw64/libexec/gcc/x86_64-w64-mingw32/14.2.0'
+ C:/msys64/usr/bin/sh.exe ./libtool --tag=disable-static  --mode=install /usr/bin/install -c   liblto_plugin.la '/mingw64/libexec/gcc/x86_64-w64-mingw32/14.2.0'
+libtool: install: /usr/bin/install -c .libs/liblto_plugin.dll.a /mingw64/libexec/gcc/x86_64-w64-mingw32/14.2.0/liblto_plugin.dll.a
+libtool: install: base_file=`basename liblto_plugin.la`
+libtool: install:  dlpath=`/bin/sh 2>&1 -c '. .libs/'liblto_plugin.la'i; echo liblto_plugin.dll'`
+libtool: install:  dldir=/mingw64/libexec/gcc/x86_64-w64-mingw32/14.2.0/`dirname liblto_plugin.dll`
+libtool: install:  test -d /mingw64/libexec/gcc/x86_64-w64-mingw32/14.2.0/. || mkdir -p /mingw64/libexec/gcc/x86_64-w64-mingw32/14.2.0/.
+libtool: install:  /usr/bin/install -c .libs/liblto_plugin.dll /mingw64/libexec/gcc/x86_64-w64-mingw32/14.2.0/./liblto_plugin.dll
+libtool: install:  chmod a+x /mingw64/libexec/gcc/x86_64-w64-mingw32/14.2.0/./liblto_plugin.dll
+libtool: install:  if test -n '' && test -n 'strip --strip-unneeded'; then eval 'strip --strip-unneeded /mingw64/libexec/gcc/x86_64-w64-mingw32/14.2.0/./liblto_plugin.dll' || exit 0; fi
+libtool: install: /usr/bin/install -c .libs/liblto_plugin.lai /mingw64/libexec/gcc/x86_64-w64-mingw32/14.2.0/liblto_plugin.la
+mingw32-make[1]: Nothing to be done for 'install-data-am'.
+mingw32-make[1]: Leaving directory 'C:/gcc-14.2.0/lto-plugin/build'
+
+설치된 파일들:
+liblto_plugin.dll.a (정적 라이브러리)
+liblto_plugin.dll (동적 라이브러리)
+liblto_plugin.la (라이브러리 설정 파일)
+
+설치된 디렉토리: (PATH나 LIBRARY_PATH에 해당 디렉토리를 추가)
+windows path : C:\msys64\mingw64\libexec\gcc\x86_64-w64-mingw32\14.2.0
+/mingw64/libexec/gcc/x86_64-w64-mingw32/14.2.0/
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin/build
+# ls -l /mingw64/libexec/gcc/x86_64-w64-mingw32/14.2.0
+합계 155928
+-rwxr-xr-x 1 nayou nayou 38153216  9월  4 06:36 cc1.exe
+-rwxr-xr-x 1 nayou nayou 40262656  9월  4 06:36 cc1plus.exe
+-rwxr-xr-x 1 nayou nayou  2043904  9월  4 06:36 collect2.exe
+-rwxr-xr-x 1 nayou nayou 38895104  9월  4 06:36 f951.exe
+-rwxr-xr-x 1 nayou nayou   211456  9월  4 06:37 g++-mapper-server.exe
+drwxr-xr-x 1 nayou nayou        0  9월  4 06:36 install-tools
+-rwxr-xr-x 1 nayou nayou   514394 12월  4 08:50 liblto_plugin.dll
+-rw-r--r-- 1 nayou nayou     1578 12월  4 08:50 liblto_plugin.dll.a
+-rw-r--r-- 1 nayou nayou     1118 12월  4 08:50 liblto_plugin.la
+-rwxr-xr-x 1 nayou nayou 36850176  9월  4 06:36 lto1.exe
+-rwxr-xr-x 1 nayou nayou  2717696  9월  4 06:37 lto-wrapper.exe
+liblto_plugin.dll, liblto_plugin.dll.a, liblto_plugin.la
+(신규)
+C:\msys64\mingw64\libexec\gcc\x86_64-w64-mingw32\14.2.0
+C:\gcc-14.2.0\lto-plugin\gcc
+C:\gcc-14.2.0\lto-plugin\build\.libs
+(기존)
+C:\msys64\mingw64\lib\bfd-plugins
+C:\msys64\mingw64-backup-11.2.0\lib\bfd-plugins
+C:\Users\nayou\AppData\Local\Arduino15\packages\arduino\tools\avr-gcc\7.3.0-atmel3.6.1-arduino7\libexec\gcc\avr\7.3.0
+C:\Users\nayou\vcpkg\downloads\tools\perl\5.38.0.1\c\libexec\gcc\x86_64-w64-mingw32\13.1.0
+C:\Qt\Tools\mingw1120_64\libexec\gcc\x86_64-w64-mingw32\11.2.0
+
+~/.bashrc 수정
+export LIBRARY_PATH="$LIBRARY_PATH:/mingw64/libexec/gcc/x86_64-w64-mingw32/14.2.0" #liblto_plugin.dll.a, liblto_plugin.dll, liblto_plugin.la
+export PATH="$PATH:/mingw64/libexec/gcc/x86_64-w64-mingw32/14.2.0" #liblto_plugin.dll.a, liblto_plugin.dll, liblto_plugin.la
+source ~/.bashrc 실행하여 환경변수 적용
+
+"C:\gcc-14.2.0\lto-plugin\Makefile" 생성하기
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# ./configure
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# mingw32-make
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# ls -l
+합계 1315
+-rw-r--r-- 1 nayou nayou  80792 11월 30 19:04 aclocal.m4
+-rw-r--r-- 1 nayou nayou  80792 11월 29 12:50 aclocal.m4_back
+drwxr-xr-x 1 nayou nayou      0 12월  3 16:19 autom4te.cache
+drwxr-xr-x 1 nayou nayou      0 12월  4 08:48 build
+drwxr-xr-x 1 nayou nayou      0 11월 29 13:00 build-aux
+-rw-r--r-- 1 nayou nayou  43644  8월  1 17:18 ChangeLog
+-rw-r--r-- 1 nayou nayou   3855 12월  4 10:34 config.h
+-rw-r--r-- 1 nayou nayou   3559 11월 30 19:05 config.h.in
+-rw-r--r-- 1 nayou nayou   3488 11월 29 12:50 config.h.in~
+-rw-r--r-- 1 nayou nayou  75768 12월  4 10:34 config.log
+-rwxr-xr-x 1 nayou nayou  61928 12월  4 10:34 config.status
+-rwxr-xr-x 1 nayou nayou 506450 12월  3 16:19 configure
+-rw-r--r-- 1 nayou nayou   4554 12월  3 16:18 configure.ac
+drwxr-xr-x 1 nayou nayou      0 12월  4 08:48 gcc
+-rw-r--r-- 1 nayou nayou   1085 12월  4 10:41 liblto_plugin.la
+-rwxr-xr-x 1 nayou nayou 351478 12월  4 10:34 libtool
+-rw-r--r-- 1 nayou nayou  44089 12월  4 08:47 lto-plugin.c
+-rw-r--r-- 1 nayou nayou    272 12월  4 10:41 lto-plugin.lo
+-rw-r--r-- 1 nayou nayou     33  8월  1 17:17 lto-plugin.map
+-rw-r--r-- 1 nayou nayou  22376 12월  4 10:34 Makefile
+-rw-r--r-- 1 nayou nayou   2735 12월  3 16:19 Makefile.am
+-rw-r--r-- 1 nayou nayou  22217 12월  3 16:19 Makefile.in
+-rw-r--r-- 1 nayou nayou     23 12월  4 10:34 stamp-h1
+
+nayou@kimnayooung MINGW64 /c/gcc-build
+# ../gcc-14.2.0/configure && mingw32-make
+
+(오류)
+mingw32-make[3]: Entering directory 'C:/gcc-build/lto-plugin'
+mingw32-make[3]: *** No rule to make target 'all'.  Stop.
+mingw32-make[3]: Leaving directory 'C:/gcc-build/lto-plugin'
+mingw32-make[2]: *** [Makefile:16106: all-stage1-lto-plugin] Error 2
+mingw32-make[2]: Leaving directory 'C:/gcc-build'
+mingw32-make[1]: *** [Makefile:25141: stage1-bubble] Error 2
+mingw32-make[1]: Leaving directory 'C:/gcc-build'
+mingw32-make: *** [Makefile:1150: all] Error 2
+
+(수정)
+C:\gcc-14.2.0\lto-plugin\Makefile 확인
+all: config.h
+	$(MAKE) $(AM_MAKEFLAGS) all-am
+
+all-am: Makefile $(LTLIBRARIES) config.h all-local
+installdirs:
+	for dir in "$(DESTDIR)$(libexecsubdir)"; do \
+	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
+	done
+
+빌드명령어 수정
+nayou@kimnayooung MINGW64 /c/gcc-build
+# ../gcc-14.2.0/configure --prefix=/mingw64 --enable-languages=c,c++ && mingw32-make
+
+(오류)
+mingw32-make[3]: Entering directory 'C:/gcc-build/lto-plugin'
+mingw32-make[3]: *** No rule to make target 'all'.  Stop.
+mingw32-make[3]: Leaving directory 'C:/gcc-build/lto-plugin'
+mingw32-make[2]: *** [Makefile:16105: all-stage1-lto-plugin] Error 2
+mingw32-make[2]: Leaving directory 'C:/gcc-build'
+mingw32-make[1]: *** [Makefile:24065: stage1-bubble] Error 2
+mingw32-make[1]: Leaving directory 'C:/gcc-build'
+mingw32-make: *** [Makefile:1150: all] Error 2
+
+(수정)
+/c/gcc-14.2.0/lto-plugin/config.h, Makefile 다시 생성
+nayou@kimnayooung MINGW64 /c/gcc-build
+# cd /c/gcc-14.2.0/lto-plugin
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# mingw32-make clean
+test -z "liblto_plugin.la" || rm -f liblto_plugin.la
+rm -f ./so_locations
+rm -rf .libs _libs
+rm -f *.o
+rm -f *.lo
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# mingw32-make distclean
+test -z "liblto_plugin.la" || rm -f liblto_plugin.la
+rm -f ./so_locations
+rm -rf .libs _libs
+rm -f *.o
+rm -f *.lo
+rm -f *.tab.c
+test -z "" || rm -f
+test . = "." || test -z "" || rm -f
+rm -f config.h stamp-h1
+rm -f libtool config.lt
+rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
+rm -f cscope.out cscope.in.out cscope.po.out cscope.files
+rm -f config.status config.cache config.log configure.lineno config.status.lineno
+rm -f Makefile
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0
+# aclocal
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0
+# autoconf
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# automake --add-missing
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# ../configure --prefix=/mingw64 --enable-languages=c,c++
+C:\gcc-14.2.0\lto-plugin\Makefile
+@SET_MAKE@
+(오류)
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# config.status
+config.status: creating Makefile
+config.status: error: cannot find input file: `config-h.in'
+C:\gcc-14.2.0\lto-plugin\Makefile
+@SET_MAKE@ -> 제거됨
+(수정)
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# cp config.h.in config-h.in
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# ls -l
+합계 1205
+-rw-r--r-- 1 nayou nayou 423053 12월  4 11:46 aclocal.m4
+-rw-r--r-- 1 nayou nayou  80792 11월 29 12:50 aclocal.m4_back
+drwxr-xr-x 1 nayou nayou      0 12월  4 12:07 autom4te.cache
+drwxr-xr-x 1 nayou nayou      0 12월  4 08:48 build
+drwxr-xr-x 1 nayou nayou      0 11월 29 13:00 build-aux
+-rw-r--r-- 1 nayou nayou  43644  8월  1 17:18 ChangeLog
+-rw-r--r-- 1 nayou nayou   3559 11월 30 19:05 config.h.in
+-rw-r--r-- 1 nayou nayou   3488 11월 29 12:50 config.h.in~
+-rw-r--r-- 1 nayou nayou  11022 12월  4 12:08 config.log
+-rwxr-xr-x 1 nayou nayou  40107 12월  4 12:06 config.status
+-rw-r--r-- 1 nayou nayou   3559 12월  4 12:09 config-h.in
+-rwxr-xr-x 1 nayou nayou 499642 12월  4 11:46 configure
+-rw-r--r-- 1 nayou nayou   4554 12월  3 16:18 configure.ac
+drwxr-xr-x 1 nayou nayou      0 12월  4 08:48 gcc
+-rw-r--r-- 1 nayou nayou  44089 12월  4 08:47 lto-plugin.c
+-rw-r--r-- 1 nayou nayou     33  8월  1 17:17 lto-plugin.map
+-rw-r--r-- 1 nayou nayou  21859 12월  4 12:07 Makefile
+-rw-r--r-- 1 nayou nayou   2735 12월  3 16:19 Makefile.am
+-rw-r--r-- 1 nayou nayou  21508 12월  4 12:08 Makefile.in
+(오류)
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/lto-plugin
+# config.status
+config.status: creating Makefile
+config.status: creating config.h
+config.status: executing tests/atconfig commands
+config.status: executing depfiles commands
+config.status: executing libtool commands
+sed: can't read build-aux/ltmain.sh: No such file or directory
+mv: cannot stat 'libtoolT': No such file or directory
+cp: cannot stat 'libtoolT': No such file or directory
+chmod: cannot access 'libtool': No such file or directory
+
+nayou@kimnayooung MINGW64 /c/gcc-build
+# mkdir build-aux
+cp /c/gcc-14.2.0/ltmain.sh /c/gcc-build/build-aux
+config.status
+
+config.status: creating Makefile
+config.status: creating config.h
+config.status: config.h is unchanged
+config.status: executing tests/atconfig commands
+config.status: executing depfiles commands
+config.status: executing libtool commands
+성공!!
+
+C:\gcc-14.2.0 폴더에서 mingw32-make clean, distclean 안될경우(Makefile:15: *** missing separator.  Stop.)
+C:\gcc-14.2.0 폴더 정리 후 빌드
+rm -rf autom4te.cache config.h config.log config.status aclocal.m4 Makefile.in Makefile config.guess config.sub m4
+
+nayou@kimnayooung MINGW64 /c/gcc-build
+# ../gcc-14.2.0/configure --prefix=/mingw64 --enable-languages=c,c++ && cd /c/gcc-build && mingw32-make
+configure: loading site script /etc/config.site
+configure: error: cannot run /bin/sh ../gcc-14.2.0/config.sub
+
+config.sub 잘못삭제했을 경우 복원
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0
+# curl -o config.sub https://git.savannah.gnu.org/cgit/config.git/plain/config.sub
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100 39713  100 39713    0     0  33887      0  0:00:01  0:00:01 --:--:-- 34147
+
+C:\gcc-build 폴더에서
+nayou@kimnayooung MINGW64 /c/gcc-build
+# mingw32-make
+(오류)
+process_begin: CreateProcess(NULL, @get_gcc_base_ver@ ./../gcc/BASE-VER, ...) failed.
+Makefile:345: pipe: No such file or directory
+mingw32-make: *** No rule to make target '@MAINTAINER_MODE_TRUE@', needed by 'Makefile.in'.  Stop.
+
+(수정)
+C:\gcc-build 폴더 mingw32-clean, distclean 안될경우(Makefile:15: *** missing separator.  Stop.)
+C:\gcc-build 폴더 정리 후 빌드
+rm -rf config.cache config.h config.log config.status Makefile Makefile.in stamp-h1 stage_current stage_last test.sh
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0
+# autoreconf -ifv
+nayou@kimnayooung MINGW64 /c/gcc-build
+# ../gcc-14.2.0/configure --prefix=/mingw64 --enable-languages=c,c++ && cd /c/gcc-build && mingw32-make
+
+Makefile.in, Makefile.am 부재파일 소스 다운로드
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0
+# curl -o Makefile.am https://raw.githubusercontent.com/gcc-mirror/gcc/master/Makefile.am
+curl -o Makefile.in https://raw.githubusercontent.com/gcc-mirror/gcc/master/Makefile.in
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100    14  100    14    0     0     31      0 --:--:-- --:--:-- --:--:--    31
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100 2365k  100 2365k    0     0  3159k      0 --:--:-- --:--:-- --:--:-- 3166k
+
+configure.ac 다운로드
+curl -o Makefile.in https://raw.githubusercontent.com/gcc-mirror/gcc/master/configure.ac
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100  128k  100  128k    0     0   275k      0 --:--:-- --:--:-- --:--:--  275k
+
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0
+# ls -l Makefile*
+-rw-r--r-- 1 nayou nayou 2422029  8월  1 17:18 'Makefile - 복사본.in'
+-rw-r--r-- 1 nayou nayou      14 12월  4 16:22  Makefile.am
+-rwxr-xr-x 1 nayou nayou   35409  8월  1 17:17  Makefile.def
+-rw-r--r-- 1 nayou nayou 2421917 12월  4 16:22  Makefile.in
+-rw-r--r-- 1 nayou nayou   79433  8월  1 17:17  Makefile.tpl
+
+(오류)
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0
+# aclocal && autoconf && autoheader && automake --add-missing                           
+autoheader-2.69: error: AC_CONFIG_HEADERS not found in configure.ac
+(수정)
+C:\gcc-14.2.0\configure.ac 수정
+AC_INIT([gcc], [14.2.0], [gcc-help@gcc.gnu.org])
+AC_DISABLE_OPTION_CHECKING
+AC_CONFIG_HEADERS([config.h])  # 추가
+(오류)
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0
+# aclocal && autoconf && autoheader && automake --add-missing
+configure.ac: error: no proper invocation of AM_INIT_AUTOMAKE was found.
+configure.ac: You should verify that configure.ac invokes AM_INIT_AUTOMAKE,
+configure.ac: that aclocal.m4 is present in the top-level directory,
+configure.ac: and that aclocal.m4 was recently regenerated (using aclocal)
+Makefile.am: error: required file './AUTHORS' not found
+Makefile.am: error: installing './INSTALL'; error while making link: File exists
+Makefile.am: error: required file './README' not found
+configure.ac:3776: error: 'RUNTEST' defined but 'dejagnu' not in 'AUTOMAKE_OPTIONS'
+(수정)
+- no proper invocation of AM_INIT_AUTOMAKE
+C:\gcc-14.2.0\configure.ac 수정
+AC_INIT([your_project_name], [1.0], [your_email@example.com])
+AM_INIT_AUTOMAKE([foreign])  # 추가: foreign 옵션을 사용하면 GNU 표준에 맞지 않는 파일도 허용
+-required file './AUTHORS' not found, required file './README' not found
+Makefile.am 파일에 AUTHORS와 README 파일이 필요하다고 명시되어 있지만, 해당 파일들이 없음
+프로젝트에 필요한 기본적인 문서 파일들이 빠져 있을 때 발생
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0
+# touch AUTHORS README
+-INSTALL 파일을 만들 수 없다는 오류(INSTALL 파일을 만들려고 시도하는 중에 "파일이 이미 존재한다"는 오류가 발생)
+INSTALL 폴더를 확인하고 삭제 => INSTALL-back로 리네임함
+-RUNTEST 정의됐지만 dejagnu가 AUTOMAKE_OPTIONS에 없음
+RUNTEST 매크로가 사용되었지만, AUTOMAKE_OPTIONS에 dejagnu가 포함되어 있지 않아서 발생하는 오류
+AC_INIT([gcc], [14.2.0], [gcc-help@gcc.gnu.org])
+AC_DISABLE_OPTION_CHECKING
+AM_INIT_AUTOMAKE([foreign dejagnu])
+
+(오류)
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0
+# aclocal && autoconf && autoheader && automake --add-missing
+configure.ac:85: warning: AC_ARG_PROGRAM was called before AC_CANONICAL_TARGET
+../../../autoconf-2.69/lib/autoconf/general.m4:1857: AC_CANONICAL_SYSTEM is expanded from...
+configure.ac:85: the top level
+configure.ac:85: warning: AC_ARG_PROGRAM was called before AC_CANONICAL_TARGET
+../../../autoconf-2.69/lib/autoconf/general.m4:1857: AC_CANONICAL_SYSTEM is expanded from...
+configure.ac:85: the top level
+configure.ac:85: warning: AC_ARG_PROGRAM was called before AC_CANONICAL_TARGET
+../../../autoconf-2.69/lib/autoconf/general.m4:1857: AC_CANONICAL_SYSTEM is expanded from...
+configure.ac:85: the top level
+configure.ac:85: warning: AC_ARG_PROGRAM was called before AC_CANONICAL_TARGET
+../../../autoconf-2.69/lib/autoconf/general.m4:1857: AC_CANONICAL_SYSTEM is expanded from...
+configure.ac:85: the top level
+configure.ac:3779: error: 'RUNTEST' defined but 'dejagnu' not in 'AUTOMAKE_OPTIONS'
+
+C:\gcc-14.2.0\configure.ac 수정
+# 먼저 시스템을 식별합니다.
+AC_CANONICAL_SYSTEM
+# 그런 다음 타겟 시스템을 설정합니다.
+AC_CANONICAL_TARGET
+AC_INIT([gcc], [14.2.0], [gcc-help@gcc.gnu.org])
+...
+# 마지막으로 프로그램 이름을 설정합니다.
+AC_ARG_PROGRAM
+
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0
+# aclocal && autoconf && autoheader && automake --add-missing && autoreconf -ivf
+autoreconf-2.69: Entering directory `.'
+autoreconf-2.69: configure.ac: not using Gettext
+autoreconf-2.69: running: aclocal --force
+autoreconf-2.69: configure.ac: tracing
+autoreconf-2.69: configure.ac: not using Libtool
+autoreconf-2.69: running: /usr/bin/autoconf-2.69 --force
+autoreconf-2.69: running: /usr/bin/autoheader-2.69 --force
+autoreconf-2.69: running: automake --add-missing --copy --force-missing
+autoreconf-2.69: Leaving directory `.'
+성공!!
+
+(오류)
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0
+# configure
+configure: loading site script /etc/config.site
+## ------------------------- ##
+## Configuring libtool 2.4.6 ##
+## ------------------------- ##
+
+checking for GNU M4 that supports accurate traces... /usr/bin/m4
+checking whether /usr/bin/m4 accepts --gnu... yes
+checking how m4 supports trace files... --debugfile
+checking for a BSD-compatible install... /usr/bin/install -c
+checking whether build environment is sane... yes
+/bin/sh: /c/libidn2/libtool-2.4.6/build-aux/missing: No such file or directory
+configure: WARNING: 'missing' script is too old or missing
+checking for a thread-safe mkdir -p... /usr/bin/mkdir -p
+checking for gawk... gawk
+checking whether make sets $(MAKE)... yes
+checking whether make supports nested variables... yes
+configure: error: source directory already configured; run "make distclean" there first
+(수정)
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0
+# rm -rf Makefile Makefile.in config.status config.log *.o
+nayou@kimnayooung MINGW64 /c/gcc-build
+# ../gcc-14.2.0/configure
+nayou@kimnayooung MINGW64 /c/gcc-build
+# mingw32-make
+[ -f stage_final ] || echo stage3 > stage_final
+mingw32-make[1]: Entering directory 'C:/gcc-build'
+mingw32-make[2]: Entering directory 'C:/gcc-build'
+mkdir -p -- host-x86_64-w64-mingw32
+mingw32-make[2]: Leaving directory 'C:/gcc-build'
+mingw32-make[2]: Entering directory 'C:/gcc-build'
+Configuring stage 1 in host-x86_64-w64-mingw32/lto-plugin
+configure: loading site script C:/msys64/etc/config.site
+configure: creating cache ./config.cache
+checking build system type... x86_64-w64-mingw32
+checking host system type... x86_64-w64-mingw32
+checking target system type... x86_64-w64-mingw32
+checking for a BSD-compatible install... C:/msys64/usr/bin/install -c
+checking whether build environment is sane... yes
+checking for a thread-safe mkdir -p... /c/msys64/usr/bin/mkdir -p
+checking for gawk... gawk
+checking whether C:/msys64/mingw64/bin/mingw32-make.exe sets $(MAKE)... yes
+checking whether C:/msys64/mingw64/bin/mingw32-make.exe supports nested variables... yes
+(오류)
+configure: error: source directory already configured; run "make distclean" there first
+mingw32-make[2]: *** [Makefile:15219: configure-stage1-lto-plugin] Error 1
+mingw32-make[2]: Leaving directory 'C:/gcc-build'
+mingw32-make[1]: *** [Makefile:23827: stage1-bubble] Error 2
+mingw32-make[1]: Leaving directory 'C:/gcc-build'
+mingw32-make: *** [Makefile:1094: all] Error 2
+(수정)
+깃허브백업파일다운로드 20241126
+https://github.com/nayoungkim0920/gcc-14.2.0/blob/main/configure.ac
+https://github.com/nayoungkim0920/gcc-14.2.0/blob/main/Makefile.in
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0
+# autoreconf -ivf
+autoreconf-2.69: Entering directory `.'
+autoreconf-2.69: configure.ac: not using Gettext
+autoreconf-2.69: running: aclocal --force
+autoreconf-2.69: configure.ac: tracing
+autoreconf-2.69: configure.ac: not using Libtool
+autoreconf-2.69: running: /usr/bin/autoconf-2.69 --force
+autoreconf-2.69: configure.ac: not using Autoheader
+autoreconf-2.69: configure.ac: not using Automake
+autoreconf-2.69: Leaving directory `.'
+nayou@kimnayooung MINGW64 /c/gcc-build
+# ../gcc-14.2.0/configure CONFIG_SITE=  --with-gmp=/mingw64 --with-mpfr=/mingw64 --with-mpc=/mingw64 CFLAGS="-I/c/libidn2/gettext-0.22.5/libtextstyle/lib" LDFLAGS="-L/c/libidn2/gettext-0.22.5/libtextstyle/lib" && mingw32-make && mingw32-make install
+configure: error: source directory already configured; run "make distclean" there first
+(오류)
+mingw32-make[2]: *** [Makefile:15237: configure-stage1-lto-plugin] Error 1
+mingw32-make[2]: Leaving directory 'C:/gcc-build'
+mingw32-make[1]: *** [Makefile:24581: stage1-bubble] Error 2
+mingw32-make[1]: Leaving directory 'C:/gcc-build'
+mingw32-make: *** [Makefile:1110: all] Error 2
+(수정)
+nayou@kimnayooung MINGW64 /c/gcc-build
+# mingw32-make clean && mingw32-make distclean
+mingw32-make[1]: Entering directory 'C:/gcc-build'
+/c/msys64/usr/bin/sh: -c: 줄 10: `"'을(를) 찾는 도중 예상치 못한 파일의 끝
+mingw32-make[1]: *** [Makefile:4434: clean-fixincludes] Error 2
+mingw32-make[1]: Leaving directory 'C:/gcc-build'
+mingw32-make: *** [Makefile:2221: do-clean] Error 2
