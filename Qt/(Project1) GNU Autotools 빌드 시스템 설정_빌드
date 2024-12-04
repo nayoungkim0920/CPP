@@ -35768,7 +35768,7 @@ mingw32-make[1]: *** [Makefile:23827: stage1-bubble] Error 2
 mingw32-make[1]: Leaving directory 'C:/gcc-build'
 mingw32-make: *** [Makefile:1094: all] Error 2
 (수정)
-깃허브백업파일다운로드 20241126
+깃허브백업파일다운로드 20241126 (현재날짜 20241204)
 https://github.com/nayoungkim0920/gcc-14.2.0/blob/main/configure.ac
 https://github.com/nayoungkim0920/gcc-14.2.0/blob/main/Makefile.in
 nayou@kimnayooung MINGW64 /c/gcc-14.2.0
@@ -35794,8 +35794,88 @@ mingw32-make: *** [Makefile:1110: all] Error 2
 (수정)
 nayou@kimnayooung MINGW64 /c/gcc-build
 # mingw32-make clean && mingw32-make distclean
+(오류)
 mingw32-make[1]: Entering directory 'C:/gcc-build'
 /c/msys64/usr/bin/sh: -c: 줄 10: `"'을(를) 찾는 도중 예상치 못한 파일의 끝
+mingw32-make[1]: *** [Makefile:4434: clean-fixincludes] Error 2
+mingw32-make[1]: Leaving directory 'C:/gcc-build'
+mingw32-make: *** [Makefile:2221: do-clean] Error 2
+
+C:\gcc-build\Makefile.in 수정
+HOST_EXPORTS=FLEX=flex \
+	LEX=flex \
+	BISON=bison \
+	YACC=bison \
+	M4=C:/msys64/usr/bin/m4 \
+	SED=C:/msys64/usr/bin/sed \
+	AWK=gawk \
+	MAKEINFO=makeinfo \
+	GUILE=guile \
+	CC=x86_64-w64-mingw32-gcc \
+	ADA_CFLAGS= \
+	CONFIG_SHELL=C:/msys64/usr/bin/sh.exe \
+	CXX=x86_64-w64-mingw32-g++ \
+	CXXFLAGS=-I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++\
+	GFORTRAN= \
+	GOC= \
+	GDC=no \
+	GM2= \
+	AR=/mingw64/x86_64-w64-mingw32/bin/ar.exe \
+	AS=as \
+	CC_FOR_BUILD=x86_64-w64-mingw32-gcc \
+	CPP_FOR_BUILD= \
+	CPPFLAGS_FOR_BUILD=-I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ \
+	CXX_FOR_BUILD=x86_64-w64-mingw32-g++ \
+	CXXFLAGS_FOR_BUILD=-I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ \
+	LD_FOR_BUILD=x86_64-w64-mingw32-ld \
+	LDFLAGS_FOR_BUILD=-L/c/libidn2/gettext-0.22.5/libtextstyle/lib \
+	LIBCFLAGS=-I/c/libidn2/gettext-0.22.5/libtextstyle/lib
+	LIBCXXFLAGS= \
+	STAGE1_CHECKING=--enable-checking=yes,types \
+	STAGE1_LANGUAGES=c,c++,lto \
+	GNATBIND=no \
+	GNATMAKE=no \
+	GDCFLAGS_FOR_BUILD=-I/c/libidn2/gettext-0.22.5/libtextstyle/lib \
+	INSTALL=C:/msys64/usr/bin/install \
+	INSTALL_PROGRAM=C:/msys64/usr/bin/install \
+	INSTALL_SCRIPT=C:/msys64/usr/bin/install \
+	INSTALL_DATA=C:/msys64/usr/bin/install \
+	RUNTEST=runtest \
+	RUNTESTFLAGS= \
+	SHELL=C:/msys64/usr/bin/sh.exe \
+	MAKE=C:/msys64/mingw64/bin/mingw32-make.exe \
+	CONFIG_SITE= \
+	CC_FOR_TARGET=/./gcc/xgcc \
+	CFLAGS_FOR_TARGET=-Ic:/libidn2/gettext-0.22.5/libtextstyle/lib \
+	CPPFLAGS_FOR_TARGET= \
+	CXXFLAGS_FOR_TARGET=-I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ \
+	LDFLAGS_FOR_TARGET=-L/mingw64/x86_64-w64-mingw32/lib \
+	LIBCFLAGS_FOR_TARGET=-Ic:/libidn2/gettext-0.22.5/libtextstyle/lib \
+	LIBCXXFLAGS_FOR_TARGET=-I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ \
+	NM_FOR_TARGET=/mingw64/x86_64-w64-mingw32/bin/nm \
+	OBJDUMP_FOR_TARGET=/mingw64/x86_64-w64-mingw32/bin/objdump \
+	OBJCOPY_FOR_TARGET=/mingw64/x86_64-w64-mingw32/bin/objcopy \
+	RANLIB_FOR_TARGET=/mingw64/x86_64-w64-mingw32/bin/ranlib \
+	AR_FOR_TARGET=/mingw64/x86_64-w64-mingw32/bin/ar \
+	AS_FOR_TARGET=/mingw64/x86_64-w64-mingw32/bin/as \
+	CONFIGURE_FOR_TARGET=./configure \
+	OBJDIR=./objdir \
+	DIST_DIR=./dist
+
+distclean-fixincludes:
+성공!!
+nayou@kimnayooung MINGW64 /c/gcc-build
+# ../gcc-14.2.0/configure CONFIG_SITE= \
+--with-gmp=/mingw64 --with-mpfr=/mingw64 --with-mpc=/mingw64 \
+CFLAGS="-I/c/libidn2/gettext-0.22.5/libtextstyle/lib" \
+LDFLAGS="-L/c/libidn2/gettext-0.22.5/libtextstyle/lib" && \
+mingw32-make && mingw32-make install
+nayou@kimnayooung MINGW64 /c/gcc-build
+# mingw32-make clean && mingw32-make distclean
+mingw32-make[1]: Entering directory 'C:/gcc-build'
+(오류)
+/c/msys64/usr/bin/sh: -c: 줄 5: 예기치 않은 토큰 `do' 근처에서 문법 오류
+/c/msys64/usr/bin/sh: -c: 줄 5: `for flag in 'AR=/mingw64/x86_64-w64-mingw32/bin/ar.exe ' 'AS=as' 'CC=x86_64-w64-mingw32-gcc' 'CXX=x86_64-w64-mingw32-g++ -std=c++11' 'DLLTOOL=dlltool' 'DSYMUTIL=dsymutil' 'GFORTRAN=' 'GOC=' 'GDC=no' 'GM2=' 'LD=/mingw64/x86_64-w64-mingw32/bin/ld.exe' 'LIPO=lipo' 'NM=nm' 'OBJDUMP=objdump' 'OTOOL=otool' 'RANLIB=ranlib ' 'READELF=readelf' 'STRIP=strip' 'WINDRES=windres' 'WINDMC=windmc' 'CREATE_GCOV=create_gcov' 'PROFILE_MERGER=profile_merger' ; do \'
 mingw32-make[1]: *** [Makefile:4434: clean-fixincludes] Error 2
 mingw32-make[1]: Leaving directory 'C:/gcc-build'
 mingw32-make: *** [Makefile:2221: do-clean] Error 2
