@@ -35879,3 +35879,421 @@ mingw32-make[1]: Entering directory 'C:/gcc-build'
 mingw32-make[1]: *** [Makefile:4434: clean-fixincludes] Error 2
 mingw32-make[1]: Leaving directory 'C:/gcc-build'
 mingw32-make: *** [Makefile:2221: do-clean] Error 2
+/c/msys64/usr/bin/sh: -c: 줄 10: `"'을(를) 찾는 도중 예상치 못한 파일의 끝
+mingw32-make[1]: *** [Makefile:4456: clean-fixincludes] Error 2
+mingw32-make[1]: Leaving directory 'C:/gcc-build'
+mingw32-make: *** [Makefile:2221: do-clean] Error 2
+(수정)
+C:\gcc-build\Makefile.in 수정
+maybe-clean-fixincludes: clean-fixincludes
+EXTRA_HOST_FLAGS = \
+	"AR=$(AR)" \
+	"AS=$(AS)" \
+	"CC=$(CC)" \
+	"CXX=$(CXX)" \
+	"DLLTOOL=$(DLLTOOL)" \
+	"DSYMUTIL=$(DSYMUTIL)" \
+	"GFORTRAN=$(GFORTRAN)" \
+	"GOC=$(GOC)" \
+	"GDC=$(GDC)" \
+	"GM2=$(GM2)" \
+	"LD=$(LD)" \
+	"LIPO=$(LIPO)" \
+	"NM=$(NM)" \
+	"OBJDUMP=$(OBJDUMP)" \
+	"OTOOL=$(OTOOL)" \
+	"RANLIB=$(RANLIB)" \
+	"READELF=$(READELF)" \
+	"STRIP=$(STRIP)" \
+	"WINDRES=$(WINDRES)" \
+	"WINDMC=$(WINDMC)" \
+	"CREATE_GCOV=$(CREATE_GCOV)" \
+	"PROFILE_MERGER=$(PROFILE_MERGER)"
+
+COMMON_FLAGS = PROGRAM_VERSION=14.0.2 \
+			DESTDIR= \
+			RPATH_ENVVAR=PATH \
+			lispdir= \
+			LDFLAGS=-L/c/libidn2/gettext-0.22.5/libtextstyle/lib \
+			oldincludedir=/usr/include \
+			LIBCXXFLAGS=-fno-implicit-templates \
+			CFLAGS_FOR_BUILD=-I/c/libidn2/gettext-0.22.5/libtextstyle/lib \
+			LDFLAGS_FOR_BUILD=-L/c/libidn2/gettext-0.22.5/libtextstyle/lib -Wl,-rpath \
+			LIBCFLAGS=-I/c/libidn2/gettext-0.22.5/libtextstyle/lib \
+			CFLAGS_FOR_TARGET=-I/c/libidn2/gettext-0.22.5/libtextstyle/lib \
+			LDFLAGS_FOR_TARGET=-L/usr/lib -Wl,-rpath \
+			target_alias=x86_64-w64-mingw32 \
+			SHELL=C:/msys64/usr/bin/sh.exe \
+			MAKEINFO=makeinfo
+
+STAGE_FLAGS = STAGE1_CHECKING=--enable-checking=yes,types \
+			STAGE1_LANGUAGES=c,c++,lto \
+			STAGE1_CFLAGS= \
+			STAGE1_CXXFLAGS=-D__USE_MINGW_ACCESS \
+			STAGE2_CFLAGS=-D__USE_MINGW_ACCESS -Wno-pedantic-ms-format \
+			STAGE2_CXXFLAGS=-D__USE_MINGW_ACCESS -Wno-pedantic-ms-format \
+			STAGE3_CFLAGS=-D__USE_MINGW_ACCESS -Wno-pedantic-ms-format \
+			STAGE3_CXXFLAGS=-D__USE_MINGW_ACCESS -Wno-pedantic-ms-format
+
+TOOL_FLAGS = AWK=gawk \
+			BISON=bison \
+			FLEX=flex \
+			LEX=flex \
+			EXPECT=expect \
+			INSTALL=/usr/bin/install \
+			INSTALL_DATA=/usr/bin/install \
+			INSTALL_PROGRAM=/usr/bin/install \
+			INSTALL_SCRIPT=/usr/bin/install \
+			M4=/usr/bin/m4 \
+			SED=/usr/bin/sed
+
+BASE_FLAGS_TO_PASS = $(COMMON_FLAGS) $(STAGE_FLAGS) $(TOOL_FLAGS)
+
+clean-fixincludes: 
+...
+$(HOST_EXPORTS); \
+...
+성공!!
+nayou@kimnayooung MINGW64 /c/gcc-build
+# ../gcc-14.2.0/configure CONFIG_SITE=  --with-gmp=/mingw64 --with-mpfr=/mingw64 --with-mpc=/mingw64 CFLAGS="-I/c/libidn2/gettext-0.22.5/libtextstyle/lib" LDFLAGS="-L/c/libidn2/gettext-0.22.5/libtextstyle/lib" && mingw32-make clean
+(오류)
+/c/msys64/usr/bin/sh: -c: 줄 5: 예기치 않은 토큰 `do' 근처에서 문법 오류
+/c/msys64/usr/bin/sh: -c: 줄 5: `for flag in "AR=/mingw64/x86_64-w64-mingw32/bin/ar.exe " "AS=as" "CC=x86_64-w64-mingw32-gcc" "CXX=x86_64-w64-mingw32-g++ -std=c++11" "DLLTOOL=dlltool" "DSYMUTIL=dsymutil" "GFORTRAN=" "GOC=" "GDC=no" "GM2=" "LD=/mingw64/x86_64-w64-mingw32/bin/ld.exe" "LIPO=lipo" "NM=nm" "OBJDUMP=objdump" "OTOOL=otool" "RANLIB=ranlib " "READELF=readelf" "STRIP=strip" "WINDRES=windres" "WINDMC=windmc" "CREATE_GCOV=create_gcov" "PROFILE_MERGER=profile_merger" "GCC_FOR_TARGET= $r/host-x86_64-w64-mingw32/gcc/xgcc -B$r/host-x86_64-w64-mingw32/gcc/ $TFLAGS" "GM2_FOR_TARGET=  $TFLAGS" "`echo 'STMP_FIXPROTO=' | sed -e s'/[^=][^=]*=$/XFOO=/'`" "`echo 'LIMITS_H_TEST=' | sed -e s'/[^=][^=]*=$/XFOO=/'`"; do \'
+mingw32-make[1]: *** [Makefile:5850: clean-gcc] Error 2
+mingw32-make[1]: Leaving directory 'C:/gcc-build'
+mingw32-make: *** [Makefile:2221: do-clean] Error 2
+(수정)
+C:\gcc-build\Makefile.in 수정
+maybe-clean-gcc: clean-gcc
+EXTRA_HOST_FLAGS = \
+	"AR=$(AR)" \
+	"AS=$(AS)" \
+	"CC=$(CC)" \
+	"CXX=$(CXX)" \
+	"DLLTOOL=$(DLLTOOL)" \
+	"DSYMUTIL=$(DSYMUTIL)" \
+	"GFORTRAN=$(GFORTRAN)" \
+	"GOC=$(GOC)" \
+	"GDC=$(GDC)" \
+	"GM2=$(GM2)" \
+	"LD=$(LD)" \
+	"LIPO=$(LIPO)" \
+	"NM=$(NM)" \
+	"OBJDUMP=$(OBJDUMP)" \
+	"OTOOL=$(OTOOL)" \
+	"RANLIB=$(RANLIB)" \
+	"READELF=$(READELF)" \
+	"STRIP=$(STRIP)" \
+	"WINDRES=$(WINDRES)" \
+	"WINDMC=$(WINDMC)" \
+	"CREATE_GCOV=$(CREATE_GCOV)" \
+	"PROFILE_MERGER=$(PROFILE_MERGER)"
+clean-gcc: 
+...
+$(HOST_EXPORTS); \
+...
+성공!!
+
+nayou@kimnayooung MINGW64 /c/gcc-build
+# ../gcc-14.2.0/configure CONFIG_SITE=  --with-gmp=/mingw64 --with-mpfr=/mingw64 --with-mpc=/mingw64 CFLAGS="-I/c/libidn2/gettext-0.22.5/libtextstyle/lib" LDFLAGS="-L/c/libidn2/gettext-0.22.5/libtextstyle/lib" && mingw32-make clean
+(오류)
+/c/msys64/usr/bin/sh: -c: 줄 5: 예기치 않은 토큰 `do' 근처에서 문법 오류
+/c/msys64/usr/bin/sh: -c: 줄 5: `for flag in "AR=/mingw64/x86_64-w64-mingw32/bin/ar.exe " "AS=as" "CC=x86_64-w64-mingw32-gcc" "CXX=x86_64-w64-mingw32-g++ -std=c++11" "DLLTOOL=dlltool" "DSYMUTIL=dsymutil" "GFORTRAN=" "GOC=" "GDC=no" "GM2=" "LD=/mingw64/x86_64-w64-mingw32/bin/ld.exe" "LIPO=lipo" "NM=nm" "OBJDUMP=objdump" "OTOOL=otool" "RANLIB=ranlib " "READELF=readelf" "STRIP=strip" "WINDRES=windres" "WINDMC=windmc" "CREATE_GCOV=create_gcov" "PROFILE_MERGER=profile_merger" ; do \'
+mingw32-make[1]: *** [Makefile:8299: clean-libbacktrace] Error 2
+mingw32-make[1]: Leaving directory 'C:/gcc-build'
+mingw32-make: *** [Makefile:2221: do-clean] Error 2
+/c/msys64/usr/bin/sh: -c: 줄 5: 예기치 않은 토큰 `do' 근처에서 문법 오류
+/c/msys64/usr/bin/sh: -c: 줄 5: `for flag in "AR=/mingw64/x86_64-w64-mingw32/bin/ar.exe " "AS=as" "CC=x86_64-w64-mingw32-gcc" "CXX=x86_64-w64-mingw32-g++ -std=c++11" "DLLTOOL=dlltool" "DSYMUTIL=dsymutil" "GFORTRAN=" "GOC=" "GDC=no" "GM2=" "LD=/mingw64/x86_64-w64-mingw32/bin/ld.exe" "LIPO=lipo" "NM=nm" "OBJDUMP=objdump" "OTOOL=otool" "RANLIB=ranlib " "READELF=readelf" "STRIP=strip" "WINDRES=windres" "WINDMC=windmc" "CREATE_GCOV=create_gcov" "PROFILE_MERGER=profile_merger" ; do \'
+mingw32-make[1]: *** [Makefile:9383: clean-libcpp] Error 2
+mingw32-make[1]: Leaving directory 'C:/gcc-build'
+mingw32-make: *** [Makefile:2221: do-clean] Error 2
+/c/msys64/usr/bin/sh: -c: 줄 5: 예기치 않은 토큰 `do' 근처에서 문법 오류
+/c/msys64/usr/bin/sh: -c: 줄 5: `for flag in "AR=/mingw64/x86_64-w64-mingw32/bin/ar.exe " "AS=as" "CC=x86_64-w64-mingw32-gcc" "CXX=x86_64-w64-mingw32-g++ -std=c++11" "DLLTOOL=dlltool" "DSYMUTIL=dsymutil" "GFORTRAN=" "GOC=" "GDC=no" "GM2=" "LD=/mingw64/x86_64-w64-mingw32/bin/ld.exe" "LIPO=lipo" "NM=nm" "OBJDUMP=objdump" "OTOOL=otool" "RANLIB=ranlib " "READELF=readelf" "STRIP=strip" "WINDRES=windres" "WINDMC=windmc" "CREATE_GCOV=create_gcov" "PROFILE_MERGER=profile_merger" ; do \'
+mingw32-make[1]: *** [Makefile:10316: clean-libcody] Error 2
+mingw32-make[1]: Leaving directory 'C:/gcc-build'
+mingw32-make: *** [Makefile:2221: do-clean] Error 2
+/c/msys64/usr/bin/sh: -c: 줄 5: 예기치 않은 토큰 `do' 근처에서 문법 오류
+/c/msys64/usr/bin/sh: -c: 줄 5: `for flag in "AR=/mingw64/x86_64-w64-mingw32/bin/ar.exe " "AS=as" "CC=x86_64-w64-mingw32-gcc" "CXX=x86_64-w64-mingw32-g++ -std=c++11" "DLLTOOL=dlltool" "DSYMUTIL=dsymutil" "GFORTRAN=" "GOC=" "GDC=no" "GM2=" "LD=/mingw64/x86_64-w64-mingw32/bin/ld.exe" "LIPO=lipo" "NM=nm" "OBJDUMP=objdump" "OTOOL=otool" "RANLIB=ranlib " "READELF=readelf" "STRIP=strip" "WINDRES=windres" "WINDMC=windmc" "CREATE_GCOV=create_gcov" "PROFILE_MERGER=profile_merger" ; do \'
+mingw32-make[1]: *** [Makefile:11385: clean-libdecnumber] Error 2
+mingw32-make[1]: Leaving directory 'C:/gcc-build'
+mingw32-make: *** [Makefile:2221: do-clean] Error 2
+/c/msys64/usr/bin/sh: -c: 줄 5: 예기치 않은 토큰 `do' 근처에서 문법 오류
+/c/msys64/usr/bin/sh: -c: 줄 5: `for flag in "AR=/mingw64/x86_64-w64-mingw32/bin/ar.exe " "AS=as" "CC=x86_64-w64-mingw32-gcc" "CXX=x86_64-w64-mingw32-g++ -std=c++11" "DLLTOOL=dlltool" "DSYMUTIL=dsymutil" "GFORTRAN=" "GOC=" "GDC=no" "GM2=" "LD=/mingw64/x86_64-w64-mingw32/bin/ld.exe" "LIPO=lipo" "NM=nm" "OBJDUMP=objdump" "OTOOL=otool" "RANLIB=ranlib " "READELF=readelf" "STRIP=strip" "WINDRES=windres" "WINDMC=windmc" "CREATE_GCOV=create_gcov" "PROFILE_MERGER=profile_merger" ; do \'
+mingw32-make[1]: *** [Makefile:12548: clean-libiberty] Error 2
+mingw32-make[1]: Leaving directory 'C:/gcc-build'
+mingw32-make: *** [Makefile:2221: do-clean] Error 2
+/c/msys64/usr/bin/sh: -c: 줄 5: 예기치 않은 토큰 `do' 근처에서 문법 오류
+/c/msys64/usr/bin/sh: -c: 줄 5: `for flag in "AR=/mingw64/x86_64-w64-mingw32/bin/ar.exe " "AS=as" "CC=x86_64-w64-mingw32-gcc" "CXX=x86_64-w64-mingw32-g++ -std=c++11" "DLLTOOL=dlltool" "DSYMUTIL=dsymutil" "GFORTRAN=" "GOC=" "GDC=no" "GM2=" "LD=/mingw64/x86_64-w64-mingw32/bin/ld.exe" "LIPO=lipo" "NM=nm" "OBJDUMP=objdump" "OTOOL=otool" "RANLIB=ranlib " "READELF=readelf" "STRIP=strip" "WINDRES=windres" "WINDMC=windmc" "CREATE_GCOV=create_gcov" "PROFILE_MERGER=profile_merger" ; do \'
+/c/msys64/usr/bin/sh: -c: 줄 5: 예기치 않은 토큰 `do' 근처에서 문법 오류
+/c/msys64/usr/bin/sh: -c: 줄 5: `for flag in "AR=/mingw64/x86_64-w64-mingw32/bin/ar.exe " "AS=as" "CC=x86_64-w64-mingw32-gcc" "CXX=x86_64-w64-mingw32-g++ -std=c++11" "DLLTOOL=dlltool" "DSYMUTIL=dsymutil" "GFORTRAN=" "GOC=" "GDC=no" "GM2=" "LD=/mingw64/x86_64-w64-mingw32/bin/ld.exe" "LIPO=lipo" "NM=nm" "OBJDUMP=objdump" "OTOOL=otool" "RANLIB=ranlib " "READELF=readelf" "STRIP=strip" "WINDRES=windres" "WINDMC=windmc" "CREATE_GCOV=create_gcov" "PROFILE_MERGER=profile_merger" ; do \'
+mingw32-make[1]: *** [Makefile:14283: clean-zlib] Error 2
+mingw32-make[1]: Leaving directory 'C:/gcc-build'
+mingw32-make: *** [Makefile:2221: do-clean] Error 2
+/c/msys64/usr/bin/sh: -c: 줄 5: 예기치 않은 토큰 `do' 근처에서 문법 오류
+/c/msys64/usr/bin/sh: -c: 줄 5: `for flag in "AR=/mingw64/x86_64-w64-mingw32/bin/ar.exe " "AS=as" "CC=x86_64-w64-mingw32-gcc" "CXX=x86_64-w64-mingw32-g++ -std=c++11" "DLLTOOL=dlltool" "DSYMUTIL=dsymutil" "GFORTRAN=" "GOC=" "GDC=no" "GM2=" "LD=/mingw64/x86_64-w64-mingw32/bin/ld.exe" "LIPO=lipo" "NM=nm" "OBJDUMP=objdump" "OTOOL=otool" "RANLIB=ranlib " "READELF=readelf" "STRIP=strip" "WINDRES=windres" "WINDMC=windmc" "CREATE_GCOV=create_gcov" "PROFILE_MERGER=profile_merger" ; do \'
+mingw32-make[1]: *** [Makefile:15343: clean-c++tools] Error 2
+mingw32-make[1]: Leaving directory 'C:/gcc-build'
+mingw32-make: *** [Makefile:2221: do-clean] Error 2
+/c/msys64/usr/bin/sh: -c: 줄 5: 예기치 않은 토큰 `do' 근처에서 문법 오류
+/c/msys64/usr/bin/sh: -c: 줄 5: `for flag in "AR=/mingw64/x86_64-w64-mingw32/bin/ar.exe " "AS=as" "CC=x86_64-w64-mingw32-gcc" "CXX=x86_64-w64-mingw32-g++ -std=c++11" "DLLTOOL=dlltool" "DSYMUTIL=dsymutil" "GFORTRAN=" "GOC=" "GDC=no" "GM2=" "LD=/mingw64/x86_64-w64-mingw32/bin/ld.exe" "LIPO=lipo" "NM=nm" "OBJDUMP=objdump" "OTOOL=otool" "RANLIB=ranlib " "READELF=readelf" "STRIP=strip" "WINDRES=windres" "WINDMC=windmc" "CREATE_GCOV=create_gcov" "PROFILE_MERGER=profile_merger" ; do \'
+mingw32-make[1]: *** [Makefile:16508: clean-lto-plugin] Error 2
+mingw32-make[1]: Leaving directory 'C:/gcc-build'
+mingw32-make: *** [Makefile:2221: do-clean] Error 2
+/c/msys64/usr/bin/sh: -c: 줄 5: 예기치 않은 토큰 `do' 근처에서 문법 오류
+/c/msys64/usr/bin/sh: -c: 줄 5: `for flag in "AR=/mingw64/x86_64-w64-mingw32/bin/ar.exe " "AS=as" "CC=x86_64-w64-mingw32-gcc" "CXX=x86_64-w64-mingw32-g++ -std=c++11" "DLLTOOL=dlltool" "DSYMUTIL=dsymutil" "GFORTRAN=" "GOC=" "GDC=no" "GM2=" "LD=/mingw64/x86_64-w64-mingw32/bin/ld.exe" "LIPO=lipo" "NM=nm" "OBJDUMP=objdump" "OTOOL=otool" "RANLIB=ranlib " "READELF=readelf" "STRIP=strip" "WINDRES=windres" "WINDMC=windmc" "CREATE_GCOV=create_gcov" "PROFILE_MERGER=profile_merger" ; do \'
+mingw32-make[1]: *** [Makefile:16954: clean-libcc1] Error 2
+mingw32-make[1]: Leaving directory 'C:/gcc-build'
+mingw32-make: *** [Makefile:2221: do-clean] Error 2
+(수정)
+동일
+nayou@kimnayooung MINGW64 /c/gcc-build
+# ../gcc-14.2.0/configure CONFIG_SITE=  --with-gmp=/mingw64 --with-mpfr=/mingw64 --with-mpc=/mingw64 CFLAGS="-I/c/libidn2/gettext-0.22.5/libtextstyle/lib" LDFLAGS="-L/c/libidn2/gettext-0.22.5/libtextstyle/lib" && mingw32-make clean
+configure: creating ./config.status
+config.status: creating Makefile
+mingw32-make[1]: Entering directory 'C:/gcc-build'
+mingw32-make[1]: Leaving directory 'C:/gcc-build'
+rm -f *.a TEMP errs core *.o *~ \#* TAGS *.E *.log
+성공!!
+
+nayou@kimnayooung MINGW64 /c/gcc-build
+# ../gcc-14.2.0/configure CONFIG_SITE=  --with-gmp=/mingw64 --with-mpfr=/mingw64 --with-mpc=/mingw64 \
+CFLAGS="-I/c/libidn2/gettext-0.22.5/libtextstyle/lib" \
+LDFLAGS="-L/c/libidn2/gettext-0.22.5/libtextstyle/lib" && \
+mingw32-make clean &&
+mingw32-make distclean
+(오류)
+/c/msys64/usr/bin/sh: -c: 줄 5: 예기치 않은 토큰 `do' 근처에서 문법 오류
+/c/msys64/usr/bin/sh: -c: 줄 5: `for flag in "AR=/mingw64/x86_64-w64-mingw32/bin/ar.exe " "AS=as" "CC=x86_64-w64-mingw32-gcc" "CXX=x86_64-w64-mingw32-g++ -std=c++11" "DLLTOOL=dlltool" "DSYMUTIL=dsymutil" "GFORTRAN=" "GOC=" "GDC=no" "GM2=" "LD=/mingw64/x86_64-w64-mingw32/bin/ld.exe" "LIPO=lipo" "NM=nm" "OBJDUMP=objdump" "OTOOL=otool" "RANLIB=ranlib " "READELF=readelf" "STRIP=strip" "WINDRES=windres" "WINDMC=windmc" "CREATE_GCOV=create_gcov" "PROFILE_MERGER=profile_merger" ; do \'
+mingw32-make[1]: *** [Makefile:4576: distclean-fixincludes] Error 2
+mingw32-make[1]: Leaving directory 'C:/gcc-build'
+mingw32-make: *** [Makefile:2314: do-distclean] Error 2
+(수정)
+C:\gcc-build\Makefile.in 수정정
+maybe-distclean-fixincludes: distclean-fixincludes
+HOST_EXPORTS=FLEX=flex \
+			LEX=flex \
+			BISON=bison \
+			YACC=bison \
+			M4=C:/msys64/usr/bin/m4 \
+			SED=C:/msys64/usr/bin/sed \
+			AWK=gawk \
+			MAKEINFO=makeinfo \
+			GUILE=guile \
+			CC=x86_64-w64-mingw32-gcc \
+			ADA_CFLAGS= \
+			CONFIG_SHELL=C:/msys64/usr/bin/sh.exe \
+			CXX=x86_64-w64-mingw32-g++ \
+			CXXFLAGS=-I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++\
+			GFORTRAN= \
+			GOC= \
+			GDC=no \
+			GM2= \
+			AR=/mingw64/x86_64-w64-mingw32/bin/ar.exe \
+			AS=as \
+			CC_FOR_BUILD=x86_64-w64-mingw32-gcc \
+			CPP_FOR_BUILD= \
+			CPPFLAGS_FOR_BUILD=-I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ \
+			CXX_FOR_BUILD=x86_64-w64-mingw32-g++ \
+			CXXFLAGS_FOR_BUILD=-I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ \
+			LD_FOR_BUILD=x86_64-w64-mingw32-ld \
+			LDFLAGS_FOR_BUILD=-L/c/libidn2/gettext-0.22.5/libtextstyle/lib \
+			LIBCFLAGS=-I/c/libidn2/gettext-0.22.5/libtextstyle/lib
+			LIBCXXFLAGS= \
+			STAGE1_CHECKING=--enable-checking=yes,types \
+			STAGE1_LANGUAGES=c,c++,lto \
+			GNATBIND=no \
+			GNATMAKE=no \
+			GDCFLAGS_FOR_BUILD=-I/c/libidn2/gettext-0.22.5/libtextstyle/lib \
+			INSTALL=C:/msys64/usr/bin/install \
+			INSTALL_PROGRAM=C:/msys64/usr/bin/install \
+			INSTALL_SCRIPT=C:/msys64/usr/bin/install \
+			INSTALL_DATA=C:/msys64/usr/bin/install \
+			RUNTEST=runtest \
+			RUNTESTFLAGS= \
+			SHELL=C:/msys64/usr/bin/sh.exe \
+			MAKE=C:/msys64/mingw64/bin/mingw32-make.exe \
+			CONFIG_SITE= \
+			CC_FOR_TARGET=/./gcc/xgcc \
+			CFLAGS_FOR_TARGET=-Ic:/libidn2/gettext-0.22.5/libtextstyle/lib \
+			CPPFLAGS_FOR_TARGET= \
+			CXXFLAGS_FOR_TARGET=-I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ \
+			LDFLAGS_FOR_TARGET=-L/mingw64/x86_64-w64-mingw32/lib \
+			LIBCFLAGS_FOR_TARGET=-Ic:/libidn2/gettext-0.22.5/libtextstyle/lib \
+			LIBCXXFLAGS_FOR_TARGET=-I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ \
+			NM_FOR_TARGET=/mingw64/x86_64-w64-mingw32/bin/nm \
+			OBJDUMP_FOR_TARGET=/mingw64/x86_64-w64-mingw32/bin/objdump \
+			OBJCOPY_FOR_TARGET=/mingw64/x86_64-w64-mingw32/bin/objcopy \
+			RANLIB_FOR_TARGET=/mingw64/x86_64-w64-mingw32/bin/ranlib \
+			AR_FOR_TARGET=/mingw64/x86_64-w64-mingw32/bin/ar \
+			AS_FOR_TARGET=/mingw64/x86_64-w64-mingw32/bin/as \
+			CONFIGURE_FOR_TARGET=./configure \
+			OBJDIR=./objdir \
+			DIST_DIR=./dist
+EXTRA_HOST_FLAGS = \
+	"AR=$(AR)" \
+	"AS=$(AS)" \
+	"CC=$(CC)" \
+	"CXX=$(CXX)" \
+	"DLLTOOL=$(DLLTOOL)" \
+	"DSYMUTIL=$(DSYMUTIL)" \
+	"GFORTRAN=$(GFORTRAN)" \
+	"GOC=$(GOC)" \
+	"GDC=$(GDC)" \
+	"GM2=$(GM2)" \
+	"LD=$(LD)" \
+	"LIPO=$(LIPO)" \
+	"NM=$(NM)" \
+	"OBJDUMP=$(OBJDUMP)" \
+	"OTOOL=$(OTOOL)" \
+	"RANLIB=$(RANLIB)" \
+	"READELF=$(READELF)" \
+	"STRIP=$(STRIP)" \
+	"WINDRES=$(WINDRES)" \
+	"WINDMC=$(WINDMC)" \
+	"CREATE_GCOV=$(CREATE_GCOV)" \
+	"PROFILE_MERGER=$(PROFILE_MERGER)"
+distclean-fixincludes: 
+...
+$(HOST_EXPORTS); \
+...
+성공!!
+/c/msys64/usr/bin/sh: -c: 줄 5: 예기치 않은 토큰 `do' 근처에서 문법 오류
+/c/msys64/usr/bin/sh: -c: 줄 5: `for flag in "AR=/mingw64/x86_64-w64-mingw32/bin/ar.exe " "AS=as" "CC=x86_64-w64-mingw32-gcc" "CXX=x86_64-w64-mingw32-g++ -std=c++11" "DLLTOOL=dlltool" "DSYMUTIL=dsymutil" "GFORTRAN=" "GOC=" "GDC=no" "GM2=" "LD=/mingw64/x86_64-w64-mingw32/bin/ld.exe" "LIPO=lipo" "NM=nm" "OBJDUMP=objdump" "OTOOL=otool" "RANLIB=ranlib " "READELF=readelf" "STRIP=strip" "WINDRES=windres" "WINDMC=windmc" "CREATE_GCOV=create_gcov" "PROFILE_MERGER=profile_merger" "GCC_FOR_TARGET= $r/host-x86_64-w64-mingw32/gcc/xgcc -B$r/host-x86_64-w64-mingw32/gcc/ $TFLAGS" "GM2_FOR_TARGET=  $TFLAGS" "`echo 'STMP_FIXPROTO=' | sed -e s'/[^=][^=]*=$/XFOO=/'`" "`echo 'LIMITS_H_TEST=' | sed -e s'/[^=][^=]*=$/XFOO=/'`"; do \'
+mingw32-make[1]: *** [Makefile:5917: distclean-gcc] Error 2
+mingw32-make[1]: Leaving directory 'C:/gcc-build'
+mingw32-make: *** [Makefile:2314: do-distclean] Error 2
+/c/msys64/usr/bin/sh: -c: 줄 5: 예기치 않은 토큰 `do' 근처에서 문법 오류
+/c/msys64/usr/bin/sh: -c: 줄 5: `for flag in "AR=/mingw64/x86_64-w64-mingw32/bin/ar.exe " "AS=as" "CC=x86_64-w64-mingw32-gcc" "CXX=x86_64-w64-mingw32-g++ -std=c++11" "DLLTOOL=dlltool" "DSYMUTIL=dsymutil" "GFORTRAN=" "GOC=" "GDC=no" "GM2=" "LD=/mingw64/x86_64-w64-mingw32/bin/ld.exe" "LIPO=lipo" "NM=nm" "OBJDUMP=objdump" "OTOOL=otool" "RANLIB=ranlib " "READELF=readelf" "STRIP=strip" "WINDRES=windres" "WINDMC=windmc" "CREATE_GCOV=create_gcov" "PROFILE_MERGER=profile_merger" ; do \'
+mingw32-make[1]: *** [Makefile:8447: distclean-libbacktrace] Error 2
+mingw32-make[1]: Leaving directory 'C:/gcc-build'
+mingw32-make: *** [Makefile:2314: do-distclean] Error 2
+/c/msys64/usr/bin/sh: -c: 줄 5: 예기치 않은 토큰 `do' 근처에서 문법 오류
+/c/msys64/usr/bin/sh: -c: 줄 5: `for flag in "AR=/mingw64/x86_64-w64-mingw32/bin/ar.exe " "AS=as" "CC=x86_64-w64-mingw32-gcc" "CXX=x86_64-w64-mingw32-g++ -std=c++11" "DLLTOOL=dlltool" "DSYMUTIL=dsymutil" "GFORTRAN=" "GOC=" "GDC=no" "GM2=" "LD=/mingw64/x86_64-w64-mingw32/bin/ld.exe" "LIPO=lipo" "NM=nm" "OBJDUMP=objdump" "OTOOL=otool" "RANLIB=ranlib " "READELF=readelf" "STRIP=strip" "WINDRES=windres" "WINDMC=windmc" "CREATE_GCOV=create_gcov" "PROFILE_MERGER=profile_merger" ; do \'
+mingw32-make[1]: *** [Makefile:9612: distclean-libcpp] Error 2
+mingw32-make[1]: Leaving directory 'C:/gcc-build'
+mingw32-make: *** [Makefile:2314: do-distclean] Error 2
+/c/msys64/usr/bin/sh: -c: 줄 5: 예기치 않은 토큰 `do' 근처에서 문법 오류
+/c/msys64/usr/bin/sh: -c: 줄 5: `for flag in "AR=/mingw64/x86_64-w64-mingw32/bin/ar.exe " "AS=as" "CC=x86_64-w64-mingw32-gcc" "CXX=x86_64-w64-mingw32-g++ -std=c++11" "DLLTOOL=dlltool" "DSYMUTIL=dsymutil" "GFORTRAN=" "GOC=" "GDC=no" "GM2=" "LD=/mingw64/x86_64-w64-mingw32/bin/ld.exe" "LIPO=lipo" "NM=nm" "OBJDUMP=objdump" "OTOOL=otool" "RANLIB=ranlib " "READELF=readelf" "STRIP=strip" "WINDRES=windres" "WINDMC=windmc" "CREATE_GCOV=create_gcov" "PROFILE_MERGER=profile_merger" ; do \'
+mingw32-make[1]: *** [Makefile:10626: distclean-libcody] Error 2
+mingw32-make[1]: Leaving directory 'C:/gcc-build'
+mingw32-make: *** [Makefile:2314: do-distclean] Error 2
+/c/msys64/usr/bin/sh: -c: 줄 5: 예기치 않은 토큰 `do' 근처에서 문법 오류
+/c/msys64/usr/bin/sh: -c: 줄 5: `for flag in "AR=/mingw64/x86_64-w64-mingw32/bin/ar.exe " "AS=as" "CC=x86_64-w64-mingw32-gcc" "CXX=x86_64-w64-mingw32-g++ -std=c++11" "DLLTOOL=dlltool" "DSYMUTIL=dsymutil" "GFORTRAN=" "GOC=" "GDC=no" "GM2=" "LD=/mingw64/x86_64-w64-mingw32/bin/ld.exe" "LIPO=lipo" "NM=nm" "OBJDUMP=objdump" "OTOOL=otool" "RANLIB=ranlib " "READELF=readelf" "STRIP=strip" "WINDRES=windres" "WINDMC=windmc" "CREATE_GCOV=create_gcov" "PROFILE_MERGER=profile_merger" ; do \'
+mingw32-make[1]: *** [Makefile:11776: distclean-libdecnumber] Error 2
+mingw32-make[1]: Leaving directory 'C:/gcc-build'
+mingw32-make: *** [Makefile:2314: do-distclean] Error 2
+/c/msys64/usr/bin/sh: -c: 줄 5: 예기치 않은 토큰 `do' 근처에서 문법 오류
+/c/msys64/usr/bin/sh: -c: 줄 5: `for flag in "AR=/mingw64/x86_64-w64-mingw32/bin/ar.exe " "AS=as" "CC=x86_64-w64-mingw32-gcc" "CXX=x86_64-w64-mingw32-g++ -std=c++11" "DLLTOOL=dlltool" "DSYMUTIL=dsymutil" "GFORTRAN=" "GOC=" "GDC=no" "GM2=" "LD=/mingw64/x86_64-w64-mingw32/bin/ld.exe" "LIPO=lipo" "NM=nm" "OBJDUMP=objdump" "OTOOL=otool" "RANLIB=ranlib " "READELF=readelf" "STRIP=strip" "WINDRES=windres" "WINDMC=windmc" "CREATE_GCOV=create_gcov" "PROFILE_MERGER=profile_merger" ; do \'
+mingw32-make[1]: *** [Makefile:13020: distclean-libiberty] Error 2
+mingw32-make[1]: Leaving directory 'C:/gcc-build'
+mingw32-make: *** [Makefile:2314: do-distclean] Error 2
+/c/msys64/usr/bin/sh: -c: 줄 5: 예기치 않은 토큰 `do' 근처에서 문법 오류
+/c/msys64/usr/bin/sh: -c: 줄 5: `for flag in "AR=/mingw64/x86_64-w64-mingw32/bin/ar.exe " "AS=as" "CC=x86_64-w64-mingw32-gcc" "CXX=x86_64-w64-mingw32-g++ -std=c++11" "DLLTOOL=dlltool" "DSYMUTIL=dsymutil" "GFORTRAN=" "GOC=" "GDC=no" "GM2=" "LD=/mingw64/x86_64-w64-mingw32/bin/ld.exe" "LIPO=lipo" "NM=nm" "OBJDUMP=objdump" "OTOOL=otool" "RANLIB=ranlib " "READELF=readelf" "STRIP=strip" "WINDRES=windres" "WINDMC=windmc" "CREATE_GCOV=create_gcov" "PROFILE_MERGER=profile_merger" ; do \'
+mingw32-make[1]: *** [Makefile:14836: distclean-zlib] Error 2
+mingw32-make[1]: Leaving directory 'C:/gcc-build'
+mingw32-make: *** [Makefile:2314: do-distclean] Error 2
+/c/msys64/usr/bin/sh: -c: 줄 5: 예기치 않은 토큰 `do' 근처에서 문법 오류
+/c/msys64/usr/bin/sh: -c: 줄 5: `for flag in "AR=/mingw64/x86_64-w64-mingw32/bin/ar.exe " "AS=as" "CC=x86_64-w64-mingw32-gcc" "CXX=x86_64-w64-mingw32-g++ -std=c++11" "DLLTOOL=dlltool" "DSYMUTIL=dsymutil" "GFORTRAN=" "GOC=" "GDC=no" "GM2=" "LD=/mingw64/x86_64-w64-mingw32/bin/ld.exe" "LIPO=lipo" "NM=nm" "OBJDUMP=objdump" "OTOOL=otool" "RANLIB=ranlib " "READELF=readelf" "STRIP=strip" "WINDRES=windres" "WINDMC=windmc" "CREATE_GCOV=create_gcov" "PROFILE_MERGER=profile_merger" ; do \'
+mingw32-make[1]: *** [Makefile:15978: distclean-c++tools] Error 2
+mingw32-make[1]: Leaving directory 'C:/gcc-build'
+mingw32-make: *** [Makefile:2314: do-distclean] Error 2
+/c/msys64/usr/bin/sh: -c: 줄 5: 예기치 않은 토큰 `do' 근처에서 문법 오류
+/c/msys64/usr/bin/sh: -c: 줄 5: `for flag in "AR=/mingw64/x86_64-w64-mingw32/bin/ar.exe " "AS=as" "CC=x86_64-w64-mingw32-gcc" "CXX=x86_64-w64-mingw32-g++ -std=c++11" "DLLTOOL=dlltool" "DSYMUTIL=dsymutil" "GFORTRAN=" "GOC=" "GDC=no" "GM2=" "LD=/mingw64/x86_64-w64-mingw32/bin/ld.exe" "LIPO=lipo" "NM=nm" "OBJDUMP=objdump" "OTOOL=otool" "RANLIB=ranlib " "READELF=readelf" "STRIP=strip" "WINDRES=windres" "WINDMC=windmc" "CREATE_GCOV=create_gcov" "PROFILE_MERGER=profile_merger" ; do \'
+mingw32-make[1]: *** [Makefile:17223: distclean-lto-plugin] Error 2
+mingw32-make[1]: Leaving directory 'C:/gcc-build'
+mingw32-make: *** [Makefile:2314: do-distclean] Error 2
+/c/msys64/usr/bin/sh: -c: 줄 5: 예기치 않은 토큰 `do' 근처에서 문법 오류
+/c/msys64/usr/bin/sh: -c: 줄 5: `for flag in "AR=/mingw64/x86_64-w64-mingw32/bin/ar.exe " "AS=as" "CC=x86_64-w64-mingw32-gcc" "CXX=x86_64-w64-mingw32-g++ -std=c++11" "DLLTOOL=dlltool" "DSYMUTIL=dsymutil" "GFORTRAN=" "GOC=" "GDC=no" "GM2=" "LD=/mingw64/x86_64-w64-mingw32/bin/ld.exe" "LIPO=lipo" "NM=nm" "OBJDUMP=objdump" "OTOOL=otool" "RANLIB=ranlib " "READELF=readelf" "STRIP=strip" "WINDRES=windres" "WINDMC=windmc" "CREATE_GCOV=create_gcov" "PROFILE_MERGER=profile_merger" ; do \'
+mingw32-make[1]: *** [Makefile:17751: distclean-libcc1] Error 2
+mingw32-make[1]: Leaving directory 'C:/gcc-build'
+mingw32-make: *** [Makefile:2314: do-distclean] Error 2
+(수정)
+동일
+성공!!
+
+nayou@kimnayooung MINGW64 /c/gcc-build
+# ../gcc-14.2.0/configure CONFIG_SITE=  --with-gmp=/mingw64 --with-mpfr=/mingw64 --with-mpc=/mingw64 CFLAGS="-I/c/libidn2/gettext-0.22.5/libtextstyle/lib" LDFLAGS="-L/c/libidn2/gettext-0.22.5/libtextstyle/lib" && mingw32-make clean && mingw32-make distclean
+(오류)
+rmdir texinfo/doc texinfo/info texinfo/intl texinfo/lib 2>/dev/null
+mingw32-make: [Makefile:2537: local-distclean] Error 1 (ignored)
+rmdir texinfo/makeinfo texinfo/po texinfo/util 2>/dev/null
+mingw32-make: [Makefile:2538: local-distclean] Error 1 (ignored)
+rmdir c++tools fastjar gcc gnattools gotools 2>/dev/null
+mingw32-make: [Makefile:2539: local-distclean] Error 1 (ignored)
+rmdir libcc1 libiberty texinfo zlib 2>/dev/null
+mingw32-make: [Makefile:2540: local-distclean] Error 1 (ignored)
+find . -name config.cache -exec rm -f {} \; \; 2>/dev/null
+mingw32-make: [Makefile:2541: local-distclean] Error 1 (ignored)
+(수정)
+clean과 distclean 명령은 이전 빌드 파일과 임시 파일을 삭제하는 작업을 수행
+texinfo는 GCC 빌드 시스템에서 문서화를 위한 도구로, GCC 빌드의 일부 디렉터리에 사용됨
+Makefile에서 지정한 작업 중 일부가 실패했지만, 무시하도록 설계된 경우에 출력
+rmdir 명령어가 실패했는데 이는 삭제하려는 디렉터리가 비어 있지 않거나 이미 존재하지 않을 경우 발생
+Makefile은 이를 치명적인 문제로 간주하지 않고 다음 단계로 넘어 감
+
+무시설정
+명령앞에 -표시가 있을경우 해당 명령어는 실패해도 무시
+에러 출력 억제 에러 메시지를 보고 싶지 않다면 2>/dev/null을 추가
+에러를 방지하려면 rmdir 실행 전에 디렉터리가 존재하는지 확인([ -d texinfo/doc ] && rmdir texinfo/doc || true)
+직접적인 무시설정 : mingw32-make -k (모든 에러를 무시하고 가능한 작업을 계속 진행)
+local-distclean:
+	-rm -f Makefile config.status config.cache mh-frag mt-frag
+	-rm -f maybedep.tmp serdep.tmp stage_final
+	-if [ "$(TARGET_SUBDIR)" != "." ]; then \
+		rm -rf $(TARGET_SUBDIR); \
+	else true; fi
+	-rm -rf $(BUILD_SUBDIR)
+	-if [ "$(HOST_SUBDIR)" != "." ]; then \
+		rm -rf $(HOST_SUBDIR); \
+	else true; fi
+	-rm -f texinfo/po/Makefile texinfo/po/Makefile.in texinfo/info/Makefile
+	-rm -f texinfo/doc/Makefile texinfo/po/POTFILES
+	-rmdir texinfo/doc texinfo/info texinfo/intl texinfo/lib 2>/dev/null
+	-rmdir texinfo/makeinfo texinfo/po texinfo/util 2>/dev/null
+	-rmdir c++tools fastjar gcc gnattools gotools 2>/dev/null
+	-rmdir libcc1 libiberty texinfo zlib 2>/dev/null
+	-find . -name config.cache -exec rm -f {} \; \; 2>/dev/null
+
+디렉터리 상태 확인
+nayou@kimnayooung MINGW64 /c/gcc-build
+# find /c/gcc-build -type d -name "texinfo"
+find /c/gcc-build -type d -iname "*texinfo*"
+검색결과없음
+
+nayou@kimnayooung MINGW64 /c/gcc-build
+# for dir in texinfo/doc texinfo/info texinfo/intl texinfo/lib; do [ -d "$dir" ] && echo "디 렉터리: $dir" && ls -l "$dir" || echo "디렉터리 없음: $dir"; done
+디렉터리 없음: texinfo/doc
+디렉터리 없음: texinfo/info
+디렉터리 없음: texinfo/intl
+디렉터리 없음: texinfo/lib
+
+list_dirs.sh 생
+Bash 스크립트
+#!/bin/bash
+
+# 디렉터리 목록
+dirs=("texinfo/doc" "texinfo/info" "texinfo/intl" "texinfo/lib")
+
+# 디렉터리 확인 및 파일 목록 출력
+for dir in "${dirs[@]}"; do
+  if [ -d "$dir" ]; then
+    echo "디렉터리: $dir"
+    ls -l "$dir"  # 자세한 파일 목록 출력
+    echo
+  else
+    echo "디렉터리 없음: $dir"
+  fi
+done
+
+성공!!
+
+nayou@kimnayooung MINGW64 /c/gcc-build
+# ../gcc-14.2.0/configure --prefix=/usr/local \
+CONFIG_SITE=  --with-gmp=/mingw64 --with-mpfr=/mingw64 --with-mpc=/mingw64 \
+CFLAGS="-I/c/libidn2/gettext-0.22.5/libtextstyle/lib" \
+LDFLAGS="-L/c/libidn2/gettext-0.22.5/libtextstyle/lib" && \
+mingw32-make clean && mingw32-make distclean && \
+mingw32-make
+(오류)
+mingw32-make: [Makefile:2541: local-distclean] Error 1 (ignored)
+mingw32-make: *** No targets specified and no makefile found.  Stop.
