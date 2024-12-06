@@ -36347,10 +36347,47 @@ nayou@kimnayooung MINGW64 /c/gcc-build
 (오류)
 Makefile:1014: /c/gcc-14.2.0/config/bootstrap-debug.mk: No such file or directory
 mingw32-make: *** No rule to make target '/c/gcc-14.2.0/config/bootstrap-debug.mk'.  Stop.
+(수정)
+bootstrap-debug.mk 파일 확인
+nayou@kimnayooung MINGW64 /c/gcc-build
+# ls -l /c/gcc-14.2.0/config/bootstrap-debug.mk
+-rw-r--r-- 1 nayou nayou 510  8월  1 17:17 /c/gcc-14.2.0/config/bootstrap-debug.mk
+"C:\gcc-14.2.0\config\bootstrap-debug.mk"
+C:\gcc-build\Makefile:1014 확인
+BUILD_CONFIG = bootstrap-debug
+ifneq ($(BUILD_CONFIG),)
+include $(foreach CONFIG, $(BUILD_CONFIG), $(srcdir)/config/$(CONFIG).mk)
+endif
+.PHONY: configure-host
+...
 
+C:\gcc-build\Makefile.in 확인
+@if gcc
+BUILD_CONFIG = @BUILD_CONFIG@
+ifneq ($(BUILD_CONFIG),)
+#include $(foreach CONFIG, $(BUILD_CONFIG), $(srcdir)/config/$(CONFIG).mk)
+include $(foreach CONFIG, $(BUILD_CONFIG), C:/gcc-14.2.0/config/bootstrap-debug.mk)
+endif
+@endif gcc
 
+.PHONY: configure-host
 
+디버깅용으로 수정
+ifeq ($(origin BUILD_CONFIG),undefined)
+    BUILD_CONFIG = @BUILD_CONFIG@
+endif
 
+$(info =============BUILD_CONFIG:$(BUILD_CONFIG))
+$(info =============srcdir:$(srcdir))
 
-
-
+ifneq ($(BUILD_CONFIG),)
+    $(foreach CONFIG, $(BUILD_CONFIG), \
+        $(info =============CONFIG:$(CONFIG)::::$(srcdir)/config/$(CONFIG).mk);)
+endif
+(출력)
+=============BUILD_CONFIG:bootstrap-debug
+=============srcdir:/c/gcc-14.2.0
+=============CONFIG:bootstrap-debug::::/c/gcc-14.2.0/config/bootstrap-debug.mk
+nayou@kimnayooung MINGW64 /c/gcc-build
+# ls -l /c/gcc-14.2.0/config/bootstrap-debug.mk
+-rw-r--r-- 1 nayou nayou 510  8월  1 17:17 /c/gcc-14.2.0/config/bootstrap-debug.mk
