@@ -36295,10 +36295,62 @@ LDFLAGS="-L/c/libidn2/gettext-0.22.5/libtextstyle/lib" && \
 mingw32-make clean && mingw32-make distclean && \
 mingw32-make
 (오류)
-mingw32-make: *** No targets specified and no makefile found.  Stop.
-configure: error: cannot find sources () in ../../../gcc-14.2.0/lto-plugin
-mingw32-make[2]: *** [Makefile:16218: configure-stage1-lto-plugin] Error 1
+configure: error: cannot find install-sh, install.sh, or shtool in "/" "//.." "//../.."
+mingw32-make[2]: *** [Makefile:16220: configure-stage1-lto-plugin] Error 1
 mingw32-make[2]: Leaving directory 'C:/gcc-build'
-mingw32-make[1]: *** [Makefile:25757: stage1-bubble] Error 2
+mingw32-make[1]: *** [Makefile:25759: stage1-bubble] Error 2
 mingw32-make[1]: Leaving directory 'C:/gcc-build'
 mingw32-make: *** [Makefile:1110: all] Error 2
+(수정)
+C:\gcc-14.2.0\configure 확인
+if test -z "$ac_aux_dir"; then
+  as_fn_error $? "cannot find install-sh, install.sh, or shtool in \"$srcdir\" \"$srcdir/..\" \"$srcdir/../..\"" "$LINENO" 5
+fi
+C:\gcc-14.2.0\configure.ac 수정
+srcdir='/c/gcc-14.2.0'
+성공!!
+nayou@kimnayooung MINGW64 /c/gcc-build
+# cd ../gcc-14.2.0 && autoconf && cd ../gcc-build && ../gcc-14.2.0/configure && mingw32-make
+(오류)
+cd /c/gcc-14.2.0 && autogen Makefile.def
+/c/msys64/usr/bin/sh: 줄 1: autogen: 명령어를 찾을 수 없음
+mingw32-make: *** [Makefile:28558: /c/gcc-14.2.0/Makefile.in] Error 127
+(수정)
+/c/gcc-14.2.0/Makefile.def 파일 확인
+nayou@kimnayooung MINGW64 /c/gcc-build
+# ls -l /c/gcc-14.2.0/Makefile.def
+-rwxr-xr-x 1 nayou nayou 35409  8월  1 17:17 /c/gcc-14.2.0/Makefile.def
+autogen 설치 확인
+nayou@kimnayooung MINGW64 /c/gcc-build
+# which autogen
+which: no autogen in (/...)
+MSYS2 업데이트
+nayou@kimnayooung MINGW64 /c/gcc-build
+# pacman -Syu
+autogen 설치
+nayou@kimnayooung MINGW64 /c/gcc-build
+# pacman -S autogen
+autogen 설치완료
+nayou@kimnayooung MINGW64 /c/gcc-build
+# which autogen
+/usr/bin/autogen
+nayou@kimnayooung MINGW64 /c/gcc-build
+# ls -l /usr/bin/autogen*
+-rwxr-xr-x 1 nayou nayou 177906  7월 14  2023 /usr/bin/autogen.exe
+"C:\msys64\usr\bin\autogen.exe"
+autogen 설치경로 환경변수 등록
+~/.bashrc
+PATH="$PATH:/usr/bin"
+nayou@kimnayooung MINGW64 /c/gcc-build
+# cd ../gcc-14.2.0 && autoconf && cd ../gcc-build && ../gcc-14.2.0/configure && mingw32-make
+성공!!
+(오류)
+Makefile:1014: /c/gcc-14.2.0/config/bootstrap-debug.mk: No such file or directory
+mingw32-make: *** No rule to make target '/c/gcc-14.2.0/config/bootstrap-debug.mk'.  Stop.
+
+
+
+
+
+
+
