@@ -36391,3 +36391,37 @@ endif
 nayou@kimnayooung MINGW64 /c/gcc-build
 # ls -l /c/gcc-14.2.0/config/bootstrap-debug.mk
 -rw-r--r-- 1 nayou nayou 510  8월  1 17:17 /c/gcc-14.2.0/config/bootstrap-debug.mk
+
+C:\gcc-build\Makefile.in 파일 수정
+config.status: configure
+@if gcc
+$(info =============srcdir:$(srcdir));)
+BUILD_CONFIG = @BUILD_CONFIG@
+ifneq ($(BUILD_CONFIG),)
+include $(foreach CONFIG, $(BUILD_CONFIG), ../gcc-14.2.0/config/$(CONFIG).mk) #상대경로로 변경
+endif
+@endif gcc
+
+nayou@kimnayooung MINGW64 /c/gcc-build
+# cd ../gcc-14.2.0 && autoreconf && cd ../gcc-build && rm -f config.status && ../gcc-14.2.0/configure && mingw32-make
+(오류)
+cd /c/gcc-14.2.0 && autogen Makefile.def
+cd /c/gcc-14.2.0 && autoconf
+CONFIG_FILES=Makefile CONFIG_HEADERS= C:/msys64/usr/bin/sh.exe ./config.status
+config.status: creating Makefile
+=============srcdir:/c/gcc-14.2.0
+cd /c/gcc-14.2.0 && autogen Makefile.def
+cd /c/gcc-14.2.0 && autoconf
+CONFIG_FILES=Makefile CONFIG_HEADERS= C:/msys64/usr/bin/sh.exe ./config.status
+config.status: creating Makefile
+=============srcdir:/c/gcc-14.2.0
+cd /c/gcc-14.2.0 && autogen Makefile.def
+cd /c/gcc-14.2.0 && autoconf
+CONFIG_FILES=Makefile CONFIG_HEADERS= C:/msys64/usr/bin/sh.exe ./config.status
+config.status: creating Makefile
+=============srcdir:/c/gcc-14.2.0
+cd /c/gcc-14.2.0 && autogen Makefile.def
+...
+(수정)
+파일 의존성을 처리하는 과정에서 Makefile이 다시 생성되면서 무한 루프가 발생
+config.status가 실행될 때마다 Makefile을 갱신하며, 갱신된 Makefile은 다시 config.status를 호출하여 반복
