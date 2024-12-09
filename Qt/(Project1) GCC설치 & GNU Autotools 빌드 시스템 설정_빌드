@@ -36425,3 +36425,148 @@ cd /c/gcc-14.2.0 && autogen Makefile.def
 (수정)
 파일 의존성을 처리하는 과정에서 Makefile이 다시 생성되면서 무한 루프가 발생
 config.status가 실행될 때마다 Makefile을 갱신하며, 갱신된 Makefile은 다시 config.status를 호출하여 반복
+C:\gcc-build\Makefile.in 수정
+FLAG_NAME=INCLUDED_BOOTSTRAP_DEBUG
+r_src=..
+a_src=/c
+FILE=/gcc-14.2.0/config/bootstrap-debug.mk
+config.status: configure
+	ifndef INCLUDED_BOOTSTRAP_DEBUG
+		INCLUDED_BOOTSTRAP_DEBUG = 1		
+		$(info $(FLAG_NAME) defined....)
+		ifeq ("$(wildcard $(r_src)$(FILE))","")
+			$(info File $(r_src)$(FILE) not found!)
+			ifeq ("$(wildcard $(a_src)$(FILE))","")
+				$(error File $(a_src)$(FILE) not found!)
+			else
+				include $(a_src)$(FILE)
+				$(info include $(a_src)$(FILE)....)
+			endif
+		else
+			include $(r_src)$(FILE)
+			$(info include $(r_src)$(FILE)....)			
+		endif
+	else
+		$(error $(FLAG_NAME) undefined!)
+	endif
+
+nayou@kimnayooung MINGW64 /c/gcc-build
+# cd ../gcc-14.2.0 && autoreconf && cd ../gcc-build && rm -f config.status && ../gcc-14.2.0/configure && mingw32-make
+(오류)
+configure: creating ./config.status
+config.status: creating Makefile
+cd /c/gcc-14.2.0 && autogen Makefile.def
+cd /c/gcc-14.2.0 && autoconf
+INCLUDED_BOOTSTRAP_DEBUG defined....
+File ../gcc-14.2.0/config/bootstrap-debug.mk not found!
+Makefile:28575: *** File /c/gcc-14.2.0/config/bootstrap-debug.mk not found!.  Stop.
+(수정)
+상대경로, 절대경로 순으로 파일을 확인하였으나 파일이 존재하지 않는다고 나옴 그러나 실제 파일존재함
+(파일존재확인)
+nayou@kimnayooung MINGW64 /c/gcc-build
+# ls -l ../gcc-14.2.0/config/bootstrap-debug.mk
+-rw-r--r-- 1 nayou nayou 510  8월  1 17:17 ../gcc-14.2.0/config/bootstrap-debug.mk
+nayou@kimnayooung MINGW64 /c/gcc-build
+# ls -l /c/gcc-14.2.0/config/bootstrap-debug.mk
+-rw-r--r-- 1 nayou nayou 510  8월  1 17:17 /c/gcc-14.2.0/config/bootstrap-debug.mk
+
+C:\gcc-build\Makefile.in 수정
+FLAG_NAME=INCLUDED_BOOTSTRAP_DEBUG
+r_src=..
+a_src=/c
+FILE=/gcc-14.2.0/config/bootstrap-debug.mk
+
+ABS_R_SRC := $(realpath $(r_src))
+ABS_A_SRC := $(realpath $(a_src))
+ABS_FILE := $(realpath $(r_src)$(FILE))
+CYG_ABS_FILE := $(shell cygpath -u "$(ABS_FILE)")
+
+$(info Checking paths...)
+$(info Relative path: $(r_src)$(FILE))
+$(info Absolute path: $(ABS_A_SRC)$(FILE))
+$(info Resolved file path: $(ABS_FILE))
+$(info Cygwin converted path: $(CYG_ABS_FILE))
+
+config.status: configure
+@if gcc
+    ifndef INCLUDED_BOOTSTRAP_DEBUG
+        INCLUDED_BOOTSTRAP_DEBUG = 1
+        $(info $(FLAG_NAME) defined....)
+
+        ifeq ("$(wildcard $(ABS_FILE))","")
+            $(error File $(ABS_FILE) not found!)
+        else
+            include $(ABS_FILE)
+            $(info include $(ABS_FILE)....)
+        endif
+    else
+        $(error $(FLAG_NAME) undefined!)
+    endif
+@endif gcc
+
+nayou@kimnayooung MINGW64 /c/gcc-build
+# cd ../gcc-14.2.0 && autoreconf && cd ../gcc-build && rm -f config.status && ../gcc-14.2.0/configure && mingw32-make
+(오류)
+cd /c/gcc-14.2.0 && autogen Makefile.def
+cd /c/gcc-14.2.0 && autoconf
+CONFIG_FILES=Makefile CONFIG_HEADERS= C:/msys64/usr/bin/sh.exe ./config.status
+config.status: creating Makefile
+Checking paths...
+Relative path: ../gcc-14.2.0/config/bootstrap-debug.mk
+Absolute path: C:/c/gcc-14.2.0/config/bootstrap-debug.mk
+Resolved file path: C:/gcc-14.2.0/config/bootstrap-debug.mk
+Cygwin converted path: /c/gcc-14.2.0/config/bootstrap-debug.mk
+INCLUDED_BOOTSTRAP_DEBUG defined....
+include C:/gcc-14.2.0/config/bootstrap-debug.mk....
+
+nayou@kimnayooung MINGW64 /c/gcc-build
+# ls -l C:/gcc-14.2.0/config/bootstrap-debug.mk
+-rw-r--r-- 1 nayou nayou 510  8월  1 17:17 C:/gcc-14.2.0/config/bootstrap-debug.mk
+
+(수정)
+C:\gcc-build\Makefile.in 수정
+# Define configure Variables
+INCLUDED_BOOTSTRAP_DEBUG=true
+FLAG_NAME=INCLUDED_BOOTSTRAP_DEBUG
+r_src=..
+a_src=/c
+FILE=/gcc-14.2.0/config/bootstrap-debug.mk
+
+ABS_R_SRC := $(realpath $(r_src))
+ABS_A_SRC := $(realpath $(a_src))
+ABS_FILE := $(realpath $(r_src)$(FILE))
+CYG_ABS_FILE := $(shell cygpath -u "$(ABS_FILE)")
+
+$(info Checking paths...)
+$(info Relative path: $(r_src)$(FILE))
+$(info Absolute path: $(ABS_A_SRC)$(FILE))
+$(info Resolved file path: $(ABS_FILE))
+$(info Cygwin converted path: $(CYG_ABS_FILE))
+
+config.status: configure
+	@if gcc
+		if [ "$(INCLUDED_BOOTSTRAP_DEBUG)" == "true" ]; then
+			$(eval INCLUDED_BOOTSTRAP_DEBUG=false);
+			$(info $(FLAG_NAME) $(INCLUDED_BOOTSTRAP_DEBUG) update....);
+			ifeq ("$(wildcard $(ABS_FILE))","")
+				$(error File $(ABS_FILE) not found!);
+			else
+				include $(ABS_FILE);
+				$(info include $(ABS_FILE)....);
+			endif
+		else
+			$(error $(FLAG_NAME) undefined!);
+		endif
+	@endif gcc
+
+
+
+
+
+
+
+
+
+
+
+
