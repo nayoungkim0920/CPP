@@ -36558,12 +36558,109 @@ config.status: configure
 			$(error $(FLAG_NAME) undefined!);
 		endif
 	@endif gcc
+(오류)
+configure: creating ./config.status
+config.status: creating Makefile
+Checking paths...
+Relative path: ../gcc-14.2.0/config/bootstrap-debug.mk
+Absolute path: C:/c/gcc-14.2.0/config/bootstrap-debug.mk
+Resolved file path: C:/gcc-14.2.0/config/bootstrap-debug.mk
+Cygwin converted path: /c/gcc-14.2.0/config/bootstrap-debug.mk
+cd /c/gcc-14.2.0 && autogen Makefile.def
+cd /c/gcc-14.2.0 && autoconf
+INCLUDED_BOOTSTRAP_DEBUG false update....
+Makefile:28588: *** File C:/gcc-14.2.0/config/bootstrap-debug.mk not found!.  Stop.
+(수정)
+C:\gcc-build\Makefile.in 수정
+# Define configure Variables
+INCLUDED_BOOTSTRAP_DEBUG=true
+FLAG_NAME=INCLUDED_BOOTSTRAP_DEBUG
+r_src=..
+a_src=/c
+FILE=/gcc-14.2.0/config/bootstrap-debug.mk
 
+ABS_R_SRC := $(realpath $(r_src))
+ABS_FILE := $(realpath $(r_src)$(FILE))
+CYG_ABS_FILE := $(shell cygpath -u "$(ABS_FILE)")
 
+$(info Checking paths...)
+$(info Relative path: $(r_src)$(FILE))
+$(info Resolved file path: $(ABS_FILE))
+$(info Cygwin converted path: $(CYG_ABS_FILE))
 
+config.status: configure
+	@if gcc
+		if [ "$(INCLUDED_BOOTSTRAP_DEBUG)" == "true" ]; then
+			$(eval INCLUDED_BOOTSTRAP_DEBUG=false);
+			$(info $(FLAG_NAME) $(INCLUDED_BOOTSTRAP_DEBUG) update....);
+			ifeq ("$(wildcard $(ABS_FILE))","")
+				$(info File $(ABS_FILE) not found!);
+				ifeq ("$(wildcard $(CYG_ABS_FILE))","")
+					$(info File $(CYG_ABS_FILE) not found!);
+					ifeq ("$(wildcard $(r_src)$(FILE))","")
+						$(error File $(r_src)$(FILE) not found!);
+					else
+						include $(r_src)$(FILE);
+						$(info include $(r_src)$(FILE)....);
+					endif
+				else
+					include $(CYG_ABS_FILE);
+					$(info include $(CYG_ABS_FILE)....);
+				endif
+			else
+				include $(ABS_FILE);
+				$(info include $(ABS_FILE)....);
+			endif
+		else
+			$(error $(FLAG_NAME) undefined!);
+		endif
+	@endif gcc
 
+nayou@kimnayooung MINGW64 /c/gcc-build
+# cd ../gcc-14.2.0 && autoreconf && cd ../gcc-build && rm -f config.status && ../gcc-14.2.0/configure && mingw32-make
+(오류)
+configure: creating ./config.status
+config.status: creating Makefile
+Checking paths...
+Relative path: ../gcc-14.2.0/config/bootstrap-debug.mk
+Absolute path: C:/c/gcc-14.2.0/config/bootstrap-debug.mk
+Resolved file path: C:/gcc-14.2.0/config/bootstrap-debug.mk
+Cygwin converted path: /c/gcc-14.2.0/config/bootstrap-debug.mk
+cd /c/gcc-14.2.0 && autogen Makefile.def
+cd /c/gcc-14.2.0 && autoconf
+INCLUDED_BOOTSTRAP_DEBUG false update....
+File C:/gcc-14.2.0/config/bootstrap-debug.mk not found!
+File /c/gcc-14.2.0/config/bootstrap-debug.mk not found!
+Makefile:28592: *** File ../gcc-14.2.0/config/bootstrap-debug.mk not found!.  Stop.
+(수정)
+bootstrap-debug.mk 파일확인
+nayou@kimnayooung MINGW64 /c/gcc-build
+# ls -l ../gcc-14.2.0/config/bootstrap-debug.mk
+ls -l C:/gcc-14.2.0/config/bootstrap-debug.mk
+ls -l /c/gcc-14.2.0/config/bootstrap-debug.mk
+-rw-r--r-- 1 nayou nayou 510  8월  1 17:17 ../gcc-14.2.0/config/bootstrap-debug.mk
+-rw-r--r-- 1 nayou nayou 510  8월  1 17:17 C:/gcc-14.2.0/config/bootstrap-debug.mk
+-rw-r--r-- 1 nayou nayou 510  8월  1 17:17 /c/gcc-14.2.0/config/bootstrap-debug.mk
+접근권한
+-rw-r--r-- (644)
+- : 일반파일
+(nayou 권한) 소유자
+r : read
+w : write
+- : execute
+(nayou 그룹 권한) 
+r : read
+- : write
+- : execute
+(others 권한)
+r : read
+- : write
+- : execute
 
-
+nayou@kimnayooung MINGW64 /c/gcc-build
+# whoami
+nayou
+=> 권한문제는 아
 
 
 
