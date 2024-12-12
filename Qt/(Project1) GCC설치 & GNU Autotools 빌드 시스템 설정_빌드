@@ -36662,10 +36662,67 @@ nayou@kimnayooung MINGW64 /c/gcc-build
 nayou
 => 권한문제는 아님
 
+C:\gcc-build\Makefile.in 수정
+# Define configure Variables
+INCLUDED_BOOTSTRAP_DEBUG=true
+FLAG_NAME=INCLUDED_BOOTSTRAP_DEBUG
+r_src=..
+a_src=/c
+FILE=/gcc-14.2.0/config/bootstrap-debug.mk
 
+ABS_R_SRC := $(realpath $(r_src))
+ABS_FILE := $(realpath $(r_src)$(FILE))
+CYG_ABS_FILE := $(shell cygpath -u "$(ABS_FILE)")
 
+GCC := $(shell gcc --version > /dev/null 2>&1 && echo yes || echo no)
+config.status: configure
+$(info GCC is: $(GCC))
+ifeq ($(GCC), yes)
+	$(info $(FLAG_NAME) $(INCLUDED_BOOTSTRAP_DEBUG) init....)
+	if [ "$(INCLUDED_BOOTSTRAP_DEBUG)" == "true" ]; then \
+		$(eval INCLUDED_BOOTSTRAP_DEBUG=false) \
+		$(info $(FLAG_NAME) $(INCLUDED_BOOTSTRAP_DEBUG) update....) \
+		include $(r_src)$(FILE) \
+		$(info include $(r_src)$(FILE)....) \
+		include $(ABS_FILE) \
+		$(info include $(ABS_FILE)....) \
+		include $(CYG_ABS_FILE) \
+		$(info include $(CYG_ABS_FILE)....) \
+	else \
+		$(info $(FLAG_NAME) undefined!); \
+	fi; \
+endif
 
+(오류)
+configure: creating ./config.status
+config.status: creating Makefile
+GCC is: yes
+Makefile:28579: *** recipe commences before first target.  Stop.
+(수정)
+타겟 규칙 전에 명령어가 나오거나, 명령어가 잘못된 위치에 있을 때 발생
+레시피가 첫 번째 타겟 앞에 시작된다
+즉, 타겟을 정의하지 않고 명령어가 먼저 나와서 발생하는 오류
 
+MSYS2 환경에서는 경로가 제대로 번역되지 않을 수 있으니, cygpath와 직접적으로 파일 경로를 출력
+nayou@kimnayooung MINGW64 /c/gcc-build
+# ls -l "$(cygpath -u /c/gcc-14.2.0/config/bootstrap-debug.mk)"
+cat "$(cygpath -u /c/gcc-14.2.0/config/bootstrap-debug.mk)"
+-rw-r--r-- 1 nayou nayou 510  8월  1 17:17 /c/gcc-14.2.0/config/bootstrap-debug.mk
+# This BUILD_CONFIG option builds checks that toggling debug
+# information generation doesn't affect the generated object code.
 
+# It is very lightweight: in addition to not performing any additional
+# compilation (unlike bootstrap-debug-lean), it actually speeds up
+# stage2, for no debug information is generated when compiling with
+# the unoptimized stage1.
 
+# For more thorough testing, see bootstrap-debug-lean.mk
 
+STAGE2_CFLAGS += -gtoggle
+do-compare = $(SHELL) $(srcdir)/contrib/compare-debug $$f1 $$f2
+=>cat 명령어로 파일 내용이 성공적으로 출력되는 것을 보면, 파일이 실제로 존재하고 읽을 수 있음 
+경로 캐싱 문제일 가능성을 배제하기 위해 Makefile에서 rm으로 캐싱을 제거한 후 다시 실행:
+
+rm -f .depend
+make clean
+make
