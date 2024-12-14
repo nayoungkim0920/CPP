@@ -39583,7 +39583,8 @@ Makefile: $(srcdir)/Makefile.in
 # Makefile.def 파일이나 autogen.done 파일의 상태를 체크하여, 필요한 경우 autogen을 실행하고, 이를 통해 autogen.done 파일을 생성하는 과정을 자동화
 # cd /c/gcc-14.2.0 && autogen Makefile.def 호출무한루프 해결결
 autogen: $(srcdir)/Makefile.def
-	@if [ ! -f autogen.done -o $(srcdir)/Makefile.def -nt autogen.done ]; then \ # autogen.done 이 없거나, Makefile.def가 autogen.done보다 최신인경우
+	#@if [ ! -f autogen.done -o $(srcdir)/Makefile.def -nt autogen.done ]; then \ # autogen.done 이 없거나, Makefile.def가 autogen.done보다 최신인경우(true)
+	@if [ ! -f autogen.done || $(srcdir)/Makefile.def -nt autogen.done ]; then \ # autogen.done 이 없거나, Makefile.def가 autogen.done보다 최신인경우(true)
 		echo "Running autogen..."; \
 		cd $(srcdir) && autogen Makefile.def; \ # 소스디렉토리로 이동 후 autogen Makefile.def 실행하여 Makefile생성
 		touch autogen.done; \ # autogen.done생성. 이후 다시 autogen.done 실행하지 않도록 
