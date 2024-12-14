@@ -39754,3 +39754,99 @@ mingw32-make[1]: *** [Makefile:25759: stage1-bubble] Error 2
 mingw32-make[1]: Leaving directory 'C:/gcc-build'
 mingw32-make: *** [Makefile:1110: all] Error 2
 
+(수정)
+configure: error: cannot find install-sh, install.sh, or shtool in "/" "//.." "//../.."
+Autotools 파일이 깨졌거나 손실된 경우 
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0
+# aclocal && autoconf && automake --add-missing
+(오류)
+configure.ac: error: no proper invocation of AM_INIT_AUTOMAKE was found.
+configure.ac: You should verify that configure.ac invokes AM_INIT_AUTOMAKE,
+configure.ac: that aclocal.m4 is present in the top-level directory,
+configure.ac: and that aclocal.m4 was recently regenerated (using aclocal)
+Makefile.am: installing './INSTALL'
+configure.ac:3776: error: 'RUNTEST' defined but 'dejagnu' not in 'AUTOMAKE_OPTIONS'
+(수정)
+dejagnu 테스트 매크로 또는 관련 변수를 정의한 상태에서, 
+AUTOMAKE_OPTIONS에 dejagnu가 포함되지 않았거나 Makefile.am이 제대로 설정되지 않은 경우 발생
+RUNTEST는 dejagnu 테스트 도구를 기반으로 테스트를 실행하기 위해 설정되는 환경 변수
+automake는 dejagnu 지원을 활성화하려면 AUTOMAKE_OPTIONS에 dejagnu를 포함해야 함 
+
+C:\gcc-14.2.0\Makefile.am 수정
+AUTOMAKE_OPTIONS = dejagnu
+
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0
+# which runtest
+which: no runtest in (...)
+
+runtest 설치(runtest는 dejagnu 패키지의 일부)
+MinGW 환경에서 dejagnu 설치가 가능한지 확인
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0
+# pacman -Ss dejagnu
+msys/dejagnu 1.6.3-1
+    Framework for testing other programs
+설치 명령을 실행
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0
+# pacman -S dejagnu
+runtest 실행 파일이 사용 가능한지 확인
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0
+# which runtest
+/usr/bin/runtest
+=> 환경변수 PATH에 /usr/bin 추가 
+버전확인 
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0
+# runtest --version
+DejaGnu version 1.6.3
+Expect version  5.45.4
+Tcl version     8.6
+
+C:\gcc-14.2.0\configure.ac 수정 
+AC_CANONICAL_SYSTEM
+AC_ARG_PROGRAM
+AM_INIT_AUTOMAKE([dejagnu])
+m4_pattern_allow([^AS_FOR_TARGET$])dnl
+m4_pattern_allow([^AS_FOR_BUILD$])dnl
+
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0
+# aclocal && autoconf && automake --add-missing
+성공!!
+
+nayou@kimnayooung MINGW64 /c/gcc-build
+# cd ../gcc-14.2.0 && autoreconf && cd ../gcc-build && ../gcc-14.2.0/configure && mingw32-make clean && mingw32-make --debug=b
+(오류)
+configure: error: cannot find install-sh, install.sh, or shtool in "/" "//.." "//../.."
+mingw32-make[2]: *** [Makefile:16220: configure-stage1-lto-plugin] Error 1
+mingw32-make[2]: Leaving directory 'C:/gcc-build'
+mingw32-make[1]: *** [Makefile:25759: stage1-bubble] Error 2
+mingw32-make[1]: Leaving directory 'C:/gcc-build'
+mingw32-make: *** [Makefile:1110: all] Error 2
+
+(수정)
+권한설정 
+nayou@kimnayooung MINGW64 /c/gcc-build
+# chmod +x /c/gcc-14.2.0/install-sh
+nayou@kimnayooung MINGW64 /c/gcc-build
+# ls -l /c/gcc-14.2.0/install-sh
+-rwxr-xr-x 1 nayou nayou 14676 12월  6 08:44 /c/gcc-14.2.0/install-sh
+C:\gcc-14.2.0\configure.ac 수정 
+AC_CANONICAL_SYSTEM
+AC_ARG_PROGRAM
+AC_CONFIG_AUX_DIR([../gcc-14.2.0]) #install-sh를 포함한 보조 파일(install-sh, config.sub, config.guess 등)이 위치한 디렉토리를 Autotools에 알려 줌 
+AM_INIT_AUTOMAKE([dejagnu])
+m4_pattern_allow([^AS_FOR_TARGET$])dnl
+m4_pattern_allow([^AS_FOR_BUILD$])dnl
+
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0
+# cd ../gcc-14.2.0 && autoreconf && cd ../gcc-build && ../gcc-14.2.0/configure && mingw32-make clean && mingw32-make --debug=b
+(오류)
+configure: error: cannot find install-sh, install.sh, or shtool in "/" "//.." "//../.."
+mingw32-make[2]: *** [Makefile:16220: configure-stage1-lto-plugin] Error 1
+mingw32-make[2]: Leaving directory 'C:/gcc-build'
+mingw32-make[1]: *** [Makefile:25759: stage1-bubble] Error 2
+mingw32-make[1]: Leaving directory 'C:/gcc-build'
+mingw32-make: *** [Makefile:1110: all] Error 2
+
+(수정)
+빌드옵션수정(../gcc-14.2.0/configure --srcdir=/c/gcc-14.2.0)
+nayou@kimnayooung MINGW64 /c/gcc-build
+# cd ../gcc-14.2.0 && autoreconf && cd ../gcc-build && ../gcc-14.2.0/configure --srcdir=/c/gcc-14.2.0 && mingw32-make clean && mingw32-make --debug=b
