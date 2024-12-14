@@ -39591,6 +39591,9 @@ autogen: $(srcdir)/Makefile.def
 	else \
 		echo "Autogen is up to date."; \
 	fi
+(참고)
+|| : 앞의연산이 true인경우 뒤연산은 하지않는다
+-o : 얖의연산과 뒤의연산을 모두 처리한후 or연산을 한다
 
 nayou@kimnayooung MINGW64 /c/gcc-build
 # cd ../gcc-14.2.0 && autoreconf && cd ../gcc-build && ../gcc-14.2.0/configure && mingw32-make clean && mingw32-make --debug=b
