@@ -39556,21 +39556,37 @@ Updating Makefile...
 config.status: creating Makefile
 cd /c/gcc-14.2.0 && autogen Makefile.def
 (수정)
+config.status: creating Makefile과 autogen Makefile.def의 반복 문제는 make가 Makefile을 계속 갱신해야 한다고 잘못 판단
+Makefile의 타임스탬프 문제 => config.status가 실행될 때마다 Makefile의 타임스탬프가 갱신되어 make가 이를 다시 생성하려고 함
+불필요한 autogen Makefile.def 호출 => autogen 실행 조건이 정확히 정의되지 않아서 매번 실행
+순환 의존성 => Makefile이 config.status와 Makefile.in에 의존하며, 변경이 없어도 재생성 
+
+C:\gcc-build\Makefile.in 수정
 # Rebuilding Makefile.
+# 원본
+# Makefile: $(srcdir)/Makefile.in config.status # config.status가 템플릿 파일($(srcdir)/Makefile.in)을 읽고, Makefile 생성을 처리
+#	CONFIG_FILES=$@ CONFIG_HEADERS= $(SHELL) ./config.status # CONFIG_HEADERS는 비우고, 환경변수 CONFIG_FILES에 현재 대상($@, Makefile)을 지정하여 $(SHELL)를 통해 config.status 실행
+=> Makefile이 config.status에 의존하고, config.status가 다시 Makefile을 생성하기 때문에, 
+make가 Makefile을 다시 만들기 위해 config.status를 호출 이로 인해 무한 루프가 발생
+=> config.status안에 Makefile을 생성/수정하는 로직이있는데 타임스탬프를 변경하게됨 그후 make에는 makefile이 수정된걸 감지하여 config.status를 호출하는 부분이 있는데
+make를 실행하면 makefile이 수정된걸 감지하고 다시 config.status를 호출하게됨 또 다시 Makefile을 생성/수정하여 타임스템프 변경하게됨
+=> 무한루프에 빠짐 =>  config.status 실행결과 Makefile이 갱신됬는지 비교하는 방식으로 변경 
 Makefile: $(srcdir)/Makefile.in
-	@if [ ! -f Makefile ] || ! cmp -s Makefile Makefile.new; then \
+	@if [ ! -f Makefile ] || ! cmp -s Makefile Makefile.new; then \ # Makefile이 없거나 Makefile과 Makefile.new가 다른경우
 		echo "Updating Makefile..."; \
-		CONFIG_FILES=Makefile CONFIG_HEADERS= $(SHELL) ./config.status; \
-		cp Makefile Makefile.new; \
+		CONFIG_FILES=Makefile CONFIG_HEADERS= $(SHELL) ./config.status; \ # Makefile 갱신
+		cp Makefile Makefile.new; \ # Makefile.new 생성
 	else \
 		echo "Makefile is up to date."; \
 	fi
-
+# autogen 규칙 추가 : 자동화된 빌드 시스템을 만드는 데 필요한 종속성 관리와 빌드 스크립트의 최신 상태 유지를 처리하기 위함
+# Makefile.def 파일이나 autogen.done 파일의 상태를 체크하여, 필요한 경우 autogen을 실행하고, 이를 통해 autogen.done 파일을 생성하는 과정을 자동화
+# cd /c/gcc-14.2.0 && autogen Makefile.def 호출무한루프 해결결
 autogen: $(srcdir)/Makefile.def
-	@if [ ! -f autogen.done -o $(srcdir)/Makefile.def -nt autogen.done ]; then \
+	@if [ ! -f autogen.done -o $(srcdir)/Makefile.def -nt autogen.done ]; then \ # autogen.done 이 없거나, Makefile.def가 autogen.done보다 최신인경우
 		echo "Running autogen..."; \
-		cd $(srcdir) && autogen Makefile.def; \
-		touch autogen.done; \
+		cd $(srcdir) && autogen Makefile.def; \ # 소스디렉토리로 이동 후 autogen Makefile.def 실행하여 Makefile생성
+		touch autogen.done; \ # autogen.done생성. 이후 다시 autogen.done 실행하지 않도록 
 	else \
 		echo "Autogen is up to date."; \
 	fi
@@ -39578,129 +39594,7 @@ autogen: $(srcdir)/Makefile.def
 nayou@kimnayooung MINGW64 /c/gcc-build
 # cd ../gcc-14.2.0 && autoreconf && cd ../gcc-build && ../gcc-14.2.0/configure && mingw32-make clean && mingw32-make --debug=b
 (오류)
-configure: loading site script /etc/config.site
-checking build system type... x86_64-w64-mingw32
-checking host system type... x86_64-w64-mingw32
-checking target system type... x86_64-w64-mingw32
-checking for a BSD-compatible install... /usr/bin/install -c
-checking whether ln works... yes
-checking whether ln -s works... no, using cp -pR
-checking for a sed that does not truncate output... /usr/bin/sed
-checking for gawk... gawk
-checking for libatomic support... yes
-checking for libitm support... no
-checking for libsanitizer support... no
-checking for libvtv support... yes
-checking for libphobos support... no
-checking for gcc... x86_64-w64-mingw32-gcc
-checking whether the C compiler works... yes
-checking for C compiler default output file name... a.exe
-checking for suffix of executables... .exe
-checking whether we are cross compiling... no
-checking for suffix of object files... o
-checking whether we are using the GNU C compiler... yes
-checking whether x86_64-w64-mingw32-gcc accepts -g... yes
-checking for x86_64-w64-mingw32-gcc option to enable C23 features... unsupported
-checking for x86_64-w64-mingw32-gcc option to enable C11 features... none needed
-checking whether we are using the GNU C++ compiler... yes
-checking whether x86_64-w64-mingw32-g++ accepts -g... yes
-checking for x86_64-w64-mingw32-g++ option to enable C++11 features... none needed
-checking whether g++ accepts -static-libstdc++ -static-libgcc... yes
-checking for gnatbind... no
-checking for gnatmake... no
-checking whether compiler driver understands Ada and is recent enough... no
-checking for gdc... no
-checking whether the D compiler works... no
-checking for cargo... no
-checking how to compare bootstrapped objects... cmp --ignore-initial=16 $$f1 $$f2
-checking for objdir... .libs
-checking for the correct version of gmp.h... yes
-checking for the correct version of mpfr.h... yes
-checking for the correct version of mpc.h... yes
-checking for the correct version of the gmp/mpfr libraries... yes
-checking for the correct version of the mpc libraries... yes
-checking for isl 0.15 or later... yes
-The following languages will be built: c,c++,fortran,lto,objc
-*** This configuration is not supported in the following subdirectories:
-     target-libgomp target-libitm target-libsanitizer target-libphobos target-libffi target-libgo gnattools gotools libgrust target-libada target-zlib target-libgm2 target-libgrust
-    (Any other directories should still work fine.)
-checking for default BUILD_CONFIG... bootstrap-debug
-checking for --enable-vtable-verify... no
-checking for bison... bison -y
-checking for bison... bison
-checking for gm4... /usr/bin/m4
-checking for flex... flex
-checking for flex... flex
-checking for makeinfo... makeinfo
-checking for expect... no
-checking for runtest... no
-checking for ar... (cached) /mingw64/x86_64-w64-mingw32/bin/ar.exe
-checking for as... as
-checking for dlltool... dlltool
-checking for dsymutil... dsymutil
-checking for ld... (cached) /mingw64/x86_64-w64-mingw32/bin/ld.exe
-checking for lipo... no
-checking for nm... nm
-checking for ranlib... ranlib
-checking for strip... strip
-checking for windres... windres
-checking for windmc... windmc
-checking for objcopy... objcopy
-checking for objdump... objdump
-checking for otool... no
-checking for readelf... readelf
-checking for -plugin option... no
-checking for cc... cc
-checking for c++... c++
-checking for gcc... gcc
-checking for gfortran... gfortran
-checking for gccgo... no
-checking for gdc... no
-checking for gm2... no
-checking for ar... /mingw64/x86_64-w64-mingw32/bin/ar
-checking for as... /mingw64/x86_64-w64-mingw32/bin/as
-checking for dlltool... /mingw64/x86_64-w64-mingw32/bin/dlltool
-checking for dsymutil... no
-checking for dsymutil... dsymutil
-checking for ld... /mingw64/x86_64-w64-mingw32/bin/ld
-checking for lipo... no
-checking for lipo... no
-checking for nm... /mingw64/x86_64-w64-mingw32/bin/nm
-checking for objcopy... /mingw64/x86_64-w64-mingw32/bin/objcopy
-checking for objdump... /mingw64/x86_64-w64-mingw32/bin/objdump
-checking for otool... no
-checking for otool... no
-checking for ranlib... /mingw64/x86_64-w64-mingw32/bin/ranlib
-checking for readelf... /mingw64/x86_64-w64-mingw32/bin/readelf
-checking for strip... /mingw64/x86_64-w64-mingw32/bin/strip
-checking for windres... no
-checking for windres... windres
-checking for windmc... no
-checking for windmc... windmc
-checking where to find the target ar... pre-installed in /mingw64/x86_64-w64-mingw32/bin
-checking where to find the target as... pre-installed in /mingw64/x86_64-w64-mingw32/bin
-checking where to find the target cc... just compiled
-checking where to find the target c++... just compiled
-checking where to find the target c++ for libstdc++... just compiled
-checking where to find the target dlltool... pre-installed in /mingw64/x86_64-w64-mingw32/bin
-checking where to find the target dsymutil... host tool
-checking where to find the target gcc... just compiled
-checking where to find the target gfortran... just compiled
-checking where to find the target gccgo... host tool
-checking where to find the target gdc... host tool
-checking where to find the target gm2... host tool
-checking where to find the target ld... pre-installed in /mingw64/x86_64-w64-mingw32/bin
-checking where to find the target lipo... host tool
-checking where to find the target nm... pre-installed in /mingw64/x86_64-w64-mingw32/bin
-checking where to find the target objcopy... pre-installed in /mingw64/x86_64-w64-mingw32/bin
-checking where to find the target objdump... pre-installed in /mingw64/x86_64-w64-mingw32/bin
-checking where to find the target otool... host tool
-checking where to find the target ranlib... pre-installed in /mingw64/x86_64-w64-mingw32/bin
-checking where to find the target readelf... pre-installed in /mingw64/x86_64-w64-mingw32/bin
-checking where to find the target strip... pre-installed in /mingw64/x86_64-w64-mingw32/bin
-checking where to find the target windres... host tool
-checking where to find the target windmc... host tool
-checking whether to enable maintainer-specific portions of Makefiles... no
+...
 configure: creating ./config.status
 config.status: creating Makefile
 cd /c/gcc-14.2.0 && autogen Makefile.def
