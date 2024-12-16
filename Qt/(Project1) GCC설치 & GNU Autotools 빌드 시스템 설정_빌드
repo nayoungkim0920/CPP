@@ -39850,3 +39850,147 @@ mingw32-make: *** [Makefile:1110: all] Error 2
 빌드옵션수정(../gcc-14.2.0/configure --srcdir=/c/gcc-14.2.0)
 nayou@kimnayooung MINGW64 /c/gcc-build
 # cd ../gcc-14.2.0 && autoreconf && cd ../gcc-build && ../gcc-14.2.0/configure --srcdir=/c/gcc-14.2.0 && mingw32-make clean && mingw32-make --debug=b
+
+환경변수등록
+nayou@kimnayooung MINGW64 /c/gcc-build
+# echo $INSTALL
+nayou@kimnayooung MINGW64 /c/gcc-build
+# export INSTALL=/c/gcc-14.2.0/install-sh
+nayou@kimnayooung MINGW64 /c/gcc-build
+# echo $INSTALL
+/c/gcc-14.2.0/install-sh
+버전확인
+nayou@kimnayooung MINGW64 /c/gcc-build
+# install-sh --version
+-bash: install-sh: 명령어를 찾을 수 없음
+nayou@kimnayooung MINGW64 /c/gcc-build
+# /c/gcc-14.2.0/install-sh --version
+/c/gcc-14.2.0/install-sh (GNU Automake) 2024-06-19.01
+최신버전확인
+nayou@kimnayooung MINGW64 /c/gcc-build
+# make --version
+GNU Make 4.4.1
+x86_64-pc-msys 빌드
+Copyright (C) 1988-2023 Free Software Foundation, Inc.
+라이선스 GPLv3+: GNU GPL 버전 3 또는 이후 <https://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+권한다시부여
+nayou@kimnayooung MINGW64 /c/gcc-build
+# chmod +x /c/gcc-14.2.0/install-sh
+빌드명령어 수정
+nayou@kimnayooung MINGW64 /c/gcc-build
+# cd ../gcc-14.2.0 && autoreconf -ivf && cd ../gcc-build && ../gcc-14.2.0/configure --prefix=/usr/local INSTALL=/c/gcc-14.2.0/install-sh && mingw32-make clean && mingw32-make --debug=b
+"/" "//.." "//../.." 디렉터리로 install-sh 파일복제
+nayou@kimnayooung MINGW64 /c/gcc-build
+# cp /c/gcc-14.2.0/install-sh /
+nayou@kimnayooung MINGW64 /c/gcc-build
+# ls -l /install-sh
+-rwxr-xr-x 1 nayou nayou 15437 12월 16 13:36 /install-sh
+nayou@kimnayooung MINGW64 /c/gcc-build
+# ls -l /install-sh /c/install-sh /c/gcc-14.2.0/install-sh /c/gcc-build/install-sh
+-rwxr-xr-x 1 nayou nayou 15437 12월 16 14:34 /c/gcc-14.2.0/install-sh
+-rwxr-xr-x 1 nayou nayou 15437 12월 16 14:32 /c/gcc-build/install-sh
+-rwxr-xr-x 1 nayou nayou 15437 12월 16 14:34 /c/install-sh
+-rwxr-xr-x 1 nayou nayou 15437 12월 16 13:36 /install-sh
+/c/gcc-14.2.0/configure 파일 재생성
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0
+# rm -f config.h config.log aclocal.m4 Makefile.in Makefile config.cache 
+rm -rf autom4te.cache/
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0
+# autoreconf -ivf
+autoreconf-2.72: export WARNINGS=
+autoreconf-2.72: Entering directory '.'
+autoreconf-2.72: configure.ac: not using Gettext
+autoreconf-2.72: running: aclocal --force
+configure.ac:37: error: Please use exactly Autoconf 2.69 instead of 2.72.
+config/override.m4:12: _GCC_AUTOCONF_VERSION_CHECK is expanded from...
+configure.ac:37: the top level
+autom4te-2.72: error: /usr/bin/m4 failed with exit status: 1
+aclocal-1.17: error: /usr/bin/autom4te-2.72 failed with exit status: 1
+autoreconf-2.72: error: aclocal failed with exit status: 1
+
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0
+# autoconf --version
+autoconf (GNU Autoconf) 2.72
+Copyright (C) 2023 Free Software Foundation, Inc.
+License GPLv3+/Autoconf: GNU GPL version 3 or later
+<https://gnu.org/licenses/gpl.html>, <https://gnu.org/licenses/exceptions.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+Written by David J. MacKenzie and Akim Demaille.
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0
+# autoreconf-2.69 -ivf
+autoreconf-2.69: Entering directory `.'
+autoreconf-2.69: configure.ac: not using Gettext
+autoreconf-2.69: running: aclocal --force
+autoreconf-2.69: configure.ac: tracing
+autoreconf-2.69: configure.ac: not using Libtool
+autoreconf-2.69: running: /usr/bin/autoconf-2.69 --force
+autoreconf-2.69: configure.ac: not using Autoheader
+autoreconf-2.69: running: automake --add-missing --copy --force-missing
+autoreconf-2.69: Leaving directory `.'
+
+nayou@kimnayooung MINGW64 /c/gcc-build
+# cd ../gcc-14.2.0 && autoreconf -ivf && cd ../gcc-build && ../gcc-14.2.0/configure --prefix=/usr/local && mingw32-make clean && mingw32-make --debug=b
+(오류)
+checking for libatomic support... ../gcc-14.2.0/configure: line 4423: /c/gcc-14.2.0/configure.tgt: No such file or directory
+yes
+checking for libitm support... ../gcc-14.2.0/configure: line 4442: /c/gcc-14.2.0/configure.tgt: No such file or directory
+yes
+checking for libsanitizer support... ../gcc-14.2.0/configure: line 4461: /c/gcc-14.2.0/configure.tgt: No such file or directory
+yes
+checking for libvtv support... ../gcc-14.2.0/configure: line 4480: /c/gcc-14.2.0/configure.tgt: No such file or directory
+yes
+checking for libphobos support... ../gcc-14.2.0/configure: line 4610: /c/gcc-14.2.0/configure.tgt: No such file or directory
+yes
+(수정)
+../gcc-14.2.0/configure 스크립트가 configure.tgt 파일을 찾을 수 없다는 것
+빌드명령어 수정
+nayou@kimnayooung MINGW64 /c/gcc-build ( --target=x86_64-w64-mingw32 지)
+# cd ../gcc-14.2.0 && autoreconf -ivf && cd ../gcc-build && ../gcc-14.2.0/configure --prefix=/usr/local --target=x86_64-w64-mingw32 && mingw32-make clean && mingw32-make --debug=b
+config.guess, config.sub파일이 최신인지 확
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0
+# ls -l config.*
+-rwxr-xr-x 1 nayou nayou 50726 12월 16 17:01 config.guess
+-rw-r--r-- 1 nayou nayou   883 12월  4 18:20 config.h.in
+-rw-r--r-- 1 nayou nayou   883 12월  4 17:48 config.h.in~
+-rwxr-xr-x 1 nayou nayou 14916  8월  1 17:17 config.rpath
+-rwxr-xr-x 1 nayou nayou 36846 12월 16 17:01 config.sub
+수동으로 configure.tgt 생성
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0
+# touch configure.tgt
+/c/gcc-14.2.0/configure.ac 확인
+AC_PROG_INSTALL # install-sh 파일을 찾는 역할을 함 
+실행권한부여
+nayou@kimnayooung MINGW64 /c/gcc-build
+# chmod +x /install-sh
+nayou@kimnayooung MINGW64 /c/gcc-build
+# chmod +x /c/install-sh
+nayou@kimnayooung MINGW64 /c/gcc-build
+# chmod +x /c/gcc-14.2.0/install-sh
+nayou@kimnayooung MINGW64 /c/gcc-build
+# chmod +x /c/gcc-build/install-sh
+빌드명령어 수정 ( INSTALL=/c/gcc-14.2.0/install-sh)
+nayou@kimnayooung MINGW64 /c/gcc-build
+# cd ../gcc-14.2.0 && autoreconf -ivf && cd ../gcc-build && ../gcc-14.2.0/configure --prefix=/usr/local --target=x86_64-w64-mingw32 INSTALL=/c/gcc-14.2.0/install-sh && mingw32-make clean && mingw32-make --debug=b
+빌드명령어 수정 ( AC_INSTALL_SH=/c/gcc-14.2.0/install-sh)
+nayou@kimnayooung MINGW64 /c/gcc-build
+# cd ../gcc-14.2.0 && autoreconf -ivf && cd ../gcc-build && ../gcc-14.2.0/configure --prefix=/usr/local && mingw32-make clean && mingw32-make --debug=b 
+(오류)
+configure: error: cannot find install-sh, install.sh, or shtool in "/" "//.." "//../.."
+mingw32-make[2]: *** [Makefile:16220: configure-stage1-lto-plugin] Error 1
+mingw32-make[2]: Leaving directory 'C:/gcc-build'
+mingw32-make[1]: *** [Makefile:25759: stage1-bubble] Error 2
+mingw32-make[1]: Leaving directory 'C:/gcc-build'
+mingw32-make: *** [Makefile:1110: all] Error 2
+(수정)
+/c/gcc-14.2.0/configure.ac 수정
+AC_INIT([gcc], [14.2.0], [gcc-help@gcc.gnu.org], [gcc-14.2.0])
+성공!!
+(오류)
+mingw32-make[1]: Entering directory 'C:/gcc-build/host-x86_64-w64-mingw32/libiberty'
+mingw32-make[1]: *** No rule to make target '/c/gcc-14.2.0/libiberty/Makefile.in', needed by 'Makefile'.  Stop.
+mingw32-make[1]: Leaving directory 'C:/gcc-build/host-x86_64-w64-mingw32/libiberty'
+mingw32-make: *** [Makefile:12332: clean-stage1-libiberty] Error 2
