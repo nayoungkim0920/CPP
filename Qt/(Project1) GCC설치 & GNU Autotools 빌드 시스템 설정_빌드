@@ -40033,10 +40033,13 @@ config.status: creating Makefile
 config.status: error: cannot find input file: `config-h.in'
 nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
 # cp config.in config-h.in
-
-
-
-
+C:\gcc-14.2.0\libiberty\configure.ac 수정  
+GCC_NO_EXECUTABLES
+AC_PROG_CC
+AC_GNU_SOURCE
+AC_SYS_LARGEFILE
+AC_PROG_CPP_WERROR
+AC_PROG_LIBTOOL
 
 
 
