@@ -40040,18 +40040,537 @@ AC_GNU_SOURCE
 AC_SYS_LARGEFILE
 AC_PROG_CPP_WERROR
 AC_PROG_LIBTOOL
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# autoreconf -ivf
+(오류)
+autoreconf-2.69: Entering directory `.'
+autoreconf-2.69: configure.ac: not using Gettext
+autoreconf-2.69: running: aclocal --force
+autoreconf-2.69: configure.ac: tracing
+autoreconf-2.69: running: libtoolize --copy --force
+libtoolize:   error: cannot expand unknown variable in AC_CONFIG_AUX_DIR argument.
+autoreconf-2.69: libtoolize failed with exit status: 1
+(수정)
+libiberty_topdir : libiberty 상위디렉터리 (../ 즉 /c/gcc-14.2.0, ./ 즉 /c/gcc-14.2.0/libiberty)
+libiberty_topdir가 필요로 하는 역할(config.sub, config.guess와 같은 스크립트가 위치하는 보조 파일 디렉터리를 지정)
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# ls -l ../config*
+-rwxr-xr-x 1 nayou nayou  50726 12월 17 19:16 ../config.guess
+-rw-r--r-- 1 nayou nayou    883 12월  4 18:20 ../config.h.in
+-rw-r--r-- 1 nayou nayou    883 12월  4 17:48 ../config.h.in~
+-rw-r--r-- 1 nayou nayou  11069 12월 16 17:14 ../config.log
+-rwxr-xr-x 1 nayou nayou  14916  8월  1 17:17 ../config.rpath
+-rwxr-xr-x 1 nayou nayou  36846 12월 17 19:16 ../config.sub
+-rw-r--r-- 1 nayou nayou  25764  8월  1 17:17 ../config-ml.in
+-rwxr-xr-x 1 nayou nayou 652203 12월 17 19:16 ../configure
+-rw-r--r-- 1 nayou nayou 128356 12월 16 18:55 ../configure.ac
+-rw-r--r-- 1 nayou nayou 128280 12월  4 18:23 ../configure.ac-20241126
+-rw-r--r-- 1 nayou nayou 128530 12월  4 17:46 ../configure.ac-original
+-rw-r--r-- 1 nayou nayou      0 12월 16 17:11 ../configure.tgt
+-rwxr-xr-x 1 nayou nayou 652414 12월 16 14:34 ../configure-basck
 
+C:\gcc-14.2.0\libiberty\configure.ac 수정
+if test "${srcdir}" = "."; then
+  if test -n "${with_build_subdir}"; then
+    libiberty_topdir="${srcdir}/../.."
+    with_target_subdir=
+  elif test -z "${with_target_subdir}"; then
+    libiberty_topdir="${srcdir}/.."
+  else
+    if test "${with_target_subdir}" != "."; then
+      libiberty_topdir="${srcdir}/${with_multisrctop}../.."
+    else
+      libiberty_topdir="${srcdir}/${with_multisrctop}.."
+    fi
+  fi
+else
+  libiberty_topdir="${srcdir}/.."
+fi
+libiberty_topdir="../" # 추가
+AC_SUBST(libiberty_topdir) # Autotools가 처리하는 configure 스크립트 생성 단계에서 변수 값 설정, configure 스크립트가 실행 될 때, 해당 변수에 설정된 값이 Makefile 등으로 전달, 변수이름전달
+# AC_CONFIG_AUX_DIR($libiberty_topdir) # libtoolize:   error: cannot expand unknown variable in AC_CONFIG_AUX_DIR argument.
+# AC_CONFIG_AUX_DIR([m4_expand(${libiberty_topdir})]) # libtoolize:   error: cannot expand unknown variable in AC_CONFIG_AUX_DIR argument.
+AC_CONFIG_AUX_DIR(../) # configure.ac에서 직접적인 값을 필요로 함. 실제 변수의 값 사용함으로 $붙여야 함, Autoconf가 문자열 값으로 변환, 변수값전달
 
+GCC_NO_EXECUTABLES
+AC_PROG_CC
+AC_GNU_SOURCE
+AC_SYS_LARGEFILE
+AC_PROG_CPP_WERROR
+AC_PROG_LIBTOOL # 추가
 
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# config.status
 
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# config.status
+config.status: creating Makefile
+config.status: creating config.h
+config.status: config.h is unchanged
+config.status: executing tests/atconfig commands
+config.status: executing depfiles commands
+config.status: executing libtool commands
+sed: can't read build-aux/ltmain.sh: No such file or directory
+mv: cannot stat 'libtoolT': No such file or directory
+cp: cannot stat 'libtoolT': No such file or directory
+chmod: cannot access 'libtool': No such file or directory
 
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# libtoolize --version
+libtoolize (GNU libtool) 2.5.3
+Written by Gary V. Vaughan <gary@gnu.org>, 2003
 
+Copyright (C) 2024 Free Software Foundation, Inc.
 
+AC_CONFIG_AUX_DIR 매크로에 지정된 디렉터리가 존재하지 않으면 libtoolize는 ltmain.sh를 복사할 수 없음  
+libtoolize는 해당 경로가 미리 생성되어 있어야 복사를 진행 
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# mkdir -p build-aux
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# chmod +w build-aux
 
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# autoreconf -ivf
+libtoolize: putting auxiliary files in AC_CONFIG_AUX_DIR, '../..'.
+libtoolize: copying file '../../ltmain.sh'
+(수정)
+C:\gcc-14.2.0\libiberty\configure.ac 수정
+AC_CONFIG_AUX_DIR(build-aux)
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# autoreconf -ivf
+libtoolize: putting auxiliary files in AC_CONFIG_AUX_DIR, 'build-aux'.
+libtoolize: copying file 'build-aux/ltmain.sh'
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# ls -l build-aux/
+합계 328
+-rwxr-xr-x 1 nayou nayou 335056 12월 18 09:34 ltmain.sh
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# config.status
+config.status: creating Makefile
+config.status: creating config.h
+config.status: config.h is unchanged
+config.status: executing tests/atconfig commands
+config.status: executing depfiles commands
+config.status: executing libtool commands
 
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# ls -l Makefile
+-rw-r--r-- 1 nayou nayou 68905 12월 18 09:36 Makefile
 
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# configure
+(오류)
+/bin/sh: /c/libidn2/libtool-2.4.6/build-aux/missing: No such file or directory
+configure: WARNING: 'missing' script is too old or missing
+configure: error: source directory already configured; run "make distclean" there first
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# make distclean
+Makefile:111: *** 분리 기호가 빠졌음.  멈춤.
+make distclean을 실행하여 깨끗한 상태로 초기화하라
+Makefile이 손상되었거나, 제대로 생성되지 않아 make distclean이 실패
+Makefile 구문이 깨졌음을 의미
+(수정)
+missing 스크립트가 보조 디렉터리에 없거나, 스크립트가 너무 오래되어 사용이 불가능하다는 의미
+이전에 이미 configure가 실행되었고, 남아 있는 설정 파일들 때문에 재구성이 불가능
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# libtoolize --copy --force && \
+aclocal --force && \
+autoconf && \
+automake --add-missing --copy
+(오류)
+automake-1.15: error: no 'Makefile.am' found for any configure output
+(수정)
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# touch Makefile.am
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# vim Makefile.am
+AM_INIT_AUTOMAKE([foreign]) # automake에 기본 설정을 알려주는 역할
+:wq
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# libtoolize --copy --force && \
+aclocal --force && \
+autoconf && \
+automake --add-missing --copy
+(오류)
+Makefile.am: error: required file './NEWS' not found
+Makefile.am: error: required file './AUTHORS' not found
+(수정)
+automake가 요구하는 NEWS와 AUTHORS 파일이 없다는 오류 
+프로젝트의 표준에 따라 필수 파일로 간주되며, 특히 GNU 프로젝트에서 자주 사용 
+이 파일들이 없으면 automake가 진행을 멈추기 때문에, 이 파일들을 추가해야 함 
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# touch NEWS AUTHORS
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# libtoolize --copy --force && \
+aclocal --force && \
+autoconf && \
+automake --add-missing --copy
+(오류)
+libtoolize: Consider adding '-I ./config' to ACLOCAL_AMFLAGS in Makefile.am.
+configure.ac: error: no proper invocation of AM_INIT_AUTOMAKE was found.
+configure.ac: You should verify that configure.ac invokes AM_INIT_AUTOMAKE,
+configure.ac: that aclocal.m4 is present in the top-level directory,
+configure.ac: and that aclocal.m4 was recently regenerated (using aclocal)
+(수정)
+configure.ac 파일에서 AM_INIT_AUTOMAKE 매크로가 호출되지 않았기 때문에 발생 
+AM_INIT_AUTOMAKE는 automake를 올바르게 실행하기 위해 필수적인 매크로
+C:\gcc-14.2.0\libiberty\configure.ac 수정
+AM_INIT_AUTOMAKE([foreign])
+(오류)
+libtoolize: Consider adding '-I ./config' to ACLOCAL_AMFLAGS in Makefile.am.
+configure.ac:4: error: possibly undefined macro: AC_INIT_AUTOMAKE
+      If this token and others are legitimate, please use m4_pattern_allow.
+      See the Autoconf documentation.
+(수정)
+C:\gcc-14.2.0\libiberty\configure.ac 수정
+libiberty_topdir="../" # 추가
+AC_SUBST(libiberty_topdir)
+AC_CONFIG_AUX_DIR(build-aux)
+AM_INIT_AUTOMAKE([foreign]) # 추가
 
+C:\gcc-14.2.0\libiberty\Makefile.am 수정
+ACLOCAL_AMFLAGS = -I ./config # 추가
 
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# libtoolize --copy --force && aclocal --force && autoconf && automake --add-missing --copy
+libtoolize: putting auxiliary files in AC_CONFIG_AUX_DIR, 'build-aux'.
+libtoolize: copying file 'build-aux/ltmain.sh'
+libtoolize: putting macros in AC_CONFIG_MACRO_DIRS, './config'.
+libtoolize: copying file './config/libtool.m4'
+libtoolize: copying file './config/ltoptions.m4'
+libtoolize: copying file './config/ltsugar.m4'
+libtoolize: copying file './config/ltversion.m4'
+libtoolize: copying file './config/lt~obsolete.m4'
+configure.ac:176: installing 'build-aux/compile'
+configure.ac:43: installing 'build-aux/missing'
+성공!!
 
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# config.status
+config.status: creating Makefile
+config.status: creating config.h
+config.status: config.h is unchanged
+config.status: executing tests/atconfig commands
+config.status: executing depfiles commands
+config.status: executing libtool commands
 
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# ./configure
+configure: loading site script /etc/config.site
+checking for a BSD-compatible install... /usr/bin/install -c
+checking whether build environment is sane... yes
+checking for a thread-safe mkdir -p... /usr/bin/mkdir -p
+checking for gawk... gawk
+checking whether make sets $(MAKE)... yes
+checking whether make supports nested variables... yes
+checking whether to enable maintainer-specific portions of Makefiles... no
+checking for makeinfo... ${SHELL} /c/gcc-14.2.0/libiberty/build-aux/missing makeinfo
+(오류)
+configure: WARNING:
+*** Makeinfo is missing. Info documentation will not be built.
+(수정)
+makeinfo가 누락되었다는 경고, 문서화 관련 도구가 누락 
+makeinfo를 설치 
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# pacman -S texinfo
+버전확인
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# makeinfo --version
+texi2any (GNU texinfo) 7.1.1
+
+Copyright (C) 2024 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# which makeinfo
+/usr/bin/makeinfo
+
+환경변수 등록
+~/.bashrc 수정 
+# MAKEINFO
+export MAKEINFO=/usr/bin/makeinfo
+성공!!
+(오류)
+./configure: line 4018: syntax error near unexpected token `PLUGIN_OPTION'
+./configure: line 4018: `GCC_PLUGIN_OPTION(PLUGIN_OPTION)'
+(수정)
+GCC_PLUGIN_OPTION 같은 매크로나 함수 호출이 잘못되었을 때 발생
+GCC_PLUGIN_OPTION : GCC 플러그인 옵션을 설정하는 매크로 
+
+autoconf 버전확인
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# autoconf --version
+autoconf (GNU Autoconf) 2.69
+Copyright (C) 2012 Free Software Foundation, Inc.
+License GPLv3+/Autoconf: GNU GPL version 3 or later
+<http://gnu.org/licenses/gpl.html>, <http://gnu.org/licenses/exceptions.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+Written by David J. MacKenzie and Akim Demaille.
+
+C:\gcc-14.2.0\libiberty\configure.ac 수정
+AC_ARG_WITH([plugin-option],
+  [AS_HELP_STRING([--with-plugin-option=OPTION], [Set plugin option])],
+  [PLUGIN_OPTION="$withval"], [PLUGIN_OPTION=""])
+
+# GCC_PLUGIN_OPTION(PLUGIN_OPTION)
+
+if test -n "$PLUGIN_OPTION"; then
+  if $AR --help 2>&1 | grep -q "\--plugin"; then
+    AR_PLUGIN_OPTION="$PLUGIN_OPTION"
+    AC_SUBST(AR_PLUGIN_OPTION)
+  fi
+  if $RANLIB --help 2>&1 | grep -q "\--plugin"; then
+    RANLIB_PLUGIN_OPTION="$PLUGIN_OPTION"
+    AC_SUBST(RANLIB_PLUGIN_OPTION)
+  fi
+fi
+====================== 또는 ==========================
+AC_ARG_ENABLE([plugins],
+  [AS_HELP_STRING([--enable-plugins],
+    [Enable GCC plugins support])],
+  [enable_plugins=$enableval],
+  [enable_plugins=no])
+
+if test "$enable_plugins" = "yes"; then
+  AC_DEFINE([ENABLE_PLUGINS], [1], [Enable GCC plugins support])
+fi
+빌드옵션추가 ( ./configure --enable-plugins )
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# libtoolize --copy --force && aclocal --force && autoconf && automake --add-missing --copy && ./configure --enable-plugins
+(오류)
+./configure: line 13723: syntax error near unexpected token `-W'
+./configure: line 13723: `ACX_PROG_CC_WARNING_OPTS(-W -Wall -Wwrite-strings -Wc++-compat \'
+(수정)
+C:\gcc-14.2.0\libiberty\configure.ac 수정
+# GCC의 경고 옵션을 설정하는 매크로, 컴파일러 옵션을 자동으로 처리하는 역할
+# ACX_PROG_CC_WARNING_OPTS([-W -Wall -Wwrite-strings -Wc++-compat \
+# 			  -Wstrict-prototypes \
+#			  -Wshadow=local], [ac_libiberty_warn_cflags])
+# 수동으로 CFLAGS에 경고 옵션을 추가
+CFLAGS="$CFLAGS -Wwrite-strings -Wc++-compat -Wstrict-prototypes -Wshadow=local"
+(오류)
+./configure: line 13741: syntax error near unexpected token `,'
+./configure: line 13741: `ACX_PROG_CC_WARNING_ALMOST_PEDANTIC(, ac_libiberty_warn_cflags)'
+(수정)
+C:\gcc-14.2.0\libiberty\configure.ac 수정
+# ACX_PROG_CC_WARNING_ALMOST_PEDANTIC([], [ac_libiberty_warn_cflags])
+ACX_PROG_CC_WARNING_ALMOST_PEDANTIC([-Wwrite-strings -Wc++-compat -Wstrict-prototypes -Wshadow=local], [ac_libiberty_warn_cflags])
+(오류)
+configure: target_header_dir =
+./configure: line 4103: GCC_NO_EXECUTABLES: command not found
+(수정)
+GCC_NO_EXECUTABLES: 필요한 GNU Autotools 매크로 파일이 누락되었거나 올바르게 포함되지 않은 경우에 발생 
+GNU Compiler Collection (GCC)와 관련된 빌드 시스템에서 사용되는 매크로
+gcc.m4 또는 관련 매크로 파일에서 정의됨 
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# ls -l /usr/share/aclocal/gcc.m4
+ls: cannot access '/usr/share/aclocal/gcc.m4': No such file or directory
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# pacman -S gcc autogen
+경고: autogen-5.18.16-5는 최신 버전입니다. -- 재설치
+
+(오류)
+./configure: line 13742: syntax error near unexpected token `-W -Wall -Wwrite-strings -Wc++-compat \
+# 			  -Wstrict-prototypes \
+#			  -Wshadow=local,'
+./configure: line 13742: `ACX_PROG_CC_WARNING_ALMOST_PEDANTIC(-W -Wall -Wwrite-strings -Wc++-compat \
+# 			  -Wstrict-prototypes \
+#			  -Wshadow=local, ac_libiberty_warn_cflags)'
+(수정)
+C:\gcc-14.2.0\libiberty\configure.ac 수정 
+# GCC의 경고 옵션을 설정하는 매크로, 컴파일러 옵션을 자동으로 처리하는 역할
+# ACX_PROG_CC_WARNING_OPTS([-W -Wall -Wwrite-strings -Wc++-compat \
+# 			  -Wstrict-prototypes \
+#			  -Wshadow=local], [ac_libiberty_warn_cflags])
+# 수동으로 CFLAGS에 경고 옵션을 추가
+CFLAGS="$CFLAGS -Wpedantic -Wall -Wwrite-strings -Wc++-compat -Wstrict-prototypes -Wshadow=local"
+AC_SUBST(CFLAGS)
+# ACX_PROG_CC_WARNING_ALMOST_PEDANTIC([], [ac_libiberty_warn_cflags])
+# ACX_PROG_CC_WARNING_ALMOST_PEDANTIC([-Wpedantic -Wall -Wwrite-strings -Wc++-compat -Wstrict-prototypes -Wshadow=local], [ac_libiberty_warn_cflags])
+# 매크로 재정의
+AC_DEFUN([ACX_PROG_CC_WARNING_ALMOST_PEDANTIC], [
+  AC_ARG_VAR([$2], [Flags to enable pedantic warnings])
+  $2="$1"
+])
+(오류)
+./configure: line 4103: GCC_NO_EXECUTABLES: command not found
+./configure: line 14241: GCC_PICFLAG: command not found
+./configure: line 14268: syntax error near unexpected token `CET_HOST_FLAGS'
+./configure: line 14268: `GCC_CET_HOST_FLAGS(CET_HOST_FLAGS)'
+(수정)
+GCC_NO_EXECUTABLES 매크로가 누락되었거나 올바르게 포함되지 않아 발생 
+이 매크로는 gcc.m4 파일에 정의되어 있으며, 이 파일이 시스템에 없거나 빌드 시스템에서 참조하지 못하고 있는 상태 
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# find /c/ -name gcc.m4
+/usr/share/aclocal/gcc.m4 파일이 없음
+m4디렉터리 생성
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0
+# mkdir -p m4
+config디렉터리의 *.m4파일 복제
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0
+# cp config/*.m4 m4/
+(오류)
+libtoolize: putting auxiliary files in AC_CONFIG_AUX_DIR, '../gcc-14.2.0'.
+libtoolize: copying file '../gcc-14.2.0/ltmain.sh'
+libtoolize: You should add the contents of the following files to 'aclocal.m4':
+libtoolize:   '/mingw64/share/aclocal/libtool.m4'
+libtoolize:   '/mingw64/share/aclocal/ltoptions.m4'
+libtoolize:   '/mingw64/share/aclocal/ltsugar.m4'
+libtoolize:   '/mingw64/share/aclocal/ltversion.m4'
+libtoolize:   '/mingw64/share/aclocal/lt~obsolete.m4'
+libtoolize: Remember to add 'LT_INIT' to configure.ac.
+libtoolize: Consider adding 'AC_CONFIG_MACRO_DIRS([m4])' to configure.ac,
+libtoolize: and rerunning libtoolize and aclocal.
+libtoolize: Consider adding '-I m4' to ACLOCAL_AMFLAGS in Makefile.am.
+(수정)
+aclocal.m4에 추가(libtool과 관련된 매크로들로, aclocal 명령이 aclocal.m4에 포함시켜야 하는 내용)
+libtoolize가 /mingw64/share/aclocal/에서 찾은 매크로 파일을 aclocal.m4에 추가
+aclocal --force 명령이 복사
+'/mingw64/share/aclocal/libtool.m4'
+'/mingw64/share/aclocal/ltoptions.m4'
+'/mingw64/share/aclocal/ltsugar.m4'
+'/mingw64/share/aclocal/ltversion.m4'
+'/mingw64/share/aclocal/lt~obsolete.m4'
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# ls -l aclocal.m4
+-rw-r--r-- 1 nayou nayou 95866 12월 18 17:14 aclocal.m4
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# echo $ACLOCAL_PATH
+/c/libidn2/gettext-0.22.5/gettext/gnulib-m4:/usr/share/aclocal:/c/libidn2/gettext-0.22.5/libtextstyle/lib/ltdl:/c/libidn2/gettext-0.22.5/libtextstyle/lib/ltdl/m4:/c/msys64/usr/share/aclocal:/mingw64/share/aclocal:/c/libidn2/m4
+C:\gcc-14.2.0\libiberty\configure.ac 수정
+AC_CONFIG_MACRO_DIRS([../config], [../m4])
+LT_INIT
+C:\gcc-14.2.0\libiberty\Makefile.am 수정
+ACLOCAL_AMFLAGS = -I ../config -I ../m4
+(오류)
+configure.ac:296: warning: AC_ARG_PROGRAM was called before AC_CANONICAL_TARGET
+../config/hwcaps.m4:8: GCC_CHECK_ASSEMBLER_HWCAP is expanded from...
+configure.ac:296: the top level
+configure.ac:296: warning: AC_ARG_PROGRAM was called before AC_CANONICAL_TARGET
+../config/hwcaps.m4:8: GCC_CHECK_ASSEMBLER_HWCAP is expanded from...
+configure.ac:296: the top level
+configure.ac:296: warning: AC_ARG_PROGRAM was called before AC_CANONICAL_TARGET
+../config/hwcaps.m4:8: GCC_CHECK_ASSEMBLER_HWCAP is expanded from...
+(수정)
+AC_ARG_PROGRAM 매크로(프로그램 이름을 설정)가 AC_CANONICAL_TARGET 매크로(타겟 시스템 정보를 설정) 보다 먼저 호출되었다는 경고 
+타겟 시스템 정보가 설정된 후 프로그램 이름을 설정하는 순서로 나오는게 맞음
+../config/hwcaps.m4 파일의 8번 줄에서 GCC_CHECK_ASSEMBLER_HWCAP 매크로가 호출되고 있다
+주로 하드웨어 기능을 확인하기 위해 사용, 타겟 시스템의 정보가 먼저 정의되어야 정상적으로 작동함 
+AC_CANONICAL_TARGET, AC_ARG_PROGRAM, GCC_CHECK_ASSEMBLER_HWCAP 순으로 선언되지 않아서 발생한 오류 같음
+C:\gcc-14.2.0\libiberty\configure.ac 수정
+AC_CANONICAL_TARGET
+AC_ARG_PROGRAM
+GCC_CHECK_ASSEMBLER_HWCAP
+(오류)
+configure.ac:296: warning: AC_ARG_PROGRAM was called before AC_CANONICAL_TARGET
+../../../autoconf-2.69/lib/autoconf/general.m4:1833: AC_CANONICAL_TARGET is expanded from...
+configure.ac:296: the top level
+configure.ac:296: warning: AC_ARG_PROGRAM was called before AC_CANONICAL_TARGET
+../../../autoconf-2.69/lib/autoconf/general.m4:1833: AC_CANONICAL_TARGET is expanded from...
+configure.ac:296: the top level
+configure.ac:296: warning: AC_ARG_PROGRAM was called before AC_CANONICAL_TARGET
+../../../autoconf-2.69/lib/autoconf/general.m4:1833: AC_CANONICAL_TARGET is expanded from...
+configure.ac:296: the top level
+configure.ac:296: warning: AC_ARG_PROGRAM was called before AC_CANONICAL_TARGET
+../../../autoconf-2.69/lib/autoconf/general.m4:1833: AC_CANONICAL_TARGET is expanded from...
+configure: target_header_dir =
+/bin/sh: ../../move-if-change: No such file or directory
+(수정)
+AC_ARG_PROGRAM이 AC_CANONICAL_TARGET보다 먼저 호출되어 발생 
+../../move-if-change 경로를 찾을 수 없다는 오류
+C:\gcc-14.2.0\libiberty\configure.ac 수정 
+AC_INIT([libiberty], [1.0], [maintainer@example.com])
+AC_CANONICAL_TARGET
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# libtoolize --copy --force && aclocal --force && autoconf && automake --add-missing --copy && ./configure --enable-plugins
+(오류)
+configure: target_header_dir =
+/bin/sh: ../../move-if-change: No such file or directory
+(수정)
+configure 스크립트에서 target_header_dir 변수의 값이 비어 있다(헤더 파일이 위치한 디렉터리를 나타내는 변수)
+AC_CONFIG_HEADERS나 AC_CHECK_HEADER와 같은 매크로들이 제대로 실행되지 않아서 해당 변수가 설정되지 않았을 수 있음 
+C:\gcc-14.2.0\libiberty\configure.ac 확인
+# 기본값으로  yes로 설정할 경우
+# ./configure --enable-install-libiberty (no : ./configure --disable-install-libiberty)
+# AC_ARG_ENABLE([install-libiberty],
+#   [AS_HELP_STRING([--enable-install-libiberty],
+#     [Install libiberty headers])],
+#   [enable_install_libiberty="$enableval"],
+#   [enable_install_libiberty="yes"])  # 기본값 설정
+
+# Option parsed, now set things appropriately.
+case x"$enable_install_libiberty" in
+  xyes|x) # enable_install_libiberty 값이 "yes"이거나 비어 있을 경우, target_header_dir는 libiberty로 설정
+    target_header_dir=libiberty
+    ;;
+  xno) # enable_install_libiberty 값이 "no"일 경우, target_header_dir는 빈 문자열로 설정  
+    target_header_dir= 
+    ;;
+  *) # 그 외의 값이 들어올 경우, target_header_dir는 enable_install_libiberty의 값을 그대로 갖게 됨 
+    # This could be sanity-checked in various ways...
+    target_header_dir="${enable_install_libiberty}"
+    ;;
+esac
+AC_MSG_RESULT($enable_install_libiberty)
+AC_MSG_NOTICE([target_header_dir = $target_header_dir])
+...
+AC_SUBST(target_header_dir)
+
+move-if-change라는 스크립트를 찾을 수 없다 
+configure 스크립트가 실행 중에 move-if-change를 호출하려고 하지만, 해당 파일이 존재하지 않아서 발생 
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# find ../ -name move-if-change
+../back/move-if-change
+../move-if-change
+C:\gcc-14.2.0\libiberty\configure.ac 수정 
+frag=xhost-mkfrag
+${CONFIG_SHELL-/bin/sh} ${libiberty_topdir}/move-if-change temp-frag xhost-mkfrag
+(오류)
+configure: WARNING: unrecognized options: --enable-plugins
+(수정)
+C:\gcc-14.2.0\libiberty\configure.ac 수정
+withval="yes" # 항상 --enable-plugins 상태로 진행되도록 추가
+
+AC_ARG_WITH([plugin-option],
+  [AS_HELP_STRING([--with-plugin-option=OPTION], [Set plugin option])],
+  # [PLUGIN_OPTION="$withval"], [PLUGIN_OPTION=""])
+  [PLUGIN_OPTION="$withval"], [PLUGIN_OPTION="$withval"]) # 항상 --enable-plugins 상태로 진행되도록 수정	
+
+# GCC_PLUGIN_OPTION(PLUGIN_OPTION)
+
+if test -n "$PLUGIN_OPTION"; then
+  if $AR --help 2>&1 | grep -q "\--plugin"; then
+    AR_PLUGIN_OPTION="$PLUGIN_OPTION"
+    AC_SUBST(AR_PLUGIN_OPTION)
+  fi
+  if $RANLIB --help 2>&1 | grep -q "\--plugin"; then
+    RANLIB_PLUGIN_OPTION="$PLUGIN_OPTION"
+    AC_SUBST(RANLIB_PLUGIN_OPTION)
+  fi
+fi
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# libtoolize --copy --force && aclocal --force && autoconf && automake --add-missing --copy && ./configure
+...
+configure: creating ./config.status
+config.status: creating Makefile
+config.status: creating testsuite/Makefile
+config.status: creating config.h
+config.status: config.h is unchanged
+config.status: executing depfiles commands
+config.status: executing libtool commands
+config.status: executing default commands
+성공!!
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0
+# libtoolize --copy --force && aclocal --force && autoconf && automake --add-missing --copy
+nayou@kimnayooung MINGW64 /c/gcc-build
+# cd ../gcc-14.2.0 && autoreconf -ivf && cd ../gcc-build && ../gcc-14.2.0/configure --prefix=/usr/local && mingw32-make clean && mingw32-make --debug=b
+(오류)
+mingw32-make[1]: Entering directory 'C:/gcc-build/host-x86_64-w64-mingw32/libiberty'
+mingw32-make[1]: *** No rule to make target '/c/gcc-14.2.0/libiberty/Makefile.in', needed by 'Makefile'.  Stop.
+mingw32-make[1]: Leaving directory 'C:/gcc-build/host-x86_64-w64-mingw32/libiberty'
+mingw32-make: *** [Makefile:12332: clean-stage1-libiberty] Error 2
 
