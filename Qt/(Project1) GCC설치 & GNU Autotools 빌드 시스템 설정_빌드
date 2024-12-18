@@ -40568,6 +40568,9 @@ nayou@kimnayooung MINGW64 /c/gcc-14.2.0
 # libtoolize --copy --force && aclocal --force && autoconf && automake --add-missing --copy
 nayou@kimnayooung MINGW64 /c/gcc-build
 # cd ../gcc-14.2.0 && autoreconf -ivf && cd ../gcc-build && ../gcc-14.2.0/configure --prefix=/usr/local && mingw32-make clean && mingw32-make --debug=b
+C:\gcc-14.2.0\Makefile.am 확인
+AUTOMAKE_OPTIONS = dejagnu
+ACLOCAL_AMFLAGS = -I ../gcc-14.2.0/m4
 (오류)
 mingw32-make[1]: Entering directory 'C:/gcc-build/host-x86_64-w64-mingw32/libiberty'
 mingw32-make[1]: *** No rule to make target '/c/gcc-14.2.0/libiberty/Makefile.in', needed by 'Makefile'.  Stop.
