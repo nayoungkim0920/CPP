@@ -40576,4 +40576,77 @@ mingw32-make[1]: Entering directory 'C:/gcc-build/host-x86_64-w64-mingw32/libibe
 mingw32-make[1]: *** No rule to make target '/c/gcc-14.2.0/libiberty/Makefile.in', needed by 'Makefile'.  Stop.
 mingw32-make[1]: Leaving directory 'C:/gcc-build/host-x86_64-w64-mingw32/libiberty'
 mingw32-make: *** [Makefile:12332: clean-stage1-libiberty] Error 2
+(수
+nayou@kimnayooung MINGW64 /c/gcc-build
+# cd /c/gcc-14.2.0/libiberty/  
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty/ 
+# autoreconf -ivf
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty/ 
+# cd /c/gcc-build
+nayou@kimnayooung MINGW64 /c/gcc-build
+# /c/gcc-14.2.0/configure --prefix=/usr/local
+nayou@kimnayooung MINGW64 /c/gcc-build
+# mingw32-make --debug=v
+(오류)
+configure: error: cannot find install-sh, install.sh, or shtool in "/" "//.." "//../.."
+mingw32-make[2]: *** [Makefile:16220: configure-stage1-lto-plugin] Error 1
+mingw32-make[2]: Leaving directory 'C:/gcc-build'
+mingw32-make[1]: *** [Makefile:25759: stage1-bubble] Error 2
+mingw32-make[1]: Leaving directory 'C:/gcc-build'
+mingw32-make: *** [Makefile:1110: all] Error 2
+(수정)
+install-sh 파일 확인
+nayou@kimnayooung MINGW64 /c/gcc-build
+# ls -l install-sh /c/gcc-14.2.0/install-sh /c/install-sh /install-sh
+-rwxr-xr-x 1 nayou nayou 15437 12월 18 18:56 /c/gcc-14.2.0/install-sh
+-rwxr-xr-x 1 nayou nayou 15437 12월 16 14:34 /c/install-sh
+-rwxr-xr-x 1 nayou nayou 15437 12월 16 13:36 /install-sh
+-rwxr-xr-x 1 nayou nayou 15437 12월 16 14:32 install-sh
+환경변수PATH에 install-sh경로 추가
+nayou@kimnayooung MINGW64 /c/gcc-build
+# export PATH=/c/gcc-14.2.0:$PATH
+nayou@kimnayooung MINGW64 /c/gcc-build
+# mingw32-make --debug=v
+(오류)
+configure: error: cannot find install-sh, install.sh, or shtool in "/" "//.." "//../.."
+mingw32-make[2]: *** [Makefile:16220: configure-stage1-lto-plugin] Error 1
+mingw32-make[2]: Leaving directory 'C:/gcc-build'
+mingw32-make[1]: *** [Makefile:25759: stage1-bubble] Error 2
+mingw32-make[1]: Leaving directory 'C:/gcc-build'
+mingw32-make: *** [Makefile:1110: all] Error 2
+(수정)
+AC_CONFIG_AUX_DIR([../gcc-14.2.0/build-aux])가 configure.ac 파일에 이미 설정되어 있다면, 
+configure 스크립트는 ../gcc-14.2.0/build-aux 디렉토리에서 보조 도구 파일들(install-sh, install.sh, shtool 등)을 찾게 됨 
+C:\gcc-14.2.0\configure.ac 확인
+AC_CONFIG_AUX_DIR([../gcc-14.2.0/build-aux])
+nayou@kimnayooung MINGW64 /c/gcc-build
+# cp install-sh /c/gcc-14.2.0/build-aux/
+nayou@kimnayooung MINGW64 /c/gcc-build
+# cd /c/gcc-14.2.0 && autoreconf -ivf && cd /c/gcc-build
+nayou@kimnayooung MINGW64 /c/gcc-build
+# /c/gcc-14.2.0/configure --prefix=/usr/local
+nayou@kimnayooung MINGW64 /c/gcc-build
+# mingw32-make --debug=v
+(오류)
+configure: error: cannot find install-sh, install.sh, or shtool in "/" "//.." "//../.."
+mingw32-make[2]: *** [Makefile:16220: configure-stage1-lto-plugin] Error 1
+mingw32-make[2]: Leaving directory 'C:/gcc-build'
+mingw32-make[1]: *** [Makefile:25759: stage1-bubble] Error 2
+mingw32-make[1]: Leaving directory 'C:/gcc-build'
+mingw32-make: *** [Makefile:1110: all] Error 2
+(수정)
+디버깅 명령을 사용하여 경로 설정이 제대로 이루어졌는지 확인
+nayou@kimnayooung MINGW64 /c/gcc-build
+# sh -x ../gcc-14.2.0/configure > configure.log 2>&1
+
+
+
+
+
+
+
+
+
+
+
 
