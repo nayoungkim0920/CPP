@@ -40638,15 +40638,200 @@ mingw32-make: *** [Makefile:1110: all] Error 2
 디버깅 명령을 사용하여 경로 설정이 제대로 이루어졌는지 확인
 nayou@kimnayooung MINGW64 /c/gcc-build
 # sh -x ../gcc-14.2.0/configure > configure.log 2>&1
++ ac_aux_dir=
++ for ac_dir in "$srcdir" "$srcdir/.." "$srcdir/../.."
++ test -f ../gcc-14.2.0/install-sh
++ ac_aux_dir=../gcc-14.2.0
++ ac_install_sh='../gcc-14.2.0/install-sh -c'
++ break
+
++ for ac_dir in ../gcc-14.2.0/build-aux "$srcdir"/../gcc-14.2.0/build-aux
++ test -f ../gcc-14.2.0/build-aux/install-sh
++ ac_aux_dir=../gcc-14.2.0/build-aux
++ ac_install_sh='../gcc-14.2.0/build-aux/install-sh -c'
++ break
+
+checking for a BSD-compatible install... + test -z '../gcc-14.2.0/build-aux/install-sh -c'
++ printf '%s\n' 'configure:12685: result: ../gcc-14.2.0/build-aux/install-sh -c'
++ printf '%s\n' '../gcc-14.2.0/build-aux/install-sh -c'
+../gcc-14.2.0/build-aux/install-sh -c
++ test -z ''
++ INSTALL_PROGRAM='${INSTALL}'
++ test -z ''
++ INSTALL_SCRIPT='${INSTALL}'
++ test -z ''
++ INSTALL_DATA='${INSTALL} -m 644'
++ printf '%s\n' 'configure:12696: checking whether sleep supports fractional seconds'
++ printf %s 'checking whether sleep supports fractional seconds... '
+checking whether sleep supports fractional seconds... + false
++ sleep 0.001
++ :
+
++ case $am_aux_dir in
++ install_sh='${SHELL} /c/gcc-14.2.0/install-sh'
++ test no '!=' no
++ INSTALL_STRIP_PROGRAM='$(install_sh) -c -s'
++ printf '%s\n' 'configure:13031: checking for a thread-safe mkdir -p'
++ printf %s 'checking for a thread-safe mkdir -p... '
+checking for a thread-safe mkdir -p... + test -z ''
+
+++ cd /c/gcc-14.2.0
+++ pwd
++ srcpwd=/c/gcc-14.2.0
++ test '../gcc-14.2.0/build-aux/install-sh -c' = '/c/gcc-14.2.0/install-sh -c'
+
+++ ac_val='../gcc-14.2.0/build-aux/install-sh -c'
+
+++ ac_val='../gcc-14.2.0/build-aux/install-sh -c'
+
+=> sh -x 디버깅 출력에서 install-sh 파일이 /c/gcc-14.2.0/build-aux/install-sh 경로에 있다고 확인 됨
+그러나 configure 스크립트가 "//.." 및 "//../.."와 같은 이상한 경로를 탐색하고 있음
+
+환경변수확인
+nayou@kimnayooung MINGW64 /c/gcc-build
+# echo $srcdir
+nayou@kimnayooung MINGW64 /c/gcc-build
+# echo $ac_aux_dir
+값설정
+nayou@kimnayooung MINGW64 /c/gcc-build
+# export srcdir=/c/gcc-14.2.0
+nayou@kimnayooung MINGW64 /c/gcc-build
+# export ac_aux_dir=/c/gcc-14.2.0/build-aux
+nayou@kimnayooung MINGW64 /c/gcc-build
+# export ac_install_sh='/c/gcc-14.2.0/build-aux/install-sh -c'
+nayou@kimnayooung MINGW64 /c/gcc-build
+# export MSYS_NO_PATHCONV=1
+MSYS환경 업데이트
+nayou@kimnayooung MINGW64 /c/gcc-build
+# pacman -Syu
+nayou@kimnayooung MINGW64 /c/gcc-build
+# rm -f config.cache && cd /c/gcc-14.2.0 && libtoolize --copy --force && aclocal --force && autoconf && automake --add-missing --copy && autoreconf -ivf && cd /c/gcc-build && ../gcc-14.2.0/configure --prefix=/usr/local --srcdir=/c/gcc-14.2.0 --with-install=/c/gcc-14.2.0/build-aux/install-sh && mingw32-make --debug=v
+(오류)
+configure: error: cannot find install-sh, install.sh, or shtool in "/" "//.." "//../.."
+mingw32-make[2]: *** [Makefile:16220: configure-stage1-lto-plugin] Error 1
+mingw32-make[2]: Leaving directory 'C:/gcc-build'
+mingw32-make[1]: *** [Makefile:25759: stage1-bubble] Error 2
+mingw32-make[1]: Leaving directory 'C:/gcc-build'
+mingw32-make: *** [Makefile:1110: all] Error 2
+(수정)
+nayou@kimnayooung MINGW64 /c/gcc-build
+# grep "install-sh" config.log
+  $ /c/gcc-14.2.0//configure --srcdir=/ --cache-file=./config.cache --prefix=/usr/local --with-install=/c/gcc-14.2.0/build-aux/install-sh --enable-languages=c,c++,fortran,lto,objc --program-transform-name=s,y,y, --disable-option-checking --build=x86_64-w64-mingw32 --host=x86_64-w64-mingw32 --target=x86_64-w64-mingw32 --disable-intermodule --enable-checking=yes,types --disable-coverage --enable-languages=c,c++,lto --disable-build-format-warnings --enable-shared
+configure:3127: error: cannot find install-sh, install.sh, or shtool in "/" "//.." "//../.."
+=> /c/gcc-14.2.0//configure --srcdir=/ 이부분이 문제가 있음
+빌드명령어 수정(--srcdir=/c/gcc-14.2.0 추가)
+rm -f config.cache && cd /c/gcc-14.2.0 && libtoolize --copy --force && aclocal --force && autoconf && automake --add-missing --copy && autoreconf -ivf && cd /c/gcc-build && ../gcc-14.2.0/configure --prefix=/usr/local --srcdir=/c/gcc-14.2.0 --with-install=/c/gcc-14.2.0/build-aux/install-sh && mingw32-make --debug=v
+
+nayou@kimnayooung MINGW64 /c/gcc-build
+# export ac_install_sh=$(cygpath -m /c/gcc-14.2.0/build-aux/install-sh)
+nayou@kimnayooung MINGW64 /c/gcc-build
+# export SRCDIR=$(cygpath -u /c/gcc-14.2.0)
+nayou@kimnayooung MINGW64 /c/gcc-build
+# rm -f config.cache && cd /c/gcc-14.2.0 && libtoolize --copy --force && aclocal --force && autoconf && automake --add-missing --copy && autoreconf -ivf && cd /c/gcc-build && /c/gcc-14.2.0/configure --srcdir="$SRCDIR" --prefix=/usr/local --with-install="$ac_install_sh" --enable-languages=c,c++,fortran,lto,objc && mingw32-make --debug=v 
+(오류)
+configure: error: cannot find sources (configure.ac) in /
+mingw32-make[2]: *** [Makefile:16220: configure-stage1-lto-plugin] Error 1
+mingw32-make[2]: Leaving directory 'C:/gcc-build'
+mingw32-make[1]: *** [Makefile:25759: stage1-bubble] Error 2
+mingw32-make[1]: Leaving directory 'C:/gcc-build'
+mingw32-make: *** [Makefile:1110: all] Error 2
+(수정)
+config.log
+  $ /c/gcc-14.2.0/configure --srcdir=/c/gcc-14.2.0 --prefix=/usr/local --with-install=C:/gcc-14.2.0/build-aux/install-sh --enable-languages=c,c++,fortran,lto,objc
+nayou@kimnayooung MINGW64 /c/gcc-build
+# echo $ac_install_sh
+C:/gcc-14.2.0/build-aux/install-sh
+nayou@kimnayooung MINGW64 /c/gcc-build
+# echo $SRCDIR
+/c/gcc-14.2.0
+nayou@kimnayooung MINGW64 /c/gcc-build
+# ls -l /c/gcc-14.2.0/configure.ac
+-rw-r--r-- 1 nayou nayou 128629 12월 20 18:11 /c/gcc-14.2.0/configure.ac
+
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0
+# cd /c/gcc-14.2.0
+libtoolize --copy --force
+aclocal --force
+autoconf
+automake --add-missing --copy
+autoreconf -ivf
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0
+# libtoolize --copy --force
+libtoolize: putting auxiliary files in AC_CONFIG_AUX_DIR, '../gcc-14.2.0/build-aux'.
+libtoolize: copying file '../gcc-14.2.0/build-aux/ltmain.sh'
+libtoolize: putting macros in AC_CONFIG_MACRO_DIRS, '../gcc-14.2.0/m4'.
+libtoolize: copying file '../gcc-14.2.0/m4/libtool.m4'
+libtoolize: copying file '../gcc-14.2.0/m4/ltoptions.m4'
+libtoolize: copying file '../gcc-14.2.0/m4/ltsugar.m4'
+libtoolize: copying file '../gcc-14.2.0/m4/ltversion.m4'
+libtoolize: copying file '../gcc-14.2.0/m4/lt~obsolete.m4'
 
 
 
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0
+# aclocal --force
 
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0
+# autoconf
 
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0
+# automake --add-missing --copy
+configure.ac:36: installing '../gcc-14.2.0/build-aux/compile'
+configure.ac:88: installing '../gcc-14.2.0/build-aux/missing'
 
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0
+# autoreconf -ivf
+autoreconf-2.69: Entering directory .'
+autoreconf-2.69: configure.ac: not using Gettext
+autoreconf-2.69: running: aclocal --force -I ../gcc-14.2.0/m4
+autoreconf-2.69: configure.ac: tracing
+autoreconf-2.69: running: libtoolize --copy --force
+libtoolize: putting auxiliary files in AC_CONFIG_AUX_DIR, '../gcc-14.2.0/build-aux'.
+libtoolize: copying file '../gcc-14.2.0/build-aux/ltmain.sh'
+libtoolize: putting macros in AC_CONFIG_MACRO_DIRS, '../gcc-14.2.0/m4'.
+libtoolize: copying file '../gcc-14.2.0/m4/libtool.m4'
+libtoolize: copying file '../gcc-14.2.0/m4/ltoptions.m4'
+libtoolize: copying file '../gcc-14.2.0/m4/ltsugar.m4'
+libtoolize: copying file '../gcc-14.2.0/m4/ltversion.m4'
+libtoolize: copying file '../gcc-14.2.0/m4/lt~obsolete.m4'
+autoreconf-2.69: running: /usr/bin/autoconf-2.69 --force
+autoreconf-2.69: configure.ac: not using Autoheader
+autoreconf-2.69: running: automake --add-missing --copy --force-missing
+configure.ac:36: installing '../gcc-14.2.0/build-aux/compile'
+configure.ac:88: installing '../gcc-14.2.0/build-aux/missing'
+autoreconf-2.69: Leaving directory .'
+=> 문제없이 완료됨
+nayou@kimnayooung MINGW64 /c/gcc-build
+# /c/gcc-14.2.0/configure --srcdir="$SRCDIR" --prefix=/usr/local --with-install="$ac_install_sh" --enable-languages=c,c++,fortran,lto,objcconfigure: creating ./config.status 
+config.status: creating Makefile
+config.status: executing libtool commands
+config.status: executing depfiles commands
+=> 문제없이 완료됨
+nayou@kimnayooung MINGW64 /c/gcc-build
+# mingw32-make
+(오류)
+configure: error: cannot find sources (configure.ac) in /
+mingw32-make[2]: *** [Makefile:16220: configure-stage1-lto-plugin] Error 1
+mingw32-make[2]: Leaving directory 'C:/gcc-build'
+mingw32-make[1]: *** [Makefile:25759: stage1-bubble] Error 2
+mingw32-make[1]: Leaving directory 'C:/gcc-build'
+mingw32-make: *** [Makefile:1110: all] Error 2
+(수정)
+AC_CONFIG_SRCDIR([./configure.ac]) 
+configure: error: cannot find sources (./configure.ac) in /
 
+AC_CONFIG_SRCDIR([../configure.ac])
+configure: error: cannot find sources (../configure.ac) in /c/gcc-14.2.0
 
+AC_CONFIG_SRCDIR([configure.ac]) 
+configure: error: cannot find sources (configure.ac) in /
 
+AC_CONFIG_SRCDIR([../gcc-14.2.0/configure.ac])
+configure: error: cannot find sources (../gcc-14.2.0/configure.ac) in /
 
+AC_CONFIG_SRCDIR([gcc-14.2.0/configure.ac])
+configure: error: cannot find sources (gcc-14.2.0/configure.ac) in /c/gcc-14.2.0
 
+AC_CONFIG_SRCDIR([/c/gcc-14.2.0/configure.ac])
+configure: error: cannot find sources (/c/gcc-14.2.0/configure.ac) in /c/gcc-14.2.0
 
