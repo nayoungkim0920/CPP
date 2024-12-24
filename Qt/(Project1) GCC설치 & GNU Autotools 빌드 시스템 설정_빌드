@@ -41118,32 +41118,6 @@ conftest.c:72:10: fatal error: stdbit.h: No such file or directory
    72 | #include <stdbit.h>
       |          ^~~~~~~~~~
 compilation terminated.
-(수정)
-c:/gcc-14.2.0/configure 수정
-- GCC는 -V, -qversion, -version 옵션을 지원하지 않음 => --version으로 교체
-- configure: error: cannot find sources (configure.ac) in /
-srcdir=/c/gcc-14.2.0 # 추가
-if test ! -r "$srcdir/$ac_unique_file"; then
-  test "$ac_srcdir_defaulted" = yes && srcdir="$ac_confdir or .."
-  as_fn_error $? "cannot find sources ($ac_unique_file) in $srcdir"
-fi
-- configure 스크립트가 C23 기능을 확인하기 위해 작성된 테스트 코드가 GCC에서 인식되지 않음 => C23 테스트를 제거
-빌드명령어 수정 (--with-std=C11 추가)
-nayou@kimnayooung MINGW64 /c/gcc-build 
-# /c/gcc-14.2.0/configure --srcdir="$SRCDIR" --prefix=/usr/local --with-std=C11 --with-install="$ac_install_sh" --enable-languages=c,c++,fortran,lto,objc && mingw32-make --debug=v
-실패
-if ${ac_cv_prog_cc_c23+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_cv_prog_cc_c23=no
-ac_cv_prog_cc_c23=no # 추가
-성공
-
-
-
-(오류)
-c:/gcc-build/config.log
-configure:4123: $? = 1
 configure: failed program was:
 | /* confdefs.h */
 | #define PACKAGE_NAME "gcc"
@@ -41153,236 +41127,8 @@ configure: failed program was:
 | #define PACKAGE_BUGREPORT "gcc-help@gcc.gnu.org"
 | #define PACKAGE_URL ""
 | /* end confdefs.h.  */
-| 
-| /* Does the compiler advertise conformance to C17 or earlier?
-|    Although GCC 14 does not do that, even with -std=gnu23,
-|    it is close enough, and defines __STDC_VERSION == 202000L.  */
-| #if !defined __STDC_VERSION__ || __STDC_VERSION__ <= 201710L
-| # error "Compiler advertises conformance to C17 or earlier"
-| #endif
-| 
-| // Check alignas.
-| char alignas (double) c23_aligned_as_double;
-| char alignas (0) c23_no_special_alignment;
-| extern char c23_aligned_as_int;
-| char alignas (0) alignas (int) c23_aligned_as_int;
-| 
-| // Check alignof.
-| enum
-| {
-|   c23_int_alignment = alignof (int),
-|   c23_int_array_alignment = alignof (int[100]),
-|   c23_char_alignment = alignof (char)
-| };
-| static_assert (0 < -alignof (int), "alignof is signed");
-| 
-| int function_with_unnamed_parameter (int) { return 0; }
-| 
-| void c23_noreturn ();
-| 
-| bool use_u8 = !u8"\xFF" == u8'x';
-| 
-| bool check_that_bool_works = true | false | !nullptr;
-| #if !true
-| # error "true does not work in #if"
-| #endif
-| #if false
-| #elifdef __STDC_VERSION__
-| #else
-| # error "#elifdef does not work"
-| #endif
-| 
-| #ifndef __has_c_attribute
-| # error "__has_c_attribute not defined"
-| #endif
-| 
-| #ifndef __has_include
-| # error "__has_include not defined"
-| #endif
-| 
-| #define LPAREN() (
-| #define FORTY_TWO(x) 42
-| #define VA_OPT_TEST(r, x, ...) __VA_OPT__ (FORTY_TWO r x))
-| static_assert (VA_OPT_TEST (LPAREN (), 0, <:-) == 42);
-| 
-| static_assert (0b101010 == 42);
-| static_assert (0B101010 == 42);
-| static_assert (0xDEAD'BEEF == 3'735'928'559);
-| static_assert (0.500'000'000 == 0.5);
-| 
-| enum unsignedish : unsigned int { uione = 1 };
-| static_assert (0 < -uione);
-| 
-| #include <stddef.h>
-| constexpr nullptr_t null_pointer = nullptr;
-| 
-| #include <stdbit.h>
-| static_assert (__STDC_ENDIAN_LITTLE__ != __STDC_ENDIAN_BIG__);
-| 
-| static typeof (1 + 1L) two () { return 2; }
-| static long int three () { return 3; }
-| 
-| 
-| int
-| main (int, char **)
-| {
-|   int ok = 0;
-|   
-|   {
-|     label_before_declaration:
-|       int arr[10] = {};
-|       if (arr[0])
-|         goto label_before_declaration;
-|       if (!arr[0])
-|         goto label_at_end_of_block;
-|     label_at_end_of_block:
-|   }
-|   ok |= two != three;
-| 
-|   return ok;
-| }
-| 
-configure:4123: x86_64-w64-mingw32-gcc -std=gnu23 -c  -I/c/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -O2  -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 conftest.c >&5
-conftest.c:72:10: fatal error: stdbit.h: No such file or directory
-   72 | #include <stdbit.h>
-      |          ^~~~~~~~~~
-compilation terminated.
-configure:4123: $? = 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "gcc"
-| #define PACKAGE_TARNAME "gcc-14.2.0"
-| #define PACKAGE_VERSION "14.2.0"
-| #define PACKAGE_STRING "gcc 14.2.0"
-| #define PACKAGE_BUGREPORT "gcc-help@gcc.gnu.org"
-| #define PACKAGE_URL ""
-| /* end confdefs.h.  */
-| 
-| /* Does the compiler advertise conformance to C17 or earlier?
-|    Although GCC 14 does not do that, even with -std=gnu23,
-|    it is close enough, and defines __STDC_VERSION == 202000L.  */
-| #if !defined __STDC_VERSION__ || __STDC_VERSION__ <= 201710L
-| # error "Compiler advertises conformance to C17 or earlier"
-| #endif
-| 
-| // Check alignas.
-| char alignas (double) c23_aligned_as_double;
-| char alignas (0) c23_no_special_alignment;
-| extern char c23_aligned_as_int;
-| char alignas (0) alignas (int) c23_aligned_as_int;
-| 
-| // Check alignof.
-| enum
-| {
-|   c23_int_alignment = alignof (int),
-|   c23_int_array_alignment = alignof (int[100]),
-|   c23_char_alignment = alignof (char)
-| };
-| static_assert (0 < -alignof (int), "alignof is signed");
-| 
-| int function_with_unnamed_parameter (int) { return 0; }
-| 
-| void c23_noreturn ();
-| 
-| bool use_u8 = !u8"\xFF" == u8'x';
-| 
-| bool check_that_bool_works = true | false | !nullptr;
-| #if !true
-| # error "true does not work in #if"
-| #endif
-| #if false
-| #elifdef __STDC_VERSION__
-| #else
-| # error "#elifdef does not work"
-| #endif
-| 
-| #ifndef __has_c_attribute
-| # error "__has_c_attribute not defined"
-| #endif
-| 
-| #ifndef __has_include
-| # error "__has_include not defined"
-| #endif
-| 
-| #define LPAREN() (
-| #define FORTY_TWO(x) 42
-| #define VA_OPT_TEST(r, x, ...) __VA_OPT__ (FORTY_TWO r x))
-| static_assert (VA_OPT_TEST (LPAREN (), 0, <:-) == 42);
-| 
-| static_assert (0b101010 == 42);
-| static_assert (0B101010 == 42);
-| static_assert (0xDEAD'BEEF == 3'735'928'559);
-| static_assert (0.500'000'000 == 0.5);
-| 
-| enum unsignedish : unsigned int { uione = 1 };
-| static_assert (0 < -uione);
-| 
-| #include <stddef.h>
-| constexpr nullptr_t null_pointer = nullptr;
-| 
-| #include <stdbit.h>
-| static_assert (__STDC_ENDIAN_LITTLE__ != __STDC_ENDIAN_BIG__);
-| 
-| static typeof (1 + 1L) two () { return 2; }
-| static long int three () { return 3; }
-| 
-| 
-| int
-| main (int, char **)
-| {
-|   int ok = 0;
-|   
-|   {
-|     label_before_declaration:
-|       int arr[10] = {};
-|       if (arr[0])
-|         goto label_before_declaration;
-|       if (!arr[0])
-|         goto label_at_end_of_block;
-|     label_at_end_of_block:
-|   }
-|   ok |= two != three;
-| 
-|   return ok;
-| }
-| 
-configure:4134: result: unsupported
-configure:4150: checking for x86_64-w64-mingw32-gcc option to enable C11 features
-configure:4164: x86_64-w64-mingw32-gcc  -c  -I/c/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -O2  -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 conftest.c >&5
+| #include <ac_nonexistent.h>
 
-configure:12463: ====================1.The source directory is: /c/gcc-14.2.0
-configure:12466: ====================2.The source directory is: /c/gcc-14.2.0
-conftest.cpp:20:9: warning: "VERSION" redefined
-   20 | #define VERSION "14.2.0"
-      |         ^~~~~~~
-<command-line>: note: this is the location of the previous definition
-configure:15137: $? = 0
-conftest.cpp:20:9: warning: "VERSION" redefined
-   20 | #define VERSION "14.2.0"
-      |         ^~~~~~~
-<command-line>: note: this is the location of the previous definition
-conftest.cpp: In function 'int main()':
-conftest.cpp:166:25: warning: empty parentheses were disambiguated as a function declaration [-Wvexing-parse]
-  166 |   cxx11test::delegate d2();
-      |                         ^~
-conftest.cpp:166:25: note: remove parentheses to default-initialize a variable
-  166 |   cxx11test::delegate d2();
-      |                         ^~
-      |                         --
-conftest.cpp:166:25: note: or replace parentheses with braces to value-initialize a variable
-configure:15469: $? = 0
-conftest.cpp:22:10: fatal error: ac_nonexistent.h: No such file or directory
-   22 | #include <ac_nonexistent.h>
-      |          ^~~~~~~~~~~~~~~~~~
-compilation terminated.
-configure:15713: $? = 1
-configure: failed program was:
-
-conftest.cpp:22:10: fatal error: ac_nonexistent.h: No such file or directory
-   22 | #include <ac_nonexistent.h>
-      |          ^~~~~~~~~~~~~~~~~~
-compilation terminated.
-configure:15772: $? = 1
 configure: failed program was:
 | /* confdefs.h */
 | #define PACKAGE_NAME "gcc"
@@ -41407,7 +41153,118 @@ configure: failed program was:
 | /* end confdefs.h.  */
 | #include <ac_nonexistent.h>
 
-conftest.cpp:20:9: warning: "VERSION" redefined
-   20 | #define VERSION "14.2.0"
-      |         ^~~~~~~
-<command-line>: note: this is the location of the previous definition
+conftest.cpp:22:10: fatal error: ac_nonexistent.h: No such file or directory
+   22 | #include <ac_nonexistent.h>
+      |          ^~~~~~~~~~~~~~~~~~
+compilation terminated.
+configure:15774: $? = 1
+(수정)
+c:/gcc-14.2.0/configure 수정
+- GCC는 -V, -qversion, -version 옵션을 지원하지 않음 => --version으로 교체
+- configure: error: cannot find sources (configure.ac) in /
+srcdir=/c/gcc-14.2.0 # 추가
+if test ! -r "$srcdir/$ac_unique_file"; then
+  test "$ac_srcdir_defaulted" = yes && srcdir="$ac_confdir or .."
+  as_fn_error $? "cannot find sources ($ac_unique_file) in $srcdir"
+fi
+- configure 스크립트가 C23 기능을 확인하기 위해 작성된 테스트 코드가 GCC에서 인식되지 않음 => C23 테스트를 제거
+빌드명령어 수정 (--with-std=C11 추가)
+nayou@kimnayooung MINGW64 /c/gcc-build 
+# /c/gcc-14.2.0/configure --srcdir="$SRCDIR" --prefix=/usr/local --with-std=C11 --with-install="$ac_install_sh" --enable-languages=c,c++,fortran,lto,objc && mingw32-make --debug=v
+실패
+if ${ac_cv_prog_cc_c23+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_cv_prog_cc_c23=no
+ac_cv_prog_cc_c23=no # 추가
+성공
+- ac_nonexistent.h 존재하지 않는 파일을 포함하려고 시도 
+- Autoconf가 특정 기능을 테스트할 때 자동으로 생성되는 파일일 수 있음 
+- Autoconf에서 컴파일러가 존재하지 않는 헤더 파일을 올바르게 처리하는지 테스트하기 위해 의도적으로 사용하는 가상의 헤더 파일 
+=> MSYS2에 필요한 추가 설정이나 라이브러리가 누락되었을 가능성이 높음 
+업데이트
+nayou@kimnayooung MINGW64 /c/gcc-build
+# pacman -Syu
+nayou@kimnayooung MINGW64 /c/gcc-build
+# pacman -S base-devel mingw-w64-x86_64-toolchain git
+경고: base-devel-2024.11-1는 최신 버전입니다. -- 재설치
+nayou@kimnayooung MINGW64 /c/gcc-build
+# echo $MSYSTEM
+MINGW64
+GCC빌드에 필요한 라이브러리(GMP, MPFR, MPC, ISL 라이브러리를 설치)
+nayou@kimnayooung MINGW64 /c/gcc-build
+# pacman -S mingw-w64-x86_64-gmp mingw-w64-x86_64-mpfr mingw-w64-x86_64-mpc mingw-w64-x86_64-isl
+경고: mingw-w64-x86_64-gmp-6.3.0-2는 최신 버전입니다. -- 재설치
+경고: mingw-w64-x86_64-mpfr-4.2.1-2는 최신 버전입니다. -- 재설치
+경고: mingw-w64-x86_64-mpc-1.3.1-2는 최신 버전입니다. -- 재설치
+경고: mingw-w64-x86_64-isl-0.27-1는 최신 버전입니다. -- 재설치
+라이브러리가 존재하는지 확인
+nayou@kimnayooung MINGW64 /c/gcc-build
+# ls /mingw64/include/gmp.h
+ls /mingw64/lib/libgmp.a
+/mingw64/include/gmp.h
+/mingw64/lib/libgmp.a
+nayou@kimnayooung MINGW64 /c/gcc-build
+# export C_INCLUDE_PATH=$C_INCLUDE_PATH:/mingw64/include
+export LIBRARY_PATH=$LIBRARY_PATH:/mingw64/lib
+nayou@kimnayooung MINGW64 /c/gcc-build
+# pacman -Syu base-devel
+nayou@kimnayooung MINGW64 /c/gcc-build
+# x86_64-w64-mingw32-gcc --version
+x86_64-w64-mingw32-ld --version
+x86_64-w64-mingw32-gcc.exe (Rev2, Built by MSYS2 project) 14.2.0
+Copyright (C) 2024 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+-bash: x86_64-w64-mingw32-ld: 명령어를 찾을 수 없음
+nayou@kimnayooung MINGW64 /c/gcc-build
+# cd /mingw64/bin
+
+심볼릭링크 추가
+nayou@kimnayooung MINGW64 /mingw64/bin
+# ln -s ld.exe x86_64-w64-mingw32-ld
+
+nayou@kimnayooung MINGW64 /mingw64/bin
+# ls -l x86_64-w64-mingw32-ld
+-rwxr-xr-x 1 nayou nayou 1885331  8월 31 19:50 x86_64-w64-mingw32-ld
+
+nayou@kimnayooung MINGW64 /mingw64/bin
+# x86_64-w64-mingw32-gcc -print-prog-name=ld
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe
+
+nayou@kimnayooung MINGW64 /mingw64/bin
+# $(x86_64-w64-mingw32-gcc -print-prog-name=ld) --version
+GNU ld (GNU Binutils) 2.43.1
+Copyright (C) 2024 Free Software Foundation, Inc.
+This program is free software; you may redistribute it under the terms of
+the GNU General Public License version 3 or (at your option) a later version.
+This program has absolutely no warranty.
+
+nayou@kimnayooung MINGW64 /mingw64/bin
+# ld --version
+GNU ld (GNU Binutils) 2.43.1
+Copyright (C) 2024 Free Software Foundation, Inc.
+This program is free software; you may redistribute it under the terms of
+the GNU General Public License version 3 or (at your option) a later version.
+This program has absolutely no warranty.
+실패
+MinGW cross-compilation을 사용할 때는 --host와 --with-sysroot 옵션을 올바르게 설정해야 함 
+빌드명령어 수정( --host=x86_64-w64-mingw32 --with-sysroot=/c/msys64/mingw64 추가)
+nayou@kimnayooung MINGW64 /c/gcc-build
+# /c/gcc-14.2.0/configure --srcdir="$SRCDIR" --prefix=/usr/local --with-std=C11 --with-install="$ac_install_sh" --enable-languages=c,c++,fortran,lto,objc --host=x86_64-w64-mingw32 --with-sysroot=/c/msys64/mingw64 && mingw32-make --debug=v
+
+=> Autoconf의 의도
+ac_nonexistent.h는 단순히 테스트 목적으로 사용되며, 실제로 파일이 생성되지 않습니다.
+컴파일러가 이 헤더를 포함하려고 할 때 "해당 파일을 찾을 수 없음"이라는 에러를 출력해야 정상적인 동작으로 간주됩니다.
+이를 통해 컴파일러의 전처리기(preprocessor)가 비정상적으로 동작하지 않는지 확인합니다. 
+
+(오류)
+cannot find sources (configure.ac) in /
+(수정)
+nayou@kimnayooung MINGW64 /c/gcc-build
+# rm -f config.cache && cd /c/gcc-14.2.0 && libtoolize --copy --force && aclocal --force && autoconf && 
+automake --add-missing --copy && autoreconf -ivf && 
+sed -i '/if test ! -r "\$srcdir\/\$ac_unique_file"; then/i srcdir=\/c\/gcc-14.2.0' configure && 
+cd /c/gcc-build && /c/gcc-14.2.0/configure --srcdir="$SRCDIR" --prefix=/usr/local --with-install="$ac_install_sh" --enable-languages=c,c++,fortran,lto,objc && mingw32-make --debug=v
+성공
