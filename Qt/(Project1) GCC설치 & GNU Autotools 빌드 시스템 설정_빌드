@@ -41262,9 +41262,136 @@ ac_nonexistent.h는 단순히 테스트 목적으로 사용되며, 실제로 파
 (오류)
 cannot find sources (configure.ac) in /
 (수정)
+빌드명령어 수정( sed -i '/if test ! -r "\$srcdir\/\$ac_unique_file"; then/i srcdir=\/c\/gcc-14.2.0' configure 추가 )
 nayou@kimnayooung MINGW64 /c/gcc-build
 # rm -f config.cache && cd /c/gcc-14.2.0 && libtoolize --copy --force && aclocal --force && autoconf && 
 automake --add-missing --copy && autoreconf -ivf && 
 sed -i '/if test ! -r "\$srcdir\/\$ac_unique_file"; then/i srcdir=\/c\/gcc-14.2.0' configure && 
 cd /c/gcc-build && /c/gcc-14.2.0/configure --srcdir="$SRCDIR" --prefix=/usr/local --with-install="$ac_install_sh" --enable-languages=c,c++,fortran,lto,objc && mingw32-make --debug=v
 성공
+(오류)
+/c/gcc-build/config.log
+gcc version 14.2.0 (Rev2, Built by MSYS2 project) 
+configure:3740: $? = 0
+configure:3729: x86_64-w64-mingw32-gcc -V >&5
+x86_64-w64-mingw32-gcc.exe: error: unrecognized command-line option '-V'
+x86_64-w64-mingw32-gcc.exe: fatal error: no input files
+compilation terminated.
+configure:3740: $? = 1
+configure:3729: x86_64-w64-mingw32-gcc -qversion >&5
+x86_64-w64-mingw32-gcc.exe: error: unrecognized command-line option '-qversion'; did you mean '--version'?
+x86_64-w64-mingw32-gcc.exe: fatal error: no input files
+compilation terminated.
+configure:3740: $? = 1
+configure:3729: x86_64-w64-mingw32-gcc -version >&5
+x86_64-w64-mingw32-gcc.exe: error: unrecognized command-line option '-version'
+x86_64-w64-mingw32-gcc.exe: fatal error: no input files
+compilation terminated.
+configure:3740: $? = 1
+...
+(수정)
+빌드명령어 수정
+rm -f config.cache && cd /c/gcc-14.2.0 && libtoolize --copy --force && aclocal --force && autoconf && automake --add-missing --copy && autoreconf -ivf && / 
+sed -i '/if test ! -r "\$srcdir\/\$ac_unique_file"; then/i srcdir=\/c\/gcc-14.2.0' configure && /
+sed -i 's/ -V -qversion -version/ --version/g' configure && /
+sed -i 's/ -V -qversion/ --version/g' configure && /
+sed -i 's/$NM -V/$NM --version/g' configure && /
+sed -i 's/$CC -V/$CC --version/g' configure && /
+cd /c/gcc-build && /c/gcc-14.2.0/configure --srcdir="$SRCDIR" --prefix=/usr/local --with-install="$ac_install_sh" --enable-languages=c,c++,fortran,lto,objc && /
+mingw32-make --debug=v
+성공
+(오류)
+conftest.c:14:3: error: #error "Compiler advertises conformance to C17 or earlier"
+   14 | # error "Compiler advertises conformance to C17 or earlier"
+      |   ^~~~~
+conftest.c: In function 'alignas':
+conftest.c:18:23: error: expected declaration specifiers before 'c23_aligned_as_double'
+   18 | char alignas (double) c23_aligned_as_double;
+      |                       ^~~~~~~~~~~~~~~~~~~~~
+conftest.c:19:15: error: expected declaration specifiers or '...' before numeric constant
+   19 | char alignas (0) c23_no_special_alignment;
+      |               ^
+conftest.c:20:13: error: storage class specified for parameter 'c23_aligned_as_int'
+   20 | extern char c23_aligned_as_int;
+      |             ^~~~~~~~~~~~~~~~~~
+...
+(수정)
+/c/gcc-14.2.0/configure.ac 수정
+# AC_PROG_CC_C99
+m4_pattern_allow([AC_PROG_CC_C11])
+AC_PROG_CC_C11
+AC_PROG_CXX
+
+빌드명령어 수정
+cd /c/gcc-14.2.0 && 
+sed -i '/if test ! -r "\$srcdir\/\$ac_unique_file"; then/i srcdir=\/c\/gcc-14.2.0' configure 
+sed -i 's/ -V -qversion -version/ --version/g' configure 
+sed -i 's/ -V -qversion/ --version/g' configure 
+sed -i 's/$NM -V/$NM --version/g' configure 
+sed -i 's/$CC -V/$CC --version/g' configure 
+sed -i '/  ac_cv_prog_cc_c23=no$/N;/  ac_save_CC=\$CC$/a\  ac_cv_prog_cc_c23=no' configure
+sed -i '/^fi$/N;/rm -f core conftest.err conftest\.\$ac_objext$/a\  ac_cv_prog_cc_c23=no' configure && cd /c/gcc-build &&
+/c/gcc-14.2.0/configure --srcdir="$SRCDIR" --prefix=/usr/local --with-install="$ac_install_sh" --enable-languages=c,c++,fortran,lto,objc &&
+mingw32-make
+성공
+(오류)
+/c/gcc-build/config.log
+conftest.c:9:10: fatal error: ac_nonexistent.h: No such file or directory
+    9 | #include <ac_nonexistent.h>
+      |          ^~~~~~~~~~~~~~~~~~
+compilation terminated.
+configure:7918: $? = 1
+configure: failed program was:
+| /* confdefs.h */
+| #define PACKAGE_NAME "gcc"
+| #define PACKAGE_TARNAME "gcc-14.2.0"
+| #define PACKAGE_VERSION "14.2.0"
+| #define PACKAGE_STRING "gcc 14.2.0"
+| #define PACKAGE_BUGREPORT "gcc-help@gcc.gnu.org"
+| #define PACKAGE_URL ""
+| /* end confdefs.h.  */
+| #include <ac_nonexistent.h>
+...
+O2 conftest.cpp
+conftest.cpp:22:10: fatal error: ac_nonexistent.h: No such file or directory
+   22 | #include <ac_nonexistent.h>
+      |          ^~~~~~~~~~~~~~~~~~
+compilation terminated.
+configure:15805: $? = 1
+configure: failed program was:
+| /* confdefs.h */
+| #define PACKAGE_NAME "gcc"
+| #define PACKAGE_TARNAME "gcc-14.2.0"
+| #define PACKAGE_VERSION "14.2.0"
+| #define PACKAGE_STRING "gcc 14.2.0"
+| #define PACKAGE_BUGREPORT "gcc-help@gcc.gnu.org"
+| #define PACKAGE_URL ""
+| #define STDC_HEADERS 1
+| #define HAVE_SYS_TYPES_H 1
+| #define HAVE_SYS_STAT_H 1
+| #define HAVE_STDLIB_H 1
+| #define HAVE_STRING_H 1
+| #define HAVE_MEMORY_H 1
+| #define HAVE_STRINGS_H 1
+| #define HAVE_INTTYPES_H 1
+| #define HAVE_STDINT_H 1
+| #define HAVE_UNISTD_H 1
+| #define LT_OBJDIR ".libs/"
+| #define PACKAGE "gcc-14.2.0"
+| #define VERSION "14.2.0"
+| /* end confdefs.h.  */
+| #include <ac_nonexistent.h>
+...
+(수정)
+C23 error
+rm -f config.cache && cd /c/gcc-14.2.0 && libtoolize --copy --force && aclocal --force && autoconf && automake --add-missing --copy && autoreconf -ivf && 
+sed -i '/if test ! -r "\$srcdir\/\$ac_unique_file"; then/i srcdir=\/c\/gcc-14.2.0' configure 
+sed -i 's/ -V -qversion -version/ --version/g' configure 
+sed -i 's/ -V -qversion/ --version/g' configure 
+sed -i 's/$NM -V/$NM --version/g' configure 
+sed -i 's/$CC -V/$CC --version/g' configure 
+sed -i '/^ac_save_CC=$CC$/i ac_cv_prog_cc_c23=no' configure 
+sed -i '/^rm -f core conftest\.err conftest\.\$ac_objext$/i ac_cv_prog_cc_c23=no' configure 
+sed -i '/^if test "x$ac_cv_prog_cc_c23" = xno; then :$/i ac_cv_prog_cc_c23=no' configure  && cd /c/gcc-build && /c/gcc-14.2.0/configure CPPFLAGS="$CPPFLAGS" LDFLAGS="$LDFLAGS" --srcdir="$SRCDIR" --prefix=/usr/local --with-install="$ac_install_sh" --enable-languages=c,c++,fortran,lto,objc && mingw32-make
+
+configure 스크립트가 ac_nonexistent.h를 사용하는 이유는 컴파일러의 에러 처리를 테스트하기 위함
