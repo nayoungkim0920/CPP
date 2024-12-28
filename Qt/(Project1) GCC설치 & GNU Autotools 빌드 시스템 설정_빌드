@@ -41392,6 +41392,24 @@ sed -i 's/$NM -V/$NM --version/g' configure
 sed -i 's/$CC -V/$CC --version/g' configure 
 sed -i '/^ac_save_CC=$CC$/i ac_cv_prog_cc_c23=no' configure 
 sed -i '/^rm -f core conftest\.err conftest\.\$ac_objext$/i ac_cv_prog_cc_c23=no' configure 
-sed -i '/^if test "x$ac_cv_prog_cc_c23" = xno; then :$/i ac_cv_prog_cc_c23=no' configure  && cd /c/gcc-build && /c/gcc-14.2.0/configure CPPFLAGS="$CPPFLAGS" LDFLAGS="$LDFLAGS" --srcdir="$SRCDIR" --prefix=/usr/local --with-install="$ac_install_sh" --enable-languages=c,c++,fortran,lto,objc && mingw32-make
-
+sed -i '/^if test "x$ac_cv_prog_cc_c23" = xno; then :$/i ac_cv_prog_cc_c23=no' configure  
+sed -i '/C23/d' configure
+sed -i '/alignas/d' configure
+sed -i '/alignof/d' configure
+sed -i '/static_assert/d' configure
+sed -i '/constexpr/d' configure
+sed -i '/nullptr/d' configure
+sed -i '/u8"/d' configure 
+sed -i '/#if !defined __STDC_VERSION__/,+2d' configure
+sed -i '/<stdbit.h>/d' configure
+sed -i '/#elifdef/d' configure
+sed -i '/empty enum/d' configure 
+sed -i '/__STDC_VERSION__/d' configure
+sed -i '/__has_c_attribute/d' configure
+sed -i '/<stdbit.h>/d' configure
+sed -i 's/-std=gnu23/-std=c11/g' configure 
+sed -i '/typeof/d' configure
+sed -i '/Alignas/d' configure 
+sed -i 's/int two = 2;/two=2/' configure  && cd /c/gcc-build && /c/gcc-14.2.0/configure --srcdir="$SRCDIR" --prefix=/usr/local --with-install="$ac_install_sh" --enable-languages=c,c++,fortran,lto,objc && mingw32-make
+(오류)
 configure 스크립트가 ac_nonexistent.h를 사용하는 이유는 컴파일러의 에러 처리를 테스트하기 위함
