@@ -41290,17 +41290,25 @@ compilation terminated.
 configure:3740: $? = 1
 ...
 (수정)
+/c/gcc-14.2.0/configure.ac 수정
+# AC_PROG_CC_C99
+m4_pattern_allow([AC_PROG_CC_C11])
+AC_PROG_CC_C11
+AC_PROG_CXX
+
 빌드명령어 수정
-rm -f config.cache && cd /c/gcc-14.2.0 && libtoolize --copy --force && aclocal --force && autoconf && automake --add-missing --copy && autoreconf -ivf && / 
-sed -i '/if test ! -r "\$srcdir\/\$ac_unique_file"; then/i srcdir=\/c\/gcc-14.2.0' configure && /
-sed -i 's/ -V -qversion -version/ --version/g' configure && /
-sed -i 's/ -V -qversion/ --version/g' configure && /
-sed -i 's/$NM -V/$NM --version/g' configure && /
-sed -i 's/$CC -V/$CC --version/g' configure && /
-cd /c/gcc-build && /c/gcc-14.2.0/configure --srcdir="$SRCDIR" --prefix=/usr/local --with-install="$ac_install_sh" --enable-languages=c,c++,fortran,lto,objc && /
-mingw32-make --debug=v
+rm -f config.cache && cd /c/gcc-14.2.0 && libtoolize --copy --force && aclocal --force && autoconf && automake --add-missing --copy && autoreconf -ivf && 
+sed -i '/if test ! -r "\$srcdir\/\$ac_unique_file"; then/i srcdir=\/c\/gcc-14.2.0' configure 
+sed -i 's/ -V -qversion -version/ --version/g' configure 
+sed -i 's/ -V -qversion/ --version/g' configure 
+sed -i 's/$NM -V/$NM --version/g' configure 
+sed -i 's/$CC -V/$CC --version/g' configure 
+sed -i '/^ac_save_CC=$CC$/i ac_cv_prog_cc_c23=no' configure 
+sed -i '/^rm -f core conftest\.err conftest\.\$ac_objext$/i ac_cv_prog_cc_c23=no' configure 
+sed -i '/^if test "x$ac_cv_prog_cc_c23" = xno; then :$/i ac_cv_prog_cc_c23=no' configure && cd /c/gcc-build && /c/gcc-14.2.0/configure --build=x86_64-w64-mingw32 --host=x86_64-w64-mingw32 --srcdir="$SRCDIR" --prefix=/usr/local --with-install="$ac_install_sh" --enable-languages=c,c++,fortran,lto,objc && mingw32-make
 성공
 (오류)
+/c/gcc-build/config.log
 conftest.c:14:3: error: #error "Compiler advertises conformance to C17 or earlier"
    14 | # error "Compiler advertises conformance to C17 or earlier"
       |   ^~~~~
@@ -41314,33 +41322,432 @@ conftest.c:19:15: error: expected declaration specifiers or '...' before numeric
 conftest.c:20:13: error: storage class specified for parameter 'c23_aligned_as_int'
    20 | extern char c23_aligned_as_int;
       |             ^~~~~~~~~~~~~~~~~~
+conftest.c:21:15: error: expected declaration specifiers or '...' before numeric constant
+   21 | char alignas (0) alignas (int) c23_aligned_as_int;
+      |               ^
+conftest.c:26:23: error: implicit declaration of function 'alignof'; did you mean 'alignas'? [-Wimplicit-function-declaration]
+   26 |   c23_int_alignment = alignof (int),
+      |                       ^~~~~~~
+      |                       alignas
+conftest.c:26:32: error: expected expression before 'int'
+   26 |   c23_int_alignment = alignof (int),
+      |                                ^~~
+conftest.c:27:38: error: expected expression before 'int'
+   27 |   c23_int_array_alignment = alignof (int[100]),
+      |                                      ^~~
+conftest.c:28:33: error: expected expression before 'char'
+   28 |   c23_char_alignment = alignof (char)
+      |                                 ^~~~
+conftest.c:24:1: warning: empty declaration
+   24 | enum
+      | ^~~~
+conftest.c:30:1: error: expected declaration specifiers before 'static_assert'
+   30 | static_assert (0 < -alignof (int), "alignof is signed");
+      | ^~~~~~~~~~~~~
+conftest.c:32:43: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+   32 | int function_with_unnamed_parameter (int) { return 0; }
+      |                                           ^
+conftest.c:36:1: error: unknown type name 'bool'
+   36 | bool use_u8 = !u8"\xFF" == u8'x';
+      | ^~~~
+conftest.c:1:1: note: 'bool' is defined in header '<stdbool.h>'; this is probably fixable by adding '#include <stdbool.h>'
+    1 | /* confdefs.h */
+conftest.c:36:1: error: parameter 'use_u8' is initialized
+   36 | bool use_u8 = !u8"\xFF" == u8'x';
+      | ^~~~
+conftest.c:36:28: error: 'u8' undeclared (first use in this function)
+   36 | bool use_u8 = !u8"\xFF" == u8'x';
+      |                            ^~
+conftest.c:36:28: note: each undeclared identifier is reported only once for each function it appears in
+conftest.c:36:30: error: expected ',' or ';' before 'x'
+   36 | bool use_u8 = !u8"\xFF" == u8'x';
+      |                              ^~~
+conftest.c:38:1: error: unknown type name 'bool'
+   38 | bool check_that_bool_works = true | false | !nullptr;
+      | ^~~~
+conftest.c:38:1: note: 'bool' is defined in header '<stdbool.h>'; this is probably fixable by adding '#include <stdbool.h>'
+conftest.c:38:1: error: parameter 'check_that_bool_works' is initialized
+conftest.c:38:30: error: 'true' undeclared (first use in this function)
+   38 | bool check_that_bool_works = true | false | !nullptr;
+      |                              ^~~~
+conftest.c:38:30: note: 'true' is defined in header '<stdbool.h>'; this is probably fixable by adding '#include <stdbool.h>'
+conftest.c:38:37: error: 'false' undeclared (first use in this function)
+   38 | bool check_that_bool_works = true | false | !nullptr;
+      |                                     ^~~~~
+conftest.c:38:37: note: 'false' is defined in header '<stdbool.h>'; this is probably fixable by adding '#include <stdbool.h>'
+conftest.c:38:46: error: 'nullptr' undeclared (first use in this function); did you mean 'nullptr_t'?
+   38 | bool check_that_bool_works = true | false | !nullptr;
+      |                                              ^~~~~~~
+      |                                              nullptr_t
+conftest.c:40:3: error: #error "true does not work in #if"
+   40 | # error "true does not work in #if"
+      |   ^~~~~
+conftest.c:59:1: error: expected declaration specifiers before 'static_assert'
+   59 | static_assert (VA_OPT_TEST (LPAREN (), 0, <:-) == 42);
+      | ^~~~~~~~~~~~~
+conftest.c:61:1: error: expected declaration specifiers before 'static_assert'
+   61 | static_assert (0b101010 == 42);
+      | ^~~~~~~~~~~~~
+conftest.c:62:1: error: expected declaration specifiers before 'static_assert'
+   62 | static_assert (0B101010 == 42);
+      | ^~~~~~~~~~~~~
+conftest.c:63:1: error: expected declaration specifiers before 'static_assert'
+   63 | static_assert (0xDEAD'BEEF == 3'735'928'559);
+      | ^~~~~~~~~~~~~
+conftest.c:63:22: warning: multi-character literal with 9 characters exceeds 'int' size of 4 bytes
+   63 | static_assert (0xDEAD'BEEF == 3'735'928'559);
+      |                      ^~~~~~~~~~~
+conftest.c:63:36: warning: multi-character character constant [-Wmultichar]
+   63 | static_assert (0xDEAD'BEEF == 3'735'928'559);
+      |                                    ^~~~~
+conftest.c:64:1: error: expected declaration specifiers before 'static_assert'
+   64 | static_assert (0.500'000'000 == 0.5);
+      | ^~~~~~~~~~~~~
+conftest.c:64:21: warning: multi-character character constant [-Wmultichar]
+   64 | static_assert (0.500'000'000 == 0.5);
+      |                     ^~~~~
+conftest.c:66:1: warning: empty declaration
+   66 | enum unsignedish : unsigned int { uione = 1 };
+      | ^~~~
+conftest.c:67:1: error: expected declaration specifiers before 'static_assert'
+   67 | static_assert (0 < -uione);
+      | ^~~~~~~~~~~~~
+In file included from C:\msys64\mingw64\x86_64-w64-mingw32\include/_mingw.h:282,
+                 from C:\msys64\mingw64\x86_64-w64-mingw32\include/corecrt.h:10,
+                 from C:\msys64\mingw64\x86_64-w64-mingw32\include/crtdefs.h:10,
+                 from C:\msys64\mingw64\x86_64-w64-mingw32\include/stddef.h:7,
+                 from conftest.c:69:
+C:\msys64\mingw64\x86_64-w64-mingw32\include/vadefs.h:14:9: error: expected declaration specifiers before '#pragma'
+   14 | #pragma pack(push,_CRT_PACKING)
+      |         ^~~~
+C:\msys64\mingw64\x86_64-w64-mingw32\include/vadefs.h:31:11: error: unknown type name '__gnuc_va_list'
+   31 |   typedef __gnuc_va_list va_list;
+      |           ^~~~~~~~~~~~~~
+C:\msys64\mingw64\x86_64-w64-mingw32\include/vadefs.h:31:26: error: storage class specified for parameter 'va_list'
+   31 |   typedef __gnuc_va_list va_list;
+      |                          ^~~~~~~
+C:\msys64\mingw64\x86_64-w64-mingw32\include/vadefs.h:103:9: error: expected declaration specifiers before '#pragma'
+  103 | #pragma pack(pop)
+      |         ^~~~
+C:\msys64\mingw64\x86_64-w64-mingw32\include/_mingw.h:582:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  582 | {
+      | ^
+C:\msys64\mingw64\x86_64-w64-mingw32\include/_mingw.h:603:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  603 | {
+      | ^
+C:\msys64\mingw64\x86_64-w64-mingw32\include/corecrt.h:15:9: error: expected declaration specifiers before '#pragma'
+   15 | #pragma pack(push,_CRT_PACKING)
+      |         ^~~~
+In file included from C:\msys64\mingw64\x86_64-w64-mingw32\include/_mingw.h:10:
+C:\msys64\mingw64\x86_64-w64-mingw32\include/corecrt.h:45:1: error: expected declaration specifiers before '__extension__'
+   45 | __MINGW_EXTENSION typedef __int64 ssize_t;
+      | ^~~~~~~~~~~~~~~~~
+C:\msys64\mingw64\x86_64-w64-mingw32\include/corecrt.h:52:9: error: unknown type name 'size_t'
+   52 | typedef size_t rsize_t;
+      |         ^~~~~~
+C:\msys64\mingw64\x86_64-w64-mingw32\include/corecrt.h:11:1: note: 'size_t' is defined in header '<stddef.h>'; this is probably fixable by adding '#include <stddef.h>'
+   10 | #include <_mingw.h>
+   11 | 
+C:\msys64\mingw64\x86_64-w64-mingw32\include/corecrt.h:52:16: error: storage class specified for parameter 'rsize_t'
+   52 | typedef size_t rsize_t;
+      |                ^~~~~~~
+C:\msys64\mingw64\x86_64-w64-mingw32\include/corecrt.h:62:1: error: expected declaration specifiers before '__extension__'
+   62 | __MINGW_EXTENSION typedef __int64 intptr_t;
+      | ^~~~~~~~~~~~~~~~~
+C:\msys64\mingw64\x86_64-w64-mingw32\include/corecrt.h:75:1: error: expected declaration specifiers before '__extension__'
+   75 | __MINGW_EXTENSION typedef unsigned __int64 uintptr_t;
+      | ^~~~~~~~~~~~~~~~~
+C:\msys64\mingw64\x86_64-w64-mingw32\include/corecrt.h:88:1: error: expected declaration specifiers before '__extension__'
+   88 | __MINGW_EXTENSION typedef __int64 ptrdiff_t;
+      | ^~~~~~~~~~~~~~~~~
+C:\msys64\mingw64\x86_64-w64-mingw32\include/corecrt.h:98:24: error: storage class specified for parameter 'wchar_t'
+   98 | typedef unsigned short wchar_t;
+      |                        ^~~~~~~
+C:\msys64\mingw64\x86_64-w64-mingw32\include/corecrt.h:106:24: error: storage class specified for parameter 'wint_t'
+  106 | typedef unsigned short wint_t;
+      |                        ^~~~~~
+C:\msys64\mingw64\x86_64-w64-mingw32\include/corecrt.h:107:24: error: storage class specified for parameter 'wctype_t'
+  107 | typedef unsigned short wctype_t;
+      |                        ^~~~~~~~
+C:\msys64\mingw64\x86_64-w64-mingw32\include/corecrt.h:113:13: error: storage class specified for parameter 'errno_t'
+  113 | typedef int errno_t;
+      |             ^~~~~~~
+C:\msys64\mingw64\x86_64-w64-mingw32\include/corecrt.h:118:14: error: storage class specified for parameter '__time32_t'
+  118 | typedef long __time32_t;
+      |              ^~~~~~~~~~
+C:\msys64\mingw64\x86_64-w64-mingw32\include/corecrt.h:123:1: error: expected declaration specifiers before '__extension__'
+  123 | __MINGW_EXTENSION typedef __int64 __time64_t;
+      | ^~~~~~~~~~~~~~~~~
+C:\msys64\mingw64\x86_64-w64-mingw32\include/corecrt.h:138:9: error: unknown type name '__time64_t'
+  138 | typedef __time64_t time_t;
+      |         ^~~~~~~~~~
+C:\msys64\mingw64\x86_64-w64-mingw32\include/corecrt.h:138:20: error: storage class specified for parameter 'time_t'
+  138 | typedef __time64_t time_t;
+      |                    ^~~~~~
+C:\msys64\mingw64\x86_64-w64-mingw32\include/corecrt.h:432:40: error: storage class specified for parameter 'pthreadlocinfo'
+  432 | typedef struct threadlocaleinfostruct *pthreadlocinfo;
+      |                                        ^~~~~~~~~~~~~~
+C:\msys64\mingw64\x86_64-w64-mingw32\include/corecrt.h:433:37: error: storage class specified for parameter 'pthreadmbcinfo'
+  433 | typedef struct threadmbcinfostruct *pthreadmbcinfo;
+      |                                     ^~~~~~~~~~~~~~
+C:\msys64\mingw64\x86_64-w64-mingw32\include/corecrt.h:437:3: error: expected specifier-qualifier-list before 'pthreadlocinfo'
+  437 |   pthreadlocinfo locinfo;
+      |   ^~~~~~~~~~~~~~
+C:\msys64\mingw64\x86_64-w64-mingw32\include/corecrt.h:439:3: error: storage class specified for parameter '_locale_tstruct'
+  439 | } _locale_tstruct,*_locale_t;
+      |   ^~~~~~~~~~~~~~~
+C:\msys64\mingw64\x86_64-w64-mingw32\include/corecrt.h:439:20: error: storage class specified for parameter '_locale_t'
+  439 | } _locale_tstruct,*_locale_t;
+      |                    ^~~~~~~~~
+C:\msys64\mingw64\x86_64-w64-mingw32\include/corecrt.h:447:3: error: storage class specified for parameter 'LC_ID'
+  447 | } LC_ID,*LPLC_ID;
+      |   ^~~~~
+C:\msys64\mingw64\x86_64-w64-mingw32\include/corecrt.h:447:10: error: storage class specified for parameter 'LPLC_ID'
+  447 | } LC_ID,*LPLC_ID;
+      |          ^~~~~~~
+C:\msys64\mingw64\x86_64-w64-mingw32\include/corecrt.h:462:3: error: expected specifier-qualifier-list before 'LC_ID'
+  462 |   LC_ID lc_id[6];
+      |   ^~~~~
+C:\msys64\mingw64\x86_64-w64-mingw32\include/corecrt.h:482:3: error: storage class specified for parameter 'threadlocinfo'
+  482 | } threadlocinfo;
+      |   ^~~~~~~~~~~~~
+C:\msys64\mingw64\x86_64-w64-mingw32\include/corecrt.h:501:9: error: expected declaration specifiers before '#pragma'
+  501 | #pragma pack(pop)
+      |         ^~~~
+C:\msys64\mingw64\x86_64-w64-mingw32\include/stddef.h:20:3: error: expected declaration specifiers before 'errno_t'
+   20 |   errno_t __cdecl _set_errno(int _Value);
+      |   ^~~~~~~
+C:\msys64\mingw64\x86_64-w64-mingw32\include/stddef.h:21:3: error: expected declaration specifiers before 'errno_t'
+   21 |   errno_t __cdecl _get_errno(int *_Value);
+      |   ^~~~~~~
+C:\msys64\mingw64\x86_64-w64-mingw32\include/stddef.h:24:3: error: expected declaration specifiers before '__attribute__'
+   24 |   _CRTIMP extern unsigned long __cdecl __threadid(void);
+      |   ^~~~~~~
+C:\msys64\mingw64\x86_64-w64-mingw32\include/stddef.h:26:3: error: expected declaration specifiers before '__attribute__'
+   26 |   _CRTIMP extern uintptr_t __cdecl __threadhandle(void);
+      |   ^~~~~~~
+C:\msys64\mingw64\x86_64-w64-mingw32\include/stddef.h:427:3: error: storage class specified for parameter 'max_align_t'
+  427 | } max_align_t;
+      |   ^~~~~~~~~~~
+conftest.c:70:1: error: unknown type name 'constexpr'
+   70 | constexpr nullptr_t null_pointer = nullptr;
+      | ^~~~~~~~~
+conftest.c:70:21: error: expected '=', ',', ';', 'asm' or '__attribute__' before 'null_pointer'
+   70 | constexpr nullptr_t null_pointer = nullptr;
+      |                     ^~~~~~~~~~~~
+conftest.c:72:10: fatal error: stdbit.h: No such file or directory
+   72 | #include <stdbit.h>
+      |          ^~~~~~~~~~
+compilation terminated.
+configure:4126: $? = 1
+configure: failed program was:
+| /* confdefs.h */
+| #define PACKAGE_NAME "gcc"
+| #define PACKAGE_TARNAME "gcc-14.2.0"
+| #define PACKAGE_VERSION "14.2.0"
+| #define PACKAGE_STRING "gcc 14.2.0"
+| #define PACKAGE_BUGREPORT "gcc-help@gcc.gnu.org"
+| #define PACKAGE_URL ""
+| /* end confdefs.h.  */
+| 
+| /* Does the compiler advertise conformance to C17 or earlier?
+|    Although GCC 14 does not do that, even with -std=gnu23,
+|    it is close enough, and defines __STDC_VERSION == 202000L.  */
+| #if !defined __STDC_VERSION__ || __STDC_VERSION__ <= 201710L
+| # error "Compiler advertises conformance to C17 or earlier"
+| #endif
+| 
+| // Check alignas.
+| char alignas (double) c23_aligned_as_double;
+| char alignas (0) c23_no_special_alignment;
+| extern char c23_aligned_as_int;
+| char alignas (0) alignas (int) c23_aligned_as_int;
+| 
+| // Check alignof.
+| enum
+| {
+|   c23_int_alignment = alignof (int),
+|   c23_int_array_alignment = alignof (int[100]),
+|   c23_char_alignment = alignof (char)
+| };
+| static_assert (0 < -alignof (int), "alignof is signed");
+| 
+| int function_with_unnamed_parameter (int) { return 0; }
+| 
+| void c23_noreturn ();
+| 
+| bool use_u8 = !u8"\xFF" == u8'x';
+| 
+| bool check_that_bool_works = true | false | !nullptr;
+| #if !true
+| # error "true does not work in #if"
+| #endif
+| #if false
+| #elifdef __STDC_VERSION__
+| #else
+| # error "#elifdef does not work"
+| #endif
+| 
+| #ifndef __has_c_attribute
+| # error "__has_c_attribute not defined"
+| #endif
+| 
+| #ifndef __has_include
+| # error "__has_include not defined"
+| #endif
+| 
+| #define LPAREN() (
+| #define FORTY_TWO(x) 42
+| #define VA_OPT_TEST(r, x, ...) __VA_OPT__ (FORTY_TWO r x))
+| static_assert (VA_OPT_TEST (LPAREN (), 0, <:-) == 42);
+| 
+| static_assert (0b101010 == 42);
+| static_assert (0B101010 == 42);
+| static_assert (0xDEAD'BEEF == 3'735'928'559);
+| static_assert (0.500'000'000 == 0.5);
+| 
+| enum unsignedish : unsigned int { uione = 1 };
+| static_assert (0 < -uione);
+| 
+| #include <stddef.h>
+| constexpr nullptr_t null_pointer = nullptr;
+| 
+| #include <stdbit.h>
+| static_assert (__STDC_ENDIAN_LITTLE__ != __STDC_ENDIAN_BIG__);
+| 
+| static typeof (1 + 1L) two () { return 2; }
+| static long int three () { return 3; }
+| 
+| 
+| int
+| main (int, char **)
+| {
+|   int ok = 0;
+|   
+|   {
+|     label_before_declaration:
+|       int arr[10] = {};
+|       if (arr[0])
+|         goto label_before_declaration;
+|       if (!arr[0])
+|         goto label_at_end_of_block;
+|     label_at_end_of_block:
+|   }
+|   ok |= two != three;
+| 
+|   return ok;
+| }
+| 
+configure:4126: x86_64-w64-mingw32-gcc -std=gnu23 -c -I/c/msys64/mingw64/include -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -O2    -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 conftest.c >&5
+conftest.c:72:10: fatal error: stdbit.h: No such file or directory
+   72 | #include <stdbit.h>
+      |          ^~~~~~~~~~
+compilation terminated.
+configure:4126: $? = 1
+configure: failed program was:
+| /* confdefs.h */
+| #define PACKAGE_NAME "gcc"
+| #define PACKAGE_TARNAME "gcc-14.2.0"
+| #define PACKAGE_VERSION "14.2.0"
+| #define PACKAGE_STRING "gcc 14.2.0"
+| #define PACKAGE_BUGREPORT "gcc-help@gcc.gnu.org"
+| #define PACKAGE_URL ""
+| /* end confdefs.h.  */
+| 
+| /* Does the compiler advertise conformance to C17 or earlier?
+|    Although GCC 14 does not do that, even with -std=gnu23,
+|    it is close enough, and defines __STDC_VERSION == 202000L.  */
+| #if !defined __STDC_VERSION__ || __STDC_VERSION__ <= 201710L
+| # error "Compiler advertises conformance to C17 or earlier"
+| #endif
+| 
+| // Check alignas.
+| char alignas (double) c23_aligned_as_double;
+| char alignas (0) c23_no_special_alignment;
+| extern char c23_aligned_as_int;
+| char alignas (0) alignas (int) c23_aligned_as_int;
+| 
+| // Check alignof.
+| enum
+| {
+|   c23_int_alignment = alignof (int),
+|   c23_int_array_alignment = alignof (int[100]),
+|   c23_char_alignment = alignof (char)
+| };
+| static_assert (0 < -alignof (int), "alignof is signed");
+| 
+| int function_with_unnamed_parameter (int) { return 0; }
+| 
+| void c23_noreturn ();
+| 
+| bool use_u8 = !u8"\xFF" == u8'x';
+| 
+| bool check_that_bool_works = true | false | !nullptr;
+| #if !true
+| # error "true does not work in #if"
+| #endif
+| #if false
+| #elifdef __STDC_VERSION__
+| #else
+| # error "#elifdef does not work"
+| #endif
+| 
+| #ifndef __has_c_attribute
+| # error "__has_c_attribute not defined"
+| #endif
+| 
+| #ifndef __has_include
+| # error "__has_include not defined"
+| #endif
+| 
+| #define LPAREN() (
+| #define FORTY_TWO(x) 42
+| #define VA_OPT_TEST(r, x, ...) __VA_OPT__ (FORTY_TWO r x))
+| static_assert (VA_OPT_TEST (LPAREN (), 0, <:-) == 42);
+| 
+| static_assert (0b101010 == 42);
+| static_assert (0B101010 == 42);
+| static_assert (0xDEAD'BEEF == 3'735'928'559);
+| static_assert (0.500'000'000 == 0.5);
+| 
+| enum unsignedish : unsigned int { uione = 1 };
+| static_assert (0 < -uione);
+| 
+| #include <stddef.h>
+| constexpr nullptr_t null_pointer = nullptr;
+| 
+| #include <stdbit.h>
+| static_assert (__STDC_ENDIAN_LITTLE__ != __STDC_ENDIAN_BIG__);
+| 
+| static typeof (1 + 1L) two () { return 2; }
+| static long int three () { return 3; }
+| 
+| 
+| int
+| main (int, char **)
+| {
+|   int ok = 0;
+|   
+|   {
+|     label_before_declaration:
+|       int arr[10] = {};
+|       if (arr[0])
+|         goto label_before_declaration;
+|       if (!arr[0])
+|         goto label_at_end_of_block;
+|     label_at_end_of_block:
+|   }
+|   ok |= two != three;
+| 
+|   return ok;
+| }
+| 
 ...
-(수정)
-/c/gcc-14.2.0/configure.ac 수정
-# AC_PROG_CC_C99
-m4_pattern_allow([AC_PROG_CC_C11])
-AC_PROG_CC_C11
-AC_PROG_CXX
-
-빌드명령어 수정
-cd /c/gcc-14.2.0 && 
-sed -i '/if test ! -r "\$srcdir\/\$ac_unique_file"; then/i srcdir=\/c\/gcc-14.2.0' configure 
-sed -i 's/ -V -qversion -version/ --version/g' configure 
-sed -i 's/ -V -qversion/ --version/g' configure 
-sed -i 's/$NM -V/$NM --version/g' configure 
-sed -i 's/$CC -V/$CC --version/g' configure 
-sed -i '/  ac_cv_prog_cc_c23=no$/N;/  ac_save_CC=\$CC$/a\  ac_cv_prog_cc_c23=no' configure
-sed -i '/^fi$/N;/rm -f core conftest.err conftest\.\$ac_objext$/a\  ac_cv_prog_cc_c23=no' configure && cd /c/gcc-build &&
-/c/gcc-14.2.0/configure --srcdir="$SRCDIR" --prefix=/usr/local --with-install="$ac_install_sh" --enable-languages=c,c++,fortran,lto,objc &&
-mingw32-make
-성공
-(오류)
-/c/gcc-build/config.log
 conftest.c:9:10: fatal error: ac_nonexistent.h: No such file or directory
     9 | #include <ac_nonexistent.h>
       |          ^~~~~~~~~~~~~~~~~~
 compilation terminated.
-configure:7918: $? = 1
+configure:7913: $? = 1
 configure: failed program was:
 | /* confdefs.h */
 | #define PACKAGE_NAME "gcc"
@@ -41352,12 +41759,78 @@ configure: failed program was:
 | /* end confdefs.h.  */
 | #include <ac_nonexistent.h>
 ...
-O2 conftest.cpp
+configure: failed program was:
+| /* confdefs.h */
+| #define PACKAGE_NAME "gcc"
+| #define PACKAGE_TARNAME "gcc-14.2.0"
+| #define PACKAGE_VERSION "14.2.0"
+| #define PACKAGE_STRING "gcc 14.2.0"
+| #define PACKAGE_BUGREPORT "gcc-help@gcc.gnu.org"
+| #define PACKAGE_URL ""
+| #define STDC_HEADERS 1
+| #define HAVE_SYS_TYPES_H 1
+| #define HAVE_SYS_STAT_H 1
+| #define HAVE_STDLIB_H 1
+| #define HAVE_STRING_H 1
+| #define HAVE_MEMORY_H 1
+| #define HAVE_STRINGS_H 1
+| #define HAVE_INTTYPES_H 1
+| #define HAVE_STDINT_H 1
+| #define HAVE_UNISTD_H 1
+| /* end confdefs.h.  */
+| #include <stdio.h>
+| #ifdef HAVE_SYS_TYPES_H
+| # include <sys/types.h>
+| #endif
+| #ifdef HAVE_SYS_STAT_H
+| # include <sys/stat.h>
+| #endif
+| #ifdef STDC_HEADERS
+| # include <stdlib.h>
+| # include <stddef.h>
+| #else
+| # ifdef HAVE_STDLIB_H
+| #  include <stdlib.h>
+| # endif
+| #endif
+| #ifdef HAVE_STRING_H
+| # if !defined STDC_HEADERS && defined HAVE_MEMORY_H
+| #  include <memory.h>
+| # endif
+| # include <string.h>
+| #endif
+| #ifdef HAVE_STRINGS_H
+| # include <strings.h>
+| #endif
+| #ifdef HAVE_INTTYPES_H
+| # include <inttypes.h>
+| #endif
+| #ifdef HAVE_STDINT_H
+| # include <stdint.h>
+| #endif
+| #ifdef HAVE_UNISTD_H
+| # include <unistd.h>
+| #endif
+| 
+| #include <dlfcn.h>
+...
+conftest.cpp:20:9: warning: "VERSION" redefined
+   20 | #define VERSION "14.2.0"
+      |         ^~~~~~~
+<command-line>: note: this is the location of the previous definition
+conftest.cpp: In function 'int main()':
+conftest.cpp:166:25: warning: empty parentheses were disambiguated as a function declaration [-Wvexing-parse]
+  166 |   cxx11test::delegate d2();
+      |                         ^~
+conftest.cpp:166:25: note: remove parentheses to default-initialize a variable
+  166 |   cxx11test::delegate d2();
+      |                         ^~
+      |                         --
+...
 conftest.cpp:22:10: fatal error: ac_nonexistent.h: No such file or directory
    22 | #include <ac_nonexistent.h>
       |          ^~~~~~~~~~~~~~~~~~
-compilation terminated.
-configure:15805: $? = 1
+...
 configure: failed program was:
 | /* confdefs.h */
 | #define PACKAGE_NAME "gcc"
@@ -41382,43 +41855,39 @@ configure: failed program was:
 | /* end confdefs.h.  */
 | #include <ac_nonexistent.h>
 ...
-(수정)
-C23 error
-rm -f config.cache && cd /c/gcc-14.2.0 && libtoolize --copy --force && aclocal --force && autoconf && automake --add-missing --copy && autoreconf -ivf && 
-sed -i '/if test ! -r "\$srcdir\/\$ac_unique_file"; then/i srcdir=\/c\/gcc-14.2.0' configure 
-sed -i 's/ -V -qversion -version/ --version/g' configure 
-sed -i 's/ -V -qversion/ --version/g' configure 
-sed -i 's/$NM -V/$NM --version/g' configure 
-sed -i 's/$CC -V/$CC --version/g' configure 
-sed -i '/^ac_save_CC=$CC$/i ac_cv_prog_cc_c23=no' configure 
-sed -i '/^rm -f core conftest\.err conftest\.\$ac_objext$/i ac_cv_prog_cc_c23=no' configure 
-sed -i '/^if test "x$ac_cv_prog_cc_c23" = xno; then :$/i ac_cv_prog_cc_c23=no' configure  
-sed -i '/C23/d' configure
-sed -i '/alignas/d' configure
-sed -i '/alignof/d' configure
-sed -i '/static_assert/d' configure
-sed -i '/constexpr/d' configure
-sed -i '/nullptr/d' configure
-sed -i '/u8"/d' configure 
-sed -i '/#if !defined __STDC_VERSION__/,+2d' configure
-sed -i '/<stdbit.h>/d' configure
-sed -i '/#elifdef/d' configure
-sed -i '/empty enum/d' configure 
-sed -i '/__STDC_VERSION__/d' configure
-sed -i '/__has_c_attribute/d' configure
-sed -i '/<stdbit.h>/d' configure
-sed -i 's/-std=gnu23/-std=c11/g' configure 
-sed -i '/typeof/d' configure
-sed -i '/Alignas/d' configure 
-sed -i 's/int two = 2;/two=2/' configure && cd /c/gcc-build && 
-/c/gcc-14.2.0/configure --build=x86_64-w64-mingw32 --host=x86_64-w64-mingw32 --srcdir="$SRCDIR" --prefix=/usr/local --with-install="$ac_install_sh" --enable-languages=c,c++,fortran,lto,objc && mingw32-make
-(오류)
-mingw32-make[3]: Entering directory 'C:/gcc-build/host-x86_64-w64-mingw32/libiberty'
-mingw32-make[3]: *** No rule to make target '/c/gcc-14.2.0/libiberty/Makefile.in', needed by 'Makefile'.  Stop.
-mingw32-make[3]: Leaving directory 'C:/gcc-build/host-x86_64-w64-mingw32/libiberty'
-mingw32-make[2]: *** [Makefile:12310: all-stage1-libiberty] Error 2
-mingw32-make[2]: Leaving directory 'C:/gcc-build'
-mingw32-make[1]: *** [Makefile:25759: stage1-bubble] Error 2
-mingw32-make[1]: Leaving directory 'C:/gcc-build'
-mingw32-make: *** [Makefile:1110: all] Error 2
+conftest.cpp:22:10: fatal error: ac_nonexistent.h: No such file or directory
+   22 | #include <ac_nonexistent.h>
+      |          ^~~~~~~~~~~~~~~~~~
+...
+configure: failed program was:
+| /* confdefs.h */
+| #define PACKAGE_NAME "gcc"
+| #define PACKAGE_TARNAME "gcc-14.2.0"
+| #define PACKAGE_VERSION "14.2.0"
+| #define PACKAGE_STRING "gcc 14.2.0"
+| #define PACKAGE_BUGREPORT "gcc-help@gcc.gnu.org"
+| #define PACKAGE_URL ""
+| #define STDC_HEADERS 1
+| #define HAVE_SYS_TYPES_H 1
+| #define HAVE_SYS_STAT_H 1
+| #define HAVE_STDLIB_H 1
+| #define HAVE_STRING_H 1
+| #define HAVE_MEMORY_H 1
+| #define HAVE_STRINGS_H 1
+| #define HAVE_INTTYPES_H 1
+| #define HAVE_STDINT_H 1
+| #define HAVE_UNISTD_H 1
+| #define LT_OBJDIR ".libs/"
+| #define PACKAGE "gcc-14.2.0"
+| #define VERSION "14.2.0"
+| /* end confdefs.h.  */
+| #include <ac_nonexistent.h>
 
+(수정)
+컴파일러가 C23 표준을 지원하지 않아 #error "Compiler advertises conformance to C17 or earlier"와 같은 에러가 발생
+alignas, alignof, static_assert 등 C23 기능이 제대로 동작하지 않음
+=>
+stdbool.h와 같은 필수 헤더 파일이 포함되지 않아 bool, true, false, nullptr 관련 오류 발생
+=>
+컴파일러와 테스트 코드의 호환성 문제. alignas (double) 같은 C23 키워드 사용 시 구문 오류 발생
+=> 
