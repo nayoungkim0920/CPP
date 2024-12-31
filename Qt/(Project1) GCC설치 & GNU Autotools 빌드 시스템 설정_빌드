@@ -42970,12 +42970,60 @@ nayou@kimnayooung MINGW64 /c/gcc-build
 -rw-r--r-- 1 nayou nayou 24133 12월 19 15:07 /c/gcc-14.2.0/libiberty/Makefile
 -rw-r--r-- 1 nayou nayou    67 12월 18 17:19 /c/gcc-14.2.0/libiberty/Makefile.am
 -rw-r--r-- 1 nayou nayou 22558 12월 19 15:04 /c/gcc-14.2.0/libiberty/Makefile.in
+nayou@kimnayooung MINGW64 /c/gcc-build
+# cd /c/gcc-14.2.0/libiberty/
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# autoreconf -ivf
+백업
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# mkdir -p back-2024-12-31
+mv autom4te.cache Makefile Makefile.in config.h config.log config.status config.h-vms config.in~ configure stamp-h stamp-h1 build-aux back-2024-12-31 2>/dev/null
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# ls -l autom4te.cache Makefile Makefile.in config.h config.log config.status config.h-vms config.in~ configure stamp-h stamp-h1 build-aux
+ls: cannot access 'autom4te.cache': No such file or directory
+ls: cannot access 'Makefile': No such file or directory
+ls: cannot access 'Makefile.in': No such file or directory
+ls: cannot access 'config.h': No such file or directory
+ls: cannot access 'config.log': No such file or directory
+ls: cannot access 'config.status': No such file or directory
+ls: cannot access 'config.h-vms': No such file or directory
+ls: cannot access 'config.in~': No such file or directory
+ls: cannot access 'configure': No such file or directory
+ls: cannot access 'stamp-h': No such file or directory
+ls: cannot access 'stamp-h1': No such file or directory
+ls: cannot access 'build-aux': No such file or directory
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# libtoolize --copy --force &&
+aclocal --force &&
+autoconf &&
+automake --add-missing --copy &&
+autoreconf -ivf &&
+./configure &&
+make
+(오류)
+Makefile:785: *** 분리 기호가 빠졌음.  멈춤.
+(수정)
+/c/gcc-14.2.0/libiberty/configure 확인
+line 785 : AM_INIT_AUTOMAKE([dejagnu])
 
+/c/gcc-14.2.0/libiberty/configure.ac 수정
+AC_INIT([gcc], [14.2.0], [gcc-help@gcc.gnu.org], [gcc-14.2.0])
+AC_CONFIG_AUX_DIR([../gcc-14.2.0/build-aux])
+AC_CONFIG_MACRO_DIRS([../gcc-14.2.0/m4])
+AC_CANONICAL_SYSTEM
+AM_INIT_AUTOMAKE([foreign])
+LT_INIT
+AC_DISABLE_OPTION_CHECKING
+AC_PROG_CC
+AC_LANG([C])
+/c/gcc-14.2.0/libiberty/Makefile.am 수정
+AM_INIT_AUTOMAKE([foreign])
+ACLOCAL_AMFLAGS = -I ../config -I ../m4
 
+(오류)
+Makefile:785: *** 분리 기호가 빠졌음.  멈춤.
 
-
-
-
+(수정)
 
 
 
