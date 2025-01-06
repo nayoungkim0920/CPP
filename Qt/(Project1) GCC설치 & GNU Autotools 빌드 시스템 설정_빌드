@@ -43852,3 +43852,342 @@ make[1]: *** [Makefile:513: physmem.o] 오류 1
 make[1]: 디렉터리 '/c/gcc-14.2.0/libiberty' 나감
 make: *** [Makefile:419: all] 오류 2
 (수정)
+C:\msys64\mingw64\x86_64-w64-mingw32\include\stralign.h 수정
+///////////////////////////////////////////////////////////////////////////////////
+// _wcsicmp 대체 함수 구현
+int custom_wcsicmp(LPCWSTR String1, LPCWSTR String2) {
+    int result = CompareStringW(
+        LOCALE_USER_DEFAULT,      // 현재 사용자 로캘
+        NORM_IGNORECASE,          // 대소문자 구분 없이 비교
+        String1, -1,              // 첫 번째 문자열과 길이 (-1은 NULL로 끝남을 의미)
+        String2, -1               // 두 번째 문자열과 길이
+    );
+
+    if (result == CSTR_LESS_THAN) return -1;  // String1 < String2
+    if (result == CSTR_EQUAL) return 0;      // String1 == String2
+    if (result == CSTR_GREATER_THAN) return 1;  // String1 > String2
+    return 0;  // 오류 발생 시 기본 반환값
+}
+///////////////////////////////////////////////////////////////////////////////////
+
+#ifndef __CRT__NO_INLINE
+  __CRT_INLINE int ua_wcsicmp(LPCUWSTR String1,LPCUWSTR String2) {
+    if(WSTR_ALIGNED(String1) && WSTR_ALIGNED(String2))
+//      return _wcsicmp((LPCWSTR)String1,(LPCWSTR)String2);
+	return custom_wcsicmp((LPCWSTR)String1,(LPCWSTR)String2);
+    return uaw_wcsicmp(String1,String2);
+  }
+
+(오류)
+simple-object.c:22:10: fatal error: simple-object.h: No such file or directory
+   22 | #include "simple-object.h"
+      |          ^~~~~~~~~~~~~~~~~
+compilation terminated.
+make[1]: *** [Makefile:513: simple-object.o] 오류 1
+make[1]: 디렉터리 '/c/gcc-14.2.0/libiberty' 나감
+make: *** [Makefile:419: all] 오류 2
+(수정)
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# find / -name 'simple-object.h'
+/c/gcc-14.2.0/include/simple-object.h
+환경변수 추가
+~/.bashrc 수정
+export CFLAGS="$CFLAGS -I/c/gcc-14.2.0/include" # simple-object.h
+source ~/.bashrc
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# libtoolize --copy --force && aclocal --force && autoconf && automake --add-missing --copy && autoreconf -ivf &&   ./configure CFLAGS="$CFLAGS -std=c11" CPPFLAGS="$CPPFLAGS" --disable-c23 &&  make
+(오류)
+In file included from C:/msys64/usr/include/errno.h:9,
+                 from simple-object.c:24:
+C:/msys64/usr/include/sys/errno.h:18:9: warning: "errno" redefined
+   18 | #define errno (*__errno())
+      |         ^~~~~
+In file included from C:/msys64/mingw64/include/libiberty/libiberty.h:45,
+                 from simple-object.c:21:
+C:\msys64\mingw64\x86_64-w64-mingw32\include/stddef.h:19:9: note: this is the location of the previous definition
+   19 | #define errno (*_errno())
+      |         ^~~~~
+In file included from C:/msys64/usr/include/sys/fcntl.h:3,
+                 from C:/msys64/usr/include/fcntl.h:13,
+                 from simple-object.c:25:
+C:/msys64/usr/include/sys/_default_fcntl.h:187:8: error: redefinition of 'struct flock'
+  187 | struct flock {
+      |        ^~~~~
+In file included from C:/msys64/usr/include/sys/types.h:222,
+                 from C:/gcc-14.2.0/include/simple-object.h:24,
+                 from simple-object.c:22:
+C:/msys64/usr/include/machine/types.h:35:8: note: originally defined here
+   35 | struct flock {
+      |        ^~~~~
+In file included from simple-object.c:28:
+C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++/stdlib.h:30:3: warning: #include_next is a GCC extension
+   30 | # include_next <stdlib.h>
+      |   ^~~~~~~~~~~~
+In file included from simple-object.c:40:
+C:/msys64/usr/include/inttypes.h:28:9: warning: "__STRINGIFY" redefined
+   28 | #define __STRINGIFY(a) #a
+      |         ^~~~~~~~~~~
+In file included from C:\msys64\mingw64\x86_64-w64-mingw32\include/_mingw.h:10,
+                 from C:\msys64\mingw64\x86_64-w64-mingw32\include/corecrt.h:10,
+                 from C:\msys64\mingw64\x86_64-w64-mingw32\include/crtdefs.h:10,
+                 from C:\msys64\mingw64\x86_64-w64-mingw32\include/stddef.h:7:
+C:\msys64\mingw64\x86_64-w64-mingw32\include/_mingw_mac.h:10:9: note: this is the location of the previous definition
+   10 | #define __STRINGIFY(x) #x
+      |         ^~~~~~~~~~~
+make[1]: *** [Makefile:513: simple-object.o] 오류 1
+make[1]: 디렉터리 '/c/gcc-14.2.0/libiberty' 나감
+make: *** [Makefile:419: all] 오류 2
+(수정)
+C:\msys64\usr\include\sys\errno.h 수정
+#ifndef _REENT_ONLY
+#ifndef errno /* 수정 - 중복체크 */
+#define errno (*__errno())
+#endif /* 수정 - 중복체크 */
+extern int *__errno (void);
+#endif
+
+C:\msys64\usr\include\sys\_default_fcntl.h 수정
+#ifndef __CYGWIN__
+/* file segment locking set data type - information passed to system by user */
+#ifndef FLOCK_DEFINED /* 수정 - 중복제거 */
+#define FLOCK_DEFINED /* 수정 - 중복제거 */
+struct flock {
+	short	l_type;		/* F_RDLCK, F_WRLCK, or F_UNLCK */
+	short	l_whence;	/* flag to choose starting offset */
+	long	l_start;	/* relative offset, in bytes */
+	long	l_len;		/* length, in bytes; 0 means lock to EOF */
+	short	l_pid;		/* returned with F_GETLK */
+	short	l_xxx;		/* reserved for future use */
+};
+#endif /* 수정 - 중복제거 */
+#endif /* __CYGWIN__ */
+
+C:\msys64\usr\include\machine\types.h 수정
+#ifndef FLOCK_DEFINED /* 수정 - 중복제거 */
+#define FLOCK_DEFINED /* 수정 - 중복제거 */
+struct flock {
+	short	 l_type;	/* F_RDLCK, F_WRLCK, or F_UNLCK */
+	short	 l_whence;	/* flag to choose starting offset */
+	off_t	 l_start;	/* relative offset, in bytes */
+	off_t	 l_len;		/* length, in bytes; 0 means lock to EOF */
+	pid_t	 l_pid;		/* returned with F_GETLK */
+};
+#endif /* 수정 - 중복제거 */
+
+C:\gcc-14.2.0\libiberty\strsignal.c 확인
+#ifndef HAVE_PSIGNAL
+
+void
+psignal (int signo, char *message)
+{
+  if (signal_names == NULL)
+    {
+      init_signal_tables ();
+    }
+  if ((signo <= 0) || (signo >= sys_nsig))
+    {
+      fprintf (stderr, "%s: unknown signal\n", message);
+    }
+  else
+    {
+      fprintf (stderr, "%s: %s\n", message, sys_siglist[signo]);
+    }
+}
+
+#endif	/* ! HAVE_PSIGNAL */
+
+C:\msys64\usr\include\signal.h 수정
+#ifndef _REENT_ONLY
+_sig_func_ptr signal (int, _sig_func_ptr);
+int	raise (int);
+//void	psignal (int, const char *);
+void	psignal (int signo, char *message);
+#endif
+
+환경변수 추가
+~/.bashrc 수정
+export CFLGAS="$CFLAGS -Wno-include-next"
+source ~/.bashrc
+
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# libtoolize --copy --force && aclocal --force && autoconf && automake --add-missing --copy && autoreconf -ivf &&   ./configure CFLAGS="$CFLAGS -std=c11" CPPFLAGS="$CPPFLAGS" --disable-c23 &&  make
+성공
+
+빌드
+rm -f config.cache && 
+cd /c/gcc-14.2.0 && 
+libtoolize --copy --force && 
+aclocal --force && 
+autoconf && 
+automake --add-missing --copy && 
+autoreconf -ivf && 
+sed -i '/if test ! -r "\$srcdir\/\$ac_unique_file"; then/i srcdir=\/c\/gcc-14.2.0' configure 
+sed -i 's/ -V -qversion -version/ --version/g' configure 
+sed -i 's/ -V -qversion/ --version/g' configure 
+sed -i 's/$NM -V/$NM --version/g' configure 
+sed -i 's/$CC -V/$CC --version/g' configure && 
+sed -i -e '/#include <stdbit.h>/d' \
+       -e 's/static_assert (__STDC_ENDIAN_LITTLE__ != __STDC_ENDIAN_BIG__);/\
+#ifndef __STDC_ENDIAN_LITTLE__\n\
+  #define __STDC_ENDIAN_LITTLE__ 1\n\
+  #define __STDC_ENDIAN_BIG__ 0\n\
+#endif\n\
+static_assert(__STDC_ENDIAN_LITTLE__ != __STDC_ENDIAN_BIG__, "Endianness conflict detected");/' \
+       -e 's/static typeof (1 + 1L) two/static long int two/' \
+       configure
+sed -i -e '/for ac_header in dlfcn.h/,/done/d' \
+       -e '/#if HAVE_DLFCN_H/,/#endif/d' \
+       configure 
+cd /c/gcc-build && 
+/c/gcc-14.2.0/configure --disable-sanity-checks --disable-dlfcn --disable-shared --build=x86_64-w64-mingw32 --host=x86_64-w64-mingw32 --srcdir="$SRCDIR" --prefix=/usr/local --with-install="$ac_install_sh" --enable-languages=c,c++,fortran,lto,objc && 
+mingw32-make
+(오류)
+/c/gcc-build/config.log
+configure: program exited with status 1
+configure: failed program was:
+| /* confdefs.h */
+| #define PACKAGE_NAME "gcc"
+| #define PACKAGE_TARNAME "gcc-14.2.0"
+| #define PACKAGE_VERSION "14.2.0"
+| #define PACKAGE_STRING "gcc 14.2.0"
+| #define PACKAGE_BUGREPORT "gcc-help@gcc.gnu.org"
+| #define PACKAGE_URL ""
+| #define PACKAGE "gcc-14.2.0"
+| #define VERSION "14.2.0"
+| /* end confdefs.h.  */
+| #include <ctype.h>
+| #include <stdlib.h>
+| #if ((' ' & 0x0FF) == 0x020)
+| # define ISLOWER(c) ('a' <= (c) && (c) <= 'z')
+| # define TOUPPER(c) (ISLOWER(c) ? 'A' + ((c) - 'a') : (c))
+| #else
+| # define ISLOWER(c) 		   (('a' <= (c) && (c) <= 'i') 		     || ('j' <= (c) && (c) <= 'r') 		     || ('s' <= (c) && (c) <= 'z'))
+| # define TOUPPER(c) (ISLOWER(c) ? ((c) | 0x40) : (c))
+| #endif
+| 
+| #define XOR(e, f) (((e) && !(f)) || (!(e) && (f)))
+| int
+| main ()
+| {
+|   int i;
+|   for (i = 0; i < 256; i++)
+|     if (XOR (islower (i), ISLOWER (i))
+| 	|| toupper (i) != TOUPPER (i))
+|       return 2;
+|   return 0;
+| }
+configure:8947: result: no
+C:/msys64/usr/include/inttypes.h:28:9: warning: "__STRINGIFY" redefined
+   28 | #define __STRINGIFY(a) #a
+      |         ^~~~~~~~~~~
+In file included from C:\msys64\mingw64\x86_64-w64-mingw32\include/_mingw.h:10,
+                 from C:\msys64\mingw64\x86_64-w64-mingw32\include/corecrt.h:10,
+                 from C:\msys64\mingw64\x86_64-w64-mingw32\include/crtdefs.h:10,
+                 from C:\msys64\mingw64\x86_64-w64-mingw32\include/stddef.h:7,
+                 from C:/msys64/usr/include/sys/cdefs.h:47,
+                 from C:/msys64/usr/include/stdio.h:35,
+                 from conftest.c:17:
+C:\msys64\mingw64\x86_64-w64-mingw32\include/_mingw_mac.h:10:9: note: this is the location of the previous definition
+   10 | #define __STRINGIFY(x) #x
+      |         ^~~~~~~~~~~
+configure:8960: $? = 0
+C:/msys64/usr/include/inttypes.h:28:9: warning: "__STRINGIFY" redefined
+   28 | #define __STRINGIFY(a) #a
+      |         ^~~~~~~~~~~
+In file included from C:\msys64\mingw64\x86_64-w64-mingw32\include/_mingw.h:10,
+                 from C:\msys64\mingw64\x86_64-w64-mingw32\include/corecrt.h:10,
+                 from C:\msys64\mingw64\x86_64-w64-mingw32\include/crtdefs.h:10,
+                 from C:\msys64\mingw64\x86_64-w64-mingw32\include/stddef.h:7,
+                 from C:/msys64/usr/include/sys/cdefs.h:47,
+                 from C:/msys64/usr/include/stdio.h:35,
+                 from conftest.c:18:
+C:\msys64\mingw64\x86_64-w64-mingw32\include/_mingw_mac.h:10:9: note: this is the location of the previous definition
+   10 | #define __STRINGIFY(x) #x
+      |         ^~~~~~~~~~~
+configure:8960: $? = 0
+C:/msys64/usr/include/inttypes.h:28:9: warning: "__STRINGIFY" redefined
+   28 | #define __STRINGIFY(a) #a
+      |         ^~~~~~~~~~~
+In file included from C:\msys64\mingw64\x86_64-w64-mingw32\include/_mingw.h:10,
+                 from C:\msys64\mingw64\x86_64-w64-mingw32\include/corecrt.h:10,
+                 from C:\msys64\mingw64\x86_64-w64-mingw32\include/crtdefs.h:10,
+                 from C:\msys64\mingw64\x86_64-w64-mingw32\include/stddef.h:7,
+                 from C:/msys64/usr/include/sys/cdefs.h:47,
+                 from C:/msys64/usr/include/stdio.h:35,
+                 from conftest.c:19:
+C:\msys64\mingw64\x86_64-w64-mingw32\include/_mingw_mac.h:10:9: note: this is the location of the previous definition
+   10 | #define __STRINGIFY(x) #x
+      |         ^~~~~~~~~~~
+conftest.cpp:9:9: warning: "VERSION" redefined
+    9 | #define VERSION "14.2.0"
+      |         ^~~~~~~
+<command-line>: note: this is the location of the previous definition
+conftest.cpp: In function 'int main()':
+conftest.cpp:166:25: warning: empty parentheses were disambiguated as a function declaration [-Wvexing-parse]
+  166 |   cxx11test::delegate d2();
+      |                         ^~
+conftest.cpp:166:25: note: remove parentheses to default-initialize a variable
+  166 |   cxx11test::delegate d2();
+      |                         ^~
+      |                         --
+conftest.cpp:22:10: fatal error: ac_nonexistent.h: No such file or directory
+   22 | #include <ac_nonexistent.h>
+      |          ^~~~~~~~~~~~~~~~~~
+compilation terminated.
+configure:16779: $? = 1
+configure: failed program was:
+| /* confdefs.h */
+| #define PACKAGE_NAME "gcc"
+| #define PACKAGE_TARNAME "gcc-14.2.0"
+| #define PACKAGE_VERSION "14.2.0"
+| #define PACKAGE_STRING "gcc 14.2.0"
+| #define PACKAGE_BUGREPORT "gcc-help@gcc.gnu.org"
+| #define PACKAGE_URL ""
+| #define PACKAGE "gcc-14.2.0"
+| #define VERSION "14.2.0"
+| #define HAVE_SYS_TYPES_H 1
+| #define HAVE_SYS_STAT_H 1
+| #define HAVE_STDLIB_H 1
+| #define HAVE_STRING_H 1
+| #define HAVE_MEMORY_H 1
+| #define HAVE_STRINGS_H 1
+| #define HAVE_INTTYPES_H 1
+| #define HAVE_STDINT_H 1
+| #define HAVE_UNISTD_H 1
+| #define LT_OBJDIR ".libs/"
+| #define MY_PACKAGE_VERSION "14.2.0"
+| /* end confdefs.h.  */
+| #include <ac_nonexistent.h>
+conftest.cpp:22:10: fatal error: ac_nonexistent.h: No such file or directory
+   22 | #include <ac_nonexistent.h>
+      |          ^~~~~~~~~~~~~~~~~~
+compilation terminated.
+configure:16838: $? = 1
+configure: failed program was:
+| /* confdefs.h */
+| #define PACKAGE_NAME "gcc"
+| #define PACKAGE_TARNAME "gcc-14.2.0"
+| #define PACKAGE_VERSION "14.2.0"
+| #define PACKAGE_STRING "gcc 14.2.0"
+| #define PACKAGE_BUGREPORT "gcc-help@gcc.gnu.org"
+| #define PACKAGE_URL ""
+| #define PACKAGE "gcc-14.2.0"
+| #define VERSION "14.2.0"
+| #define HAVE_SYS_TYPES_H 1
+| #define HAVE_SYS_STAT_H 1
+| #define HAVE_STDLIB_H 1
+| #define HAVE_STRING_H 1
+| #define HAVE_MEMORY_H 1
+| #define HAVE_STRINGS_H 1
+| #define HAVE_INTTYPES_H 1
+| #define HAVE_STDINT_H 1
+| #define HAVE_UNISTD_H 1
+| #define LT_OBJDIR ".libs/"
+| #define MY_PACKAGE_VERSION "14.2.0"
+| /* end confdefs.h.  */
+| #include <ac_nonexistent.h>
+conftest.cpp:9:9: warning: "VERSION" redefined
+    9 | #define VERSION "14.2.0"
+      |         ^~~~~~~
+
+
