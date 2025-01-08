@@ -44006,7 +44006,7 @@ void	psignal (int signo, char *message);
 
 환경변수 추가
 ~/.bashrc 수정
-export CFLGAS="$CFLAGS -Wno-include-next"
+export CFLAGS="$CFLAGS -Wno-include-next"
 source ~/.bashrc
 
 nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
@@ -44189,5 +44189,27 @@ configure: failed program was:
 conftest.cpp:9:9: warning: "VERSION" redefined
     9 | #define VERSION "14.2.0"
       |         ^~~~~~~
+(수정)
+C:\msys64\usr\include\inttypes.h 수정
+#ifndef __STRINGIGY /* 수정 - 중복체크 */
+#define __STRINGIFY(a) #a
+#endif /* 수정 - 중복체크 */
+configure.ac 수정
+m4_include([../config/no-executables.m4])
 
+AC_INIT([libiberty], [1.0], [maintainer@example.com])
+AC_CONFIG_AUX_DIR([build-aux])
+AC_CONFIG_SRCDIR([xmalloc.c])
+AC_CONFIG_MACRO_DIRS([../config])
+AC_CONFIG_MACRO_DIRS([../m4])
+AC_CANONICAL_TARGET
+AC_CANONICAL_SYSTEM
+AM_INIT_AUTOMAKE([foreign subdir-objects])
+
+# VERSION 정의를 PROJECT_VERSION으로 대체하고 조건부 정의 추가
+AH_VERBATIM([PROJECT_VERSION],
+[/* Define PROJECT_VERSION if not already defined */
+#ifndef PROJECT_VERSION
+#define PROJECT_VERSION "$VERSION"
+#endif])
 
