@@ -44194,6 +44194,12 @@ C:\msys64\usr\include\inttypes.h 수정
 #ifndef __STRINGIGY /* 수정 - 중복체크 */
 #define __STRINGIFY(a) #a
 #endif /* 수정 - 중복체크 */
+
+C:\msys64\mingw64\x86_64-w64-mingw32\include\_mingw_mac.h 수정
+#ifndef __STRINGIFY /* 수정 - 중복제거 */
+#define __STRINGIFY(x) #x
+#endif /* 수정 - 중복제거 */
+
 configure.ac 수정
 m4_include([../config/no-executables.m4])
 
@@ -44213,3 +44219,7 @@ AH_VERBATIM([PROJECT_VERSION],
 #define PROJECT_VERSION "$VERSION"
 #endif])
 
+환경변수 추가
+~/.bashrc 수정
+export CFLAGS="$CFLAGS -D_GNU_SOURCE"
+source ~/.bashrc
