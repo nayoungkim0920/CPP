@@ -45287,3 +45287,265 @@ LDADD = -lws2_32 -ladvapi32
 환경설정 수정(~/.bashrc 수정)
 export CFLAGS="$CFLAGS -D__USE_MINGW_ANSI_STDIO=1"
 source ~/.bashrc
+(오류)
+configure: error: ws2_32 library is required
+(수정)
+Windows에서 소켓 프로그래밍을 위한 라이브러리
+MSYS2 패키지 업데이트(MSYS2 환경을 최신 상태로 업데이트)
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# pacman -Syu
+ws2_32 설치
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# pacman -S mingw-w64-x86_64-crt
+ws2_32 설치 확인
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# ls /mingw64/lib | grep ws2_32
+libws2_32.a
+
+/c/gcc-14.2.0/libiberty/configure.ac 수정
+AC_CHECK_LIB([ws2_32], [socket], [
+  LIBS="$LIBS -lws2_32"
+], [
+  AC_MSG_ERROR([ws2_32 library is required])
+])
+
+AC_CHECK_LIB([advapi32], [RegOpenKeyEx], [
+  LIBS="$LIBS -ladvapi32"
+], [
+  AC_MSG_ERROR([advapi32 library is required])
+])
+(오류)
+configure: error: advapi32 library is required
+(수정)
+설치확인
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# ls /mingw64/lib | grep advapi32
+libadvapi32.a
+환경변수확인
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# echo $LDFLAGS
+-L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0 -L/mingw64/lib -L/usr/lib -L/mingw64/x86_64-w64-mingw32/lib -L/c/libidn2/gettext-0.22.5/libtextstyle/lib -Wl,-rpath,/mingw64/bin
+
+/c/gcc-14.2.0/libiberty/configure.ac 수정
+AC_CHECK_LIB([advapi32], [RegOpenKeyExA], [
+  LIBS="$LIBS -ladvapi32"
+], [
+  AC_MSG_ERROR([advapi32 library is required])
+])
+(오류)
+C:\msys64\mingw64\x86_64-w64-mingw32\bin\ar.exe: `u' modifier ignored since `D' is the default (see `U')
+ranlib libiberty.a
+(수정)
+/c/gcc-14.2.0/libiberty/configure 확인
+16661 : old_archive_cmds_CXX='$CC -ar -WR,-u -o $oldlib $oldobjs'
+=> old_archive_cmds_CXX='$CC -ar -WR -o $oldlib $oldobjs'
+빌드 명령어 수정
+libtoolize --copy --force && aclocal --force && autoconf && automake --add-missing --copy && autoreconf -ivf && 
+sed -i '/^ac_save_CC=\$CC/i ac_cv_prog_cc_c23=no' configure 
+sed -i 's/\$ac_c_conftest_c23_program//g' configure 
+sed -i '/ac_fn_c_check_header_mongrel.*"minix\/config.h"/,/^  fi/d' configure 
+sed -i 's/cxx11test::delegate d2();/cxx11test::delegate d2{};/g' configure
+sed -i '/^ VERSION='\''1\.0'\''$/d' configure 
+sed -i "/# define ISLOWER/c\#define ISLOWER(c) (islower(c))" configure
+sed -i "/# define TOUPPER/c\#define TOUPPER(c) (toupper(c))" configure 
+sed -i '/&& LARGE_FTYPE % 2147483647 == 1)/d' configure
+sed -i '/int FTYPE_is_large\[/c\
+void check_large_ftype() {\
+    int FTYPE_is_large[(LARGE_FTYPE % 2147483629 == 721 && LARGE_FTYPE % 2147483647 == 1) ? 1 : -1];\
+}' configure 
+sed -i '/\? 1 : -1];/d' configure 
+sed -i 's/\bnot\b/!/g' configure 
+sed -i 's/! big endian/#error "not big endian"/g' configure 
+sed -i 's/! a universal capable compiler//g' configure 
+sed -i 's/! big endian/#if BYTE_ORDER != BIG_ENDIAN\n    #error "not big endian"\n#endif/g' configure 
+sed -i '/^#define VERSION "\$VERSION"$/d' configure 
+sed -i '/old_archive_cmds_CXX=/s/-u//g' configure && 
+./configure &&  make
+(오류)
+configure:4346: x86_64-w64-mingw32-gcc -V >&5
+x86_64-w64-mingw32-gcc.exe: error: unrecognized command-line option '-V'
+x86_64-w64-mingw32-gcc.exe: fatal error: no input files
+compilation terminated.
+configure:4357: $? = 1
+configure:4346: x86_64-w64-mingw32-gcc -qversion >&5
+x86_64-w64-mingw32-gcc.exe: error: unrecognized command-line option '-qversion'; did you mean '--version'?
+x86_64-w64-mingw32-gcc.exe: fatal error: no input files
+compilation terminated.
+configure:4357: $? = 1
+configure:4346: x86_64-w64-mingw32-gcc -version >&5
+x86_64-w64-mingw32-gcc.exe: error: unrecognized command-line option '-version'
+x86_64-w64-mingw32-gcc.exe: fatal error: no input files
+compilation terminated.
+configure:4357: $? = 1
+conftest.c:10:10: fatal error: ac_nonexistent.h: No such file or directory
+   10 | #include <ac_nonexistent.h>
+      |          ^~~~~~~~~~~~~~~~~~
+compilation terminated.
+configure:5228: $? = 1
+conftest.c: In function 'main':
+conftest.c:182:23: error: expected expression before ')' token
+  182 | if (sizeof ((intptr_t)))
+      |                       ^
+configure:21178: $? = 1
+conftest.c: In function 'main':
+conftest.c:183:24: error: expected expression before ')' token
+  183 | if (sizeof ((uintptr_t)))
+      |                        ^
+configure:21214: $? = 1
+conftest.c: In function 'main':
+conftest.c:184:22: error: expected expression before ')' token
+  184 | if (sizeof ((ssize_t)))
+      |                      ^
+configure:21250: $? = 1
+conftest.c: In function 'main':
+conftest.c:186:20: error: expected expression before ')' token
+  186 | if (sizeof ((pid_t)))
+      |                    ^
+configure:21270: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccER4S8u.o:conftest.c:(.text.startup+0xa): undefined reference to `bzero'
+collect2.exe: error: ld returned 1 exit status
+configure:21541: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccgIMizu.o:conftest.c:(.text.startup+0xa): undefined reference to `bcmp'
+collect2.exe: error: ld returned 1 exit status
+configure:21559: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccG3M2ZN.o:conftest.c:(.text.startup+0xa): undefined reference to `bcopy'
+collect2.exe: error: ld returned 1 exit status
+configure:21559: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccGqv65R.o:conftest.c:(.text.startup+0xa): undefined reference to `setenv'
+collect2.exe: error: ld returned 1 exit status
+configure:21559: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccOKYJwg.o:conftest.c:(.text.startup+0xa): undefined reference to `ffs'
+collect2.exe: error: ld returned 1 exit status
+configure:22209: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccyS7ZFC.o:conftest.c:(.text.startup+0xa): undefined reference to `index'
+collect2.exe: error: ld returned 1 exit status
+configure:22209: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccwZ1GaQ.o:conftest.c:(.text.startup+0xa): undefined reference to `insque'
+collect2.exe: error: ld returned 1 exit status
+configure:22209: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cc2b39Ei.o:conftest.c:(.text.startup+0xa): undefined reference to `memmem'
+collect2.exe: error: ld returned 1 exit status
+configure:22209: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cc4j6RIE.o:conftest.c:(.text.startup+0xa): undefined reference to `mkstemps'
+collect2.exe: error: ld returned 1 exit status
+configure:22209: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccMkM0Kd.o:conftest.c:(.text.startup+0xa): undefined reference to `rindex'
+collect2.exe: error: ld returned 1 exit status
+configure:22209: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccgzY15U.o:conftest.c:(.text.startup+0xa): undefined reference to `sigsetmask'
+collect2.exe: error: ld returned 1 exit status
+configure:22209: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccwXQqYb.o:conftest.c:(.text.startup+0xa): undefined reference to `stpcpy'
+collect2.exe: error: ld returned 1 exit status
+configure:22209: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccqTQCD7.o:conftest.c:(.text.startup+0xa): undefined reference to `stpncpy'
+collect2.exe: error: ld returned 1 exit status
+configure:22209: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccyYU8vU.o:conftest.c:(.text.startup+0xa): undefined reference to `strndup'
+collect2.exe: error: ld returned 1 exit status
+configure:22209: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccSJuO4W.o:conftest.c:(.text.startup+0xa): undefined reference to `strverscmp'
+collect2.exe: error: ld returned 1 exit status
+configure:22209: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccY0xrmL.o:conftest.c:(.text.startup+0xa): undefined reference to `waitpid'
+collect2.exe: error: ld returned 1 exit status
+configure:22209: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccYipf68.o:conftest.c:(.text.startup+0xa): undefined reference to `setproctitle'
+collect2.exe: error: ld returned 1 exit status
+configure:22209: $? = 1
+conftest.c:191:10: fatal error: vfork.h: No such file or directory
+  191 | #include <vfork.h>
+      |          ^~~~~~~~~
+compilation terminated.
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cc2H6CZd.o:conftest.c:(.text.startup+0xa): undefined reference to `vfork'
+collect2.exe: error: ld returned 1 exit status
+configure:22329: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccuiqJFn.o:conftest.c:(.text.startup+0xa): undefined reference to `_doprnt'
+collect2.exe: error: ld returned 1 exit status
+configure:22556: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cceRCdlW.o:conftest.c:(.rdata$.refptr.sys_siglist[.refptr.sys_siglist]+0x0): undefined reference to `sys_siglist'
+collect2.exe: error: ld returned 1 exit status
+configure:22587: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccEvxJDU.o:conftest.c:(.text.startup+0xa): undefined reference to `__fsetlocking'
+collect2.exe: error: ld returned 1 exit status
+configure:22640: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccYpnuXj.o:conftest.c:(.text.startup+0xa): undefined reference to `canonicalize_file_name'
+collect2.exe: error: ld returned 1 exit status
+configure:22640: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cckyq1ut.o:conftest.c:(.text.startup+0xa): undefined reference to `dup3'
+collect2.exe: error: ld returned 1 exit status
+configure:22640: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccwfCkrl.o:conftest.c:(.text.startup+0xa): undefined reference to `getrlimit'
+collect2.exe: error: ld returned 1 exit status
+configure:22640: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccWkiibF.o:conftest.c:(.text.startup+0xa): undefined reference to `getrusage'
+collect2.exe: error: ld returned 1 exit status
+configure:22640: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccsmXj4v.o:conftest.c:(.text.startup+0xa): undefined reference to `getsysinfo'
+collect2.exe: error: ld returned 1 exit status
+configure:22640: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccyYDlly.o:conftest.c:(.text.startup+0xa): undefined reference to `on_exit'
+collect2.exe: error: ld returned 1 exit status
+configure:22640: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cccRbJXS.o:conftest.c:(.text.startup+0xa): undefined reference to `pipe2'
+collect2.exe: error: ld returned 1 exit status
+configure:22640: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccOj3dy2.o:conftest.c:(.text.startup+0xa): undefined reference to `posix_spawn'
+collect2.exe: error: ld returned 1 exit status
+configure:22640: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cck0iRMo.o:conftest.c:(.text.startup+0xa): undefined reference to `posix_spawnp'
+collect2.exe: error: ld returned 1 exit status
+configure:22640: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cc0cxSXn.o:conftest.c:(.text.startup+0xa): undefined reference to `psignal'
+collect2.exe: error: ld returned 1 exit status
+configure:22640: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cceRORwu.o:conftest.c:(.text.startup+0xa): undefined reference to `pstat_getdynamic'
+collect2.exe: error: ld returned 1 exit status
+configure:22640: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cco6drJQ.o:conftest.c:(.text.startup+0xa): undefined reference to `pstat_getstatic'
+collect2.exe: error: ld returned 1 exit status
+configure:22640: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cc8OxGJU.o:conftest.c:(.text.startup+0xa): undefined reference to `realpath'
+collect2.exe: error: ld returned 1 exit status
+configure:22640: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccKuxppq.o:conftest.c:(.text.startup+0xa): undefined reference to `setrlimit'
+collect2.exe: error: ld returned 1 exit status
+configure:22640: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccgoDID6.o:conftest.c:(.text.startup+0xa): undefined reference to `strsignal'
+collect2.exe: error: ld returned 1 exit status
+configure:22640: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cc6AESPm.o:conftest.c:(.text.startup+0xa): undefined reference to `sysconf'
+collect2.exe: error: ld returned 1 exit status
+configure:22640: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccyC4GJl.o:conftest.c:(.text.startup+0xa): undefined reference to `sysctl'
+collect2.exe: error: ld returned 1 exit status
+configure:22640: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccWDNbjp.o:conftest.c:(.text.startup+0xa): undefined reference to `sysmp'
+collect2.exe: error: ld returned 1 exit status
+configure:22640: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccQYrxeA.o:conftest.c:(.text.startup+0xa): undefined reference to `table'
+collect2.exe: error: ld returned 1 exit status
+configure:22640: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccSMrGrM.o:conftest.c:(.text.startup+0xa): undefined reference to `times'
+collect2.exe: error: ld returned 1 exit status
+configure:22640: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cckDZXQX.o:conftest.c:(.text.startup+0xa): undefined reference to `wait3'
+collect2.exe: error: ld returned 1 exit status
+configure:22640: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccAs8Dc1.o:conftest.c:(.text.startup+0xa): undefined reference to `wait4'
+collect2.exe: error: ld returned 1 exit status
+configure:22640: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccKJOvTj.o:conftest.c:(.text.startup+0xa): undefined reference to `sbrk'
+collect2.exe: error: ld returned 1 exit status
+configure:22640: $? = 1
+conftest.c: In function 'main':
+conftest.c:235:28: error: 'canonicalize_file_name' undeclared (first use in this function)
+  235 | char *(*pfn) = (char *(*)) canonicalize_file_name
+      |                            ^~~~~~~~~~~~~~~~~~~~~~
+conftest.c:235:28: note: each undeclared identifier is reported only once for each function it appears in
+configure:22870: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cci5zqbO.o:conftest.c:(.text.startup+0x192): undefined reference to `mmap'
+collect2.exe: error: ld returned 1 exit status
+configure:23143: $? = 1
+(수정)
+
