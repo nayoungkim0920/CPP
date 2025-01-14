@@ -45548,4 +45548,253 @@ C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w6
 collect2.exe: error: ld returned 1 exit status
 configure:23143: $? = 1
 (수정)
+빌드명령어 수정
+libtoolize --copy --force && aclocal --force && autoconf && automake --add-missing --copy && autoreconf -ivf && 
+sed -i 's/ -V -qversion -version/ --version/g' configure 
+sed -i 's/ -V -qversion/ --version/g' configure 
+sed -i 's/$NM -V/$NM --version/g' configure 
+sed -i 's/$CC -V/$CC --version/g' configure
+sed -i '/^ac_save_CC=\$CC/i ac_cv_prog_cc_c23=no' configure 
+sed -i 's/\$ac_c_conftest_c23_program//g' configure 
+sed -i '/ac_fn_c_check_header_mongrel.*"minix\/config.h"/,/^  fi/d' configure 
+sed -i 's/cxx11test::delegate d2();/cxx11test::delegate d2{};/g' configure
+sed -i '/^ VERSION='\''1\.0'\''$/d' configure 
+sed -i "/# define ISLOWER/c\#define ISLOWER(c) (islower(c))" configure
+sed -i "/# define TOUPPER/c\#define TOUPPER(c) (toupper(c))" configure 
+sed -i '/&& LARGE_FTYPE % 2147483647 == 1)/d' configure
+sed -i '/int FTYPE_is_large\[/c\
+void check_large_ftype() {\
+    int FTYPE_is_large[(LARGE_FTYPE % 2147483629 == 721 && LARGE_FTYPE % 2147483647 == 1) ? 1 : -1];\
+}' configure 
+sed -i '/\? 1 : -1];/d' configure 
+sed -i 's/\bnot\b/!/g' configure 
+sed -i 's/! big endian/#error "not big endian"/g' configure 
+sed -i 's/! a universal capable compiler//g' configure 
+sed -i 's/! big endian/#if BYTE_ORDER != BIG_ENDIAN\n    #error "not big endian"\n#endif/g' configure 
+sed -i '/^#define VERSION "\$VERSION"$/d' configure 
+sed -i '/old_archive_cmds_CXX=/s/-u//g' configure && 
+./configure &&  make
+
+conftest.c:10:10: fatal error: ac_nonexistent.h: No such file or directory
+필수헤더설치
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# pacman -S mingw-w64-x86_64-headers
+
+undefined reference to `bzero'
+링커가 특정 함수(bzero, setenv, mmap 등)를 찾지 못함 
+POSIX 함수 : -lws2_32 또는 -lmsvcrt 옵션 추가
+glibc 함수 : mingw-w64에 맞는 라이브러리나 헤더를 추가로 설치
+
+undefined reference to `posix_spawn`
+mingw-w64-crt 라이브러리 설치
+
+canonicalize_file_name undeclared
+정의되지 않은 함수 또는 헤더 파일을 참조
+configure 스크립트 또는 소스 코드를 수정하여 해당 함수를 제외
+
+MSYS2 환경(개발 도구를 최신 상태로 유지)
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# pacman -Syu
+pacman -S base-devel mingw-w64-x86_64-toolchain
+
+undefined reference to 'bzero'(bzero 함수는 libmsvcrt 또는 libws2_32에 포함된 함수로 대체)
+/c/gcc-14.2.0/libiberty/configure.ac 수정
+####################################################################################
+AC_CHECK_FUNCS([bzero bcmp bcopy setenv random])
+
+if test "$ac_cv_func_bzero" = "no"; then
+  AC_DEFINE([HAVE_BZERO], [0], [Define if bzero is not available])
+  AC_LIBOBJ([bzero])
+else
+  AC_DEFINE([HAVE_BZERO], [1], [Define if bzero is available])
+fi
+
+if test "$ac_cv_func_bcmp" = "no"; then
+  AC_DEFINE([HAVE_BCMP], [0], [Define if bcmp is not available])
+  AC_LIBOBJ([bcmp])
+fi
+
+if test "$ac_cv_func_bcopy" = "no"; then
+  AC_DEFINE([HAVE_BCOPY], [0], [Define if bcopy is not available])
+  AC_LIBOBJ([bcopy])
+fi
+
+if test "$ac_cv_func_setenv" = "no"; then
+  AC_DEFINE([HAVE_SETENV], [0], [Define if setenv is not available])
+  AC_LIBOBJ([setenv])
+fi
+
+# Check for ws2_32 library
+AC_CHECK_LIB([ws2_32], [socket], [
+  LIBS="$LIBS -lws2_32"
+], [
+  AC_MSG_ERROR([ws2_32 library is required for network functions])
+])
+
+# Check for advapi32 library
+AC_CHECK_LIB([advapi32], [RegOpenKeyExA], [
+  LIBS="$LIBS -ladvapi32"
+], [
+  AC_MSG_ERROR([advapi32 library is required for registry functions])
+])
+####################################################################################
+
+undefined reference to 'posix_spawn'
+posix_spawn은 POSIX 시스템에서 사용되는 함수로, Windows에서는 기본적으로 지원되지 않음
+mingw-w64-crt 라이브러리를 설치
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# pacman -S mingw-w64-x86_64-crt
+
+canonicalize_file_name undeclared
+POSIX 환경에서 파일 경로를 정규화하는 함수로, Windows(MinGW) 환경에서는 기본적으로 제공되지 않음 
+AC_CHECK_FUNCS([canonicalize_file_name]) 부분을 찾아서 주석 처리
+Windows에서 유사한 작업을 수행하려면 GetFullPathName API를 사용
+
+/c/gcc-14.2.0/libiberty/configure.ac 수정
+####################################################################################
+AC_CHECK_FUNCS([bzero bcmp bcopy setenv random])
+
+if test "$ac_cv_func_bzero" = "no"; then
+  AC_DEFINE([HAVE_BZERO], [0], [Define if bzero is not available])
+  AC_LIBOBJ([bzero])
+else
+  AC_DEFINE([HAVE_BZERO], [1], [Define if bzero is available])
+fi
+
+if test "$ac_cv_func_bcmp" = "no"; then
+  AC_DEFINE([HAVE_BCMP], [0], [Define if bcmp is not available])
+  AC_LIBOBJ([bcmp])
+fi
+
+if test "$ac_cv_func_bcopy" = "no"; then
+  AC_DEFINE([HAVE_BCOPY], [0], [Define if bcopy is not available])
+  AC_LIBOBJ([bcopy])
+fi
+
+if test "$ac_cv_func_setenv" = "no"; then
+  AC_DEFINE([HAVE_SETENV], [0], [Define if setenv is not available])
+  AC_LIBOBJ([setenv])
+fi
+
+# posix_spawn 확인
+AC_CHECK_FUNCS([posix_spawn], [], [
+  AC_MSG_WARN([posix_spawn이 없으므로, Windows에서는 CreateProcess를 사용합니다.])
+  AC_DEFINE([HAVE_POSIX_SPAWN], [0], [Define if posix_spawn is not available])
+  AC_DEFINE([USE_CREATEPROCESS], [1], [Define if CreateProcess is used instead of posix_spawn on Windows])
+])
+
+# canonicalize_file_name 확인
+AC_CHECK_FUNCS([canonicalize_file_name], [], [
+  AC_MSG_WARN([canonicalize_file_name이 없으므로, Windows에서는 GetFullPathName을 사용합니다.])
+  AC_DEFINE([HAVE_CANONICALIZE_FILE_NAME], [0], [Define if canonicalize_file_name is not available])
+  AC_DEFINE([USE_GETFULLPATHNAME], [1], [Define if GetFullPathName is used instead of canonicalize_file_name on Windows])
+])
+
+# Check for ws2_32 library
+AC_CHECK_LIB([ws2_32], [socket], [
+  LIBS="$LIBS -lws2_32"
+], [
+  AC_MSG_ERROR([ws2_32 library is required for network functions])
+])
+
+# Check for advapi32 library
+AC_CHECK_LIB([advapi32], [RegOpenKeyExA], [
+  LIBS="$LIBS -ladvapi32"
+], [
+  AC_MSG_ERROR([advapi32 library is required for registry functions])
+])
+####################################################################################
+(오류)
+conftest.c:182:23: error: expected expression before ')' token
+  182 | if (sizeof ((intptr_t)))
+      |                       ^
+configure:21178: $? = 1
+conftest.c:183:24: error: expected expression before ')' token
+  183 | if (sizeof ((uintptr_t)))
+      |                        ^
+configure:21214: $? = 1
+conftest.c:184:22: error: expected expression before ')' token
+  184 | if (sizeof ((ssize_t)))
+      |                      ^
+configure:21250: $? = 1
+conftest.c:186:20: error: expected expression before ')' token
+  186 | if (sizeof ((pid_t)))
+      |                    ^
+configure:21270: $? = 1
+(수정)
+빌드명령어 수정
+libtoolize --copy --force && aclocal --force && autoconf && automake --add-missing --copy && autoreconf -ivf && 
+sed -i 's/ -V -qversion -version/ --version/g' configure 
+sed -i 's/ -V -qversion/ --version/g' configure 
+sed -i 's/$NM -V/$NM --version/g' configure 
+sed -i 's/$CC -V/$CC --version/g' configure
+sed -i '/^ac_save_CC=\$CC/i ac_cv_prog_cc_c23=no' configure 
+sed -i 's/\$ac_c_conftest_c23_program//g' configure 
+sed -i '/ac_fn_c_check_header_mongrel.*"minix\/config.h"/,/^  fi/d' configure 
+sed -i 's/cxx11test::delegate d2();/cxx11test::delegate d2{};/g' configure
+sed -i '/^ VERSION='\''1\.0'\''$/d' configure 
+sed -i "/# define ISLOWER/c\#define ISLOWER(c) (islower(c))" configure
+sed -i "/# define TOUPPER/c\#define TOUPPER(c) (toupper(c))" configure 
+sed -i '/&& LARGE_FTYPE % 2147483647 == 1)/d' configure
+sed -i '/int FTYPE_is_large\[/c\
+void check_large_ftype() {\
+    int FTYPE_is_large[(LARGE_FTYPE % 2147483629 == 721 && LARGE_FTYPE % 2147483647 == 1) ? 1 : -1];\
+}' configure 
+sed -i '/\? 1 : -1];/d' configure 
+sed -i 's/\bnot\b/!/g' configure 
+sed -i 's/! big endian/#error "not big endian"/g' configure 
+sed -i 's/! a universal capable compiler//g' configure 
+sed -i 's/! big endian/#if BYTE_ORDER != BIG_ENDIAN\n    #error "not big endian"\n#endif/g' configure 
+sed -i '/^#define VERSION "\$VERSION"$/d' configure 
+sed -i '/old_archive_cmds_CXX=/s/-u//g' configure 
+sed -i 's/if (sizeof ((\$\([^)]*\))))/if (sizeof (\1))/g' configure && 
+./configure &&  make
+(오류)
+config.h:546:15: error: two or more data types in declaration specifiers
+  546 | #define pid_t __int64
+      |               ^~~~~~~
+C:/msys64/usr/include/sys/types.h:172:25: note: in expansion of macro 'pid_t'
+  172 | typedef __pid_t         pid_t;          /* process id */
+      |                         ^~~~~
+config.h:546:15: error: two or more data types in declaration specifiers
+  546 | #define pid_t __int64
+      |               ^~~~~~~
+C:/msys64/usr/include/sys/types.h:172:25: note: in expansion of macro 'pid_t'
+  172 | typedef __pid_t         pid_t;          /* process id */
+      |                         ^~~~~
+(수정)
+pid_t가 두 번 정의되어 충돌하는 문제
+configure.ac에서 pid_t 정의를 조건부로 하여, sys/types.h가 이미 포함된 경우 이를 중복 정의하지 않도록 설정 
+/c/gcc-14.2.0/libiberty/configure.ac 수정
+# AC_TYPE_PID_T
+#################################################################
+# Check for pid_t type
+AC_CHECK_TYPE([pid_t],
+  [AC_DEFINE([HAVE_PID_T], [1], [Define if pid_t is available])],
+  [AC_DEFINE_UNQUOTED([pid_t], [int], [Define pid_t to int if not defined in sys/types.h])]
+)
+#################################################################
+
+
+
+
+configure: WARNING: posix_spawn이 없으므로, Windows에서는 CreateProcess를 사용합니다.
+checking for canonicalize_file_name... no
+configure: WARNING: canonicalize_file_name이 없으므로, Windows에서는 GetFullPathName을 사용합니다.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
