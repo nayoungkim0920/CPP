@@ -1,0 +1,1433 @@
+(오류)
+configure: failed program was:
+| /* confdefs.h */
+| #define PACKAGE_NAME "libiberty"
+| #define PACKAGE_TARNAME "libiberty-1.0"
+| #define PACKAGE_VERSION "1.0"
+| #define PACKAGE_STRING "libiberty 1.0"
+| #define PACKAGE_BUGREPORT "maintainer@example.com"
+| #define PACKAGE_URL ""
+| #define PACKAGE "libiberty-1.0"
+| #define STDC_HEADERS 1
+| #define HAVE_SYS_TYPES_H 1
+| #define HAVE_SYS_STAT_H 1
+| #define HAVE_STDLIB_H 1
+| #define HAVE_STRING_H 1
+| #define HAVE_MEMORY_H 1
+| #define HAVE_STRINGS_H 1
+| #define HAVE_INTTYPES_H 1
+| #define HAVE_STDINT_H 1
+| #define HAVE_UNISTD_H 1
+| #define __EXTENSIONS__ 1
+| #define _ALL_SOURCE 1
+| #define _GNU_SOURCE 1
+| #define _POSIX_PTHREAD_SEMANTICS 1
+| #define _TANDEM_SOURCE 1
+| #define HAVE_DLFCN_H 1
+| #define LT_OBJDIR ".libs/"
+| #define HAVE_SYS_FILE_H 1
+| #define HAVE_SYS_FILE_H 1
+| #define HAVE_SYS_PARAM_H 1
+| #define HAVE_LIMITS_H 1
+| #define HAVE_STDIO_EXT_H 1
+| #define HAVE_SYS_PARAM_H 1
+| #define HAVE_SYS_FILE_H 1
+| #define HAVE_SYS_PARAM_H 1
+| #define HAVE_LIMITS_H 1
+| #define HAVE_STDIO_EXT_H 1
+| #define HAVE_LIMITS_H 1
+| #define HAVE_SYS_FILE_H 1
+| #define HAVE_SYS_PARAM_H 1
+| #define HAVE_LIMITS_H 1
+| #define HAVE_STDIO_EXT_H 1
+| #define HAVE_STDLIB_H 1
+| #define HAVE_SYS_FILE_H 1
+| #define HAVE_SYS_PARAM_H 1
+| #define HAVE_LIMITS_H 1
+| #define HAVE_STDIO_EXT_H 1
+| #define HAVE_MALLOC_H 1
+| #define HAVE_SYS_FILE_H 1
+| #define HAVE_SYS_PARAM_H 1
+| #define HAVE_LIMITS_H 1
+| #define HAVE_STDIO_EXT_H 1
+| #define HAVE_STRING_H 1
+| #define HAVE_SYS_FILE_H 1
+| #define HAVE_SYS_PARAM_H 1
+| #define HAVE_LIMITS_H 1
+| #define HAVE_STDIO_EXT_H 1
+| #define HAVE_UNISTD_H 1
+| #define HAVE_SYS_FILE_H 1
+| #define HAVE_SYS_PARAM_H 1
+| #define HAVE_LIMITS_H 1
+| #define HAVE_STDIO_EXT_H 1
+| #define HAVE_STRINGS_H 1
+| #define HAVE_SYS_FILE_H 1
+| #define HAVE_SYS_PARAM_H 1
+| #define HAVE_LIMITS_H 1
+| #define HAVE_STDIO_EXT_H 1
+| #define HAVE_SYS_TIME_H 1
+| #define HAVE_SYS_FILE_H 1
+| #define HAVE_SYS_PARAM_H 1
+| #define HAVE_LIMITS_H 1
+| #define HAVE_STDIO_EXT_H 1
+| #define HAVE_TIME_H 1
+| #define HAVE_SYS_FILE_H 1
+| #define HAVE_SYS_PARAM_H 1
+| #define HAVE_LIMITS_H 1
+| #define HAVE_STDIO_EXT_H 1
+| #define HAVE_FCNTL_H 1
+| #define HAVE_SYS_FILE_H 1
+| #define HAVE_SYS_PARAM_H 1
+| #define HAVE_LIMITS_H 1
+| #define HAVE_STDIO_EXT_H 1
+| #define HAVE_ALLOCA_H 1
+| #define HAVE_SYS_FILE_H 1
+| #define HAVE_SYS_PARAM_H 1
+| #define HAVE_LIMITS_H 1
+| #define HAVE_STDIO_EXT_H 1
+| #define HAVE_STDINT_H 1
+| #define HAVE_SYS_FILE_H 1
+| #define HAVE_SYS_PARAM_H 1
+| #define HAVE_LIMITS_H 1
+| #define HAVE_STDIO_EXT_H 1
+| #define HAVE_PROCESS_H 1
+| #define HAVE_SYS_FILE_H 1
+| #define HAVE_SYS_PARAM_H 1
+| #define HAVE_LIMITS_H 1
+| #define HAVE_STDIO_EXT_H 1
+| #define HAVE_WINDOWS_REPLACEMENT_FOR_RESOURCE 1
+| #define HAVE_SYS_WAIT_H 1
+| #define TIME_WITH_SYS_TIME 1
+| /* end confdefs.h.  */
+| #include <stdio.h>
+| #ifdef HAVE_SYS_TYPES_H
+| # include <sys/types.h>
+| #endif
+| #ifdef HAVE_SYS_STAT_H
+| # include <sys/stat.h>
+| #endif
+| #ifdef STDC_HEADERS
+| # include <stdlib.h>
+| # include <stddef.h>
+| #else
+| # ifdef HAVE_STDLIB_H
+| #  include <stdlib.h>
+| # endif
+| #endif
+| #ifdef HAVE_STRING_H
+| # if !defined STDC_HEADERS && defined HAVE_MEMORY_H
+| #  include <memory.h>
+| # endif
+| # include <string.h>
+| #endif
+| #ifdef HAVE_STRINGS_H
+| # include <strings.h>
+| #endif
+| #ifdef HAVE_INTTYPES_H
+| # include <inttypes.h>
+| #endif
+| #ifdef HAVE_STDINT_H
+| # include <stdint.h>
+| #endif
+| #ifdef HAVE_UNISTD_H
+| # include <unistd.h>
+| #endif
+| static long int longval () { return (long int) (sizeof (int)); }
+| static unsigned long int ulongval () { return (long int) (sizeof (int)); }
+| #include <stdio.h>
+| #include <stdlib.h>
+| int
+| main ()
+| {
+| 
+|   FILE *f = fopen ("conftest.val", "w");
+|   if (! f)
+|     return 1;
+|   if (((long int) (sizeof (int))) < 0)
+|     {
+|       long int i = longval ();
+|       if (i != ((long int) (sizeof (int))))
+| 	return 1;
+|       fprintf (f, "%ld", i);
+|     }
+|   else
+|     {
+|       unsigned long int i = ulongval ();
+|       if (i != ((long int) (sizeof (int))))
+| 	return 1;
+|       fprintf (f, "%lu", i);
+|     }
+|   /* Do ! output a trailing newline, as this causes \r\n confusion
+|      on some platforms.  */
+|   return ferror (f) || fclose (f) != 0;
+| 
+|   ;
+|   return 0;
+| }
+configure:21015: result: 0
+(수정)
+/c/gcc-14.2.0/libiberty/configure.ac 수정
+# sys/pstat.h sys/sysmp.h machine/hal_sysinfo.h sys/table.h sys/sysctl.h sys/systemcfg.h sys/resource.h sys/mman.h sys/sysinfo.h stdio_ext.h sys/prctl.h spawn.h sys/file.h 제거
+AC_CHECK_HEADERS([sys/param.h limits.h stdlib.h malloc.h string.h unistd.h strings.h sys/time.h time.h fcntl.h alloca.h stdint.h process.h],
+    [#AC_DEFINE([HAVE_SYS_FILE_H], [1], [Define if sys/file.h is available])
+     AC_DEFINE([HAVE_SYS_PARAM_H], [1], [Define if sys/param.h is available])
+     AC_DEFINE([HAVE_LIMITS_H], [1], [Define if limits.h is available])
+     # AC_DEFINE([HAVE_STDIO_H], [1], [Define if stdio.h is available])
+     # AC_DEFINE([HAVE_SYS_RESOURCE_H], [1], [Define if sys/resource.h is available])
+     # AC_DEFINE([HAVE_SYS_MMAN_H], [1], [Define if sys/mman.h is available])
+     # AC_DEFINE([HAVE_SYS_PSTAT_H], [1], [Define if sys/pstat.h is available])
+     # AC_DEFINE([HAVE_SYS_SYSMP_H], [1], [Define if sys/sysmp.h is available])
+     # AC_DEFINE([HAVE_SYS_SYSINFO_H], [1], [Define if sys/sysinfo.h is available])
+     # AC_DEFINE([HAVE_MACHINE_HAL_SYSINFO_H], [1], [Define if machine/hal_sysinfo.h is available])
+     # AC_DEFINE([HAVE_SYS_TABLE_H], [1], [Define if sys/table.h is available])
+     # AC_DEFINE([HAVE_SYS_SYSCTL_H], [1], [Define if sys/sysctl.h is available])
+     # AC_DEFINE([HAVE_SYS_SYSTEMCFG_H], [1], [Define if sys/systemcfg.h is available])
+     AC_DEFINE([HAVE_STDIO_EXT_H], [1], [Define if stdio_ext.h is available])
+     # AC_DEFINE([HAVE_SYS_PRCTL_H], [1], [Define if sys/prctl.h is available])
+     # AC_DEFINE([HAVE_SPAWN_H], [1], [Define if spawn.h is available])],
+    [AC_MSG_WARN([Some headers are missing])])
+(오류)
+configure: failed program was:
+| /* confdefs.h */
+| #define PACKAGE_NAME "libiberty"
+| #define PACKAGE_TARNAME "libiberty-1.0"
+| #define PACKAGE_VERSION "1.0"
+| #define PACKAGE_STRING "libiberty 1.0"
+| #define PACKAGE_BUGREPORT "maintainer@example.com"
+| #define PACKAGE_URL ""
+| #define PACKAGE "libiberty-1.0"
+| #define STDC_HEADERS 1
+| #define HAVE_SYS_TYPES_H 1
+| #define HAVE_SYS_STAT_H 1
+| #define HAVE_STDLIB_H 1
+| #define HAVE_STRING_H 1
+| #define HAVE_MEMORY_H 1
+| #define HAVE_STRINGS_H 1
+| #define HAVE_INTTYPES_H 1
+| #define HAVE_STDINT_H 1
+| #define HAVE_UNISTD_H 1
+| #define __EXTENSIONS__ 1
+| #define _ALL_SOURCE 1
+| #define _GNU_SOURCE 1
+| #define _POSIX_PTHREAD_SEMANTICS 1
+| #define _TANDEM_SOURCE 1
+| #define HAVE_DLFCN_H 1
+| #define LT_OBJDIR ".libs/"
+| #define HAVE_SYS_FILE_H 1
+| #define HAVE_SYS_FILE_H 1
+| #define HAVE_SYS_PARAM_H 1
+| #define HAVE_LIMITS_H 1
+| #define HAVE_STDIO_EXT_H 1
+| #define HAVE_SYS_PARAM_H 1
+| #define HAVE_SYS_FILE_H 1
+| #define HAVE_SYS_PARAM_H 1
+| #define HAVE_LIMITS_H 1
+| #define HAVE_STDIO_EXT_H 1
+| #define HAVE_LIMITS_H 1
+| #define HAVE_SYS_FILE_H 1
+| #define HAVE_SYS_PARAM_H 1
+| #define HAVE_LIMITS_H 1
+| #define HAVE_STDIO_EXT_H 1
+| #define HAVE_STDLIB_H 1
+| #define HAVE_SYS_FILE_H 1
+| #define HAVE_SYS_PARAM_H 1
+| #define HAVE_LIMITS_H 1
+| #define HAVE_STDIO_EXT_H 1
+| #define HAVE_MALLOC_H 1
+| #define HAVE_SYS_FILE_H 1
+| #define HAVE_SYS_PARAM_H 1
+| #define HAVE_LIMITS_H 1
+| #define HAVE_STDIO_EXT_H 1
+| #define HAVE_STRING_H 1
+| #define HAVE_SYS_FILE_H 1
+| #define HAVE_SYS_PARAM_H 1
+| #define HAVE_LIMITS_H 1
+| #define HAVE_STDIO_EXT_H 1
+| #define HAVE_UNISTD_H 1
+| #define HAVE_SYS_FILE_H 1
+| #define HAVE_SYS_PARAM_H 1
+| #define HAVE_LIMITS_H 1
+| #define HAVE_STDIO_EXT_H 1
+| #define HAVE_STRINGS_H 1
+| #define HAVE_SYS_FILE_H 1
+| #define HAVE_SYS_PARAM_H 1
+| #define HAVE_LIMITS_H 1
+| #define HAVE_STDIO_EXT_H 1
+| #define HAVE_SYS_TIME_H 1
+| #define HAVE_SYS_FILE_H 1
+| #define HAVE_SYS_PARAM_H 1
+| #define HAVE_LIMITS_H 1
+| #define HAVE_STDIO_EXT_H 1
+| #define HAVE_TIME_H 1
+| #define HAVE_SYS_FILE_H 1
+| #define HAVE_SYS_PARAM_H 1
+| #define HAVE_LIMITS_H 1
+| #define HAVE_STDIO_EXT_H 1
+| #define HAVE_FCNTL_H 1
+| #define HAVE_SYS_FILE_H 1
+| #define HAVE_SYS_PARAM_H 1
+| #define HAVE_LIMITS_H 1
+| #define HAVE_STDIO_EXT_H 1
+| #define HAVE_ALLOCA_H 1
+| #define HAVE_SYS_FILE_H 1
+| #define HAVE_SYS_PARAM_H 1
+| #define HAVE_LIMITS_H 1
+| #define HAVE_STDIO_EXT_H 1
+| #define HAVE_STDINT_H 1
+| #define HAVE_SYS_FILE_H 1
+| #define HAVE_SYS_PARAM_H 1
+| #define HAVE_LIMITS_H 1
+| #define HAVE_STDIO_EXT_H 1
+| #define HAVE_PROCESS_H 1
+| #define HAVE_SYS_FILE_H 1
+| #define HAVE_SYS_PARAM_H 1
+| #define HAVE_LIMITS_H 1
+| #define HAVE_STDIO_EXT_H 1
+| #define HAVE_WINDOWS_REPLACEMENT_FOR_RESOURCE 1
+| #define HAVE_SYS_WAIT_H 1
+| #define TIME_WITH_SYS_TIME 1
+| /* end confdefs.h.  */
+| #include <stdio.h>
+| #ifdef HAVE_SYS_TYPES_H
+| # include <sys/types.h>
+| #endif
+| #ifdef HAVE_SYS_STAT_H
+| # include <sys/stat.h>
+| #endif
+| #ifdef STDC_HEADERS
+| # include <stdlib.h>
+| # include <stddef.h>
+| #else
+| # ifdef HAVE_STDLIB_H
+| #  include <stdlib.h>
+| # endif
+| #endif
+| #ifdef HAVE_STRING_H
+| # if !defined STDC_HEADERS && defined HAVE_MEMORY_H
+| #  include <memory.h>
+| # endif
+| # include <string.h>
+| #endif
+| #ifdef HAVE_STRINGS_H
+| # include <strings.h>
+| #endif
+| #ifdef HAVE_INTTYPES_H
+| # include <inttypes.h>
+| #endif
+| #ifdef HAVE_STDINT_H
+| # include <stdint.h>
+| #endif
+| #ifdef HAVE_UNISTD_H
+| # include <unistd.h>
+| #endif
+| static long int longval () { return (long int) (sizeof (int)); }
+| static unsigned long int ulongval () { return (long int) (sizeof (int)); }
+| #include <stdio.h>
+| #include <stdlib.h>
+| int
+| main ()
+| {
+| 
+|   FILE *f = fopen ("conftest.val", "w");
+|   if (! f)
+|     return 1;
+|   if (((long int) (sizeof (int))) < 0)
+|     {
+|       long int i = longval ();
+|       if (i != ((long int) (sizeof (int))))
+| 	return 1;
+|       fprintf (f, "%ld", i);
+|     }
+|   else
+|     {
+|       unsigned long int i = ulongval ();
+|       if (i != ((long int) (sizeof (int))))
+| 	return 1;
+|       fprintf (f, "%lu", i);
+|     }
+|   /* Do ! output a trailing newline, as this causes \r\n confusion
+|      on some platforms.  */
+|   return ferror (f) || fclose (f) != 0;
+| 
+|   ;
+|   return 0;
+| }
+configure:21015: result: 0
+(수정)
+/c/gcc-14.2.0/libiberty/configure.ac 수정
+# sys/pstat.h sys/sysmp.h machine/hal_sysinfo.h sys/table.h sys/sysctl.h sys/systemcfg.h sys/resource.h sys/mman.h sys/sysinfo.h stdio_ext.h sys/prctl.h spawn.h sys/file.h 제거
+AC_CHECK_HEADERS([sys/param.h limits.h stdlib.h malloc.h string.h unistd.h strings.h sys/time.h time.h fcntl.h alloca.h stdint.h process.h],
+    [#AC_DEFINE([HAVE_SYS_FILE_H], [1], [Define if sys/file.h is available])
+     AC_DEFINE([HAVE_SYS_PARAM_H], [1], [Define if sys/param.h is available])
+     AC_DEFINE([HAVE_LIMITS_H], [1], [Define if limits.h is available])
+     # AC_DEFINE([HAVE_STDIO_H], [1], [Define if stdio.h is available])
+     # AC_DEFINE([HAVE_SYS_RESOURCE_H], [1], [Define if sys/resource.h is available])
+     # AC_DEFINE([HAVE_SYS_MMAN_H], [1], [Define if sys/mman.h is available])
+     # AC_DEFINE([HAVE_SYS_PSTAT_H], [1], [Define if sys/pstat.h is available])
+     # AC_DEFINE([HAVE_SYS_SYSMP_H], [1], [Define if sys/sysmp.h is available])
+     # AC_DEFINE([HAVE_SYS_SYSINFO_H], [1], [Define if sys/sysinfo.h is available])
+     # AC_DEFINE([HAVE_MACHINE_HAL_SYSINFO_H], [1], [Define if machine/hal_sysinfo.h is available])
+     # AC_DEFINE([HAVE_SYS_TABLE_H], [1], [Define if sys/table.h is available])
+     # AC_DEFINE([HAVE_SYS_SYSCTL_H], [1], [Define if sys/sysctl.h is available])
+     # AC_DEFINE([HAVE_SYS_SYSTEMCFG_H], [1], [Define if sys/systemcfg.h is available])
+     AC_DEFINE([HAVE_STDIO_EXT_H], [1], [Define if stdio_ext.h is available])
+     # AC_DEFINE([HAVE_SYS_PRCTL_H], [1], [Define if sys/prctl.h is available])
+     # AC_DEFINE([HAVE_SPAWN_H], [1], [Define if spawn.h is available])],
+    [AC_MSG_WARN([Some headers are missing])])
+(오류)
+conftest.c: In function 'main':
+conftest.c:141:24: error: expected expression before ')' token
+  141 | if (sizeof ((uintptr_t)))
+      |                        ^
+configure:21206: $? = 1
+conftest.c:122:23: error: expected expression before ')' token
+  122 | if (sizeof ((intptr_t)))
+      |                       ^
+configure:21168: $? = 1
+conftest.c:124:22: error: expected expression before ')' token
+  124 | if (sizeof ((ssize_t)))
+      |                      ^
+configure:21240: $? = 1
+conftest.c:126:20: error: expected expression before ')' token
+  126 | if (sizeof ((pid_t)))
+      |                    ^
+configure:21260: $? = 1
+(수정)
+/c/gcc-14.2.0/libiberty/configure.ac 수정
+# sys/pstat.h sys/sysmp.h machine/hal_sysinfo.h sys/table.h sys/sysctl.h sys/systemcfg.h sys/resource.h sys/mman.h sys/sysinfo.h stdio_ext.h sys/prctl.h spawn.h sys/file.h 제거
+# stdint.h inttypes.h unistd.h 추가
+AC_CHECK_HEADERS([sys/param.h limits.h stdlib.h malloc.h string.h unistd.h strings.h sys/time.h time.h fcntl.h alloca.h stdint.h process.h stdint.h inttypes.h unistd.h],
+    [#AC_DEFINE([HAVE_SYS_FILE_H], [1], [Define if sys/file.h is available])
+     AC_DEFINE([HAVE_SYS_PARAM_H], [1], [Define if sys/param.h is available])
+     AC_DEFINE([HAVE_LIMITS_H], [1], [Define if limits.h is available])
+     # AC_DEFINE([HAVE_STDIO_H], [1], [Define if stdio.h is available])
+     # AC_DEFINE([HAVE_SYS_RESOURCE_H], [1], [Define if sys/resource.h is available])
+     # AC_DEFINE([HAVE_SYS_MMAN_H], [1], [Define if sys/mman.h is available])
+     # AC_DEFINE([HAVE_SYS_PSTAT_H], [1], [Define if sys/pstat.h is available])
+     # AC_DEFINE([HAVE_SYS_SYSMP_H], [1], [Define if sys/sysmp.h is available])
+     # AC_DEFINE([HAVE_SYS_SYSINFO_H], [1], [Define if sys/sysinfo.h is available])
+     # AC_DEFINE([HAVE_MACHINE_HAL_SYSINFO_H], [1], [Define if machine/hal_sysinfo.h is available])
+     # AC_DEFINE([HAVE_SYS_TABLE_H], [1], [Define if sys/table.h is available])
+     # AC_DEFINE([HAVE_SYS_SYSCTL_H], [1], [Define if sys/sysctl.h is available])
+     # AC_DEFINE([HAVE_SYS_SYSTEMCFG_H], [1], [Define if sys/systemcfg.h is available])
+     AC_DEFINE([HAVE_STDIO_EXT_H], [1], [Define if stdio_ext.h is available])
+     # AC_DEFINE([HAVE_SYS_PRCTL_H], [1], [Define if sys/prctl.h is available])
+     # AC_DEFINE([HAVE_SPAWN_H], [1], [Define if spawn.h is available])
+     AC_DEFINE([HAVE_STDINT_H], [1], [Define if stdint.h is available])
+     AC_DEFINE([HAVE_INTTYPES_H], [1], [Define if inttypes.h is available])
+     AC_DEFINE([HAVE_UNISTD_H], [1], [Define if unistd.h is available])],
+    [AC_MSG_WARN([Some headers are missing])])
+(오류)
+conftest.c:186:20: error: expected expression before ')' token
+  186 | if (sizeof ((pid_t)))
+      |                    ^
+configure:21270: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccEFbWpO.o:conftest.c:(.text.startup+0xa): undefined reference to `bcmp'
+collect2.exe: error: ld returned 1 exit status
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccyEoKEc.o:conftest.c:(.text.startup+0xa): undefined reference to `bcopy'
+collect2.exe: error: ld returned 1 exit status
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccaV5qJr.o:conftest.c:(.text.startup+0xa): undefined reference to `bzero'
+collect2.exe: error: ld returned 1 exit status
+configure:22064: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccgu9tUH.o:conftest.c:(.text.startup+0xa): undefined reference to `ffs'
+collect2.exe: error: ld returned 1 exit status
+configure:22064: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccEKiKxn.o:conftest.c:(.text.startup+0xa): undefined reference to `index'
+collect2.exe: error: ld returned 1 exit status
+configure:22064: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccwnbN6h.o:conftest.c:(.text.startup+0xa): undefined reference to `insque'
+collect2.exe: error: ld returned 1 exit status
+configure:22064: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cc8iuCzO.o:conftest.c:(.text.startup+0xa): undefined reference to `memmem'
+collect2.exe: error: ld returned 1 exit status
+configure:22064: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccDqLrvi.o:conftest.c:(.text.startup+0xa): undefined reference to `mkstemps'
+collect2.exe: error: ld returned 1 exit status
+configure:22064: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccmmG6km.o:conftest.c:(.text.startup+0xa): undefined reference to `random'
+collect2.exe: error: ld returned 1 exit status
+configure:22064: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccutKLly.o:conftest.c:(.text.startup+0xa): undefined reference to `rindex'
+collect2.exe: error: ld returned 1 exit status
+configure:22064: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cccGZjEN.o:conftest.c:(.text.startup+0xa): undefined reference to `setenv'
+collect2.exe: error: ld returned 1 exit status
+configure:22064: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cc6xBm9d.o:conftest.c:(.text.startup+0xa): undefined reference to `sigsetmask'
+collect2.exe: error: ld returned 1 exit status
+configure:22064: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cceb8aR4.o:conftest.c:(.text.startup+0xa): undefined reference to `stpcpy'
+collect2.exe: error: ld returned 1 exit status
+configure:22064: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cciPXqBm.o:conftest.c:(.text.startup+0xa): undefined reference to `stpncpy'
+collect2.exe: error: ld returned 1 exit status
+configure:22064: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccAxDGhO.o:conftest.c:(.text.startup+0xa): undefined reference to `strndup'
+collect2.exe: error: ld returned 1 exit status
+configure:22064: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccMarKVB.o:conftest.c:(.text.startup+0xa): undefined reference to `strverscmp'
+collect2.exe: error: ld returned 1 exit status
+configure:22064: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cc2Onrbf.o:conftest.c:(.text.startup+0xa): undefined reference to `waitpid'
+collect2.exe: error: ld returned 1 exit status
+configure:22064: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccAtuZgh.o:conftest.c:(.text.startup+0xa): undefined reference to `setproctitle'
+collect2.exe: error: ld returned 1 exit status
+configure:22064: $? = 1
+conftest.c:188:10: fatal error: vfork.h: No such file or directory
+  188 | #include <vfork.h>
+      |          ^~~~~~~~~
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccIQIhDN.o:conftest.c:(.text.startup+0xa): undefined reference to `fork'
+collect2.exe: error: ld returned 1 exit status
+configure:22184: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccKMOYtS.o:conftest.c:(.text.startup+0xa): undefined reference to `vfork'
+collect2.exe: error: ld returned 1 exit status
+configure:22184: $? = 1\
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccy0yAOS.o:conftest.c:(.text.startup+0xa): undefined reference to `_doprnt'
+collect2.exe: error: ld returned 1 exit status
+configure:22411: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccy0yAOS.o:conftest.c:(.text.startup+0xa): undefined reference to `_doprnt'
+collect2.exe: error: ld returned 1 exit status
+configure:22411: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cc2O1wth.o:conftest.c:(.rdata$.refptr.sys_siglist[.refptr.sys_siglist]+0x0): undefined reference to `sys_siglist'
+collect2.exe: error: ld returned 1 exit status
+configure:22442: $? = 1
+conftest.c:191:10: fatal error: sys/systemcfg.h: No such file or directory
+  191 | #include <sys/systemcfg.h>
+      |          ^~~~~~~~~~~~~~~~~
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cca6sUBg.o:conftest.c:(.text.startup+0xa): undefined reference to `__fsetlocking'
+collect2.exe: error: ld returned 1 exit status
+configure:22495: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccGriRWj.o:conftest.c:(.text.startup+0xa): undefined reference to `canonicalize_file_name'
+collect2.exe: error: ld returned 1 exit status
+configure:22495: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccKr3llx.o:conftest.c:(.text.startup+0xa): undefined reference to `dup3'
+collect2.exe: error: ld returned 1 exit status
+configure:22495: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccMHF05x.o:conftest.c:(.text.startup+0xa): undefined reference to `getrlimit'
+collect2.exe: error: ld returned 1 exit status
+configure:22495: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccojXABU.o:conftest.c:(.text.startup+0xa): undefined reference to `getrusage'
+collect2.exe: error: ld returned 1 exit status
+configure:22495: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccObzS6W.o:conftest.c:(.text.startup+0xa): undefined reference to `getsysinfo'
+collect2.exe: error: ld returned 1 exit status
+configure:22495: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cc08kDpg.o:conftest.c:(.text.startup+0xa): undefined reference to `on_exit'
+collect2.exe: error: ld returned 1 exit status
+configure:22495: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cckX9w3C.o:conftest.c:(.text.startup+0xa): undefined reference to `pipe2'
+collect2.exe: error: ld returned 1 exit status
+configure:22495: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccwQLJ3C.o:conftest.c:(.text.startup+0xa): undefined reference to `posix_spawn'
+collect2.exe: error: ld returned 1 exit status
+configure:22495: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cc6iZUjP.o:conftest.c:(.text.startup+0xa): undefined reference to `posix_spawnp'
+collect2.exe: error: ld returned 1 exit status
+configure:22495: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccqsFiHV.o:conftest.c:(.text.startup+0xa): undefined reference to `psignal'
+collect2.exe: error: ld returned 1 exit status
+configure:22495: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccecoIy9.o:conftest.c:(.text.startup+0xa): undefined reference to `pstat_getdynamic'
+collect2.exe: error: ld returned 1 exit status
+configure:22495: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccwWDxB7.o:conftest.c:(.text.startup+0xa): undefined reference to `pstat_getstatic'
+collect2.exe: error: ld returned 1 exit status
+configure:22495: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccSl9q8q.o:conftest.c:(.text.startup+0xa): undefined reference to `realpath'
+collect2.exe: error: ld returned 1 exit status
+configure:22495: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccgZBj5i.o:conftest.c:(.text.startup+0xa): undefined reference to `setrlimit'
+collect2.exe: error: ld returned 1 exit status
+configure:22495: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccIpFkWK.o:conftest.c:(.text.startup+0xa): undefined reference to `strsignal'
+collect2.exe: error: ld returned 1 exit status
+configure:22495: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccAOw5FP.o:conftest.c:(.text.startup+0xa): undefined reference to `sysconf'
+collect2.exe: error: ld returned 1 exit status
+configure:22495: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cci7uBm9.o:conftest.c:(.text.startup+0xa): undefined reference to `sysctl'
+collect2.exe: error: ld returned 1 exit status
+configure:22495: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cc06Ls1Y.o:conftest.c:(.text.startup+0xa): undefined reference to `sysmp'
+collect2.exe: error: ld returned 1 exit status
+configure:22495: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccnCCZxl.o:conftest.c:(.text.startup+0xa): undefined reference to `table'
+collect2.exe: error: ld returned 1 exit status
+configure:22495: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccydpixp.o:conftest.c:(.text.startup+0xa): undefined reference to `times'
+collect2.exe: error: ld returned 1 exit status
+configure:22495: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cc2Zgrql.o:conftest.c:(.text.startup+0xa): undefined reference to `wait3'
+collect2.exe: error: ld returned 1 exit status
+configure:22495: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccOqS0Ry.o:conftest.c:(.text.startup+0xa): undefined reference to `wait4'
+collect2.exe: error: ld returned 1 exit status
+configure:22495: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccQM1t0B.o:conftest.c:(.text.startup+0xa): undefined reference to `sbrk'
+collect2.exe: error: ld returned 1 exit status
+configure:22495: $? = 1
+conftest.c: In function 'main':
+conftest.c:232:28: error: 'canonicalize_file_name' undeclared (first use in this function)
+  232 | char *(*pfn) = (char *(*)) canonicalize_file_name
+      |                            ^~~~~~~~~~~~~~~~~~~~~~
+conftest.c:232:28: note: each undeclared identifier is reported only once for each function it appears in
+configure:22725: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccktkR4Z.o:conftest.c:(.text.startup+0xfc): undefined reference to `mmap'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccktkR4Z.o:conftest.c:(.text.startup+0x150): undefined reference to `munmap'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccktkR4Z.o:conftest.c:(.text.startup+0x192): undefined reference to `mmap'
+collect2.exe: error: ld returned 1 exit status
+configure:22998: $? = 1
+(수정)
+필요한 Gnulib 모듈 추가(Gnulib 모듈을 사용하여 누락된 함수(bcmp, setenv, strndup 등)를 대체)
+python /c/gnulib/gnulib-tool.py --add-import bcmp bcopy bzero setenv strndup
+/c/gcc-14.2.0/libiberty/configure.ac 수정
+####################################################################################
+AC_CHECK_FUNCS([bzero])
+if test "$ac_cv_func_bzero" = "no"; then
+  AC_DEFINE([HAVE_BZERO], [0], [Define if bzero is available])
+fi
+
+AC_CHECK_FUNCS([bcmp bcopy bzero setenv random])
+
+# 필요 시 대체 코드 삽입
+if test "$ac_cv_func_bcmp" = "no"; then
+  AC_DEFINE([HAVE_BCMP], [0], [Define if bcmp is available])
+fi
+
+if test "$ac_cv_func_bcopy" = "no"; then
+  AC_DEFINE([HAVE_BCOPY], [0], [Define if bcopy is available])
+fi
+
+AC_CHECK_LIB([ws2_32], [function_name], [
+  LIBS="$LIBS -lws2_32"
+], [
+  AC_MSG_ERROR([ws2_32 library is required])
+])
+
+AC_CHECK_LIB([advapi32], [function_name], [
+  LIBS="$LIBS -ladvapi32"
+], [
+  AC_MSG_ERROR([advapi32 library is required])
+])
+####################################################################################
+
+/c/gcc-14.2.0/libiberty/Makefile.am 수정
+# winsock 관련 함수나 고급 Windows API를 사용시 라이브러리를 링크
+LDADD = -lws2_32 -ladvapi32
+
+환경설정 수정(~/.bashrc 수정)
+export CFLAGS="$CFLAGS -D__USE_MINGW_ANSI_STDIO=1"
+source ~/.bashrc
+(오류)
+configure: error: ws2_32 library is required
+(수정)
+Windows에서 소켓 프로그래밍을 위한 라이브러리
+MSYS2 패키지 업데이트(MSYS2 환경을 최신 상태로 업데이트)
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# pacman -Syu
+ws2_32 설치
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# pacman -S mingw-w64-x86_64-crt
+ws2_32 설치 확인
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# ls /mingw64/lib | grep ws2_32
+libws2_32.a
+
+/c/gcc-14.2.0/libiberty/configure.ac 수정
+AC_CHECK_LIB([ws2_32], [socket], [
+  LIBS="$LIBS -lws2_32"
+], [
+  AC_MSG_ERROR([ws2_32 library is required])
+])
+
+AC_CHECK_LIB([advapi32], [RegOpenKeyEx], [
+  LIBS="$LIBS -ladvapi32"
+], [
+  AC_MSG_ERROR([advapi32 library is required])
+])
+(오류)
+configure: error: advapi32 library is required
+(수정)
+설치확인
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# ls /mingw64/lib | grep advapi32
+libadvapi32.a
+환경변수확인
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# echo $LDFLAGS
+-L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0 -L/mingw64/lib -L/usr/lib -L/mingw64/x86_64-w64-mingw32/lib -L/c/libidn2/gettext-0.22.5/libtextstyle/lib -Wl,-rpath,/mingw64/bin
+
+/c/gcc-14.2.0/libiberty/configure.ac 수정
+AC_CHECK_LIB([advapi32], [RegOpenKeyExA], [
+  LIBS="$LIBS -ladvapi32"
+], [
+  AC_MSG_ERROR([advapi32 library is required])
+])
+(오류)
+C:\msys64\mingw64\x86_64-w64-mingw32\bin\ar.exe: `u' modifier ignored since `D' is the default (see `U')
+ranlib libiberty.a
+(수정)
+/c/gcc-14.2.0/libiberty/configure 확인
+16661 : old_archive_cmds_CXX='$CC -ar -WR,-u -o $oldlib $oldobjs'
+=> old_archive_cmds_CXX='$CC -ar -WR -o $oldlib $oldobjs'
+빌드 명령어 수정
+libtoolize --copy --force && aclocal --force && autoconf && automake --add-missing --copy && autoreconf -ivf && 
+sed -i '/^ac_save_CC=\$CC/i ac_cv_prog_cc_c23=no' configure 
+sed -i 's/\$ac_c_conftest_c23_program//g' configure 
+sed -i '/ac_fn_c_check_header_mongrel.*"minix\/config.h"/,/^  fi/d' configure 
+sed -i 's/cxx11test::delegate d2();/cxx11test::delegate d2{};/g' configure
+sed -i '/^ VERSION='\''1\.0'\''$/d' configure 
+sed -i "/# define ISLOWER/c\#define ISLOWER(c) (islower(c))" configure
+sed -i "/# define TOUPPER/c\#define TOUPPER(c) (toupper(c))" configure 
+sed -i '/&& LARGE_FTYPE % 2147483647 == 1)/d' configure
+sed -i '/int FTYPE_is_large\[/c\
+void check_large_ftype() {\
+    int FTYPE_is_large[(LARGE_FTYPE % 2147483629 == 721 && LARGE_FTYPE % 2147483647 == 1) ? 1 : -1];\
+}' configure 
+sed -i '/\? 1 : -1];/d' configure 
+sed -i 's/\bnot\b/!/g' configure 
+sed -i 's/! big endian/#error "not big endian"/g' configure 
+sed -i 's/! a universal capable compiler//g' configure 
+sed -i 's/! big endian/#if BYTE_ORDER != BIG_ENDIAN\n    #error "not big endian"\n#endif/g' configure 
+sed -i '/^#define VERSION "\$VERSION"$/d' configure 
+sed -i '/old_archive_cmds_CXX=/s/-u//g' configure && 
+./configure &&  make
+(오류)
+configure:4346: x86_64-w64-mingw32-gcc -V >&5
+x86_64-w64-mingw32-gcc.exe: error: unrecognized command-line option '-V'
+x86_64-w64-mingw32-gcc.exe: fatal error: no input files
+compilation terminated.
+configure:4357: $? = 1
+configure:4346: x86_64-w64-mingw32-gcc -qversion >&5
+x86_64-w64-mingw32-gcc.exe: error: unrecognized command-line option '-qversion'; did you mean '--version'?
+x86_64-w64-mingw32-gcc.exe: fatal error: no input files
+compilation terminated.
+configure:4357: $? = 1
+configure:4346: x86_64-w64-mingw32-gcc -version >&5
+x86_64-w64-mingw32-gcc.exe: error: unrecognized command-line option '-version'
+x86_64-w64-mingw32-gcc.exe: fatal error: no input files
+compilation terminated.
+configure:4357: $? = 1
+conftest.c:10:10: fatal error: ac_nonexistent.h: No such file or directory
+   10 | #include <ac_nonexistent.h>
+      |          ^~~~~~~~~~~~~~~~~~
+compilation terminated.
+configure:5228: $? = 1
+conftest.c: In function 'main':
+conftest.c:182:23: error: expected expression before ')' token
+  182 | if (sizeof ((intptr_t)))
+      |                       ^
+configure:21178: $? = 1
+conftest.c: In function 'main':
+conftest.c:183:24: error: expected expression before ')' token
+  183 | if (sizeof ((uintptr_t)))
+      |                        ^
+configure:21214: $? = 1
+conftest.c: In function 'main':
+conftest.c:184:22: error: expected expression before ')' token
+  184 | if (sizeof ((ssize_t)))
+      |                      ^
+configure:21250: $? = 1
+conftest.c: In function 'main':
+conftest.c:186:20: error: expected expression before ')' token
+  186 | if (sizeof ((pid_t)))
+      |                    ^
+configure:21270: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccER4S8u.o:conftest.c:(.text.startup+0xa): undefined reference to `bzero'
+collect2.exe: error: ld returned 1 exit status
+configure:21541: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccgIMizu.o:conftest.c:(.text.startup+0xa): undefined reference to `bcmp'
+collect2.exe: error: ld returned 1 exit status
+configure:21559: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccG3M2ZN.o:conftest.c:(.text.startup+0xa): undefined reference to `bcopy'
+collect2.exe: error: ld returned 1 exit status
+configure:21559: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccGqv65R.o:conftest.c:(.text.startup+0xa): undefined reference to `setenv'
+collect2.exe: error: ld returned 1 exit status
+configure:21559: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccOKYJwg.o:conftest.c:(.text.startup+0xa): undefined reference to `ffs'
+collect2.exe: error: ld returned 1 exit status
+configure:22209: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccyS7ZFC.o:conftest.c:(.text.startup+0xa): undefined reference to `index'
+collect2.exe: error: ld returned 1 exit status
+configure:22209: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccwZ1GaQ.o:conftest.c:(.text.startup+0xa): undefined reference to `insque'
+collect2.exe: error: ld returned 1 exit status
+configure:22209: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cc2b39Ei.o:conftest.c:(.text.startup+0xa): undefined reference to `memmem'
+collect2.exe: error: ld returned 1 exit status
+configure:22209: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cc4j6RIE.o:conftest.c:(.text.startup+0xa): undefined reference to `mkstemps'
+collect2.exe: error: ld returned 1 exit status
+configure:22209: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccMkM0Kd.o:conftest.c:(.text.startup+0xa): undefined reference to `rindex'
+collect2.exe: error: ld returned 1 exit status
+configure:22209: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccgzY15U.o:conftest.c:(.text.startup+0xa): undefined reference to `sigsetmask'
+collect2.exe: error: ld returned 1 exit status
+configure:22209: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccwXQqYb.o:conftest.c:(.text.startup+0xa): undefined reference to `stpcpy'
+collect2.exe: error: ld returned 1 exit status
+configure:22209: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccqTQCD7.o:conftest.c:(.text.startup+0xa): undefined reference to `stpncpy'
+collect2.exe: error: ld returned 1 exit status
+configure:22209: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccyYU8vU.o:conftest.c:(.text.startup+0xa): undefined reference to `strndup'
+collect2.exe: error: ld returned 1 exit status
+configure:22209: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccSJuO4W.o:conftest.c:(.text.startup+0xa): undefined reference to `strverscmp'
+collect2.exe: error: ld returned 1 exit status
+configure:22209: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccY0xrmL.o:conftest.c:(.text.startup+0xa): undefined reference to `waitpid'
+collect2.exe: error: ld returned 1 exit status
+configure:22209: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccYipf68.o:conftest.c:(.text.startup+0xa): undefined reference to `setproctitle'
+collect2.exe: error: ld returned 1 exit status
+configure:22209: $? = 1
+conftest.c:191:10: fatal error: vfork.h: No such file or directory
+  191 | #include <vfork.h>
+      |          ^~~~~~~~~
+compilation terminated.
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cc2H6CZd.o:conftest.c:(.text.startup+0xa): undefined reference to `vfork'
+collect2.exe: error: ld returned 1 exit status
+configure:22329: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccuiqJFn.o:conftest.c:(.text.startup+0xa): undefined reference to `_doprnt'
+collect2.exe: error: ld returned 1 exit status
+configure:22556: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cceRCdlW.o:conftest.c:(.rdata$.refptr.sys_siglist[.refptr.sys_siglist]+0x0): undefined reference to `sys_siglist'
+collect2.exe: error: ld returned 1 exit status
+configure:22587: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccEvxJDU.o:conftest.c:(.text.startup+0xa): undefined reference to `__fsetlocking'
+collect2.exe: error: ld returned 1 exit status
+configure:22640: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccYpnuXj.o:conftest.c:(.text.startup+0xa): undefined reference to `canonicalize_file_name'
+collect2.exe: error: ld returned 1 exit status
+configure:22640: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cckyq1ut.o:conftest.c:(.text.startup+0xa): undefined reference to `dup3'
+collect2.exe: error: ld returned 1 exit status
+configure:22640: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccwfCkrl.o:conftest.c:(.text.startup+0xa): undefined reference to `getrlimit'
+collect2.exe: error: ld returned 1 exit status
+configure:22640: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccWkiibF.o:conftest.c:(.text.startup+0xa): undefined reference to `getrusage'
+collect2.exe: error: ld returned 1 exit status
+configure:22640: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccsmXj4v.o:conftest.c:(.text.startup+0xa): undefined reference to `getsysinfo'
+collect2.exe: error: ld returned 1 exit status
+configure:22640: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccyYDlly.o:conftest.c:(.text.startup+0xa): undefined reference to `on_exit'
+collect2.exe: error: ld returned 1 exit status
+configure:22640: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cccRbJXS.o:conftest.c:(.text.startup+0xa): undefined reference to `pipe2'
+collect2.exe: error: ld returned 1 exit status
+configure:22640: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccOj3dy2.o:conftest.c:(.text.startup+0xa): undefined reference to `posix_spawn'
+collect2.exe: error: ld returned 1 exit status
+configure:22640: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cck0iRMo.o:conftest.c:(.text.startup+0xa): undefined reference to `posix_spawnp'
+collect2.exe: error: ld returned 1 exit status
+configure:22640: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cc0cxSXn.o:conftest.c:(.text.startup+0xa): undefined reference to `psignal'
+collect2.exe: error: ld returned 1 exit status
+configure:22640: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cceRORwu.o:conftest.c:(.text.startup+0xa): undefined reference to `pstat_getdynamic'
+collect2.exe: error: ld returned 1 exit status
+configure:22640: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cco6drJQ.o:conftest.c:(.text.startup+0xa): undefined reference to `pstat_getstatic'
+collect2.exe: error: ld returned 1 exit status
+configure:22640: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cc8OxGJU.o:conftest.c:(.text.startup+0xa): undefined reference to `realpath'
+collect2.exe: error: ld returned 1 exit status
+configure:22640: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccKuxppq.o:conftest.c:(.text.startup+0xa): undefined reference to `setrlimit'
+collect2.exe: error: ld returned 1 exit status
+configure:22640: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccgoDID6.o:conftest.c:(.text.startup+0xa): undefined reference to `strsignal'
+collect2.exe: error: ld returned 1 exit status
+configure:22640: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cc6AESPm.o:conftest.c:(.text.startup+0xa): undefined reference to `sysconf'
+collect2.exe: error: ld returned 1 exit status
+configure:22640: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccyC4GJl.o:conftest.c:(.text.startup+0xa): undefined reference to `sysctl'
+collect2.exe: error: ld returned 1 exit status
+configure:22640: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccWDNbjp.o:conftest.c:(.text.startup+0xa): undefined reference to `sysmp'
+collect2.exe: error: ld returned 1 exit status
+configure:22640: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccQYrxeA.o:conftest.c:(.text.startup+0xa): undefined reference to `table'
+collect2.exe: error: ld returned 1 exit status
+configure:22640: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccSMrGrM.o:conftest.c:(.text.startup+0xa): undefined reference to `times'
+collect2.exe: error: ld returned 1 exit status
+configure:22640: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cckDZXQX.o:conftest.c:(.text.startup+0xa): undefined reference to `wait3'
+collect2.exe: error: ld returned 1 exit status
+configure:22640: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccAs8Dc1.o:conftest.c:(.text.startup+0xa): undefined reference to `wait4'
+collect2.exe: error: ld returned 1 exit status
+configure:22640: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccKJOvTj.o:conftest.c:(.text.startup+0xa): undefined reference to `sbrk'
+collect2.exe: error: ld returned 1 exit status
+configure:22640: $? = 1
+conftest.c: In function 'main':
+conftest.c:235:28: error: 'canonicalize_file_name' undeclared (first use in this function)
+  235 | char *(*pfn) = (char *(*)) canonicalize_file_name
+      |                            ^~~~~~~~~~~~~~~~~~~~~~
+conftest.c:235:28: note: each undeclared identifier is reported only once for each function it appears in
+configure:22870: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cci5zqbO.o:conftest.c:(.text.startup+0x192): undefined reference to `mmap'
+collect2.exe: error: ld returned 1 exit status
+configure:23143: $? = 1
+(수정)
+빌드명령어 수정
+libtoolize --copy --force && aclocal --force && autoconf && automake --add-missing --copy && autoreconf -ivf && 
+sed -i 's/ -V -qversion -version/ --version/g' configure 
+sed -i 's/ -V -qversion/ --version/g' configure 
+sed -i 's/$NM -V/$NM --version/g' configure 
+sed -i 's/$CC -V/$CC --version/g' configure
+sed -i '/^ac_save_CC=\$CC/i ac_cv_prog_cc_c23=no' configure 
+sed -i 's/\$ac_c_conftest_c23_program//g' configure 
+sed -i '/ac_fn_c_check_header_mongrel.*"minix\/config.h"/,/^  fi/d' configure 
+sed -i 's/cxx11test::delegate d2();/cxx11test::delegate d2{};/g' configure
+sed -i '/^ VERSION='\''1\.0'\''$/d' configure 
+sed -i "/# define ISLOWER/c\#define ISLOWER(c) (islower(c))" configure
+sed -i "/# define TOUPPER/c\#define TOUPPER(c) (toupper(c))" configure 
+sed -i '/&& LARGE_FTYPE % 2147483647 == 1)/d' configure
+sed -i '/int FTYPE_is_large\[/c\
+void check_large_ftype() {\
+    int FTYPE_is_large[(LARGE_FTYPE % 2147483629 == 721 && LARGE_FTYPE % 2147483647 == 1) ? 1 : -1];\
+}' configure 
+sed -i '/\? 1 : -1];/d' configure 
+sed -i 's/\bnot\b/!/g' configure 
+sed -i 's/! big endian/#error "not big endian"/g' configure 
+sed -i 's/! a universal capable compiler//g' configure 
+sed -i 's/! big endian/#if BYTE_ORDER != BIG_ENDIAN\n    #error "not big endian"\n#endif/g' configure 
+sed -i '/^#define VERSION "\$VERSION"$/d' configure 
+sed -i '/old_archive_cmds_CXX=/s/-u//g' configure && 
+./configure &&  make
+
+conftest.c:10:10: fatal error: ac_nonexistent.h: No such file or directory
+필수헤더설치
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# pacman -S mingw-w64-x86_64-headers
+
+undefined reference to `bzero'
+링커가 특정 함수(bzero, setenv, mmap 등)를 찾지 못함 
+POSIX 함수 : -lws2_32 또는 -lmsvcrt 옵션 추가
+glibc 함수 : mingw-w64에 맞는 라이브러리나 헤더를 추가로 설치
+
+undefined reference to `posix_spawn`
+mingw-w64-crt 라이브러리 설치
+
+canonicalize_file_name undeclared
+정의되지 않은 함수 또는 헤더 파일을 참조
+configure 스크립트 또는 소스 코드를 수정하여 해당 함수를 제외
+
+MSYS2 환경(개발 도구를 최신 상태로 유지)
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# pacman -Syu
+pacman -S base-devel mingw-w64-x86_64-toolchain
+
+undefined reference to 'bzero'(bzero 함수는 libmsvcrt 또는 libws2_32에 포함된 함수로 대체)
+/c/gcc-14.2.0/libiberty/configure.ac 수정
+####################################################################################
+AC_CHECK_FUNCS([bzero bcmp bcopy setenv random])
+
+if test "$ac_cv_func_bzero" = "no"; then
+  AC_DEFINE([HAVE_BZERO], [0], [Define if bzero is not available])
+  AC_LIBOBJ([bzero])
+else
+  AC_DEFINE([HAVE_BZERO], [1], [Define if bzero is available])
+fi
+
+if test "$ac_cv_func_bcmp" = "no"; then
+  AC_DEFINE([HAVE_BCMP], [0], [Define if bcmp is not available])
+  AC_LIBOBJ([bcmp])
+fi
+
+if test "$ac_cv_func_bcopy" = "no"; then
+  AC_DEFINE([HAVE_BCOPY], [0], [Define if bcopy is not available])
+  AC_LIBOBJ([bcopy])
+fi
+
+if test "$ac_cv_func_setenv" = "no"; then
+  AC_DEFINE([HAVE_SETENV], [0], [Define if setenv is not available])
+  AC_LIBOBJ([setenv])
+fi
+
+# Check for ws2_32 library
+AC_CHECK_LIB([ws2_32], [socket], [
+  LIBS="$LIBS -lws2_32"
+], [
+  AC_MSG_ERROR([ws2_32 library is required for network functions])
+])
+
+# Check for advapi32 library
+AC_CHECK_LIB([advapi32], [RegOpenKeyExA], [
+  LIBS="$LIBS -ladvapi32"
+], [
+  AC_MSG_ERROR([advapi32 library is required for registry functions])
+])
+####################################################################################
+
+undefined reference to 'posix_spawn'
+posix_spawn은 POSIX 시스템에서 사용되는 함수로, Windows에서는 기본적으로 지원되지 않음
+mingw-w64-crt 라이브러리를 설치
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# pacman -S mingw-w64-x86_64-crt
+
+canonicalize_file_name undeclared
+POSIX 환경에서 파일 경로를 정규화하는 함수로, Windows(MinGW) 환경에서는 기본적으로 제공되지 않음 
+AC_CHECK_FUNCS([canonicalize_file_name]) 부분을 찾아서 주석 처리
+Windows에서 유사한 작업을 수행하려면 GetFullPathName API를 사용
+
+/c/gcc-14.2.0/libiberty/configure.ac 수정
+####################################################################################
+AC_CHECK_FUNCS([bzero bcmp bcopy setenv random])
+
+if test "$ac_cv_func_bzero" = "no"; then
+  AC_DEFINE([HAVE_BZERO], [0], [Define if bzero is not available])
+  AC_LIBOBJ([bzero])
+else
+  AC_DEFINE([HAVE_BZERO], [1], [Define if bzero is available])
+fi
+
+if test "$ac_cv_func_bcmp" = "no"; then
+  AC_DEFINE([HAVE_BCMP], [0], [Define if bcmp is not available])
+  AC_LIBOBJ([bcmp])
+fi
+
+if test "$ac_cv_func_bcopy" = "no"; then
+  AC_DEFINE([HAVE_BCOPY], [0], [Define if bcopy is not available])
+  AC_LIBOBJ([bcopy])
+fi
+
+if test "$ac_cv_func_setenv" = "no"; then
+  AC_DEFINE([HAVE_SETENV], [0], [Define if setenv is not available])
+  AC_LIBOBJ([setenv])
+fi
+
+# posix_spawn 확인
+AC_CHECK_FUNCS([posix_spawn], [], [
+  AC_MSG_WARN([posix_spawn이 없으므로, Windows에서는 CreateProcess를 사용합니다.])
+  AC_DEFINE([HAVE_POSIX_SPAWN], [0], [Define if posix_spawn is not available])
+  AC_DEFINE([USE_CREATEPROCESS], [1], [Define if CreateProcess is used instead of posix_spawn on Windows])
+])
+
+# canonicalize_file_name 확인
+AC_CHECK_FUNCS([canonicalize_file_name], [], [
+  AC_MSG_WARN([canonicalize_file_name이 없으므로, Windows에서는 GetFullPathName을 사용합니다.])
+  AC_DEFINE([HAVE_CANONICALIZE_FILE_NAME], [0], [Define if canonicalize_file_name is not available])
+  AC_DEFINE([USE_GETFULLPATHNAME], [1], [Define if GetFullPathName is used instead of canonicalize_file_name on Windows])
+])
+
+# Check for ws2_32 library
+AC_CHECK_LIB([ws2_32], [socket], [
+  LIBS="$LIBS -lws2_32"
+], [
+  AC_MSG_ERROR([ws2_32 library is required for network functions])
+])
+
+# Check for advapi32 library
+AC_CHECK_LIB([advapi32], [RegOpenKeyExA], [
+  LIBS="$LIBS -ladvapi32"
+], [
+  AC_MSG_ERROR([advapi32 library is required for registry functions])
+])
+####################################################################################
+(오류)
+conftest.c:182:23: error: expected expression before ')' token
+  182 | if (sizeof ((intptr_t)))
+      |                       ^
+configure:21178: $? = 1
+conftest.c:183:24: error: expected expression before ')' token
+  183 | if (sizeof ((uintptr_t)))
+      |                        ^
+configure:21214: $? = 1
+conftest.c:184:22: error: expected expression before ')' token
+  184 | if (sizeof ((ssize_t)))
+      |                      ^
+configure:21250: $? = 1
+conftest.c:186:20: error: expected expression before ')' token
+  186 | if (sizeof ((pid_t)))
+      |                    ^
+configure:21270: $? = 1
+(수정)
+빌드명령어 수정
+libtoolize --copy --force && aclocal --force && autoconf && automake --add-missing --copy && autoreconf -ivf && 
+sed -i 's/ -V -qversion -version/ --version/g' configure 
+sed -i 's/ -V -qversion/ --version/g' configure 
+sed -i 's/$NM -V/$NM --version/g' configure 
+sed -i 's/$CC -V/$CC --version/g' configure
+sed -i '/^ac_save_CC=\$CC/i ac_cv_prog_cc_c23=no' configure 
+sed -i 's/\$ac_c_conftest_c23_program//g' configure 
+sed -i '/ac_fn_c_check_header_mongrel.*"minix\/config.h"/,/^  fi/d' configure 
+sed -i 's/cxx11test::delegate d2();/cxx11test::delegate d2{};/g' configure
+sed -i '/^ VERSION='\''1\.0'\''$/d' configure 
+sed -i "/# define ISLOWER/c\#define ISLOWER(c) (islower(c))" configure
+sed -i "/# define TOUPPER/c\#define TOUPPER(c) (toupper(c))" configure 
+sed -i '/&& LARGE_FTYPE % 2147483647 == 1)/d' configure
+sed -i '/int FTYPE_is_large\[/c\
+void check_large_ftype() {\
+    int FTYPE_is_large[(LARGE_FTYPE % 2147483629 == 721 && LARGE_FTYPE % 2147483647 == 1) ? 1 : -1];\
+}' configure 
+sed -i '/\? 1 : -1];/d' configure 
+sed -i 's/\bnot\b/!/g' configure 
+sed -i 's/! big endian/#error "not big endian"/g' configure 
+sed -i 's/! a universal capable compiler//g' configure 
+sed -i 's/! big endian/#if BYTE_ORDER != BIG_ENDIAN\n    #error "not big endian"\n#endif/g' configure 
+sed -i '/^#define VERSION "\$VERSION"$/d' configure 
+sed -i '/old_archive_cmds_CXX=/s/-u//g' configure 
+sed -i 's/if (sizeof ((\$\([^)]*\))))/if (sizeof (\1))/g' configure && 
+./configure &&  make
+(오류)
+config.h:546:15: error: two or more data types in declaration specifiers
+  546 | #define pid_t __int64
+      |               ^~~~~~~
+C:/msys64/usr/include/sys/types.h:172:25: note: in expansion of macro 'pid_t'
+  172 | typedef __pid_t         pid_t;          /* process id */
+      |                         ^~~~~
+config.h:546:15: error: two or more data types in declaration specifiers
+  546 | #define pid_t __int64
+      |               ^~~~~~~
+C:/msys64/usr/include/sys/types.h:172:25: note: in expansion of macro 'pid_t'
+  172 | typedef __pid_t         pid_t;          /* process id */
+      |                         ^~~~~
+(수정)
+pid_t가 두 번 정의되어 충돌하는 문제
+configure.ac에서 pid_t 정의를 조건부로 하여, sys/types.h가 이미 포함된 경우 이를 중복 정의하지 않도록 설정 
+/c/gcc-14.2.0/libiberty/configure.ac 수정
+# AC_TYPE_PID_T
+
+빌드명령어 수정
+rm -f config.cache && 
+libtoolize --copy --force && aclocal --force && autoconf && automake --add-missing --copy && autoreconf -ivf && 
+sed -i 's/ -V -qversion -version/ --version/g' configure 
+sed -i 's/ -V -qversion/ --version/g' configure 
+sed -i 's/$NM -V/$NM --version/g' configure 
+sed -i 's/$CC -V/$CC --version/g' configure
+sed -i '/^ac_save_CC=\$CC/i ac_cv_prog_cc_c23=no' configure 
+sed -i 's/\$ac_c_conftest_c23_program//g' configure 
+sed -i '/ac_fn_c_check_header_mongrel.*"minix\/config.h"/,/^  fi/d' configure 
+sed -i 's/cxx11test::delegate d2();/cxx11test::delegate d2{};/g' configure
+sed -i '/^ VERSION='\''1\.0'\''$/d' configure 
+sed -i "/# define ISLOWER/c\#define ISLOWER(c) (islower(c))" configure
+sed -i "/# define TOUPPER/c\#define TOUPPER(c) (toupper(c))" configure 
+sed -i '/&& LARGE_FTYPE % 2147483647 == 1)/d' configure
+sed -i '/int FTYPE_is_large\[/c\
+void check_large_ftype() {\
+    int FTYPE_is_large[(LARGE_FTYPE % 2147483629 == 721 && LARGE_FTYPE % 2147483647 == 1) ? 1 : -1];\
+}' configure 
+sed -i '/\? 1 : -1];/d' configure 
+sed -i 's/\bnot\b/!/g' configure 
+sed -i 's/! big endian/#error "not big endian"/g' configure 
+sed -i 's/! a universal capable compiler//g' configure 
+sed -i 's/! big endian/#if BYTE_ORDER != BIG_ENDIAN\n    #error "not big endian"\n#endif/g' configure 
+sed -i '/^#define VERSION "\$VERSION"$/d' configure 
+sed -i '/old_archive_cmds_CXX=/s/-u//g' configure 
+sed -i 's/if (sizeof ((\$\([^)]*\))))/if (sizeof (\1))/g' configure && 
+./configure && 
+sed -i '/#define pid_t int/d' config.h && 
+make
+(오류)
+
+(수정)
+/c/gcc-14.2.0/libiberty/Makefile.am 수정
+# ar 플래그를 설정하여 'u' 플래그를 제거
+AR_FLAGS = rcs
+
+# 정적 라이브러리 정의
+noinst_LIBRARIES = libiberty.a
+
+# 라이브러리에 포함될 소스 파일
+libiberty_a_SOURCES = \
+    argv.c \
+    cplus-dem.c \
+    dyn-string.c \
+    fibheap.c \
+    floatformat.c \
+    fnmatch.c \
+    getruntime.c \
+    hex.c \
+    lbasename.c \
+    make-relative-prefix.c \
+    objalloc.c \
+    obstack.c \
+    partition.c \
+    pexecute.c \
+    physmem.c \
+    safe-ctype.c \
+    simple-object.c \
+    strerror.c \
+    strsignal.c \
+    xatexit.c \
+    xexit.c \
+    xmalloc.c \
+    xstrdup.c
+
+# 라이브러리 빌드 규칙 수정 (ar 명령어에 AR_FLAGS 적용)
+libiberty.a: $(libiberty_a_OBJECTS)
+	$(AR) $(AR_FLAGS) $@ $(libiberty_a_OBJECTS)
+
+# 추가 규칙
+CLEANFILES = *.o
+
+# 컴파일 플래그
+AM_CPPFLAGS = -D_UNICODE -I/c/msys64/mingw64/include -I$(srcdir)
+AM_CFLAGS = -Wall -Wextra -g
+
+# 링커 플래그
+LDADD = -lws2_32 -ladvapi32
+
+# 배포 클린 규칙
+DISTCLEANFILES = Makefile.in config.log config.status
+(오류)
+conftest.c:10:10: fatal error: ac_nonexistent.h: No such file or directory
+   10 | #include <ac_nonexistent.h>
+      |          ^~~~~~~~~~~~~~~~~~
+(수정)
+/c/gcc-14.2.0/libiberty/configure.ac 수정
+AC_CHECK_HEADERS([ac_nonexistent.h], [], [
+    # 파일이 없을 때 실행할 명령어
+    echo "ac_nonexistent.h does not exist."
+])
+(오류)
+conftest.c:183:12: error: size of array 'test_array' is negative
+  183 | static int test_array [1 - 2 * !(sizeof (void *) <= sizeof (int))];
+      |            ^~~~~~~~~~
+configure:21222: $? = 1
+(수정)
+빌드명령어 수정
+rm -f config.cache && 
+libtoolize --copy --force && aclocal --force && autoconf && automake --add-missing --copy && autoreconf -ivf && 
+sed -i 's/ -V -qversion -version/ --version/g' configure 
+sed -i 's/ -V -qversion/ --version/g' configure 
+sed -i 's/$NM -V/$NM --version/g' configure 
+sed -i 's/$CC -V/$CC --version/g' configure
+sed -i '/^ac_save_CC=\$CC/i ac_cv_prog_cc_c23=no' configure 
+sed -i 's/\$ac_c_conftest_c23_program//g' configure 
+sed -i '/ac_fn_c_check_header_mongrel.*"minix\/config.h"/,/^  fi/d' configure 
+sed -i 's/cxx11test::delegate d2();/cxx11test::delegate d2{};/g' configure
+sed -i '/^ VERSION='\''1\.0'\''$/d' configure 
+sed -i "/# define ISLOWER/c\#define ISLOWER(c) (islower(c))" configure
+sed -i "/# define TOUPPER/c\#define TOUPPER(c) (toupper(c))" configure 
+sed -i '/&& LARGE_FTYPE % 2147483647 == 1)/d' configure
+sed -i '/int FTYPE_is_large\[/c\
+void check_large_ftype() {\
+    int FTYPE_is_large[(LARGE_FTYPE % 2147483629 == 721 && LARGE_FTYPE % 2147483647 == 1) ? 1 : -1];\
+}' configure 
+sed -i '/\? 1 : -1];/d' configure 
+sed -i 's/\bnot\b/!/g' configure 
+sed -i 's/! big endian/#error "not big endian"/g' configure 
+sed -i 's/! a universal capable compiler//g' configure 
+sed -i 's/! big endian/#if BYTE_ORDER != BIG_ENDIAN\n    #error "not big endian"\n#endif/g' configure 
+sed -i '/^#define VERSION "\$VERSION"$/d' configure 
+sed -i '/old_archive_cmds_CXX=/s/-u//g' configure 
+sed -i 's/if (sizeof ((\$\([^)]*\))))/if (sizeof (\1))/g' configure 
+sed -i 's/\(static int test_array \[1 - 2 \* !(sizeof (void \*) <= sizeof (\$ac_type))\];\)/static int test_array [1 - 2 * !(sizeof(void *) <= sizeof(\$ac_type)) < 0 ? 0 : 1];/' configure && 
+./configure && 
+sed -i '/#define pid_t int/d' config.h && 
+make
+(오류)
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cccpFL2J.o:conftest.c:(.text.startup+0xa): undefined reference to `bzero'
+collect2.exe: error: ld returned 1 exit status
+configure:21557: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccoUAsTS.o:conftest.c:(.text.startup+0xa): undefined reference to `bcmp'
+collect2.exe: error: ld returned 1 exit status
+configure:21557: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccC67syr.o:conftest.c:(.text.startup+0xa): undefined reference to `bcopy'
+collect2.exe: error: ld returned 1 exit status
+configure:21557: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccC67syr.o:conftest.c:(.text.startup+0xa): undefined reference to `setenv'
+collect2.exe: error: ld returned 1 exit status
+configure:21557: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccksMHKv.o:conftest.c:(.text.startup+0xa): undefined reference to `random'
+collect2.exe: error: ld returned 1 exit status
+configure:21557: $? = 1
+(수정)
+/c/gcc-14.2.0/libiberty/configure.ac 수정
+# AC_CHECK_FUNCS([bzero bcmp bcopy setenv random])
+(오류)
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccQKhonH.o:conftest.c:(.text.startup+0xa): undefined reference to `posix_spawn'
+collect2.exe: error: ld returned 1 exit status
+configure:21611: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cceNEGRV.o:conftest.c:(.text.startup+0xa): undefined reference to `canonicalize_file_name'
+collect2.exe: error: ld returned 1 exit status
+configure:21635: $? = 1
+(수정)
+/c/gcc-14.2.0/libiberty/configure.ac 수정
+# posix_spawn 확인
+# AC_CHECK_FUNCS([posix_spawn], [], [
+#   AC_MSG_WARN([posix_spawn이 없으므로, Windows에서는 CreateProcess를 사용합니다.])
+#   AC_DEFINE([HAVE_POSIX_SPAWN], [0], [Define if posix_spawn is not available])
+#   AC_DEFINE([USE_CREATEPROCESS], [1], [Define if CreateProcess is used instead of posix_spawn on Windows])
+# ])
+
+# canonicalize_file_name 확인
+# AC_CHECK_FUNCS([canonicalize_file_name], [], [
+#   AC_MSG_WARN([canonicalize_file_name이 없으므로, Windows에서는 GetFullPathName을 사용합니다.])
+#   AC_DEFINE([HAVE_CANONICALIZE_FILE_NAME], [0], [Define if canonicalize_file_name is not available])
+#   AC_DEFINE([USE_GETFULLPATHNAME], [1], [Define if GetFullPathName is used instead of canonicalize_file_name on Windows])
+# ])
+(오류)
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccsC7Exh.o:conftest.c:(.text.startup+0xa): undefined reference to `bcmp'
+collect2.exe: error: ld returned 1 exit status
+configure:22285: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccKNPBI8.o:conftest.c:(.text.startup+0xa): undefined reference to `bcopy'
+collect2.exe: error: ld returned 1 exit status
+configure:22237: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccoRvXGg.o:conftest.c:(.text.startup+0xa): undefined reference to `bzero'
+collect2.exe: error: ld returned 1 exit status
+configure:22237: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cciADW8x.o:conftest.c:(.text.startup+0xa): undefined reference to `ffs'
+collect2.exe: error: ld returned 1 exit status
+configure:22237: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cc2vogg9.o:conftest.c:(.text.startup+0xa): undefined reference to `index'
+collect2.exe: error: ld returned 1 exit status
+configure:22237: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccQrzX5k.o:conftest.c:(.text.startup+0xa): undefined reference to `insque'
+collect2.exe: error: ld returned 1 exit status
+configure:22237: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cccG2VJL.o:conftest.c:(.text.startup+0xa): undefined reference to `memmem'
+collect2.exe: error: ld returned 1 exit status
+configure:22237: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cce5DwqV.o:conftest.c:(.text.startup+0xa): undefined reference to `mkstemps'
+collect2.exe: error: ld returned 1 exit status
+configure:22237: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cc40A3Lc.o:conftest.c:(.text.startup+0xa): undefined reference to `random'
+collect2.exe: error: ld returned 1 exit status
+configure:22237: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccguvhJx.o:conftest.c:(.text.startup+0xa): undefined reference to `rindex'
+collect2.exe: error: ld returned 1 exit status
+configure:22237: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cc6Pxzlt.o:conftest.c:(.text.startup+0xa): undefined reference to `setenv'
+collect2.exe: error: ld returned 1 exit status
+configure:22237: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccyLcJMM.o:conftest.c:(.text.startup+0xa): undefined reference to `sigsetmask'
+collect2.exe: error: ld returned 1 exit status
+configure:22237: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccmB2A4c.o:conftest.c:(.text.startup+0xa): undefined reference to `stpcpy'
+collect2.exe: error: ld returned 1 exit status
+configure:22237: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccCI2D8e.o:conftest.c:(.text.startup+0xa): undefined reference to `stpncpy'
+collect2.exe: error: ld returned 1 exit status
+configure:22237: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccQwkzWM.o:conftest.c:(.text.startup+0xa): undefined reference to `strndup'
+collect2.exe: error: ld returned 1 exit status
+configure:22237: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccE11FqE.o:conftest.c:(.text.startup+0xa): undefined reference to `strverscmp'
+collect2.exe: error: ld returned 1 exit status
+configure:22237: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccOSyOGx.o:conftest.c:(.text.startup+0xa): undefined reference to `waitpid'
+collect2.exe: error: ld returned 1 exit status
+configure:22237: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccSIUiwU.o:conftest.c:(.text.startup+0xa): undefined reference to `setproctitle'
+collect2.exe: error: ld returned 1 exit status
+configure:22237: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccw2RMzs.o:conftest.c:(.text.startup+0xa): undefined reference to `strndup'
+collect2.exe: error: ld returned 1 exit status
+configure:22229: $? = 1
+conftest.c:193:10: fatal error: vfork.h: No such file or directory
+  193 | #include <vfork.h>
+      |          ^~~~~~~~~
+compilation terminated.
+configure:22348: $? = 1
+(수정)
+funcs="asprintf"
+funcs="$funcs atexit"
+funcs="$funcs basename"
+# funcs="$funcs bcmp"
+# funcs="$funcs bcopy"
+funcs="$funcs bsearch"
+# funcs="$funcs bzero"
+funcs="$funcs calloc"
+funcs="$funcs clock"
+# funcs="$funcs ffs"
+funcs="$funcs getcwd"
+funcs="$funcs getpagesize"
+funcs="$funcs gettimeofday"
+# funcs="$funcs index"
+# funcs="$funcs insque"
+funcs="$funcs memchr"
+funcs="$funcs memcmp"
+funcs="$funcs memcpy"
+# funcs="$funcs memmem"
+funcs="$funcs memmove"
+funcs="$funcs mempcpy"
+funcs="$funcs memset"
+# funcs="$funcs mkstemps"
+funcs="$funcs putenv"
+# funcs="$funcs random"
+funcs="$funcs rename"
+# funcs="$funcs rindex"
+# funcs="$funcs setenv"
+funcs="$funcs snprintf"
+# funcs="$funcs sigsetmask"
+# funcs="$funcs stpcpy"
+# funcs="$funcs stpncpy"
+funcs="$funcs strcasecmp"
+funcs="$funcs strchr"
+# funcs="$funcs strdup"
+funcs="$funcs strncasecmp"
+# funcs="$funcs strndup"
+funcs="$funcs strnlen"
+funcs="$funcs strrchr"
+funcs="$funcs strstr"
+funcs="$funcs strtod"
+funcs="$funcs strtol"
+funcs="$funcs strtoul"
+funcs="$funcs strtoll"
+funcs="$funcs strtoull"
+# funcs="$funcs strverscmp"
+funcs="$funcs tmpnam"
+funcs="$funcs vasprintf"
+funcs="$funcs vfprintf"
+funcs="$funcs vprintf"
+funcs="$funcs vsnprintf"
+funcs="$funcs vsprintf"
+# funcs="$funcs waitpid"
+# funcs="$funcs setproctitle"
+...
+# AC_CHECK_FUNCS([bzero bcmp bcopy setenv random])
+...
+#if test "$ac_cv_func_bcopy" = "no"; then
+#  AC_DEFINE([HAVE_BCOPY], [0], [Define if bcopy is not available])
+#  AC_LIBOBJ([bcopy])
+#fi
+...
+# These are neither executed nor required, but they help keep
+# autoheader happy without adding a bunch of text to acconfig.h.
+if test "x" = "y"; then
+  AC_CHECK_FUNCS(asprintf atexit \
+    bcmp basename bsearch \
+    calloc canonicalize_file_name clock \
+    dup3 \
+    __fsetlocking \
+    getcwd getpagesize getrlimit getrusage getsysinfo gettimeofday \
+    memchr memcmp memcpy memmove memset \
+    on_exit \
+    pipe2 posix_spawn posix_spawnp psignal \
+    pstat_getdynamic pstat_getstatic putenv \
+    realpath rename \
+    sbrk setrlimit snprintf spawnve spawnvpe \
+     strcasecmp strchr strdup \
+     strerror strncasecmp strnlen strrchr strsignal strstr strtod \
+     strtol strtoul strtoll strtoull sysconf sysctl sysmp \
+    table times tmpnam \
+    vasprintf vfprintf vprintf vsprintf \
+    wait3 wait4)
+  AC_CHECK_DECLS([basename(char *), ffs, asprintf, vasprintf, snprintf, vsnprintf, strtol, strtoul, strtoll, strtoull, strnlen])
+  AC_DEFINE(HAVE_SYS_ERRLIST, 1, [Define if you have the sys_errlist variable.])
+  AC_DEFINE(HAVE_SYS_NERR,    1, [Define if you have the sys_nerr variable.])
+  AC_DEFINE(HAVE_SYS_SIGLIST, 1, [Define if you have the sys_siglist variable.])
+fi
+(오류)
+conftest.c:190:15: error: two or more data types in declaration specifiers
+  190 | #define pid_t int
+      |               ^~~
+C:/msys64/usr/include/sys/types.h:172:25: note: in expansion of macro 'pid_t'
+  172 | typedef __pid_t         pid_t;          /* process id */
+      |                         ^~~~~
+configure:22729: $? = 1
+(수정)
