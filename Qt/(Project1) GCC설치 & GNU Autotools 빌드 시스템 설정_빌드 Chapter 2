@@ -1431,3 +1431,129 @@ C:/msys64/usr/include/sys/types.h:172:25: note: in expansion of macro 'pid_t'
       |                         ^~~~~
 configure:22729: $? = 1
 (수정)
+빌드 명령어 수정
+rm -f config.cache && 
+libtoolize --copy --force && aclocal --force && autoconf && automake --add-missing --copy && autoreconf -ivf && 
+sed -i 's/ -V -qversion -version/ --version/g' configure 
+sed -i 's/ -V -qversion/ --version/g' configure 
+sed -i 's/$NM -V/$NM --version/g' configure 
+sed -i 's/$CC -V/$CC --version/g' configure
+sed -i '/^ac_save_CC=\$CC/i ac_cv_prog_cc_c23=no' configure 
+sed -i 's/\$ac_c_conftest_c23_program//g' configure 
+sed -i '/ac_fn_c_check_header_mongrel.*"minix\/config.h"/,/^  fi/d' configure 
+sed -i 's/cxx11test::delegate d2();/cxx11test::delegate d2{};/g' configure
+sed -i '/^ VERSION='\''1\.0'\''$/d' configure 
+sed -i "/# define ISLOWER/c\#define ISLOWER(c) (islower(c))" configure
+sed -i "/# define TOUPPER/c\#define TOUPPER(c) (toupper(c))" configure 
+sed -i '/&& LARGE_FTYPE % 2147483647 == 1)/d' configure
+sed -i '/int FTYPE_is_large\[/c\
+void check_large_ftype() {\
+    int FTYPE_is_large[(LARGE_FTYPE % 2147483629 == 721 && LARGE_FTYPE % 2147483647 == 1) ? 1 : -1];\
+}' configure 
+sed -i '/\? 1 : -1];/d' configure 
+sed -i 's/\bnot\b/!/g' configure 
+sed -i 's/! big endian/#error "not big endian"/g' configure 
+sed -i 's/! a universal capable compiler//g' configure 
+sed -i 's/! big endian/#if BYTE_ORDER != BIG_ENDIAN\n    #error "not big endian"\n#endif/g' configure 
+sed -i '/^#define VERSION "\$VERSION"$/d' configure 
+sed -i '/old_archive_cmds_CXX=/s/-u//g' configure 
+sed -i 's/if (sizeof ((\$\([^)]*\))))/if (sizeof (\1))/g' configure 
+sed -i 's/\(static int test_array \[1 - 2 \* !(sizeof (void \*) <= sizeof (\$ac_type))\];\)/static int test_array [1 - 2 * !(sizeof(void *) <= sizeof(\$ac_type)) < 0 ? 0 : 1];/' configure 
+sed -i '/#ifdef HAVE_VFORK_H/,/#endif/d' configure 
+sed -i '/for ac_header in vfork.h/,/done/d' configure 
+sed -i '/if test "x\$ac_cv_type_pid_t" = xyes; then :/,/fi/{H;d};${x;s/.*\nif test "x\$ac_cv_type_pid_t" = xyes; then :\n\nelse\n\ncat >>confdefs.h <<_ACEOF\n#define pid_t int\n_ACEOF\n\nfi\n//;p}' configure && 
+./configure && 
+sed -i '/#define pid_t int/d' config.h && 
+make
+(오류)
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cc6GMYaB.o:conftest.c:(.text.startup+0xa): undefined reference to `fork'
+collect2.exe: error: ld returned 1 exit status
+configure:22329: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cc8BtWS1.o:conftest.c:(.text.startup+0xa): undefined reference to `vfork'
+collect2.exe: error: ld returned 1 exit status
+configure:22329: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cc8g3k7W.o:conftest.c:(.text.startup+0xa): undefined reference to `_doprnt'
+collect2.exe: error: ld returned 1 exit status
+configure:22548: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccqZ7NLp.o:conftest.c:(.rdata$.refptr.sys_siglist[.refptr.sys_siglist]+0x0): undefined reference to `sys_siglist'
+collect2.exe: error: ld returned 1 exit status
+configure:22579: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccEJGC2x.o:conftest.c:(.text.startup+0xa): undefined reference to `__fsetlocking'
+collect2.exe: error: ld returned 1 exit status
+configure:22632: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cc6FzFjJ.o:conftest.c:(.text.startup+0xa): undefined reference to `canonicalize_file_name'
+collect2.exe: error: ld returned 1 exit status
+configure:22632: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccwGL63E.o:conftest.c:(.text.startup+0xa): undefined reference to `dup3'
+collect2.exe: error: ld returned 1 exit status
+configure:22632: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccc4Yla4.o:conftest.c:(.text.startup+0xa): undefined reference to `getrlimit'
+collect2.exe: error: ld returned 1 exit status
+configure:22632: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccYNihp5.o:conftest.c:(.text.startup+0xa): undefined reference to `getrusage'
+collect2.exe: error: ld returned 1 exit status
+configure:22632: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccpb2bhi.o:conftest.c:(.text.startup+0xa): undefined reference to `getsysinfo'
+collect2.exe: error: ld returned 1 exit status
+configure:22632: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccQmpvIO.o:conftest.c:(.text.startup+0xa): undefined reference to `on_exit'
+collect2.exe: error: ld returned 1 exit status
+configure:22632: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccKMAYcM.o:conftest.c:(.text.startup+0xa): undefined reference to `pipe2'
+collect2.exe: error: ld returned 1 exit status
+configure:22632: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cc0kqkp9.o:conftest.c:(.text.startup+0xa): undefined reference to `posix_spawn'
+collect2.exe: error: ld returned 1 exit status
+configure:22632: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccUeHuHZ.o:conftest.c:(.text.startup+0xa): undefined reference to `posix_spawnp'
+collect2.exe: error: ld returned 1 exit status
+configure:22632: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cccAHJMo.o:conftest.c:(.text.startup+0xa): undefined reference to `psignal'
+collect2.exe: error: ld returned 1 exit status
+configure:22632: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccSAHnTx.o:conftest.c:(.text.startup+0xa): undefined reference to `pstat_getdynamic'
+collect2.exe: error: ld returned 1 exit status
+configure:22632: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccuzh0Qp.o:conftest.c:(.text.startup+0xa): undefined reference to `pstat_getstatic'
+collect2.exe: error: ld returned 1 exit status
+configure:22632: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccg0KuoJ.o:conftest.c:(.text.startup+0xa): undefined reference to `realpath'
+collect2.exe: error: ld returned 1 exit status
+configure:22632: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cc4stGPL.o:conftest.c:(.text.startup+0xa): undefined reference to `setrlimit'
+collect2.exe: error: ld returned 1 exit status
+configure:22632: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccOA6fed.o:conftest.c:(.text.startup+0xa): undefined reference to `strsignal'
+collect2.exe: error: ld returned 1 exit status
+configure:22632: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccOHmHrp.o:conftest.c:(.text.startup+0xa): undefined reference to `sysconf'
+collect2.exe: error: ld returned 1 exit status
+configure:22632: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccaVt8vA.o:conftest.c:(.text.startup+0xa): undefined reference to `sysctl'
+collect2.exe: error: ld returned 1 exit status
+configure:22632: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cc46359M.o:conftest.c:(.text.startup+0xa): undefined reference to `sysmp'
+collect2.exe: error: ld returned 1 exit status
+configure:22632: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccq0UUd9.o:conftest.c:(.text.startup+0xa): undefined reference to `table'
+collect2.exe: error: ld returned 1 exit status
+configure:22632: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cc0T0g76.o:conftest.c:(.text.startup+0xa): undefined reference to `times'
+collect2.exe: error: ld returned 1 exit status
+configure:22632: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccps6DEl.o:conftest.c:(.text.startup+0xa): undefined reference to `wait3'
+collect2.exe: error: ld returned 1 exit status
+configure:22632: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccWkmJ4m.o:conftest.c:(.text.startup+0xa): undefined reference to `wait4'
+collect2.exe: error: ld returned 1 exit status
+configure:22632: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccufp2ez.o:conftest.c:(.text.startup+0xa): undefined reference to `sbrk'
+collect2.exe: error: ld returned 1 exit status
+configure:22632: $? = 1
+conftest.c: In function 'main':
+conftest.c:235:28: error: 'canonicalize_file_name' undeclared (first use in this function)
+  235 | char *(*pfn) = (char *(*)) canonicalize_file_name
+      |                            ^~~~~~~~~~~~~~~~~~~~~~
+conftest.c:235:28: note: each undeclared identifier is reported only once for each function it appears in
+configure:22862: $? = 1
+(수정)
