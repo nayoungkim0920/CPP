@@ -1562,3 +1562,199 @@ configure:22862: $? = 1
 (수정)
 /c/gcc-14.2.0/libiberty/configure.ac 수정
   # AC_FUNC_FORK
+  # if test $ac_cv_func_vfork_works = no; then
+    # AC_LIBOBJ([vfork])
+  # fi
+  # We only need _doprnt if we might use it to implement v*printf.
+  #if test $ac_cv_func_vprintf != yes \
+  #   || test $ac_cv_func_vfprintf != yes \
+  #   || test $ac_cv_func_vsprintf != yes; then
+  #  AC_REPLACE_FUNCS(_doprnt)
+  #else
+  #  AC_CHECK_FUNCS(_doprnt)
+  #fi
+
+#vars="sys_errlist sys_nerr sys_siglist"
+vars="sys_errlist sys_nerr"
+#AC_DEFINE(HAVE_SYS_SIGLIST, 1, [Define if you have the sys_siglist variable.])
+
+# checkfuncs="__fsetlocking canonicalize_file_name dup3 getrlimit getrusage \
+ getsysinfo gettimeofday on_exit pipe2 posix_spawn posix_spawnp psignal \
+ pstat_getdynamic pstat_getstatic \
+ realpath setrlimit spawnve spawnvpe strerror strsignal sysconf sysctl \
+ sysmp table times wait3 wait4"
+
+checkfuncs="gettimeofday spawnve spawnvpe strerror"
+
+
+# Darwin has sbrk, but it is deprecated and that produces build-time warnings
+# so do not check for it.
+#case "${host}" in
+#  *-*-darwin*) ;;
+#  *) checkfuncs="$checkfuncs sbrk"
+#esac
+(오류)
+./configure: line 21423: syntax error near unexpected token `('
+./configure: line 21423: `ac_fn_c_check_decl "$LINENO" "basename(char *)" "$as_ac_Symbol" "$ac_includes_default"'
+(수정)
+#AC_CHECK_DECLS([basename(char *), ffs, asprintf, vasprintf, snprintf, vsnprintf])
+#AC_CHECK_DECLS([basename(char *), ffs, asprintf, vasprintf, snprintf, vsnprintf, strtol, strtoul, strtoll, strtoull, strnlen])
+AC_CHECK_DECLS([basename\(char \*\), ffs, asprintf, vasprintf, snprintf, vsnprintf])
+AC_CHECK_DECLS([basename\(char \*\), ffs, asprintf, vasprintf, snprintf, vsnprintf, strtol, strtoul, strtoll, strtoull, strnlen])
+(오류)
+./configure: line 21595: syntax error near unexpected token `('
+./configure: line 21595: `  $as_echo_n "(cached) " >&6'
+(수정)
+빌드 명령어 추가
+sed -i 's/\$as_echo_n "(cached) "/\$as_echo_n "\\(cached\\) "/' configure
+(오류)
+./configure: line 22416: syntax error near unexpected token `('
+./configure: line 22416: `  as_ac_Symbol=`$as_echo "ac_cv_have_decl_basename\\(char \\*\\)" | $as_tr_sh`'
+(수정)
+sed -i 's/ac_cv_have_decl_basename\\\\(char \\\\\*\\\\)/ac_cv_have_decl_basename\\(char \\*\\)/' configure
+(오류)
+./configure: command substitution: line 21387: syntax error: unexpected end of file
+./configure: command substitution: line 21375: syntax error near unexpected token `;'
+./configure: command substitution: line 21375: `; do'
+./configure: command substitution: line 21375: syntax error near unexpected token `in'
+./configure: command substitution: line 21375: ` in #('
+./configure: line 21375: getsysinfo: command not found
+./configure: line 23102: syntax error near unexpected token `[_$as_cr_alnum]*_cv_[_$as_cr_alnum]*\\'
+./configure: line 23102: `        s/^\\([_$as_cr_alnum]*_cv_[_$as_cr_alnum]*\\)=\\(.*\\)/\\1='\\2'/p"'
+(수정)
+rm -f config.cache && 
+libtoolize --copy --force && aclocal --force && autoconf && automake --add-missing --copy && autoreconf -ivf && 
+sed -i 's/ -V -qversion -version/ --version/g' configure 
+sed -i 's/ -V -qversion/ --version/g' configure 
+sed -i 's/$NM -V/$NM --version/g' configure 
+sed -i 's/$CC -V/$CC --version/g' configure
+sed -i '/^ac_save_CC=\$CC/i ac_cv_prog_cc_c23=no' configure 
+sed -i 's/\$ac_c_conftest_c23_program//g' configure 
+sed -i '/ac_fn_c_check_header_mongrel.*"minix\/config.h"/,/^  fi/d' configure 
+sed -i 's/cxx11test::delegate d2();/cxx11test::delegate d2{};/g' configure
+sed -i '/^ VERSION='\''1\.0'\''$/d' configure 
+sed -i "/# define ISLOWER/c\#define ISLOWER(c) (islower(c))" configure
+sed -i "/# define TOUPPER/c\#define TOUPPER(c) (toupper(c))" configure 
+sed -i '/&& LARGE_FTYPE % 2147483647 == 1)/d' configure
+sed -i '/int FTYPE_is_large\[/c\
+void check_large_ftype() {\
+    int FTYPE_is_large[(LARGE_FTYPE % 2147483629 == 721 && LARGE_FTYPE % 2147483647 == 1) ? 1 : -1];\
+}' configure 
+sed -i '/\? 1 : -1];/d' configure 
+sed -i 's/\bnot\b/!/g' configure 
+sed -i 's/! big endian/#error "not big endian"/g' configure 
+sed -i 's/! a universal capable compiler//g' configure 
+sed -i 's/! big endian/#if BYTE_ORDER != BIG_ENDIAN\n    #error "not big endian"\n#endif/g' configure 
+sed -i '/^#define VERSION "\$VERSION"$/d' configure 
+sed -i '/old_archive_cmds_CXX=/s/-u//g' configure 
+sed -i 's/if (sizeof ((\$\([^)]*\))))/if (sizeof (\1))/g' configure 
+sed -i 's/\(static int test_array \[1 - 2 \* !(sizeof (void \*) <= sizeof (\$ac_type))\];\)/static int test_array [1 - 2 * !(sizeof(void *) <= sizeof(\$ac_type)) < 0 ? 0 : 1];/' configure 
+sed -i '/#ifdef HAVE_VFORK_H/,/#endif/d' configure 
+sed -i '/for ac_header in vfork.h/,/done/d' configure 
+sed -i '/if test "x\$ac_cv_type_pid_t" = xyes; then :/,/fi/{H;d};${x;s/.*\nif test "x\$ac_cv_type_pid_t" = xyes; then :\n\nelse\n\ncat >>confdefs.h <<_ACEOF\n#define pid_t int\n_ACEOF\n\nfi\n//;p}' configure 
+sed -i 's/\$as_echo_n "(cached) "/\$as_echo_n "\\(cached\\) "/' configure 
+sed -i 's/ac_cv_have_decl_basename\\\\(char \\\\\*\\\\)/ac_cv_have_decl_basename\\(char \\*\\)/' configure && 
+./configure 
+&& 
+sed -i '/#define pid_t int/d' config.h && 
+make
+(오류)
+conftest.c:196:10: error: macro names must be identifiers
+  196 | #define  0
+      |          ^
+configure:22511: $? = 1
+(수정)
+/c/gcc-14.2.0/libiberty/configure.ac 수정
+# AC_CHECK_DECLS([basename\(char \*\), ffs, asprintf, vasprintf, snprintf, vsnprintf, strtol, strtoul, strtoll, strtoull, strnlen])
+#   AC_CHECK_DECLS([basename\(char \*\), ffs, asprintf, vasprintf, snprintf, vsnprintf])
+#   AC_CHECK_DECLS([calloc, getenv, getopt, malloc, realloc])
+#   case "${host}" in
+#       *-*-darwin*) ;; # Darwin's sbrk implementation is deprecated.
+#       *) AC_CHECK_DECLS([sbrk]);;
+#   esac
+#   AC_CHECK_DECLS([strtol, strtoul, strtoll, strtoull])
+#   AC_CHECK_DECLS([strverscmp])
+#   AC_CHECK_DECLS([strnlen])
+###############################################################################
+  # basename(char *)를 개별적으로 처리
+  AC_CHECK_DECL([basename], 
+              [AC_DEFINE([HAVE_DECL_BASENAME], [1], [Define if basename is declared.])],
+              [AC_DEFINE([HAVE_DECL_BASENAME], [0], [Define if basename is not declared.])],
+              [#include <libgen.h>])
+
+  # 나머지 함수에 대해 선언 여부를 확인
+  AC_CHECK_DECLS([ffs, asprintf, vasprintf, snprintf, vsnprintf, strtol, strtoul, strtoll, strtoull, strnlen])
+  AC_CHECK_DECLS([calloc, getenv, getopt, malloc, realloc])
+
+  # Darwin의 sbrk 처리
+  case "${host}" in
+      *-*-darwin*) ;; # Darwin's sbrk implementation is deprecated.
+      *) AC_CHECK_DECLS([sbrk]);;
+  esac
+
+  # 추가 함수 확인
+  AC_CHECK_DECLS([strverscmp])
+  ###############################################################################
+(오류)
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\cc6HUL5b.o:conftest.c:(.rdata$.refptr.sys_siglist[.refptr.sys_siglist]+0x0): undefined reference to `sys_siglist'
+collect2.exe: error: ld returned 1 exit status
+configure:22234: $? = 1
+conftest.c: In function 'main':
+conftest.c:234:28: error: 'canonicalize_file_name' undeclared (first use in this function)
+  234 | char *(*pfn) = (char *(*)) canonicalize_file_name
+      |                            ^~~~~~~~~~~~~~~~~~~~~~
+conftest.c:234:28: note: each undeclared identifier is reported only once for each function it appears in
+configure:22527: $? = 1
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccIxpnwe.o:conftest.c:(.text.startup+0xfc): undefined reference to `mmap'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccIxpnwe.o:conftest.c:(.text.startup+0x150): undefined reference to `munmap'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\msys64\tmp\ccIxpnwe.o:conftest.c:(.text.startup+0x192): undefined reference to `mmap'
+collect2.exe: error: ld returned 1 exit status
+configure:22800: $? = 1
+configure: program exited with status 1
+(수정)
+# vars="sys_errlist sys_nerr sys_siglist"
+vars="sys_errlist sys_nerr"
+
+####################################################################################
+# canonicalize_file_name 함수 확인
+AC_CHECK_FUNCS([canonicalize_file_name])
+
+# canonicalize_file_name이 없다면 realpath를 사용하도록 정의
+if test "x$ac_cv_func_canonicalize_file_name" = "xno"; then
+  AC_CHECK_FUNCS([realpath])
+fi
+####################################################################################
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+int
+main ()
+{
+char *(*pfn) = (char *(*)) canonicalize_file_name
+  ;
+  return 0;
+}
+=>
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+#ifdef HAVE_CANONICALIZE_FILE_NAME
+  #include <libgen.h>
+#else
+  #define canonicalize_file_name realpath
+#endifint
+main ()
+{
+char *(*pfn) = (char *(*)) canonicalize_file_name
+  ;
+  return 0;
+}
+
+sed -i '/^#ifdef HAVE_UNISTD_H/,/int\s*main\s*(/{
+  /int\s*main\s*(/i\
+#ifdef HAVE_CANONICALIZE_FILE_NAME\n\
+  #include <libgen.h>\n\
+#else\n\
+  #define canonicalize_file_name realpath\n\
+#endif
+}' configure
