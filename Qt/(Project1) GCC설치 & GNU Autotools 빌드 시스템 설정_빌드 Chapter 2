@@ -1724,6 +1724,9 @@ if test "x$ac_cv_func_canonicalize_file_name" = "xno"; then
   AC_CHECK_FUNCS([realpath])
 fi
 ####################################################################################
+
+빌드 명령어 수정
+/c/gcc-14.2.0/libiberty/configure 확인
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
@@ -1750,11 +1753,677 @@ char *(*pfn) = (char *(*)) canonicalize_file_name
   return 0;
 }
 
-sed -i '/^#ifdef HAVE_UNISTD_H/,/int\s*main\s*(/{
-  /int\s*main\s*(/i\
-#ifdef HAVE_CANONICALIZE_FILE_NAME\n\
-  #include <libgen.h>\n\
-#else\n\
-  #define canonicalize_file_name realpath\n\
+sed -i '/#ifdef HAVE_UNISTD_H/a\
+#ifdef HAVE_CANONICALIZE_FILE_NAME\n  #include <libgen.h>\n#else\n  #define canonicalize_file_name realpath' configure
+(오류)
+In file included from C:/msys64/mingw64/include/libiberty/demangle.h:32,
+                 from cplus-dem.c:50:
+cplus-dem.c: In function 'ada_demangle':
+C:/msys64/mingw64/include/libiberty/libiberty.h:370:33: error: implicit declaration of function 'free' [-Wimplicit-function-declaration]
+  370 | #define XDELETEVEC(P)           free ((void*) (P))
+      |                                 ^~~~
+cplus-dem.c:452:3: note: in expansion of macro 'XDELETEVEC'
+  452 |   XDELETEVEC (demangled);
+      |   ^~~~~~~~~~
+cplus-dem.c:55:1: note: include '<stdlib.h>' or provide a declaration of 'free'
+   54 | #include "libiberty.h"
+  +++ |+#include <stdlib.h>
+   55 |
+make[1]: *** [Makefile:512: cplus-dem.o] 오류 1
+make[1]: 디렉터리 '/c/gcc-14.2.0/libiberty' 나감
+make: *** [Makefile:423: all] 오류 2
+(수정)
+/c/gcc-14.2.0/libiberty/cplus-dem.c 수정
+#ifdef HAVE_STDLIB_H
+#include <stdlib.h>
+#else
+void * malloc ();
+void * realloc ();
+void free(void *ptr);  // free 함수 선언 추가
 #endif
-}' configure
+(오류)
+dyn-string.c: In function 'dyn_string_delete':
+dyn-string.c:110:3: error: implicit declaration of function 'free' [-Wimplicit-function-declaration]
+  110 |   free (ds->s);
+      |   ^~~~
+dyn-string.c:47:1: note: include '<stdlib.h>' or provide a declaration of 'free'
+   46 | #include "dyn-string.h"
+  +++ |+#include <stdlib.h>
+   47 |
+dyn-string.c: In function 'dyn_string_copy':
+dyn-string.c:187:5: error: implicit declaration of function 'abort' [-Wimplicit-function-declaration]
+  187 |     abort ();
+      |     ^~~~~
+dyn-string.c:187:5: note: include '<stdlib.h>' or provide a declaration of 'abort'
+dyn-string.c:193:3: error: implicit declaration of function 'strcpy' [-Wimplicit-function-declaration]
+  193 |   strcpy (dest->s, src->s);
+      |   ^~~~~~
+dyn-string.c:47:1: note: include '<string.h>' or provide a declaration of 'strcpy'
+   46 | #include "dyn-string.h"
+  +++ |+#include <string.h>
+   47 |
+dyn-string.c: In function 'dyn_string_copy_cstr':
+dyn-string.c:206:16: error: implicit declaration of function 'strlen' [-Wimplicit-function-declaration]
+  206 |   int length = strlen (src);
+      |                ^~~~~~
+dyn-string.c:206:16: note: include '<string.h>' or provide a declaration of 'strlen'
+dyn-string.c: In function 'dyn_string_insert':
+dyn-string.c:257:3: error: implicit declaration of function 'strncpy' [-Wimplicit-function-declaration]
+  257 |   strncpy (dest->s + pos, src->s, src->length);
+      |   ^~~~~~~
+dyn-string.c:257:3: note: include '<string.h>' or provide a declaration of 'strncpy'
+dyn-string.c: In function 'dyn_string_insert_cstr':
+dyn-string.c:280:3: error: implicit declaration of function 'memcpy' [-Wimplicit-function-declaration]
+  280 |   memcpy (dest->s + pos, src, length);
+      |   ^~~~~~
+dyn-string.c:280:3: note: include '<string.h>' or provide a declaration of 'memcpy'
+dyn-string.c: In function 'dyn_string_eq':
+dyn-string.c:396:13: error: implicit declaration of function 'strcmp' [-Wimplicit-function-declaration]
+  396 |     return !strcmp (ds1->s, ds2->s);
+      |             ^~~~~~
+dyn-string.c:396:13: note: include '<string.h>' or provide a declaration of 'strcmp'
+make[1]: *** [Makefile:512: dyn-string.o] 오류 1
+make[1]: 디렉터리 '/c/gcc-14.2.0/libiberty' 나감
+make: *** [Makefile:423: all] 오류 2
+(수정)
+/c/gcc-14.2.0/libiberty/dyn-string.c 수정
+#ifdef HAVE_STRING_H
+#include <string.h>
+#else
+void *memcpy(void *dest, const void *src, size_t n);  // memcpy 선언
+size_t strlen(const char *str);                        // strlen 선언
+int strcmp(const char *str1, const char *str2);        // strcmp 선언
+char *strcpy(char *dest, const char *src);             // strcpy 선언
+#endif
+
+#ifdef HAVE_STDLIB_H
+#include <stdlib.h>
+#else
+void *malloc(size_t size);                             // malloc 선언
+void *realloc(void *ptr, size_t size);                 // realloc 선언
+void free(void *ptr);                                  // free 선언
+void abort(void);                                      // abort 선언
+#endif
+(오류)
+dyn-string.c: In function 'dyn_string_insert':
+dyn-string.c:267:3: error: implicit declaration of function 'strncpy' [-Wimplicit-function-declaration]
+  267 |   strncpy (dest->s + pos, src->s, src->length);
+      |   ^~~~~~~
+dyn-string.c:57:1: note: include '<string.h>' or provide a declaration of 'strncpy'
+   56 | #include "dyn-string.h"
+  +++ |+#include <string.h>
+   57 |
+make[1]: *** [Makefile:512: dyn-string.o] 오류 1
+make[1]: 디렉터리 '/c/gcc-14.2.0/libiberty' 나감
+make: *** [Makefile:423: all] 오류 2
+(수정)
+/c/gcc-14.2.0/libiberty/dyn-string.c 수정
+#include <string.h>
+#include <stdlib.h>
+(오류)
+fibheap.c: In function 'fibheap_union':
+fibheap.c:151:7: error: implicit declaration of function 'free' [-Wimplicit-function-declaration]
+  151 |       free (heapa);
+      |       ^~~~
+fibheap.c:36:1: note: include '<stdlib.h>' or provide a declaration of 'free'
+   35 | #include "fibheap.h"
+  +++ |+#include <stdlib.h>
+   36 |
+fibheap.c: In function 'fibheap_delete_node':
+fibheap.c:265:7: error: implicit declaration of function 'abort' [-Wimplicit-function-declaration]
+  265 |       abort ();
+      |       ^~~~~
+fibheap.c:265:7: note: include '<stdlib.h>' or provide a declaration of 'abort'
+fibheap.c: In function 'fibheap_consolidate':
+fibheap.c:368:3: error: implicit declaration of function 'memset' [-Wimplicit-function-declaration]
+  368 |   memset (a, 0, sizeof (fibnode_t) * D);
+      |   ^~~~~~
+fibheap.c:36:1: note: include '<string.h>' or provide a declaration of 'memset'
+   35 | #include "fibheap.h"
+  +++ |+#include <string.h>
+   36 |
+(수정)
+/c/gcc-14.2.0/libiberty/fibheap.c 수정
+//#ifdef HAVE_STDLIB_H
+#include <stdlib.h>
+//#endif
+//#ifdef HAVE_STRING_H
+#include <string.h>
+//#endif
+(오류)
+floatformat.c: In function 'floatformat_from_double':
+floatformat.c:631:3: error: implicit declaration of function 'memset' [-Wimplicit-function-declaration]
+  631 |   memset (uto, 0, fmt->totalsize / FLOATFORMAT_CHAR_BIT);
+      |   ^~~~~~
+floatformat.c:43:1: note: include '<string.h>' or provide a declaration of 'memset'
+   42 | #include "floatformat.h"
+  +++ |+#include <string.h>
+   43 |
+make[1]: *** [Makefile:512: floatformat.o] 오류 1
+make[1]: 디렉터리 '/c/gcc-14.2.0/libiberty' 나감
+make: *** [Makefile:423: all] 오류 2
+(수정)
+/c/gcc-14.2.0/libiberty/floatformat.c 수정
+//#ifdef HAVE_STRING_H
+#include <string.h>
+//#endif
+(오류)
+make-relative-prefix.c: In function 'save_string':
+make-relative-prefix.c:108:27: error: implicit declaration of function 'malloc' [-Wimplicit-function-declaration]
+  108 |   char *result = (char *) malloc (len + 1);
+      |                           ^~~~~~
+make-relative-prefix.c:68:1: note: include '<stdlib.h>' or provide a declaration of 'malloc'
+   67 | #include "libiberty.h"
+  +++ |+#include <stdlib.h>
+   68 |
+make-relative-prefix.c: In function 'split_directories':
+make-relative-prefix.c:162:11: error: implicit declaration of function 'free' [-Wimplicit-function-declaration]
+  162 |           free (dirs);
+      |           ^~~~
+make-relative-prefix.c:162:11: note: include '<stdlib.h>' or provide a declaration of 'free'
+make-relative-prefix.c: In function 'make_relative_prefix_1':
+make-relative-prefix.c:249:14: error: implicit declaration of function 'getenv' [-Wimplicit-function-declaration]
+  249 |       temp = getenv ("PATH");
+      |              ^~~~~~
+make-relative-prefix.c:249:14: note: 'getenv' is defined in header '<stdlib.h>'; this is probably fixable by adding '#include <stdlib.h>'
+make-relative-prefix.c:249:12: error: assignment to 'char *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
+  249 |       temp = getenv ("PATH");
+      |            ^
+make[1]: *** [Makefile:512: make-relative-prefix.o] 오류 1
+make[1]: 디렉터리 '/c/gcc-14.2.0/libiberty' 나감
+make: *** [Makefile:423: all] 오류 2
+(수정)
+/c/gcc-14.2.0/libiberty/make-relative-prefix.c 수정
+//#ifdef HAVE_STDLIB_H
+#include <stdlib.h>
+//#endif
+(오류)
+objalloc.c: In function 'objalloc_free_block':
+objalloc.c:223:5: error: implicit declaration of function 'abort' [-Wimplicit-function-declaration]
+  223 |     abort ();
+      |     ^~~~~
+objalloc.c:35:1: note: include '<stdlib.h>' or provide a declaration of 'abort'
+   34 | #include <stddef.h>
+  +++ |+#include <stdlib.h>
+   35 |
+make[1]: *** [Makefile:512: objalloc.o] 오류 1
+make[1]: 디렉터리 '/c/gcc-14.2.0/libiberty' 나감
+make: *** [Makefile:423: all] 오류 2
+(수정)
+/c/gcc-14.2.0/libiberty/objalloc.c 수정
+//#ifdef HAVE_STDLIB_H
+#include <stdlib.h>
+//#else
+/* For systems with larger pointers than ints, this must be declared.  */
+//extern void *malloc (size_t);
+//extern void free (void *);
+//#endif
+(오류)
+partition.c: In function 'partition_delete':
+partition.c:66:3: error: implicit declaration of function 'free' [-Wimplicit-function-declaration]
+   66 |   free (part);
+      |   ^~~~
+partition.c:36:1: note: include '<stdlib.h>' or provide a declaration of 'free'
+   35 | #include "partition.h"
+  +++ |+#include <stdlib.h>
+   36 |
+partition.c: In function 'partition_print':
+partition.c:150:3: error: implicit declaration of function 'memset' [-Wimplicit-function-declaration]
+  150 |   memset (done, 0, num_elements);
+      |   ^~~~~~
+partition.c:36:1: note: include '<string.h>' or provide a declaration of 'memset'
+   35 | #include "partition.h"
+  +++ |+#include <string.h>
+   36 |
+partition.c:171:9: error: implicit declaration of function 'qsort' [-Wimplicit-function-declaration]
+  171 |         qsort ((void *) class_elements, count, sizeof (int), elem_compare);
+      |         ^~~~~
+partition.c: In function 'partition_print':
+partition.c:150:3: error: implicit declaration of function 'memset' [-Wimplicit-function-declaration]
+  150 |   memset (done, 0, num_elements);
+      |   ^~~~~~
+partition.c:36:1: note: include '<string.h>' or provide a declaration of 'memset'
+   35 | #include "partition.h"
+  +++ |+#include <string.h>
+   36 |
+make[1]: *** [Makefile:512: partition.o] 오류 1
+make[1]: 디렉터리 '/c/gcc-14.2.0/libiberty' 나감
+make: *** [Makefile:423: all] 오류 2
+(수정)
+/c/gcc-14.2.0/libiberty/partition.c 수정
+//#ifdef HAVE_STDLIB_H
+#include <stdlib.h>
+//#endif
+//#ifdef HAVE_STRING_H
+#include <string.h>
+//#endif
+(오류)
+pexecute.c: In function 'pwait':
+pexecute.c:105:11: error: implicit declaration of function 'free' [-Wimplicit-function-declaration]
+  105 |           free (vector);
+      |           ^~~~
+pexecute.c:27:1: note: include '<stdlib.h>' or provide a declaration of 'free'
+   26 | #include "libiberty.h"
+  +++ |+#include <stdlib.h>
+   27 |
+make[1]: *** [Makefile:512: pexecute.o] 오류 1
+make[1]: 디렉터리 '/c/gcc-14.2.0/libiberty' 나감
+make: *** [Makefile:423: all] 오류 2
+(수정)
+/c/gcc-14.2.0/libiberty/pexecute.c 수정
+//#ifdef HAVE_STDLIB_H
+#include <stdlib.h>
+//#endif
+(오류)
+simple-object.c: In function 'find_one_section':
+simple-object.c:223:7: error: implicit declaration of function 'strcmp' [-Wimplicit-function-declaration]
+  223 |   if (strcmp (name, fosd->name) != 0)
+      |       ^~~~~~
+simple-object.c:52:1: note: include '<string.h>' or provide a declaration of 'strcmp'
+   51 | #include "simple-object-common.h"
+  +++ |+#include <string.h>
+   52 |
+In file included from simple-object.c:21:
+simple-object.c: In function 'handle_lto_debug_sections':
+simple-object.c:265:44: error: implicit declaration of function 'strlen' [-Wimplicit-function-declaration]
+  265 |   char *newname = rename ? XCNEWVEC (char, strlen (name) + 1)
+      |                                            ^~~~~~
+C:/msys64/mingw64/include/libiberty/libiberty.h:367:50: note: in definition of macro 'XCNEWVE
+'
+  367 | #define XCNEWVEC(T, N)          ((T *) xcalloc ((N), sizeof (T)))
+      |                                                  ^
+simple-object.c:265:44: note: include '<string.h>' or provide a declaration of 'strlen'
+  265 |   char *newname = rename ? XCNEWVEC (char, strlen (name) + 1)
+      |                                            ^~~~~~
+C:/msys64/mingw64/include/libiberty/libiberty.h:367:50: note: in definition of macro 'XCNEWVE
+'
+  367 | #define XCNEWVEC(T, N)          ((T *) xcalloc ((N), sizeof (T)))
+      |                                                  ^
+simple-object.c:273:7: error: implicit declaration of function 'strncmp' [-Wimplicit-function-declaration]
+  273 |   if (strncmp (name, ".rela", sizeof (".rela") - 1) == 0)
+      |       ^~~~~~~
+simple-object.c:273:7: note: include '<string.h>' or provide a declaration of 'strncmp'
+simple-object.c:276:9: error: implicit declaration of function 'strncpy' [-Wimplicit-function-declaration]
+  276 |         strncpy (newname, name, sizeof (".rela") - 1);
+      |         ^~~~~~~
+simple-object.c:276:9: note: include '<string.h>' or provide a declaration of 'strncpy'
+simple-object.c:289:21: error: implicit declaration of function 'strcat' [-Wimplicit-function-declaration]
+  289 |     return rename ? strcat (newname, name + sizeof (".gnu.debuglto_") - 1) : newname;
+      |                     ^~~~~~
+simple-object.c:289:21: note: include '<string.h>' or provide a declaration of 'strcat'
+simple-object.c:295:12: error: implicit declaration of function 'strcpy' [-Wimplicit-function-declaration]
+  295 |     return strcpy (newname, name);
+      |            ^~~~~~
+simple-object.c:295:12: note: include '<string.h>' or provide a declaration of 'strcpy'
+simple-object.c:313:3: error: implicit declaration of function 'free' [-Wimplicit-function-declaration]
+  313 |   free (newname);
+      |   ^~~~
+simple-object.c:52:1: note: include '<stdlib.h>' or provide a declaration of 'free'
+   51 | #include "simple-object-common.h"
+  +++ |+#include <stdlib.h>
+   52 |
+simple-object.c: In function 'simple_object_write_add_data':
+simple-object.c:515:7: error: implicit declaration of function 'memcpy' [-Wimplicit-function-declaration]
+  515 |       memcpy (wsb->free_buffer, buffer, size);
+      |       ^~~~~~
+simple-object.c:515:7: note: include '<string.h>' or provide a declaration of 'memcpy'
+make[1]: *** [Makefile:512: simple-object.o] 오류 1
+make[1]: 디렉터리 '/c/gcc-14.2.0/libiberty' 나감
+make: *** [Makefile:423: all] 오류 2
+(수정)
+/c/gcc-14.2.0/libiberty/simple-object.c 수정
+//#ifdef HAVE_STDLIB_H
+#include <stdlib.h>
+//#endif
+//#ifdef HAVE_STRING_H
+#include <string.h>
+//#endif
+(오류)
+strerror.c: In function 'strtoerrno':
+strerror.c:757:16: error: implicit declaration of function 'strcmp' [-Wimplicit-function-declaration]
+  757 |               (strcmp (name, error_names[errnoval]) == 0))
+      |                ^~~~~~
+strerror.c:22:1: note: include '<string.h>' or provide a declaration of 'strcmp'
+   21 | #include <errno.h>
+  +++ |+#include <string.h>
+   22 |
+make[1]: *** [Makefile:512: strerror.o] 오류 1
+make[1]: 디렉터리 '/c/gcc-14.2.0/libiberty' 나감
+make: *** [Makefile:423: all] 오류 2
+(수정)
+/c/gcc-14.2.0/libiberty/strerror.c 수정
+//#ifdef HAVE_STDLIB_H
+#include <stdlib.h>
+//#else
+//extern void *malloc ();
+//#endif
+
+//#ifdef HAVE_STRING_H
+#include <string.h>
+//#else
+//extern void *memset ();
+//#endif
+(오류)
+strsignal.c: In function 'strtosigno':
+strsignal.c:525:16: error: implicit declaration of function 'strcmp' [-Wimplicit-function-declaration]
+  525 |               (strcmp (name, signal_names[signo]) == 0))
+      |                ^~~~~~
+strsignal.c:23:1: note: include '<string.h>' or provide a declaration of 'strcmp'
+   22 | #include <signal.h>
+  +++ |+#include <string.h>
+   23 |
+make[1]: *** [Makefile:512: strsignal.o] 오류 1
+make[1]: 디렉터리 '/c/gcc-14.2.0/libiberty' 나감
+make: *** [Makefile:423: all] 오류 2
+(수정)
+/c/gcc-14.2.0/libiberty/strsignal.c 수정
+//#ifdef HAVE_STDLIB_H
+#include <stdlib.h>
+//#else
+//extern void *malloc ();
+//#endif
+
+//#ifdef HAVE_STRING_H
+#include <string.h>
+//#else
+//extern void *memset ();
+//#endif
+(오류)
+xexit.c: In function 'xexit':
+xexit.c:51:3: error: implicit declaration of function 'exit' [-Wimplicit-function-declaration]
+   51 |   exit (code);
+      |   ^~~~
+xexit.c:40:1: note: include '<stdlib.h>' or provide a declaration of 'exit'
+   39 | #include "libiberty.h"
+  +++ |+#include <stdlib.h>
+   40 |
+make[1]: *** [Makefile:512: xexit.o] 오류 1
+make[1]: 디렉터리 '/c/gcc-14.2.0/libiberty' 나감
+make: *** [Makefile:423: all] 오류 2
+(수정)
+/c/gcc-14.2.0/libiberty/xexit.c 수정
+//#ifdef HAVE_STDLIB_H
+#include <stdlib.h>
+//#endif
+(오류)
+xstrdup.c: In function 'xstrdup':
+xstrdup.c:33:25: error: implicit declaration of function 'strlen' [-Wimplicit-function-declaration]
+   33 |   register size_t len = strlen (s) + 1;
+      |                         ^~~~~~
+xstrdup.c:29:1: note: include '<string.h>' or provide a declaration of 'strlen'
+   28 | #include "libiberty.h"
+  +++ |+#include <string.h>
+   29 |
+xstrdup.c:35:19: error: implicit declaration of function 'memcpy' [-Wimplicit-function-declaration]
+   35 |   return (char *) memcpy (ret, s, len);
+      |                   ^~~~~~
+xstrdup.c:35:19: note: include '<string.h>' or provide a declaration of 'memcpy'
+make[1]: *** [Makefile:512: xstrdup.o] 오류 1
+make[1]: 디렉터리 '/c/gcc-14.2.0/libiberty' 나감
+make: *** [Makefile:423: all] 오류 2
+(수정)
+/c/gcc-14.2.0/libiberty/xstrdup.c 수정
+//#ifdef HAVE_STRING_H
+#include <string.h>
+//#else
+//# ifdef HAVE_STRINGS_H
+#  include <strings.h>
+//# endif
+//#endif
+(오류)
+conftest.c:41: error: unterminated #ifdef
+   41 | #ifdef HAVE_UNISTD_H
+configure:5508: $? = 1
+(수정)
+빌드 명령어 추가
+sed -i '/#ifdef HAVE_UNISTD_H/,/#endif/d' configure 
+(오류)
+install: target ''$'\n''    ac_useropt_orig='$'\n''    ac_useropt='$'\n''    case  in'$'\n''      *' is not a directory
+./configure: line 938: enable_: command not found
+./configure: line 959: *) ;;
+      *) ac_unrecognized_opts=--disable-
+         ac_unrecognized_sep=', ';;
+    esac
+    eval enable_=no ;;
+
+  -docdir | --docdir | --docdi | --doc | --do)
+    ac_prev=docdir ;;
+  -docdir=* | --docdir=* | --docdi=* | --doc=* | --do=*)
+    docdir= ;;
+
+  -dvidir | --dvidir | --dvidi | --dvid | --dvi | --dv)
+    ac_prev=dvidir ;;
+  -dvidir=* | --dvidir=* | --dvidi=* | --dvid=* | --dvi=* | --dv=*)
+    dvidir= ;;
+
+  -enable-* | --enable-*)
+    ac_useropt=
+    # Reject names that are ! valid shell variable names.
+    expr x : .*[^-+._abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789] >/dev/null &&
+      as_fn_error 1 invalid: No such file or directory
+./configure: line 964: enable_: command not found
+./configure: line 1163: *) ;;
+      *) ac_unrecognized_opts=--enable-
+         ac_unrecognized_sep=', ';;
+    esac
+    eval enable_=$ac_optarg ;;
+
+  -exec-prefix | --exec_prefix | --exec-prefix | --exec-prefi   | --exec-pref | --exec-pre | --exec-pr | --exec-p | --exec-   | --exec | --exe | --ex)
+    ac_prev=exec_prefix ;;
+  -exec-prefix=* | --exec_prefix=* | --exec-prefix=* | --exec-prefi=*   | --exec-pref=* | --exec-pre=* | --exec-pr=* | --exec-p=* | --exec-=*   | --exec=* | --exe=* | --ex=*)
+    exec_prefix= ;;
+
+  -gas | --gas | --ga | --g)
+    # Obsolete; use --with-gas.
+    with_gas=yes ;;
+
+  -help | --help | --hel | --he | -h)
+    ac_init_help=long ;;
+  -help=r* | --help=r* | --hel=r* | --he=r* | -hr*)
+    ac_init_help=recursive ;;
+  -help=s* | --help=s* | --hel=s* | --he=s* | -hs*)
+    ac_init_help=short ;;
+
+  -host | --host | --hos | --ho)
+    ac_prev=host_alias ;;
+  -host=* | --host=* | --hos=* | --ho=*)
+    host_alias= ;;
+
+  -htmldir | --htmldir | --htmldi | --htmld | --html | --htm | --ht)
+    ac_prev=htmldir ;;
+  -htmldir=* | --htmldir=* | --htmldi=* | --htmld=* | --html=* | --htm=*   | --ht=*)
+    htmldir= ;;
+
+  -includedir | --includedir | --includedi | --included | --include   | --includ | --inclu | --incl | --inc)
+    ac_prev=includedir ;;
+  -includedir=* | --includedir=* | --includedi=* | --included=* | --include=*   | --includ=* | --inclu=* | --incl=* | --inc=*)
+    includedir= ;;
+
+  -infodir | --infodir | --infodi | --infod | --info | --inf)
+    ac_prev=infodir ;;
+  -infodir=* | --infodir=* | --infodi=* | --infod=* | --info=* | --inf=*)
+    infodir= ;;
+
+  -libdir | --libdir | --libdi | --libd)
+    ac_prev=libdir ;;
+  -libdir=* | --libdir=* | --libdi=* | --libd=*)
+    libdir= ;;
+
+  -libexecdir | --libexecdir | --libexecdi | --libexecd | --libexec   | --libexe | --libex | --libe)
+    ac_prev=libexecdir ;;
+  -libexecdir=* | --libexecdir=* | --libexecdi=* | --libexecd=* | --libexec=*   | --libexe=* | --libex=* | --libe=*)
+    libexecdir= ;;
+
+  -localedir | --localedir | --localedi | --localed | --locale)
+    ac_prev=localedir ;;
+  -localedir=* | --localedir=* | --localedi=* | --localed=* | --locale=*)
+    localedir= ;;
+
+  -localstatedir | --localstatedir | --localstatedi | --localstated   | --localstate | --localstat | --localsta | --localst | --locals)
+    ac_prev=localstatedir ;;
+  -localstatedir=* | --localstatedir=* | --localstatedi=* | --localstated=*   | --localstate=* | --localstat=* | --localsta=* | --localst=* | --locals=*)
+    localstatedir= ;;
+
+  -mandir | --mandir | --mandi | --mand | --man | --ma | --m)
+    ac_prev=mandir ;;
+  -mandir=* | --mandir=* | --mandi=* | --mand=* | --man=* | --ma=* | --m=*)
+    mandir= ;;
+
+  -nfp | --nfp | --nf)
+    # Obsolete; use --without-fp.
+    with_fp=no ;;
+
+  -no-create | --no-create | --no-creat | --no-crea | --no-cre   | --no-cr | --no-c | -n)
+    no_create=yes ;;
+
+  -no-recursion | --no-recursion | --no-recursio | --no-recursi   | --no-recurs | --no-recur | --no-recu | --no-rec | --no-re | --no-r)
+    no_recursion=yes ;;
+
+  -oldincludedir | --oldincludedir | --oldincludedi | --oldincluded   | --oldinclude | --oldinclud | --oldinclu | --oldincl | --oldinc   | --oldin | --oldi | --old | --ol | --o)
+    ac_prev=oldincludedir ;;
+  -oldincludedir=* | --oldincludedir=* | --oldincludedi=* | --oldincluded=*   | --oldinclude=* | --oldinclud=* | --oldinclu=* | --oldincl=* | --oldinc=*   | --oldin=* | --oldi=* | --old=* | --ol=* | --o=*)
+    oldincludedir= ;;
+
+  -prefix | --prefix | --prefi | --pref | --pre | --pr | --p)
+    ac_prev=prefix ;;
+  -prefix=* | --prefix=* | --prefi=* | --pref=* | --pre=* | --pr=* | --p=*)
+    prefix= ;;
+
+  -program-prefix | --program-prefix | --program-prefi | --program-pref   | --program-pre | --program-pr | --program-p)
+    ac_prev=program_prefix ;;
+  -program-prefix=* | --program-prefix=* | --program-prefi=*   | --program-pref=* | --program-pre=* | --program-pr=* | --program-p=*)
+    program_prefix= ;;
+
+  -program-suffix | --program-suffix | --program-suffi | --program-suff   | --program-suf | --program-su | --program-s)
+    ac_prev=program_suffix ;;
+  -program-suffix=* | --program-suffix=* | --program-suffi=*   | --program-suff=* | --program-suf=* | --program-su=* | --program-s=*)
+    program_suffix= ;;
+
+  -program-transform-name | --program-transform-name   | --program-transform-nam | --program-transform-na   | --program-transform-n | --program-transform-   | --program-transform | --program-transfor   | --program-transfo | --program-transf   | --program-trans | --program-tran   | --progr-tra | --program-tr | --program-t)
+    ac_prev=program_transform_name ;;
+  -program-transform-name=* | --program-transform-name=*   | --program-transform-nam=* | --program-transform-na=*   | --program-transform-n=* | --program-transform-=*   | --program-transform=* | --program-transfor=*   | --program-transfo=* | --program-transf=*   | --program-trans=* | --program-tran=*   | --progr-tra=* | --program-tr=* | --program-t=*)
+    program_transform_name= ;;
+
+  -pdfdir | --pdfdir | --pdfdi | --pdfd | --pdf | --pd)
+    ac_prev=pdfdir ;;
+  -pdfdir=* | --pdfdir=* | --pdfdi=* | --pdfd=* | --pdf=* | --pd=*)
+    pdfdir= ;;
+
+  -psdir | --psdir | --psdi | --psd | --ps)
+    ac_prev=psdir ;;
+  -psdir=* | --psdir=* | --psdi=* | --psd=* | --ps=*)
+    psdir= ;;
+
+  -q | -quiet | --quiet | --quie | --qui | --qu | --q   | -silent | --silent | --silen | --sile | --sil)
+    silent=yes ;;
+
+  -sbindir | --sbindir | --sbindi | --sbind | --sbin | --sbi | --sb)
+    ac_prev=sbindir ;;
+  -sbindir=* | --sbindir=* | --sbindi=* | --sbind=* | --sbin=*   | --sbi=* | --sb=*)
+    sbindir= ;;
+
+  -sharedstatedir | --sharedstatedir | --sharedstatedi   | --sharedstated | --sharedstate | --sharedstat | --sharedsta   | --sharedst | --shareds | --shared | --share | --shar   | --sha | --sh)
+    ac_prev=sharedstatedir ;;
+  -sharedstatedir=* | --sharedstatedir=* | --sharedstatedi=*   | --sharedstated=* | --sharedstate=* | --sharedstat=* | --sharedsta=*   | --sharedst=* | --shareds=* | --shared=* | --share=* | --shar=*   | --sha=* | --sh=*)
+    sharedstatedir= ;;
+
+  -site | --site | --sit)
+    ac_prev=site ;;
+  -site=* | --site=* | --sit=*)
+    site= ;;
+
+  -srcdir | --srcdir | --srcdi | --srcd | --src | --sr)
+    ac_prev=srcdir ;;
+  -srcdir=* | --srcdir=* | --srcdi=* | --srcd=* | --src=* | --sr=*)
+    srcdir= ;;
+
+  -sysconfdir | --sysconfdir | --sysconfdi | --sysconfd | --sysconf   | --syscon | --sysco | --sysc | --sys | --sy)
+    ac_prev=sysconfdir ;;
+  -sysconfdir=* | --sysconfdir=* | --sysconfdi=* | --sysconfd=* | --sysconf=*   | --syscon=* | --sysco=* | --sysc=* | --sys=* | --sy=*)
+    sysconfdir= ;;
+
+  -target | --target | --targe | --targ | --tar | --ta | --t)
+    ac_prev=target_alias ;;
+  -target=* | --target=* | --targe=* | --targ=* | --tar=* | --ta=* | --t=*)
+    target_alias= ;;
+
+  -v | -verbose | --verbose | --verbos | --verbo | --verb)
+    verbose=yes ;;
+
+  -version | --version | --versio | --versi | --vers | -V)
+    ac_init_version=: ;;
+
+  -with-* | --with-*)
+    ac_useropt=
+    # Reject names that are ! valid shell variable names.
+    expr x : .*[^-+._abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789] >/dev/null &&
+      as_fn_error 1 invalid: No such file or directory
+./configure: line 1168: with_: command not found
+./configure: line 1179: *) ;;
+      *) ac_unrecognized_opts=--with-
+         ac_unrecognized_sep=', ';;
+    esac
+    eval with_=$ac_optarg ;;
+
+  -without-* | --without-*)
+    ac_useropt=
+    # Reject names that are ! valid shell variable names.
+    expr x : .*[^-+._abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789] >/dev/null &&
+      as_fn_error 1 invalid: No such file or directory
+./configure: line 1184: with_: command not found
+./configure: line 1209: $'*) ;;\n      *) ac_unrecognized_opts=--without-\n\t ac_unrecognized_sep=\', \';;\n    esac\n    eval with_=no ;;\n\n  --x)\n    # Obsolete; use --with-x.\n    with_x=yes ;;\n\n  -x-includes | --x-includes | --x-include | --x-includ | --x-inclu   | --x-incl | --x-inc | --x-in | --x-i)\n    ac_prev=x_includes ;;\n  -x-includes=* | --x-includes=* | --x-include=* | --x-includ=* | --x-inclu=*   | --x-incl=* | --x-inc=* | --x-in=* | --x-i=*)\n    x_includes= ;;\n\n  -x-libraries | --x-libraries | --x-librarie | --x-librari   | --x-librar | --x-libra | --x-libr | --x-lib | --x-li | --x-l)\n    ac_prev=x_libraries ;;\n  -x-libraries=* | --x-libraries=* | --x-librarie=* | --x-librari=*   | --x-librar=* | --x-libra=* | --x-libr=* | --x-lib=* | --x-li=* | --x-l=*)\n    x_libraries= ;;\n\n  -*) as_fn_error 127 unrecognized': command not found
+(수정)
+- install 명령어 문제: install 명령어가 빈 타겟 디렉토리를 참조하고 있어 오류가 발생
+install 명령어가 참조하는 타겟 디렉토리를 명확히 설정
+/c/gcc-14.2.0/libiberty/configure.ac 
+##############################################################
+#--enable-install-libiberty 옵션을 통해 헤더와 정적 라이브러리를 설치할지를 결정
+##############################################################
+AC_ARG_ENABLE(install-libiberty,
+[  --enable-install-libiberty       Install headers and library for end users],
+enable_install_libiberty=$enableval,
+enable_install_libiberty=no)dnl # 기본값은 설치하지 않도록 설정되어 있음
+##############################################################
+# 설치경로결정
+##############################################################
+# Option parsed, now set things appropriately.
+case x"$enable_install_libiberty" in
+  xyes|x) # yes : libiberty 디렉토리에 설치
+    target_header_dir=libiberty
+    ;;
+  xno) # no : 설치되지 않음
+    target_header_dir=
+    ;;
+  *) # 사용자가 값을 직접 입력하면 해당 경로에 설치 ex) ./configure --enable-install-libiberty=/custom/path
+    # This could be sanity-checked in various ways...
+    target_header_dir="${enable_install_libiberty}"
+    ;;
+esac
+target_header_dir=libiberty # 강제적용
+###############################################################
+...
+##################################################################
+#install 명령을 사용 가능하도록 설정하는 부분
+#실제 설치 경로는 위의 target_header_dir 및 INSTALL_DEST 설정에 따라 결정
+##################################################################
+dnl When we start using automake:
+dnl AM_PROG_INSTALL
+AC_PROG_INSTALL
+# 디버깅 추가
+AC_MSG_NOTICE([=================target_header_dir = $target_header_dir])
+AC_MSG_NOTICE([=================INSTALL_DEST = $INSTALL_DEST])
+AC_MSG_NOTICE([=================INSTALL program is $INSTALL])
+##################################################################
+=> 빌드명령어 수정(libiberty 디렉토리에 설치)
+./configure --enable-install-libiberty=yes
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# which install
+/usr/bin/install
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# pacman -Syu
+pacman -S autoconf automake libtool
+
+- enable_ 관련 오류: eval enable_=$ac_optarg 부분에서 ac_optarg가 제대로 설정되지 않은 상태에서 사용되어 오류가 발생
+빌드명령어 수정
+perl -i -pe 'if (/fi/){ $_ = $_ . "\n# 옵션에서 --enable-* 또는 --disable-*을 파싱\nac_useropt=`expr \"x\$ac_option\" : \"x-*enable-\([^=]*\)\"`\nif [ -z \"\$ac_useropt\" ]; then\nac_useropt=`expr \"x\$ac_option\" : \"x-*disable-\([^=]*\)\"`\nfi\n\n# ac_useropt가 비어 있으면 에러 처리\nif [ -z \"\$ac_useropt\" ]; then\necho \"Error: Invalid option \$ac_option\" >&2\nexit 1\nfi\n\n# 디버깅 메시지\necho \"ac_option: \$ac_option\"\necho \"ac_useropt: \$ac_useropt\"\n" }' configure 
+- case 문의 비정상 동작
