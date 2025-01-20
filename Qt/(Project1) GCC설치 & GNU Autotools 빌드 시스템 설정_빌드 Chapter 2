@@ -2428,10 +2428,39 @@ sed -i '/^  # If the previous option needs an argument, assign it\./a\
 ###################################################\n  ac_useropt=expr "x$ac_option" : "x-*enable-\\([^=]*\\)"\n  if [ -z "$ac_useropt" ]; then\n    ac_useropt=expr "x$ac_option" : "x-*disable-\\([^=]*\\)"\n  fi\n  if [ -z "$ac_useropt" ]; then\n    echo "Error: Invalid option $ac_option" >&2\n    exit 1\n  fi\n  echo "ac_option: $ac_option"\n  echo "ac_useropt: $ac_useropt"\n####################################################' configure
 - case 문의 비정상 동작
 (오류)
-"enable_$ac_useropt"
-./configure: line 951: enable_: command not found
+  if test "X(/usr/ucb/echo -n -n $as_echo) 2>/dev/null" ="X-n $as_echo"; then
+if test "${PATH_SEPARATOR+set}" !=set; then
+if test "x$as_myself" =x; then
+  if test "$x""${_as_can_reexec}" !=xno && test "x$CONFIG_SHELL" !=x; then
+if test "x$CONFIG_SHELL" =x; then
+   test "Xexpr 00001 : '.*\(...\)'" =X001; then
+if (basename -- /) >/dev/null 2>&1 && test "Xbasename -- / 2>&1" ="X/"; then
+  test "xexpr $as_lineno_1'$as_run' + 1" ="x$as_lineno_2'$as_run'"' || {
 
-      as_fn_error $? "invalid feature name: $ac_useropt"
-./configure: line 972: *) ;;
-      *) ac_unrecognized_opts="$ac_unrecognized_opts$ac_unrecognized_sep--disable-$ac_useropt_orig"
-(수정)
+오류발생 sed문 수정
+
+sed -i 's|test "X\$as_echo" != "X" && test "X\$as_echo" = "X-n"|test "X\$as_echo" != "X" && test -n "\$as_echo" && test "X\$as_echo" = "X-n"|g' configure 
+sed -i 's|test "\$x""\${_as_can_reexec}" !=xno && test "x\$CONFIG_SHELL" !=x|test "X\$x\$\{_as_can_reexec\}" != "Xno" && test "X\$CONFIG_SHELL" != "X"|g' configure
+sed -i 's|test "Xbasename -- \/ 2>&1" =\"X\/\"|test "X\$(basename -- \/ 2>&1)" = "X\/"|g' configure 
+sed -i '431s|test "Xexpr 00001 : \\\.\*\\\\(...\\\\)" =X001|test "X\$(expr 00001 : \\\.\*\\\\(...\\\\))" = \"X001\"|' configure 
+sed -i 's|test "xexpr \$as_lineno_1\\\$as_run\\$ + 1" = \"x\$as_lineno_2\\\$as_run\"|test "X\$(expr \$as_lineno_1\\\$as_run + 1)" = \"X\$as_lineno_2\\\$as_run\"|' configure
+
+수정된 configure 파일
+   if test "X(/usr/ucb/echo -n -n $as_echo) 2>/dev/null" ="X-n $as_echo"; then
+if test "${PATH_SEPARATOR+set}" !=set; then
+if test "x$as_myself" =x; then
+  if test "X$x${_as_can_reexec}" != "Xno" test "$x""${_as_can_reexec}" !=xno && test "x$CONFIG_SHELL" !=xtest "$x""${_as_can_reexec}" !=xno && test "x
+if test "x$CONFIG_SHELL" =x; then
+   test "Xexpr 00001 : '.*\(...\)'" =X001; then
+if (basename -- /) >/dev/null 2>&1 && test "Xbasename -- / 2>&1" ="X/"; then
+  test "xexpr $as_lineno_1'$as_run' + 1" ="x$as_lineno_2'$as_run'"' || {
+
+./configure: 행 53번: test: X: 단항 연산자가 필요합니다
+./configure: 행 75번: test: : 단항 연산자가 필요합니다
+./configure: 행 108번: test: x./configure: 단항 연산자가 필요합니다
+./configure: line 139: test: too many arguments
+./configure: line 162: test: x: unary operator expected
+./configure: line 431: test: X001: unary operator expected
+./configure: line 437: test: X/: unary operator expected
+./configure: line 479: test: x476: unary operator expected
+
