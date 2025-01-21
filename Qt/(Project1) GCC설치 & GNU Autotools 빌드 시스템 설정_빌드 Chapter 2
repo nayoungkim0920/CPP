@@ -2521,12 +2521,12 @@ if command -v uname >/dev/null 2>&1; then\
     uname_output=$(uname -s)\
     case "$uname_output" in\
         *CYGWIN*|*MINGW*|*MSYS*|*WIN*) lt_PATH_SEPARATOR=";";;\
-        *) lt_PATH_SEPARATOR=":";;\
+        *) PATH_SEPARATOR=":";;\
     esac\
-    echo "lt_PATH_SEPARATOR is set to $lt_PATH_SEPARATOR"\
+    echo "PATH_SEPARATOR is set to $lt_PATH_SEPARATOR"\
 else\
     echo "Warning: '\''uname'\'' command not found. Setting default lt_PATH_SEPARATOR."\
-    lt_PATH_SEPARATOR=":"\
+    PATH_SEPARATOR=":"\
 fi' configure
 오류구문 바로 위에 설정 로직 넣어줌
 # The user is always right.
@@ -2536,7 +2536,7 @@ if command -v uname >/dev/null 2>&1; then
         *CYGWIN*|*MINGW*|*MSYS*|*WIN*) lt_PATH_SEPARATOR=";";;
         *) PATH_SEPARATOR=":";;
     esac
-    echo "lt_PATH_SEPARATOR is set to $lt_PATH_SEPARATOR"
+    echo "PATH_SEPARATOR is set to $lt_PATH_SEPARATOR"
 else
     echo "Warning: 'uname' command not found. Setting default lt_PATH_SEPARATOR."
     PATH_SEPARATOR=":"
