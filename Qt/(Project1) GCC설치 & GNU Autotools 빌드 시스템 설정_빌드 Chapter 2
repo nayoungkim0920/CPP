@@ -2500,7 +2500,8 @@ if test "X(echo -n $as_echo) 2>/dev/null" ="X-n $as_echo"; then
 
 75번째줄 : if test "${PATH_SEPARATOR+set}" !=set; then
 오류 : ./configure.lineno: line 75: test: : unary operator expected
-PATH_SEPARATOR : 윈도우일경우 :, 유닉스일경우 ;
+./configure: 행 86번: test: : 단항 연산자가 필요합니다
+PATH_SEPARATOR : MING64 ;, UNIX :
 터미널에서 테스트
 nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
 # uname -s
@@ -2520,33 +2521,70 @@ sed -i '/# The user is always right./a \
 if command -v uname >/dev/null 2>&1; then\
     uname_output=$(uname -s)\
     case "$uname_output" in\
-        *CYGWIN*|*MINGW*|*MSYS*|*WIN*) lt_PATH_SEPARATOR=";";;\
+        *CYGWIN*|*MINGW*|*MSYS*|*WIN*) PATH_SEPARATOR=";";;\
         *) PATH_SEPARATOR=":";;\
     esac\
-    echo "PATH_SEPARATOR is set to $lt_PATH_SEPARATOR"\
+    echo "PATH_SEPARATOR is set to $PATH_SEPARATOR"\
 else\
-    echo "Warning: '\''uname'\'' command not found. Setting default lt_PATH_SEPARATOR."\
+    echo "Warning: '\''uname'\'' command not found. Setting default PATH_SEPARATOR."\
     PATH_SEPARATOR=":"\
 fi' configure
-오류구문 바로 위에 설정 로직 넣어줌
-# The user is always right.
-if command -v uname >/dev/null 2>&1; then
-    uname_output=$(uname -s)
-    case "$uname_output" in
-        *CYGWIN*|*MINGW*|*MSYS*|*WIN*) lt_PATH_SEPARATOR=";";;
-        *) PATH_SEPARATOR=":";;
-    esac
-    echo "PATH_SEPARATOR is set to $lt_PATH_SEPARATOR"
-else
-    echo "Warning: 'uname' command not found. Setting default lt_PATH_SEPARATOR."
-    PATH_SEPARATOR=":"
-fi
-if test "${PATH_SEPARATOR+set}" !=set; then
-  PATH_SEPARATOR=:
-  (PATH='/bin;/bin'; FPATH=$PATH; sh -c :) >/dev/null 2>&1 && {
-    (PATH='/bin:/bin'; FPATH=$PATH; sh -c :) >/dev/null 2>&1 ||
-      PATH_SEPARATOR=';'
-  }
-fi
+오류
+PATH_SEPARATOR is set to ;
+./configure: 행 86번: test: set: 단항 연산자가 필요합니다
+sed문 생성
+sed -i 's|if test "${PATH_SEPARATOR+set}" !=set; then|if [ -z "$PATH_SEPARATOR" ]; then|' configure\
 
-./configure: 행 86번: test: : 단항 연산자가 필요합니다
+119번째줄 : if test "x$as_myself" =x; then
+오류 : ./configure: 행 119번: test: x./configure: 단항 연산자가 필요합니다
+sed문 생성
+변수 값이 비어 있는지 또는 올바르게 설정되었는지 확인하고, 변수가 비어 있을 경우 적절한 기본 값을 설정하거나 오류 처리
+sed -i 's|if test "x\$as_myself" =x; then|if [ -z "\$as_myself" ]; then|' configure
+
+150번쨰줄 :   if test "$x""${_as_can_reexec}" !=xno && test "x$CONFIG_SHELL" !=x; then
+오류 :  ./configure: line 150: test: : unary operator expected
+./configure: line 150: test: : unary operator expected
+sed문 생성
+sed -i 's|if test "\$x""\${_as_can_reexec}" !=xno && test "x\$CONFIG_SHELL" !=x; then|_as_can_reexec_check_line|' configure 
+sed -i 's|_as_can_reexec_check_line|if [ -n "\$x" ] \&\& [ -n "\${_as_can_reexec}" ] \&\& [ "\$x\${_as_can_reexec}" != "xno" ] \&\& [ -n "\$CONFIG_SHELL" ]; then|g' configure
+
+173번째줄 : if test "x$CONFIG_SHELL" =x; then
+오류 : ./configure: line 173: test: x: unary operator expected
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# echo $CONFIG_SHELL
++ echo
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# echo $SHELL
++ echo /usr/bin/bash
+/usr/bin/bash
+환경변수설정
+~/.bashrc
+# CONFIG SHELL 설정
+export CONFIG_SHELL=$SHELL               # echo $SHELL
+source ~/.bashrc
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# echo $CONFIG_SHELL
++ echo /usr/bin/bash
+/usr/bin/bash
+오류
+./configure: line 173: test: x/usr/bin/bash: unary operator expected
+sed문 생성
+sed -i 's|if test "x\$CONFIG_SHELL" =x; then|if test "x\$CONFIG_SHELL" = "x"; then|' configure
+
+442번째줄 :    test "X`expr 00001 : '.*\(...\)'`" =X001; then
+./configure: line 442: test: X001: unary operator expected
+비교 구문에서 피연산자 값이 예상대로 초기화되지 않거나, 적절한 형식이 아니기 때문
+sed -i 's|test "X\`expr 00001 : '\''.*\(...\)'\''\`" =X001;|result=$(expr 00001 : '\''.*\(...\)'\') && test "X\$result" = X001;|' configure
+-bash: 예기치 않은 토큰 `)' 근처에서 문법 오류
+
+
+
+
+
+
+
+
+
+
+
+
