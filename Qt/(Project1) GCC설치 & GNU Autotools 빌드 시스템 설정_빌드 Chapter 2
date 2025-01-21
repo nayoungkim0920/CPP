@@ -2464,3 +2464,89 @@ if (basename -- /) >/dev/null 2>&1 && test "Xbasename -- / 2>&1" ="X/"; then
 ./configure: line 437: test: X/: unary operator expected
 ./configure: line 479: test: x476: unary operator expected
 
+53번째줄 :   if test "X`(/usr/ucb/echo -n -n $as_echo) 2>/dev/null`" = "X-n $as_echo"; then
+오류 : ./configure: 행 53번: test: X: 단항 연산자가 필요합니다
+디버깅메시지추가
+echo `(/usr/ucb/echo -n -n $as_echo)`
+오류
+./configure: 줄 57: /usr/ucb/echo: No such file or directory
+sed문 생성
+sed -i 's|/usr/ucb/echo|echo|g' configure
+오류
+unary operator expected
+디버깅메시지추가
+# 임시값대입
+as_echo=test
+# 공백 제거
+as_echo_trimmed=$(echo "$as_echo" | xargs)
+# 값 확인
+echo "as_echo value: '$as_echo_trimmed'"
+result=$(echo -n "$as_echo_trimmed")
+echo "Command result: '$result'"
+# 비교
+if test "X$result" = "X$as_echo_trimmed"; then
+  echo "Match found"
+else
+  echo "No match"
+fi
+출력
+as_echo value: 'test'
+Command result: 'test'
+Match found
+sed문 생성
+sed -i.bak 's/if test "X(echo -n \$as_echo) 2>\/dev\/null" ="X-n \$as_echo"; then/if test "X$(echo -n "\$as_echo")" = "X-n \$as_echo"; then/' configure
+if test "X(echo -n $as_echo) 2>/dev/null" ="X-n $as_echo"; then
+=>if test "X$(echo -n "$as_echo")" = "X-n $as_echo"; then
+
+75번째줄 : if test "${PATH_SEPARATOR+set}" !=set; then
+오류 : ./configure.lineno: line 75: test: : unary operator expected
+PATH_SEPARATOR : 윈도우일경우 :, 유닉스일경우 ;
+터미널에서 테스트
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# uname -s
++ uname -s
+MINGW64_NT-10.0-22631
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# if command -v uname >/dev/null 2>&1; then uname_output=$(uname -s); case "$uname_output" in *CYGWIN*|*MINGW*|*MSYS*|*WIN*) PATH_SEPARATOR=";";; *) PATH_SEPARATOR=":";; esac; echo "PATH_SEPARATOR is set to '$PATH_SEPARATOR'"; else echo "Warning: 'uname' command not found. Setting default PATH_SEPARATOR."; PATH_SEPARATOR=":"; fi
++ command -v uname
+++ uname -s
++ uname_output=MINGW64_NT-10.0-22631
++ case "$uname_output" in
++ PATH_SEPARATOR=';'
++ echo 'PATH_SEPARATOR is set to '\'';'\'''
+PATH_SEPARATOR is set to ';'
+sed문 생성
+sed -i '/# The user is always right./a \
+if command -v uname >/dev/null 2>&1; then\
+    uname_output=$(uname -s)\
+    case "$uname_output" in\
+        *CYGWIN*|*MINGW*|*MSYS*|*WIN*) lt_PATH_SEPARATOR=";";;\
+        *) lt_PATH_SEPARATOR=":";;\
+    esac\
+    echo "lt_PATH_SEPARATOR is set to $lt_PATH_SEPARATOR"\
+else\
+    echo "Warning: '\''uname'\'' command not found. Setting default lt_PATH_SEPARATOR."\
+    lt_PATH_SEPARATOR=":"\
+fi' configure
+오류구문 바로 위에 설정 로직 넣어줌
+# The user is always right.
+if command -v uname >/dev/null 2>&1; then
+    uname_output=$(uname -s)
+    case "$uname_output" in
+        *CYGWIN*|*MINGW*|*MSYS*|*WIN*) lt_PATH_SEPARATOR=";";;
+        *) PATH_SEPARATOR=":";;
+    esac
+    echo "lt_PATH_SEPARATOR is set to $lt_PATH_SEPARATOR"
+else
+    echo "Warning: 'uname' command not found. Setting default lt_PATH_SEPARATOR."
+    PATH_SEPARATOR=":"
+fi
+if test "${PATH_SEPARATOR+set}" !=set; then
+  PATH_SEPARATOR=:
+  (PATH='/bin;/bin'; FPATH=$PATH; sh -c :) >/dev/null 2>&1 && {
+    (PATH='/bin:/bin'; FPATH=$PATH; sh -c :) >/dev/null 2>&1 ||
+      PATH_SEPARATOR=';'
+  }
+fi
+
+./configure: 행 86번: test: : 단항 연산자가 필요합니다
