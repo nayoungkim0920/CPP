@@ -2600,7 +2600,7 @@ nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
 + basename -- /
 /
 sed문 생성
-sed -i 's|if (basename -- /) >/dev/null 2>&1 && test "X\`basename -- / 2>&1\`" ="X/";|if result=$(basename -- / 2>/dev/null) && [ $? -eq 0 ] && [ -n "$result" ] && [ "X$result" = "X/" ]; then|' configure
+sed -i '448s|.*|if result=\$\\(basename -- / 2>/dev/null\\) \&\& [ \$? -eq 0 ] \&\& [ -n \"\$result\" ] \&\& [ \"X\$result\" = \"X/\" ]; then|' configure
 if (basename -- /) >/dev/null 2>&1 && test "Xbasename -- / 2>&1" ="X/"; then
   as_basename=basename
 else
@@ -2637,8 +2637,17 @@ nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
 # grep -rn 'test "x`expr $as_lineno_1' configure
 + grep -rn 'test "x`expr $as_lineno_1' configure
 490:  test "x`expr $as_lineno_1'$as_run' + 1`" ="x$as_lineno_2'$as_run'"' || {
+sed문생성
+sed -i '490s|.*|result=\$\\(expr \$as_lineno_1'\''\$as_run'\'' + 1\\) \&\& [ -n \"\$result\" ] \&\& [ \"x\$result\" = \"x\$as_lineno_2'\''\$as_run'\''\" ] \|\| {|' configure
+test "x`expr $as_lineno_1'$as_run' + 1`" ="x$as_lineno_2'$as_run'"' || {
+=>
+result=$(expr $as_lineno_1'$as_run' + 1) && [ -n "$result" ] && [ "x$result" = "x$as_lineno_2'$as_run'" ] || {
 
+491번쨰줄 :   # Blame Lee E. McMahon (1931-1989) for sed's syntax.  :-)
+오류 : ./configure: line 491: syntax error near unexpected token `)'
+./configure: line 491: `  # Blame Lee E. McMahon (1931-1989) for sed's syntax.  :-)'
+sed문 생성
+sed -i '491s|.*||' configure
 
-
-
-
+496번째줄 :     sed '
+오류 : ./configure: eval: line 496: syntax error: unexpected end of file
