@@ -2572,17 +2572,71 @@ sed문 생성
 sed -i 's|if test "x\$CONFIG_SHELL" =x; then|if test "x\$CONFIG_SHELL" = "x"; then|' configure
 
 442번째줄 :    test "X`expr 00001 : '.*\(...\)'`" =X001; then
-./configure: line 442: test: X001: unary operator expected
+오류 : ./configure: line 442: test: X001: unary operator expected
 비교 구문에서 피연산자 값이 예상대로 초기화되지 않거나, 적절한 형식이 아니기 때문
 sed -i 's|test "X\`expr 00001 : '\''.*\(...\)'\''\`" =X001;|result=$(expr 00001 : '\''.*\(...\)'\') && test "X\$result" = X001;|' configure
 -bash: 예기치 않은 토큰 `)' 근처에서 문법 오류
+sed문 생성
+sed -i.bak 's|test "X`expr 00001 : '\''.*\\(...\\)'\''`" =X001;|result=\$(expr 00001 : '\''.*\\(...\\)'\'' ) \&\& test "X\\\$result" = X001;|' configure
+if expr a : '\(a\)' >/dev/null 2>&1 &&
+   test "X`expr 00001 : '.*\(...\)'`" = X001; then
+  as_expr=expr
+else
+  as_expr=false
+fi
+=>
+if expr a : '\(a\)' >/dev/null 2>&1 &&
+   result=$(expr 00001 : '.*\(...\)') && test "X\$result" = X001; then
+  as_expr=expr
+else
+  as_expr=false
+fi
 
+448번째줄 : if (basename -- /) >/dev/null 2>&1 && test "X`basename -- / 2>&1`" ="X/"; then
+오류 : ./configure: line 448: test: X/: unary operator expected
+basename -- / 2>&1의 결과값이 예상과 다르거나, 비어 있는 경우 test 명령에서 unary operator expected 오류가 발생 
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# basename -- /
++ basename -- /
+/
+sed문 생성
+sed -i 's|if (basename -- /) >/dev/null 2>&1 && test "X\`basename -- / 2>&1\`" ="X/";|if result=$(basename -- / 2>/dev/null) && [ $? -eq 0 ] && [ -n "$result" ] && [ "X$result" = "X/" ]; then|' configure
+if (basename -- /) >/dev/null 2>&1 && test "Xbasename -- / 2>&1" ="X/"; then
+  as_basename=basename
+else
+  as_basename=false
+fi
+=>
+if result=$(basename -- / 2>/dev/null) && [ $? -eq 0 ] && [ -n "$result" ] && [ "X$result" = "X/" ]; then
+  as_basename=basename
+else
+  as_basename=false
+fi
 
+490번째줄 :   test "x`expr $as_lineno_1'$as_run' + 1`" ="x$as_lineno_2'$as_run'"' || {
+오류 : ./configure: line 490: test: x487: unary operator expected
+test 명령어가 예상하는 두 번째 인자 없이 실행될 때 발생, expr $as_lineno_1'$as_run' + 1의 결과가 비어 있거나, as_run 변수의 값이 비어 있어서 발생 
+test 명령어를 실행하기 전에 해당 값이 비어 있지 않은지 확인 
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# grep -rn 'test "x\`expr \$as_lineno_1\$as_run\` + 1" ="x\$as_lineno_2\$as_run"' configure
++ grep -rn 'test "x\`expr \$as_lineno_1\$as_run\` + 1" ="x\$as_lineno_2\$as_run"' configure
 
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# grep -rn 'test "x$(expr \$as_lineno_1\$as_run + 1)" ="x\$as_lineno_2\$as_run"' configure
++ grep -rn 'test "x$(expr \$as_lineno_1\$as_run + 1)" ="x\$as_lineno_2\$as_run"' configure
 
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# grep -F 'test "x`expr $as_lineno_1$as_run + 1`" ="x$as_lineno_2$as_run"' configure
++ grep -F 'test "x`expr $as_lineno_1$as_run + 1`" ="x$as_lineno_2$as_run"' configure
 
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# grep -rn 'test "x\`expr \$as_lineno_1\$as_run + 1\`" ="x\$as_lineno_2\$as_run"' configure
++ grep -rn 'test "x\`expr \$as_lineno_1\$as_run + 1\`" ="x\$as_lineno_2\$as_run"' configure
 
-
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# grep -rn 'test "x`expr $as_lineno_1' configure
++ grep -rn 'test "x`expr $as_lineno_1' configure
+490:  test "x`expr $as_lineno_1'$as_run' + 1`" ="x$as_lineno_2'$as_run'"' || {
 
 
 
