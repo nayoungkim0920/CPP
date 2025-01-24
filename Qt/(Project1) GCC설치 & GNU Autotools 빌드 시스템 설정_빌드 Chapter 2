@@ -2664,47 +2664,38 @@ sed '
     ' 
 496번째줄 :     sed '
 오류 : ./configure: eval: line 496: syntax error: unexpected end of file
-sed문 생성
-sed -i '497s|.*|s/[$]LINENO\.\*/\\\&-/|' configure
-s/[$]LINENO.*/&-/
-
-sed -i '503s|.*|s/[$]LINENO\\([^'\''\\'\'''\''$as_cr_alnum'\''\\'\'''\''_].*\\n\\)\\(.*\\)/\\2\\1\\2/|' configure
-s/[$]LINENO\([^'$as_cr_alnum'_].*\n\)\(.*\)/\2\1\2/
-=>
-s/[$]LINENO\([^'\''$as_cr_alnum'\''_].*\n\)\(.*\)/\2\1\2/
-
-  sed -n '
-    p
-    /[$]LINENO/=
-  ' <$as_myself |
-    sed '
-      s/[$]LINENO.*/&-/
-      t lineno
-      b
-      :lineno
-      N
-      :loop
-      s/[$]LINENO\([^'$as_cr_alnum'_].*\n\)\(.*\)/\2\1\2/
-      t loop
-      s/-\n.*//
-    ' >$as_me.lineno &&
-  chmod +x "$as_me.lineno" ||
-    { $as_echo "$as_me: error: cannot create $as_me.lineno; rerun with a POSIX shell" >&2; as_fn_exit 1; }
-
-./configure: eval: line 496: syntax error: unexpected end of file
 스크립트의 구문이 올바르게 닫히지 않았거나, 
 사용하는 변수(예: $as_cr_alnum, $as_me.lineno, $as_myself)의 값이 제대로 설정되지 않아 발생
+syntax error: unexpected end of file은 블록 구조가 제대로 닫히지 않거나, 
+적절한 종료 처리가 누락된 상태에서 파일 끝에 도달했음을 의미
+디버깅
+echo "as_lineno_1=$as_lineno_1, as_lineno_2=$as_lineno_2, as_run=$as_run"
+=> as_run 값의 부재 확인(디버깅 정보나 특정 실행 상태를 나타내는 데 사용)
+sed문 생성
+기존코드삭제
+sed -i '489,508d' configure
+수정된코드생성
+sed -i '489s|.*|eval '\''test \"x\${as_lineno_1}\${as_run}\" != \"x\${as_lineno_2}\${as_run}\" \&\& \
+result=\$((as_lineno_1 + as_run + 1)) \&\& [ -n \"\$result\" ] \&\& [ \"x\$result\" = \"x\${as_lineno_2}\${as_run}\" ] \|\| { \
+sed -n \" \
+p \
+/[\$]LINENO/= \
+\" \"\$as_myself\" \| sed \" \
+s/[\$]LINENO.*/\&-/ \
+t lineno \
+    b end \
+    :lineno \
+    N \
+    :loop \
+    s/[\$]LINENO\([^'\''\"\$as_cr_alnum\"'\''_].*\\n)\(.*)/\\2\\1\\2/ \
+    t loop \
+    s/-\\n.*// \
+    :end \
+  \" > \"\$as_me.lineno\" \&\&   \
+  chmod +x \"\$as_me.lineno\" \|\| \
+    { echo \"\$as_me: error: cannot create \$as_me.lineno; rerun with a POSIX shell\" >\&2; exit 1; } \
+}'\''|' configure
 
-# Avoid depending upon Character Ranges.
-as_cr_letters='abcdefghijklmnopqrstuvwxyz'
-as_cr_LETTERS='ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-as_cr_Letters=$as_cr_letters$as_cr_LETTERS
-as_cr_digits='0123456789'
-as_cr_alnum=$as_cr_Letters$as_cr_digits
-
-
-  as_lineno_1=$LINENO as_lineno_1a=$LINENO
-  as_lineno_2=$LINENO as_lineno_2a=$LINENO
   eval 'test "x$as_lineno_1'$as_run'" !="x$as_lineno_2'$as_run'" &&
 result=$\(expr $as_lineno_1'$as_run' + 1\) && [ -n "$result" ] && [ "x$result" = "x$as_lineno_2'$as_run'" ] || {
 
@@ -2725,7 +2716,60 @@ result=$\(expr $as_lineno_1'$as_run' + 1\) && [ -n "$result" ] && [ "x$result" =
     ' >$as_me.lineno &&
   chmod +x "$as_me.lineno" ||
     { $as_echo "$as_me: error: cannot create $as_me.lineno; rerun with a POSIX shell" >&2; as_fn_exit 1; }
+=>
 
+eval 'test "x${as_lineno_1}${as_run}" != "x${as_lineno_2}${as_run}" && 
+result=$((as_lineno_1 + as_run + 1)) && [ -n "$result" ] && [ "x$result" = "x${as_lineno_2}${as_run}" ] || { 
+sed -n " 
+p 
+/[$]LINENO/= 
+" "$as_myself" | sed " 
+s/[$]LINENO.*/&-/ 
+t lineno 
+    b end 
+    :lineno 
+    N 
+    :loop 
+    s/[$]LINENO([^'"$as_cr_alnum"'_].*\n)(.*)/\2\1\2/ 
+    t loop 
+    s/-\n.*// 
+    :end 
+  " > "$as_me.lineno" &&   
+  chmod +x "$as_me.lineno" || 
+    { echo "$as_me: error: cannot create $as_me.lineno; rerun with a POSIX shell" >&2; exit 1; } 
+}'
+
+오류
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# ./configure
++ ./configure
+PATH_SEPARATOR is set to ;
+PATH_SEPARATOR is set to ;
+PATH_SEPARATOR is set to ;
+PATH_SEPARATOR is set to ;
+PATH_SEPARATOR is set to ;
+PATH_SEPARATOR is set to ;
+PATH_SEPARATOR is set to ;
+...
+수정
+configure파일 수정
+80 : echo "PATH_SEPARATOR is set to $PATH_SEPARATOR" 
+=>
+echo "111PATH_SEPARATOR is set to $PATH_SEPARATOR" 
+23312 : echo "PATH_SEPARATOR is set to $PATH_SEPARATOR"
+=>
+echo "222PATH_SEPARATOR is set to $PATH_SEPARATOR" 
+nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
+# grep -rn 'echo "PATH_SEPARATOR is set to $PATH_SEPARATOR"' ./
++ grep -rn 'echo "PATH_SEPARATOR is set to $PATH_SEPARATOR"' ./
+./configure.bak:81:    echo "PATH_SEPARATOR is set to $PATH_SEPARATOR"
+./configure.bak:23313:    echo "PATH_SEPARATOR is set to $PATH_SEPARATOR"
+./configure.lineno:81:    echo "PATH_SEPARATOR is set to $PATH_SEPARATOR"
+./configure.lineno:23316:    echo "PATH_SEPARATOR is set to $PATH_SEPARATOR"
+=>
+./configure.lineno:81:    echo "PATH_SEPARATOR is set to $PATH_SEPARATOR"
+./configure.lineno:23316:    echo "PATH_SEPARATOR is set to $PATH_SEPARATOR"
+반복원인 찾음
 
 
 
