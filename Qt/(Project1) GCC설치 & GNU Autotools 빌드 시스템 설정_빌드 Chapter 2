@@ -3069,6 +3069,15 @@ cd /c/gcc-build &&
 /c/gcc-14.2.0/configure --disable-sanity-checks --disable-dlfcn --disable-shared --build=x86_64-w64-mingw32 --host=x86_64-w64-mingw32 --srcdir="$SRCDIR" --prefix=/usr/local --with-install="$ac_install_sh" --enable-languages=c,c++,fortran,lto,objc && 
 mingw32-make
 
+오류
+mingw32-make[3]: Entering directory 'C:/gcc-build/host-x86_64-w64-mingw32/libiberty'
+mingw32-make[3]: *** No rule to make target '/c/gcc-14.2.0/libiberty/Makefile.in', needed by 'Makefile'.  Stop.
+mingw32-make[3]: Leaving directory 'C:/gcc-build/host-x86_64-w64-mingw32/libiberty'
+mingw32-make[2]: *** [Makefile:12310: all-stage1-libiberty] Error 2
+mingw32-make[2]: Leaving directory 'C:/gcc-build'
+mingw32-make[1]: *** [Makefile:25759: stage1-bubble] Error 2
+mingw32-make[1]: Leaving directory 'C:/gcc-build'
+mingw32-make: *** [Makefile:1110: all] Error 2
 
 
 
