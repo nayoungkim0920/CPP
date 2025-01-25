@@ -2753,10 +2753,10 @@ PATH_SEPARATOR is set to ;
 ...
 수정
 configure파일 수정
-80 : echo "PATH_SEPARATOR is set to $PATH_SEPARATOR" 
+81 : echo "PATH_SEPARATOR is set to $PATH_SEPARATOR" 
 =>
 echo "111PATH_SEPARATOR is set to $PATH_SEPARATOR" 
-23312 : echo "PATH_SEPARATOR is set to $PATH_SEPARATOR"
+23313 : echo "PATH_SEPARATOR is set to $PATH_SEPARATOR"
 =>
 echo "222PATH_SEPARATOR is set to $PATH_SEPARATOR" 
 nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
@@ -2770,11 +2770,304 @@ nayou@kimnayooung MINGW64 /c/gcc-14.2.0/libiberty
 ./configure.lineno:81:    echo "PATH_SEPARATOR is set to $PATH_SEPARATOR"
 ./configure.lineno:23316:    echo "PATH_SEPARATOR is set to $PATH_SEPARATOR"
 반복원인 찾음
+configure.lineno 수정
+81 : echo "PATH_SEPARATOR is set to $PATH_SEPARATOR" 
+=>
+echo "333PATH_SEPARATOR is set to $PATH_SEPARATOR" 
+23313 : echo "PATH_SEPARATOR is set to $PATH_SEPARATOR"
+=>
+echo "444PATH_SEPARATOR is set to $PATH_SEPARATOR"
+nayou@nayoungkim MINGW64 /c/gcc-14.2.0/libiberty
+# ./configure
+test1111
+1111PATH_SEPARATOR is set to ;
+test2222
+3333PATH_SEPARATOR is set to ;
+3333PATH_SEPARATOR is set to ;
+3333PATH_SEPARATOR is set to ;
+3333PATH_SEPARATOR is set to ;
+3333PATH_SEPARATOR is set to ;
+3333PATH_SEPARATOR is set to ;
+3333PATH_SEPARATOR is set to ;
+3333PATH_SEPARATOR is set to ;
+3333PATH_SEPARATOR is set to ;
+...
+configure파일 수정 sed문 생성
+sed -i '516s|.*|#. "./$as_me.lineno"|' configure
 
+최종 빌드 명령어
+rm -f config.cache && 
+libtoolize --copy --force && aclocal --force && autoconf && automake --add-missing --copy && autoreconf -ivf && 
+sed -i 's/ -V -qversion -version/ --version/g' configure 
+sed -i 's/ -V -qversion/ --version/g' configure 
+sed -i 's/$NM -V/$NM --version/g' configure 
+sed -i 's/$CC -V/$CC --version/g' configure
+sed -i '/^ac_save_CC=\$CC/i ac_cv_prog_cc_c23=no' configure 
+sed -i 's/\$ac_c_conftest_c23_program//g' configure 
+sed -i '/ac_fn_c_check_header_mongrel.*"minix\/config.h"/,/^  fi/d' configure 
+sed -i 's/cxx11test::delegate d2();/cxx11test::delegate d2{};/g' configure
+sed -i '/^ VERSION='\''1\.0'\''$/d' configure 
+sed -i "/# define ISLOWER/c\#define ISLOWER(c) (islower(c))" configure
+sed -i "/# define TOUPPER/c\#define TOUPPER(c) (toupper(c))" configure 
+sed -i '/&& LARGE_FTYPE % 2147483647 == 1)/d' configure
+sed -i '/int FTYPE_is_large\[/c\
+void check_large_ftype() {\
+    int FTYPE_is_large[(LARGE_FTYPE % 2147483629 == 721 && LARGE_FTYPE % 2147483647 == 1) ? 1 : -1];\
+}' configure 
+sed -i '/\? 1 : -1];/d' configure 
+sed -i 's/\bnot\b/!/g' configure 
+sed -i 's/! big endian/#error "not big endian"/g' configure 
+sed -i 's/! a universal capable compiler//g' configure 
+sed -i 's/! big endian/#if BYTE_ORDER != BIG_ENDIAN\n    #error "not big endian"\n#endif/g' configure 
+sed -i '/^#define VERSION "\$VERSION"$/d' configure 
+sed -i '/old_archive_cmds_CXX=/s/-u//g' configure 
+sed -i 's/if (sizeof ((\$\([^)]*\))))/if (sizeof (\1))/g' configure 
+sed -i 's/\(static int test_array \[1 - 2 \* !(sizeof (void \*) <= sizeof (\$ac_type))\];\)/static int test_array [1 - 2 * !(sizeof(void *) <= sizeof(\$ac_type)) < 0 ? 0 : 1];/' configure 
+sed -i '/#ifdef HAVE_VFORK_H/,/#endif/d' configure 
+sed -i '/for ac_header in vfork.h/,/done/d' configure 
+sed -i '/if test "x\$ac_cv_type_pid_t" = xyes; then :/,/fi/{H;d};${x;s/.*\nif test "x\$ac_cv_type_pid_t" = xyes; then :\n\nelse\n\ncat >>confdefs.h <<_ACEOF\n#define pid_t int\n_ACEOF\n\nfi\n//;p}' configure 
+sed -i 's/\$as_echo_n "(cached) "/\$as_echo_n "\\(cached\\) "/' configure 
+sed -i 's/ac_cv_have_decl_basename\\\\(char \\\\\*\\\\)/ac_cv_have_decl_basename\\(char \\*\\)/' configure 
+sed -i '/if eval test \\"x\\$"$as_ac_Symbol"\\" = x"yes"; then :/i ac_have_decl=0' configure 
+sed -i '/#ifdef HAVE_UNISTD_H/a\
+#ifdef HAVE_CANONICALIZE_FILE_NAME\n  #include <libgen.h>\n#else\n  #define canonicalize_file_name realpath' configure 
+sed -i '/#ifdef HAVE_UNISTD_H/,/#endif/d' configure 
+sed -i '/^with_plugin_option=no\./a\
+###################################################\n  ac_useropt=expr "x$ac_option" : "x-*enable-\\([^=]*\\)"\n  if [ -z "$ac_useropt" ]; then\n    ac_useropt=expr "x$ac_option" : "x-*disable-\\([^=]*\\)"\n  fi\n  if [ -z "$ac_useropt" ]; then\n    echo "Error: Invalid option $ac_option" >&2\n    exit 1\n  fi\n  echo "ac_option: $ac_option"\n  echo "ac_useropt: $ac_useropt"\n####################################################' configure 
+# 1. 기본 변수 초기화 및 동적 변수 설정
+sed -i '/x_libraries=NONE/a\
+# Initialize some variables set by options.\n\
+ac_init_help=\n\
+ac_init_version=false\n\
+ac_unrecognized_opts=\n\
+ac_unrecognized_sep=\n\
+\n\
+# Initialize dynamic enable_* and with_* variables\n\
+enable_silent_rules=no\n\
+enable_shared=no\n\
+enable_static=no\n\
+enable_dependency_tracking=no\n\
+enable_fast_install=no\n\
+enable_largefile=no\n\
+enable_maintainer_mode=no\n\
+\n\
+with_x=no\n\
+with_gnu_ld=no\n\
+with_sysroot=\n\
+with_build_subdir=\n\
+with_target_subdir=\n\
+with_cross_host=no\n\
+with_newlib=no\n\
+with_plugin_option=no\n\
+' configure
 
+# 2. enable_ 및 with_ 처리 문제 해결
+sed -i 's/eval enable_=no/eval "enable_${ac_useropt:-no}"/' configure
+sed -i 's/eval with_=no/eval "with_${ac_useropt:-no}"/' configure
+sed -i 's/eval enable_=\$ac_optarg/eval "enable_${ac_useropt}='\''${ac_optarg}'\''"/' configure
+sed -i 's/eval with_=\$ac_optarg/eval "with_${ac_useropt}='\''${ac_optarg}'\''"/' configure
 
+# 3. case 문 종료 문제 해결
+sed -i '/case.*-disable-\*/a \ \ \ \ ;;' configure
+sed -i '/case.*-enable-\*/a \ \ \ \ ;;' configure
+sed -i '/case.*$ac_dashdash.*$ac_option in/a \ \ \ \ ;;' configure
 
+# 4. 환경 변수 초기화 및 검증 추가
+sed -i '/# Initialize dynamic enable_\* and with_\* variables/a ac_useropt=""\nac_optarg=""' configure
+sed -i '/ac_useropt=`expr "x\$ac_option" :.*/a if [ -z "\$ac_useropt" ]; then\n  as_fn_error 1 "Invalid enable option format: \$ac_option"\nfi' configure
+sed -i '/ac_envvar=`expr "x\$ac_option" :.*/a case \$ac_envvar in\n  ""|*[!a-zA-Z0-9_]* )\n    as_fn_error 1 "Invalid environment variable: \$ac_envvar"\n    ;;\nesac' configure
 
+# 5. install 명령 관련 문제 해결
+sed -i '/install: target/d' configure
+sed -i '/ac_useropt_orig=/d' configure
+sed -i '/ac_useropt=/d' configure
+
+# 6. test 명령어 오류 방지 및 기본값 설정
+sed -i '
+  # 1. ac_prev 변수 뒤에 공백 처리 및 세미콜론 추가
+  s/^\([ ]*ac_prev[ ]*=[ ]*[^;]*\)[ ]*;/\1 ;/
+
+  # 2. 옵션 처리에서 = 뒤에 불필요한 공백 제거
+  s/=[ ]*/=/g
+
+  # 3. ac_optarg가 비어있는 경우 기본값 설정
+  s/^\([ ]*ac_optarg[ ]*=[ ]*\)$/\1 "default_value"/
+
+  # 4. ac_useropt 변수에 잘못된 값이 할당되지 않도록 수정
+  s/^\([ ]*ac_useropt[ ]*=[ ]*\)[^;]*;/\1 "correct_value";/
+
+  # 5. ac_useropt, ac_optarg가 비어있는 경우 기본값 할당
+  /ac_useropt=`expr "x\$ac_option" :.*/a \
+if [ -z "\$ac_useropt" ]; then\n\
+  ac_useropt="default_value"\n\
+fi
+
+  /ac_optarg=`expr "x\$ac_option" :.*/a \
+if [ -z "\$ac_optarg" ]; then\n\
+  ac_optarg="default_value"\n\
+fi
+' configure 
+sed -i -e 's/test X/test "$X"/g' \
+       -e 's/test :/test "$1"/g' \
+       -e 's/test x\.\//test "$x"\//g' \
+       -e 's/test x/test "$x"/g' \
+       -e 's/test xno/test "$xno"/g' \
+       -e 's/test x\/bin\/sh/test "$x\/bin\/sh"/g' \
+       -e 's/test X001/test "$X001"/g' \
+       -e 's/test X\//test "$X\//g' \
+       -e 's/test x476/test "$x476"/g' configure 
+
+sed -i 's|/usr/ucb/echo|echo|g' configure
+
+sed -i 's| -n -n | -n |g' configure
+
+sed -i.bak 's/if test "X`(echo -n .*\$as_echo) 2>\/dev\/null`" ="X-n .*\$as_echo"; then/if test "X$(echo -n "\$as_echo")" = "X-n \$as_echo"; then/' configure
+
+sed -i '/# The user is always right./a \
+if command -v uname >/dev/null 2>&1; then\
+    uname_output=$(uname -s)\
+    case "$uname_output" in\
+        *CYGWIN*|*MINGW*|*MSYS*|*WIN*) PATH_SEPARATOR=";";;\
+        *) PATH_SEPARATOR=":";;\
+    esac\
+    echo "PATH_SEPARATOR is set to $PATH_SEPARATOR"\
+else\
+    echo "Warning: '\''uname'\'' command not found. Setting default PATH_SEPARATOR."\
+    PATH_SEPARATOR=":"\
+fi' configure
+
+sed -i 's|if test "${PATH_SEPARATOR+set}" !=set; then|if [ -z "$PATH_SEPARATOR" ]; then|' configure
+
+sed -i 's|if test "x\$as_myself" =x; then|if [ -z "\$as_myself" ]; then|' configure
+
+sed -i 's|if test "\$x\"\${_as_can_reexec}" !=xno && test "x\$CONFIG_SHELL" !=x; then|if [ -n "\$x" ] && [ -n "\${_as_can_reexec}" ] && [ "\$x\${_as_can_reexec}" != "xno" ] && [ -n "\$CONFIG_SHELL" ]; then|' configure
+
+sed -i 's|if test "\$x""\${_as_can_reexec}" !=xno && test "x\$CONFIG_SHELL" !=x; then|_as_can_reexec_check_line|' configure 
+sed -i 's|_as_can_reexec_check_line|if [ -n "\$x" ] \&\& [ -n "\${_as_can_reexec}" ] \&\& [ "\$x\${_as_can_reexec}" != "xno" ] \&\& [ -n "\$CONFIG_SHELL" ]; then|g' configure
+
+sed -i 's|if test "x\$CONFIG_SHELL" =x; then|if test "x\$CONFIG_SHELL" = "x"; then|' configure
+
+sed -i.bak 's|test "X`expr 00001 : '\''.*\\(...\\)'\''`" =X001;|result=\$(expr 00001 : '\''.*\\(...\\)'\'' ) \&\& test "X\\\$result" = X001;|' configure
+
+sed -i '448s|.*|if result=\$\\(basename -- / 2>/dev/null\\) \&\& [ \$? -eq 0 ] \&\& [ -n \"\$result\" ] \&\& [ \"X\$result\" = \"X/\" ]; then|' configure
+
+sed -i '490s|.*|result=\$\\(expr \$as_lineno_1'\''\$as_run'\'' + 1\\) \&\& [ -n \"\$result\" ] \&\& [ \"x\$result\" = \"x\$as_lineno_2'\''\$as_run'\''\" ] \|\| {|' configure
+
+sed -i '491s|.*||' configure
+
+sed -i '489,508d' configure
+sed -i '489s|.*|eval '\''test \"x\${as_lineno_1}\${as_run}\" != \"x\${as_lineno_2}\${as_run}\" \&\& \
+result=\$((as_lineno_1 + as_run + 1)) \&\& [ -n \"\$result\" ] \&\& [ \"x\$result\" = \"x\${as_lineno_2}\${as_run}\" ] \|\| { \
+sed -n \" \
+p \
+/[\$]LINENO/= \
+\" \"\$as_myself\" \| sed \" \
+s/[\$]LINENO.*/\&-/ \
+t lineno \
+    b end \
+    :lineno \
+    N \
+    :loop \
+    s/[\$]LINENO\([^'\''\"\$as_cr_alnum\"'\''_].*\\n)\(.*)/\\2\\1\\2/ \
+    t loop \
+    s/-\\n.*// \
+    :end \
+  \" > \"\$as_me.lineno\" \&\&   \
+  chmod +x \"\$as_me.lineno\" \|\| \
+    { echo \"\$as_me: error: cannot create \$as_me.lineno; rerun with a POSIX shell\" >\&2; exit 1; } \
+}'\''|' configure
+
+sed -i '571s|.*|#. "./$as_me.lineno"|' configure
+
+sed -i '516s|.*|#. "./$as_me.lineno"|' configure
+
+set -x &&
+
+./configure --prefix=/usr/local --enable-shared --disable-static --with-openssl --without-x
+
+sed -i '/#define pid_t int/d' config.h && 
+make &&
+make install
+
+오류
+make[1]: 'install-exec-am'을(를) 위해 할 일이 없습니다.
+make[1]: 'install-data-am'을(를) 위해 할 일이 없습니다.
+make[1]: 디렉터리 '/c/gcc-14.2.0/libiberty' 나감
+
+수정
+nayou@nayoungkim MINGW64 /c/gcc-14.2.0/libiberty
+# ls -l /usr/local/libiberty*
++ ls -l '/usr/local/libiberty*'
+ls: cannot access '/usr/local/libiberty*': No such file or directory
+
+nayou@nayoungkim MINGW64 /c/gcc-14.2.0/libiberty
+# cp libiberty.a /usr/local
++ cp libiberty.a /usr/local
+
+nayou@nayoungkim MINGW64 /c/gcc-14.2.0/libiberty
+# ls -l /usr/local/libiberty*
++ ls -l /usr/local/libiberty.a
+-rw-r--r-- 1 nayou nayou 268576  1월 25 10:35 /usr/local/libiberty.a
+
+/c/gcc-14.2.0/libiberty/Makefile.am 수정
+# install-exec-am 타겟 설정
+install-exec-am:
+	@echo "Installing executables and libraries"
+	$(INSTALL) -m 644 libiberty.a $(DESTDIR)$(libdir)
+
+# install-data-am 타겟 설정
+install-data-am:
+	@echo "Installing data files"
+	$(INSTALL) -m 644 README $(DESTDIR)$(docdir)
+
+nayou@nayoungkim MINGW64 /c/gcc-14.2.0/libiberty
+# ...
+./configure --prefix=/usr/local --enable-shared --disable-static --with-openssl --without-x  --no-recursion
+sed -i '/#define pid_t int/d' config.h && 
+make &&
+make install
+...
+Installing executables and libraries
+/usr/bin/install -c -m 644 libiberty.a /mingw64/lib
+Installing data files
+/usr/bin/install -c -m 644 README /mingw64/share/doc/libiberty-1.0
+make[1]: 디렉터리 '/c/gcc-14.2.0/libiberty' 나감
+
+nayou@nayoungkim MINGW64 /c/gcc-14.2.0/libiberty
+# ls -l Makefile*
++ ls -l Makefile Makefile.am Makefile.in
+-rw-r--r-- 1 nayou nayou 28794  1월 25 10:32 Makefile
+-rw-r--r-- 1 nayou nayou  1310  1월 25 10:30 Makefile.am
+-rw-r--r-- 1 nayou nayou 29363  1월 25 10:32 Makefile.in
+
+다시 /c/gcc-build 디렉터리로 이동하여 설치 진행
+rm -f config.cache && 
+cd /c/gcc-14.2.0 && 
+libtoolize --copy --force && 
+aclocal --force && 
+autoconf && 
+automake --add-missing --copy && 
+autoreconf -ivf && 
+sed -i '/if test ! -r "\$srcdir\/\$ac_unique_file"; then/i srcdir=\/c\/gcc-14.2.0' configure 
+sed -i 's/ -V -qversion -version/ --version/g' configure 
+sed -i 's/ -V -qversion/ --version/g' configure 
+sed -i 's/$NM -V/$NM --version/g' configure 
+sed -i 's/$CC -V/$CC --version/g' configure && 
+sed -i -e '/#include <stdbit.h>/d' \
+       -e 's/static_assert (__STDC_ENDIAN_LITTLE__ != __STDC_ENDIAN_BIG__);/\
+#ifndef __STDC_ENDIAN_LITTLE__\n\
+  #define __STDC_ENDIAN_LITTLE__ 1\n\
+  #define __STDC_ENDIAN_BIG__ 0\n\
+#endif\n\
+static_assert(__STDC_ENDIAN_LITTLE__ != __STDC_ENDIAN_BIG__, "Endianness conflict detected");/' \
+       -e 's/static typeof (1 + 1L) two/static long int two/' \
+       configure
+sed -i -e '/for ac_header in dlfcn.h/,/done/d' \
+       -e '/#if HAVE_DLFCN_H/,/#endif/d' \
+       configure 
+cd /c/gcc-build && 
+/c/gcc-14.2.0/configure --disable-sanity-checks --disable-dlfcn --disable-shared --build=x86_64-w64-mingw32 --host=x86_64-w64-mingw32 --srcdir="$SRCDIR" --prefix=/usr/local --with-install="$ac_install_sh" --enable-languages=c,c++,fortran,lto,objc && 
+mingw32-make
 
 
 
