@@ -3026,61 +3026,189 @@ nayou@nayoungkim MINGW64 /c/gcc-14.2.0/libiberty
 sed -i '/#define pid_t int/d' config.h && 
 make &&
 make install
-...
+출력
+libtoolize: putting auxiliary files in AC_CONFIG_AUX_DIR, 'build-aux'.
+libtoolize: copying file 'build-aux/ltmain.sh'
+libtoolize: putting macros in AC_CONFIG_MACRO_DIRS, '../config'.
+libtoolize: copying file '../config/libtool.m4'
+libtoolize: copying file '../config/ltoptions.m4'
+libtoolize: copying file '../config/ltsugar.m4'
+libtoolize: copying file '../config/ltversion.m4'
+libtoolize: copying file '../config/lt~obsolete.m4'
+libtoolize: Consider adding '-I ../config' to ACLOCAL_AMFLAGS in Makefile.am.
+configure.ac:18: installing 'build-aux/compile'
+configure.ac:12: installing 'build-aux/missing'
+Makefile.am: installing 'build-aux/depcomp'
+autoreconf: Entering directory `.'
+autoreconf: configure.ac: not using Gettext
+autoreconf: running: aclocal --force
+autoreconf: configure.ac: tracing
+autoreconf: running: libtoolize --copy --force
+libtoolize: putting auxiliary files in AC_CONFIG_AUX_DIR, 'build-aux'.
+libtoolize: copying file 'build-aux/ltmain.sh'
+libtoolize: putting macros in AC_CONFIG_MACRO_DIRS, '../config'.
+libtoolize: copying file '../config/libtool.m4'
+libtoolize: copying file '../config/ltoptions.m4'
+libtoolize: copying file '../config/ltsugar.m4'
+libtoolize: copying file '../config/ltversion.m4'
+libtoolize: copying file '../config/lt~obsolete.m4'
+libtoolize: Consider adding '-I ../config' to ACLOCAL_AMFLAGS in Makefile.am.
+autoreconf: running: /usr/local/bin/autoconf --force
+autoreconf: running: /usr/local/bin/autoheader --force
+autoreconf: running: automake --add-missing --copy --force-missing
+configure.ac:18: installing 'build-aux/compile'
+configure.ac:12: installing 'build-aux/missing'
+Makefile.am: installing 'build-aux/depcomp'
+autoreconf: Leaving directory `.'
++ ./configure --prefix=/usr/local --enable-shared --disable-static --with-openssl --without-x --no-recursion
+PATH_SEPARATOR is set to ;
++ sed -i '/#define pid_t int/d' config.h
++ make
+/bin/sh ./config.status --recheck
+running CONFIG_SHELL=/bin/sh /bin/sh ./configure CC=x86_64-w64-mingw32-gcc CFLAGS= -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -I/mingw64/include/libiberty -I/usr/include -I/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/plugin/include -I/c/gcc-14.2.0/include -O2 -w -std=c11 -D_GNU_SOURCE -D__USE_MINGW_ANSI_STDIO=1 LDFLAGS=-L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0 -L/mingw64/lib -L/usr/lib -L/mingw64/x86_64-w64-mingw32/lib -L/c/libidn2/gettext-0.22.5/libtextstyle/lib -Wl,-rpath,/mingw64/bin CPPFLAGS= -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 CPP=/mingw64/bin/cpp CXX=x86_64-w64-mingw32-g++ CXXFLAGS=-I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -O2 -DDEBUG -DVERSION="1.0.0" --no-create --no-recursion
+PATH_SEPARATOR is set to ;
+ cd . && /bin/sh ./config.status Makefile depfiles
+config.status: creating Makefile
+config.status: executing depfiles commands
+/bin/sh ./config.status --recheck
+running CONFIG_SHELL=/bin/sh /bin/sh ./configure CC=x86_64-w64-mingw32-gcc CFLAGS= -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -I/mingw64/include/libiberty -I/usr/include -I/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/plugin/include -I/c/gcc-14.2.0/include -O2 -w -std=c11 -D_GNU_SOURCE -D__USE_MINGW_ANSI_STDIO=1 LDFLAGS=-L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0 -L/mingw64/lib -L/usr/lib -L/mingw64/x86_64-w64-mingw32/lib -L/c/libidn2/gettext-0.22.5/libtextstyle/lib -Wl,-rpath,/mingw64/bin CPPFLAGS= -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 CPP=/mingw64/bin/cpp CXX=x86_64-w64-mingw32-g++ CXXFLAGS=-I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -O2 -DDEBUG -DVERSION="1.0.0" --no-create --no-recursion
+PATH_SEPARATOR is set to ;
+cd . && /bin/sh ./config.status config.h
+config.status: creating config.h
+config.status: config.h is unchanged
+make  all-am
+make[1]: 디렉터리 '/c/gcc-14.2.0/libiberty' 들어감
+/bin/sh ./config.status --recheck
+running CONFIG_SHELL=/bin/sh /bin/sh ./configure CC=x86_64-w64-mingw32-gcc CFLAGS= -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -I/mingw64/include/libiberty -I/usr/include -I/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/plugin/include -I/c/gcc-14.2.0/include -O2 -w -std=c11 -D_GNU_SOURCE -D__USE_MINGW_ANSI_STDIO=1 LDFLAGS=-L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0 -L/mingw64/lib -L/usr/lib -L/mingw64/x86_64-w64-mingw32/lib -L/c/libidn2/gettext-0.22.5/libtextstyle/lib -Wl,-rpath,/mingw64/bin CPPFLAGS= -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 CPP=/mingw64/bin/cpp CXX=x86_64-w64-mingw32-g++ CXXFLAGS=-I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -O2 -DDEBUG -DVERSION="1.0.0" --no-create --no-recursion
+PATH_SEPARATOR is set to ;
+depbase=`echo argv.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+x86_64-w64-mingw32-gcc -DHAVE_CONFIG_H -I.  -D_UNICODE -I/c/msys64/mingw64/include -I. -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -Wall -Wextra -g -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -I/mingw64/include/libiberty -I/usr/include -I/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/plugin/include -I/c/gcc-14.2.0/include -O2 -w -std=c11 -D_GNU_SOURCE -D__USE_MINGW_ANSI_STDIO=1 -Wpedantic -Wall -Wwrite-strings -Wc++-compat -Wstrict-prototypes -Wshadow=local -MT argv.o -MD -MP -MF $depbase.Tpo -c -o argv.o argv.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo cplus-dem.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+x86_64-w64-mingw32-gcc -DHAVE_CONFIG_H -I.  -D_UNICODE -I/c/msys64/mingw64/include -I. -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -Wall -Wextra -g -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -I/mingw64/include/libiberty -I/usr/include -I/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/plugin/include -I/c/gcc-14.2.0/include -O2 -w -std=c11 -D_GNU_SOURCE -D__USE_MINGW_ANSI_STDIO=1 -Wpedantic -Wall -Wwrite-strings -Wc++-compat -Wstrict-prototypes -Wshadow=local -MT cplus-dem.o -MD -MP -MF $depbase.Tpo -c -o cplus-dem.o cplus-dem.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo dyn-string.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+x86_64-w64-mingw32-gcc -DHAVE_CONFIG_H -I.  -D_UNICODE -I/c/msys64/mingw64/include -I. -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -Wall -Wextra -g -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -I/mingw64/include/libiberty -I/usr/include -I/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/plugin/include -I/c/gcc-14.2.0/include -O2 -w -std=c11 -D_GNU_SOURCE -D__USE_MINGW_ANSI_STDIO=1 -Wpedantic -Wall -Wwrite-strings -Wc++-compat -Wstrict-prototypes -Wshadow=local -MT dyn-string.o -MD -MP -MF $depbase.Tpo -c -o dyn-string.o dyn-string.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo fibheap.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+x86_64-w64-mingw32-gcc -DHAVE_CONFIG_H -I.  -D_UNICODE -I/c/msys64/mingw64/include -I. -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -Wall -Wextra -g -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -I/mingw64/include/libiberty -I/usr/include -I/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/plugin/include -I/c/gcc-14.2.0/include -O2 -w -std=c11 -D_GNU_SOURCE -D__USE_MINGW_ANSI_STDIO=1 -Wpedantic -Wall -Wwrite-strings -Wc++-compat -Wstrict-prototypes -Wshadow=local -MT fibheap.o -MD -MP -MF $depbase.Tpo -c -o fibheap.o fibheap.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo floatformat.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+x86_64-w64-mingw32-gcc -DHAVE_CONFIG_H -I.  -D_UNICODE -I/c/msys64/mingw64/include -I. -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -Wall -Wextra -g -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -I/mingw64/include/libiberty -I/usr/include -I/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/plugin/include -I/c/gcc-14.2.0/include -O2 -w -std=c11 -D_GNU_SOURCE -D__USE_MINGW_ANSI_STDIO=1 -Wpedantic -Wall -Wwrite-strings -Wc++-compat -Wstrict-prototypes -Wshadow=local -MT floatformat.o -MD -MP -MF $depbase.Tpo -c -o floatformat.o floatformat.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo fnmatch.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+x86_64-w64-mingw32-gcc -DHAVE_CONFIG_H -I.  -D_UNICODE -I/c/msys64/mingw64/include -I. -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -Wall -Wextra -g -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -I/mingw64/include/libiberty -I/usr/include -I/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/plugin/include -I/c/gcc-14.2.0/include -O2 -w -std=c11 -D_GNU_SOURCE -D__USE_MINGW_ANSI_STDIO=1 -Wpedantic -Wall -Wwrite-strings -Wc++-compat -Wstrict-prototypes -Wshadow=local -MT fnmatch.o -MD -MP -MF $depbase.Tpo -c -o fnmatch.o fnmatch.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo getruntime.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+x86_64-w64-mingw32-gcc -DHAVE_CONFIG_H -I.  -D_UNICODE -I/c/msys64/mingw64/include -I. -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -Wall -Wextra -g -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -I/mingw64/include/libiberty -I/usr/include -I/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/plugin/include -I/c/gcc-14.2.0/include -O2 -w -std=c11 -D_GNU_SOURCE -D__USE_MINGW_ANSI_STDIO=1 -Wpedantic -Wall -Wwrite-strings -Wc++-compat -Wstrict-prototypes -Wshadow=local -MT getruntime.o -MD -MP -MF $depbase.Tpo -c -o getruntime.o getruntime.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo hex.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+x86_64-w64-mingw32-gcc -DHAVE_CONFIG_H -I.  -D_UNICODE -I/c/msys64/mingw64/include -I. -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -Wall -Wextra -g -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -I/mingw64/include/libiberty -I/usr/include -I/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/plugin/include -I/c/gcc-14.2.0/include -O2 -w -std=c11 -D_GNU_SOURCE -D__USE_MINGW_ANSI_STDIO=1 -Wpedantic -Wall -Wwrite-strings -Wc++-compat -Wstrict-prototypes -Wshadow=local -MT hex.o -MD -MP -MF $depbase.Tpo -c -o hex.o hex.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo lbasename.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+x86_64-w64-mingw32-gcc -DHAVE_CONFIG_H -I.  -D_UNICODE -I/c/msys64/mingw64/include -I. -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -Wall -Wextra -g -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -I/mingw64/include/libiberty -I/usr/include -I/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/plugin/include -I/c/gcc-14.2.0/include -O2 -w -std=c11 -D_GNU_SOURCE -D__USE_MINGW_ANSI_STDIO=1 -Wpedantic -Wall -Wwrite-strings -Wc++-compat -Wstrict-prototypes -Wshadow=local -MT lbasename.o -MD -MP -MF $depbase.Tpo -c -o lbasename.o lbasename.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo make-relative-prefix.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+x86_64-w64-mingw32-gcc -DHAVE_CONFIG_H -I.  -D_UNICODE -I/c/msys64/mingw64/include -I. -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -Wall -Wextra -g -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -I/mingw64/include/libiberty -I/usr/include -I/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/plugin/include -I/c/gcc-14.2.0/include -O2 -w -std=c11 -D_GNU_SOURCE -D__USE_MINGW_ANSI_STDIO=1 -Wpedantic -Wall -Wwrite-strings -Wc++-compat -Wstrict-prototypes -Wshadow=local -MT make-relative-prefix.o -MD -MP -MF $depbase.Tpo -c -o make-relative-prefix.o make-relative-prefix.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo objalloc.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+x86_64-w64-mingw32-gcc -DHAVE_CONFIG_H -I.  -D_UNICODE -I/c/msys64/mingw64/include -I. -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -Wall -Wextra -g -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -I/mingw64/include/libiberty -I/usr/include -I/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/plugin/include -I/c/gcc-14.2.0/include -O2 -w -std=c11 -D_GNU_SOURCE -D__USE_MINGW_ANSI_STDIO=1 -Wpedantic -Wall -Wwrite-strings -Wc++-compat -Wstrict-prototypes -Wshadow=local -MT objalloc.o -MD -MP -MF $depbase.Tpo -c -o objalloc.o objalloc.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo obstack.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+x86_64-w64-mingw32-gcc -DHAVE_CONFIG_H -I.  -D_UNICODE -I/c/msys64/mingw64/include -I. -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -Wall -Wextra -g -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -I/mingw64/include/libiberty -I/usr/include -I/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/plugin/include -I/c/gcc-14.2.0/include -O2 -w -std=c11 -D_GNU_SOURCE -D__USE_MINGW_ANSI_STDIO=1 -Wpedantic -Wall -Wwrite-strings -Wc++-compat -Wstrict-prototypes -Wshadow=local -MT obstack.o -MD -MP -MF $depbase.Tpo -c -o obstack.o obstack.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo partition.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+x86_64-w64-mingw32-gcc -DHAVE_CONFIG_H -I.  -D_UNICODE -I/c/msys64/mingw64/include -I. -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -Wall -Wextra -g -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -I/mingw64/include/libiberty -I/usr/include -I/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/plugin/include -I/c/gcc-14.2.0/include -O2 -w -std=c11 -D_GNU_SOURCE -D__USE_MINGW_ANSI_STDIO=1 -Wpedantic -Wall -Wwrite-strings -Wc++-compat -Wstrict-prototypes -Wshadow=local -MT partition.o -MD -MP -MF $depbase.Tpo -c -o partition.o partition.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo pexecute.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+x86_64-w64-mingw32-gcc -DHAVE_CONFIG_H -I.  -D_UNICODE -I/c/msys64/mingw64/include -I. -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -Wall -Wextra -g -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -I/mingw64/include/libiberty -I/usr/include -I/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/plugin/include -I/c/gcc-14.2.0/include -O2 -w -std=c11 -D_GNU_SOURCE -D__USE_MINGW_ANSI_STDIO=1 -Wpedantic -Wall -Wwrite-strings -Wc++-compat -Wstrict-prototypes -Wshadow=local -MT pexecute.o -MD -MP -MF $depbase.Tpo -c -o pexecute.o pexecute.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo physmem.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+x86_64-w64-mingw32-gcc -DHAVE_CONFIG_H -I.  -D_UNICODE -I/c/msys64/mingw64/include -I. -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -Wall -Wextra -g -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -I/mingw64/include/libiberty -I/usr/include -I/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/plugin/include -I/c/gcc-14.2.0/include -O2 -w -std=c11 -D_GNU_SOURCE -D__USE_MINGW_ANSI_STDIO=1 -Wpedantic -Wall -Wwrite-strings -Wc++-compat -Wstrict-prototypes -Wshadow=local -MT physmem.o -MD -MP -MF $depbase.Tpo -c -o physmem.o physmem.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo simple-object.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+x86_64-w64-mingw32-gcc -DHAVE_CONFIG_H -I.  -D_UNICODE -I/c/msys64/mingw64/include -I. -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -Wall -Wextra -g -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -I/mingw64/include/libiberty -I/usr/include -I/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/plugin/include -I/c/gcc-14.2.0/include -O2 -w -std=c11 -D_GNU_SOURCE -D__USE_MINGW_ANSI_STDIO=1 -Wpedantic -Wall -Wwrite-strings -Wc++-compat -Wstrict-prototypes -Wshadow=local -MT simple-object.o -MD -MP -MF $depbase.Tpo -c -o simple-object.o simple-object.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo strerror.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+x86_64-w64-mingw32-gcc -DHAVE_CONFIG_H -I.  -D_UNICODE -I/c/msys64/mingw64/include -I. -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -Wall -Wextra -g -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -I/mingw64/include/libiberty -I/usr/include -I/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/plugin/include -I/c/gcc-14.2.0/include -O2 -w -std=c11 -D_GNU_SOURCE -D__USE_MINGW_ANSI_STDIO=1 -Wpedantic -Wall -Wwrite-strings -Wc++-compat -Wstrict-prototypes -Wshadow=local -MT strerror.o -MD -MP -MF $depbase.Tpo -c -o strerror.o strerror.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo strsignal.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+x86_64-w64-mingw32-gcc -DHAVE_CONFIG_H -I.  -D_UNICODE -I/c/msys64/mingw64/include -I. -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -Wall -Wextra -g -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -I/mingw64/include/libiberty -I/usr/include -I/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/plugin/include -I/c/gcc-14.2.0/include -O2 -w -std=c11 -D_GNU_SOURCE -D__USE_MINGW_ANSI_STDIO=1 -Wpedantic -Wall -Wwrite-strings -Wc++-compat -Wstrict-prototypes -Wshadow=local -MT strsignal.o -MD -MP -MF $depbase.Tpo -c -o strsignal.o strsignal.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo xatexit.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+x86_64-w64-mingw32-gcc -DHAVE_CONFIG_H -I.  -D_UNICODE -I/c/msys64/mingw64/include -I. -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -Wall -Wextra -g -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -I/mingw64/include/libiberty -I/usr/include -I/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/plugin/include -I/c/gcc-14.2.0/include -O2 -w -std=c11 -D_GNU_SOURCE -D__USE_MINGW_ANSI_STDIO=1 -Wpedantic -Wall -Wwrite-strings -Wc++-compat -Wstrict-prototypes -Wshadow=local -MT xatexit.o -MD -MP -MF $depbase.Tpo -c -o xatexit.o xatexit.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo xexit.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+x86_64-w64-mingw32-gcc -DHAVE_CONFIG_H -I.  -D_UNICODE -I/c/msys64/mingw64/include -I. -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -Wall -Wextra -g -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -I/mingw64/include/libiberty -I/usr/include -I/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/plugin/include -I/c/gcc-14.2.0/include -O2 -w -std=c11 -D_GNU_SOURCE -D__USE_MINGW_ANSI_STDIO=1 -Wpedantic -Wall -Wwrite-strings -Wc++-compat -Wstrict-prototypes -Wshadow=local -MT xexit.o -MD -MP -MF $depbase.Tpo -c -o xexit.o xexit.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo xmalloc.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+x86_64-w64-mingw32-gcc -DHAVE_CONFIG_H -I.  -D_UNICODE -I/c/msys64/mingw64/include -I. -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -Wall -Wextra -g -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -I/mingw64/include/libiberty -I/usr/include -I/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/plugin/include -I/c/gcc-14.2.0/include -O2 -w -std=c11 -D_GNU_SOURCE -D__USE_MINGW_ANSI_STDIO=1 -Wpedantic -Wall -Wwrite-strings -Wc++-compat -Wstrict-prototypes -Wshadow=local -MT xmalloc.o -MD -MP -MF $depbase.Tpo -c -o xmalloc.o xmalloc.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo xstrdup.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+x86_64-w64-mingw32-gcc -DHAVE_CONFIG_H -I.  -D_UNICODE -I/c/msys64/mingw64/include -I. -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -Wall -Wextra -g -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -I/mingw64/include/libiberty -I/usr/include -I/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/plugin/include -I/c/gcc-14.2.0/include -O2 -w -std=c11 -D_GNU_SOURCE -D__USE_MINGW_ANSI_STDIO=1 -Wpedantic -Wall -Wwrite-strings -Wc++-compat -Wstrict-prototypes -Wshadow=local -MT xstrdup.o -MD -MP -MF $depbase.Tpo -c -o xstrdup.o xstrdup.c &&\
+mv -f $depbase.Tpo $depbase.Po
+/mingw64/x86_64-w64-mingw32/bin/ar.exe rcs libiberty.a argv.o cplus-dem.o dyn-string.o fibheap.o floatformat.o fnmatch.o getruntime.o hex.o lbasename.o make-relative-prefix.o objalloc.o obstack.o partition.o pexecute.o physmem.o safe-ctype.o simple-object.o strerror.o strsignal.o xatexit.o xexit.o xmalloc.o xstrdup.o
+make[1]: 디렉터리 '/c/gcc-14.2.0/libiberty' 나감
++ make install
+/bin/sh ./config.status --recheck
+running CONFIG_SHELL=/bin/sh /bin/sh ./configure CC=x86_64-w64-mingw32-gcc CFLAGS= -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -I/mingw64/include/libiberty -I/usr/include -I/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/plugin/include -I/c/gcc-14.2.0/include -O2 -w -std=c11 -D_GNU_SOURCE -D__USE_MINGW_ANSI_STDIO=1 LDFLAGS=-L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0 -L/mingw64/lib -L/usr/lib -L/mingw64/x86_64-w64-mingw32/lib -L/c/libidn2/gettext-0.22.5/libtextstyle/lib -Wl,-rpath,/mingw64/bin CPPFLAGS= -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 CPP=/mingw64/bin/cpp CXX=x86_64-w64-mingw32-g++ CXXFLAGS=-I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -O2 -DDEBUG -DVERSION="1.0.0" --no-create --no-recursion
+PATH_SEPARATOR is set to ;
+make[1]: 디렉터리 '/c/gcc-14.2.0/libiberty' 들어감
+/bin/sh ./config.status --recheck
+running CONFIG_SHELL=/bin/sh /bin/sh ./configure CC=x86_64-w64-mingw32-gcc CFLAGS= -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -I/mingw64/include/libiberty -I/usr/include -I/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/plugin/include -I/c/gcc-14.2.0/include -O2 -w -std=c11 -D_GNU_SOURCE -D__USE_MINGW_ANSI_STDIO=1 LDFLAGS=-L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0 -L/mingw64/lib -L/usr/lib -L/mingw64/x86_64-w64-mingw32/lib -L/c/libidn2/gettext-0.22.5/libtextstyle/lib -Wl,-rpath,/mingw64/bin CPPFLAGS= -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 CPP=/mingw64/bin/cpp CXX=x86_64-w64-mingw32-g++ CXXFLAGS=-I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -O2 -DDEBUG -DVERSION="1.0.0" --no-create --no-recursion
+PATH_SEPARATOR is set to ;
 Installing executables and libraries
 /usr/bin/install -c -m 644 libiberty.a /mingw64/lib
 Installing data files
 /usr/bin/install -c -m 644 README /mingw64/share/doc/libiberty-1.0
 make[1]: 디렉터리 '/c/gcc-14.2.0/libiberty' 나감
 
-nayou@nayoungkim MINGW64 /c/gcc-14.2.0/libiberty
-# ls -l Makefile*
-+ ls -l Makefile Makefile.am Makefile.in
--rw-r--r-- 1 nayou nayou 28794  1월 25 10:32 Makefile
--rw-r--r-- 1 nayou nayou  1310  1월 25 10:30 Makefile.am
--rw-r--r-- 1 nayou nayou 29363  1월 25 10:32 Makefile.in
-
-다시 /c/gcc-build 디렉터리로 이동하여 설치 진행
-rm -f config.cache && 
-cd /c/gcc-14.2.0 && 
-libtoolize --copy --force && 
-aclocal --force && 
-autoconf && 
-automake --add-missing --copy && 
-autoreconf -ivf && 
-sed -i '/if test ! -r "\$srcdir\/\$ac_unique_file"; then/i srcdir=\/c\/gcc-14.2.0' configure 
-sed -i 's/ -V -qversion -version/ --version/g' configure 
-sed -i 's/ -V -qversion/ --version/g' configure 
-sed -i 's/$NM -V/$NM --version/g' configure 
-sed -i 's/$CC -V/$CC --version/g' configure && 
-sed -i -e '/#include <stdbit.h>/d' \
-       -e 's/static_assert (__STDC_ENDIAN_LITTLE__ != __STDC_ENDIAN_BIG__);/\
-#ifndef __STDC_ENDIAN_LITTLE__\n\
-  #define __STDC_ENDIAN_LITTLE__ 1\n\
-  #define __STDC_ENDIAN_BIG__ 0\n\
-#endif\n\
-static_assert(__STDC_ENDIAN_LITTLE__ != __STDC_ENDIAN_BIG__, "Endianness conflict detected");/' \
-       -e 's/static typeof (1 + 1L) two/static long int two/' \
-       configure
-sed -i -e '/for ac_header in dlfcn.h/,/done/d' \
-       -e '/#if HAVE_DLFCN_H/,/#endif/d' \
-       configure 
-cd /c/gcc-build && 
-/c/gcc-14.2.0/configure --disable-sanity-checks --disable-dlfcn --disable-shared --build=x86_64-w64-mingw32 --host=x86_64-w64-mingw32 --srcdir="$SRCDIR" --prefix=/usr/local --with-install="$ac_install_sh" --enable-languages=c,c++,fortran,lto,objc && 
-mingw32-make
-
 오류
-mingw32-make[3]: Entering directory 'C:/gcc-build/host-x86_64-w64-mingw32/libiberty'
-mingw32-make[3]: *** No rule to make target '/c/gcc-14.2.0/libiberty/Makefile.in', needed by 'Makefile'.  Stop.
-mingw32-make[3]: Leaving directory 'C:/gcc-build/host-x86_64-w64-mingw32/libiberty'
-mingw32-make[2]: *** [Makefile:12310: all-stage1-libiberty] Error 2
-mingw32-make[2]: Leaving directory 'C:/gcc-build'
-mingw32-make[1]: *** [Makefile:25759: stage1-bubble] Error 2
-mingw32-make[1]: Leaving directory 'C:/gcc-build'
-mingw32-make: *** [Makefile:1110: all] Error 2
+libtoolize: Consider adding '-I ../config' to ACLOCAL_AMFLAGS in Makefile.am.
+aclocal에서 매크로 디렉터리를 찾지 못했음을 의미
+/c/gcc-14.2.0/libiberty/Makefile.am 수정
+ACLOCAL_AMFLAGS = -I ../config
 
+autoreconf: Entering directory `.'
+autoreconf: configure.ac: not using Gettext
+configure.ac에서 Gettext를 사용하지 않겠다고 선언했지만, 일부 모듈이 Gettext에 의존하고 있을 수 있음
+nayou@nayoungkim MINGW64 /c/gcc-14.2.0/libiberty
+# gettext --version
++ gettext --version
+gettext.exe (GNU gettext-runtime) 0.23.1
+Copyright (C) 1995-2024 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Written by Ulrich Drepper.
+/c/gcc-14.2.0/libiberty/configure.ac 수정
+AC_PROG_INSTALL
+# gettext 초기화
+AM_GNU_GETTEXT([external])
+AM_GNU_GETTEXT_VERSION([0.23])
 
+/c/gcc-14.2.0/libiberty/Makefile.am 수정
+# 컴파일 플래그
+#-D_UNICODE: 유니코드 정의를 활성화
+#-I/c/msys64/mingw64/include: 특정 헤더 파일 경로를 포함
+#-I$(srcdir): 소스 디렉토리를 포함
+#-Wall: 기본적인 경고 활성화
+#-Wextra: 추가 경고 활성화
+#-g: 디버깅 심볼을 포함
+#-Wpedantic: 표준에 맞지 않는 코드를 경고
+#-Wshadow: 변수 이름 충돌을 경고
+#-Wconversion: 암시적 형 변환 경고
+#-O2:최적화
+AM_CPPFLAGS = -D_UNICODE -I/c/msys64/mingw64/include -I$(srcdir)
+AM_CFLAGS = -Wall -Wextra -Wpedantic -Wshadow -g
 
-
-
-
+빌드옵션수정
+./configure --prefix=/usr/local --enable-shared --disable-static --with-openssl --without-x  --no-recursion
+sed -i '/#define pid_t int/d' config.h && 
+make &&
+make install
+=>
+./configure --prefix=/usr/local --enable-shared --disable-static &&
+sed -i '/#define pid_t int/d' config.h &&
+make -j$(nproc) &&
+make install
