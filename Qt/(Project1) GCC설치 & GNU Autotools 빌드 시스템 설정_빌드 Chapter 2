@@ -3171,21 +3171,6 @@ ACLOCAL_AMFLAGS = -I ../config
 
 autoreconf: Entering directory `.'
 autoreconf: configure.ac: not using Gettext
-configure.ac에서 Gettext를 사용하지 않겠다고 선언했지만, 일부 모듈이 Gettext에 의존하고 있을 수 있음
-nayou@nayoungkim MINGW64 /c/gcc-14.2.0/libiberty
-# gettext --version
-+ gettext --version
-gettext.exe (GNU gettext-runtime) 0.23.1
-Copyright (C) 1995-2024 Free Software Foundation, Inc.
-License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>
-This is free software: you are free to change and redistribute it.
-There is NO WARRANTY, to the extent permitted by law.
-Written by Ulrich Drepper.
-/c/gcc-14.2.0/libiberty/configure.ac 수정
-AC_PROG_INSTALL
-# gettext 초기화
-AM_GNU_GETTEXT([external])
-AM_GNU_GETTEXT_VERSION([0.23])
 
 /c/gcc-14.2.0/libiberty/Makefile.am 수정
 # 컴파일 플래그
@@ -3212,3 +3197,81 @@ make install
 sed -i '/#define pid_t int/d' config.h &&
 make -j$(nproc) &&
 make install
+
+갱신된것처럼 처리
+nayou@nayoungkim MINGW64 /c/gcc-build
+# touch /c/gcc-14.2.0/libiberty/Makefile.in
+
+다시 make
+nayou@nayoungkim MINGW64 /c/gcc-build
+# mingw32-make
+
+오류
+configure: error: `CXX' has changed since the previous run:
+configure:   former value:  `x86_64-w64-mingw32-g++ -std=c++11'
+configure:   current value: `x86_64-w64-mingw32-g++ -std=c++11 -std=c++11'
+configure: warning: ignoring whitespace changes in `CXXFLAGS' since the previous run:
+configure:   former value:  `-I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -O2 -DDEBUG -DVERSION="1.0.0"  '
+configure:   current value: `-I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -O2 -DDEBUG -DVERSION="1.0.0"    '
+configure: warning: ignoring whitespace changes in `AR' since the previous run:
+configure:   former value:  `/mingw64/x86_64-w64-mingw32/bin/ar.exe '
+configure:   current value: `/mingw64/x86_64-w64-mingw32/bin/ar.exe  '
+configure: error: in `/c/gcc-build':
+configure: error: changes in the environment can compromise the build
+configure: error: run `make distclean' and/or `rm ./config.cache' and start over
+mingw32-make[2]: *** [Makefile:16219: configure-stage1-lto-plugin] Error 1
+mingw32-make[2]: Leaving directory 'C:/gcc-build'
+mingw32-make[1]: *** [Makefile:24683: stage1-bubble] Error 2
+mingw32-make[1]: Leaving directory 'C:/gcc-build'
+mingw32-make: *** [Makefile:1110: all] Error 2
+수정
+환경 변수 (CFLAGS, CXX, CXXFLAGS, AR 등)가 이전 configure 실행 시 사용된 값과 현재 값이 다르기 때문에 발생하는 문제
+GCC 빌드 시스템은 환경 변수의 변경을 엄격하게 감지하며, 변경이 감지되면 빌드가 중단됨
+
+환경변수를 해제하고 다시 설정한 후 다시 configure && make
+nayou@nayoungkim MINGW64 /c/gcc-build
+# unset CFLAGS
+unset CXXFLAGS
+unset LDFLAGS
+unset AR
+unset CXX
+export CXX='x86_64-w64-mingw32-g++ -std=c++11'
+export CXXFLAGS='-I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -O2 -DDEBUG -DVERSION="1.0.0"'
+export AR='/mingw64/x86_64-w64-mingw32/bin/ar.exe'
+
+nayou@nayoungkim MINGW64 /c/gcc-build
+# /c/gcc-14.2.0/configure --disable-sanity-checks --disable-dlfcn --disable-shared \
+    --build=x86_64-w64-mingw32 --host=x86_64-w64-mingw32 \
+    --srcdir=/c/gcc-14.2.0 --prefix=/usr/local --enable-languages=c,c++,fortran,lto,objc
+
+nayou@nayoungkim MINGW64 /c/gcc-build
+# mingw32-make -j$(nproc)
+
+오류
+cd /c/gcc-14.2.0 && autogen Makefile.def
+cd /c/gcc-14.2.0 && autoconf
+Makefile:1014: /c/gcc-14.2.0/config/bootstrap-debug.mk: No such file or directory
+mingw32-make: *** No rule to make target '/c/gcc-14.2.0/config/bootstrap-debug.mk'.  Stop.
+mingw32-make: *** Waiting for unfinished jobs....
+
+수정
+nayou@nayoungkim MINGW64 /c/gcc-14.2.0
+# grep -r "bootstrap-debug.mk" /c/gcc-14.2.0
++ grep -r bootstrap-debug.mk /c/gcc-14.2.0
+Binary file /c/gcc-14.2.0/.git/index matches
+/c/gcc-14.2.0/back/Makefile.in-20241126:include $(foreach CONFIG, $(BUILD_CONFIG), $(srcdir)/config/bootstrap-debug.mk)
+/c/gcc-14.2.0/back/MD5SUMS:9a194b56c06b616528d1e76306aa78e6  config/bootstrap-debug.mk
+/c/gcc-14.2.0/back-2024-12-30/Makefile.in-20241126:include $(foreach CONFIG, $(BUILD_CONFIG), $(srcdir)/config/bootstrap-debug.mk)
+/c/gcc-14.2.0/back-2024-12-30/MD5SUMS:9a194b56c06b616528d1e76306aa78e6  config/bootstrap-debug.mk
+/c/gcc-14.2.0/config/ChangeLog: * bootstrap-debug.mk: Add comments.
+/c/gcc-14.2.0/config/ChangeLog: * bootstrap-debug.mk: New.
+
+/c/gcc-14.2.0/Mainfile.in 수정
+@if gcc
+BUILD_CONFIG = @BUILD_CONFIG@
+ifneq ($(BUILD_CONFIG),)
+include $(foreach CONFIG, $(BUILD_CONFIG), $(srcdir)/config/$(CONFIG).mk)
+# 2025-02-12 추가 /c/gcc-14.2.0/config/bootstrap-debug.mk: No such file or directory
+include $(foreach CONFIG, $(BUILD_CONFIG), $(srcdir)/config/bootstrap-debug.mk)
+endif
+@endif gcc
