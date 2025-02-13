@@ -3275,3 +3275,216 @@ include $(foreach CONFIG, $(BUILD_CONFIG), $(srcdir)/config/$(CONFIG).mk)
 include $(foreach CONFIG, $(BUILD_CONFIG), $(srcdir)/config/bootstrap-debug.mk)
 endif
 @endif gcc
+
+/c/gcc-14.2.0/Makefile.am 수정
+include $(foreach CONFIG, $(BUILD_CONFIG), $(srcdir)/config/bootstrap-debug.mk)
+
+# Automake 옵션 설정
+AUTOMAKE_OPTIONS = foreign
+
+# aclocal에서 사용할 추가 매크로 경로 설정
+ACLOCAL_AMFLAGS = -I ../gcc-14.2.0/m4
+
+# 프로젝트의 소스 파일 목록
+bin_PROGRAMS = gcc
+
+gcc_SOURCES = \
+    main.c \
+    gcc.c \
+    driver.c \
+    some_other_file.c
+
+# 빌드 규칙 추가
+all: main.o gcc.o driver.o some_other_file.o
+	$(CC) -o gcc.exe main.o gcc.o driver.o some_other_file.o $(LDFLAGS) $(LDADD)
+
+# main.c, gcc.c, driver.c, some_other_file.c가 없을 경우 기본 파일 생성
+main.c:
+	echo "#include <stdio.h>\nint main() { return 0; }" > main.c
+
+gcc.c:
+	echo "#include <stdio.h>\nvoid gcc_function() {}" > gcc.c
+
+driver.c:
+	echo "#include <stdio.h>\nvoid driver_function() {}" > driver.c
+
+some_other_file.c:
+	echo "#include <stdio.h>\nvoid some_other_function() {}" > some_other_file.c
+
+main.o: main.c
+	$(CC) -c main.c -o main.o $(CFLAGS)
+
+gcc.o: gcc.c
+	$(CC) -c gcc.c -o gcc.o $(CFLAGS)
+
+driver.o: driver.c
+	$(CC) -c driver.c -o driver.o $(CFLAGS)
+
+some_other_file.o: some_other_file.c
+	$(CC) -c some_other_file.c -o some_other_file.o $(CFLAGS)
+
+# 컴파일러 플래그 설정
+AM_CFLAGS = -std=c11 -Wno-c23-extensions
+AM_CXXFLAGS = -std=c++11 -DDEBUG
+
+# 링커 플래그 추가
+LDADD = -lstdc++ -lm
+
+# 추가 빌드 프로그램
+bin_PROGRAMS += ld
+ld_SOURCES = ld.c
+
+# 설치 경로 설정
+prefix = /usr/local
+exec_prefix = ${prefix}
+bindir = ${exec_prefix}/bin
+libdir = ${exec_prefix}/lib
+
+# AM_CPPFLAGS 설정
+AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_builddir)/include
+
+# 테스트 프로그램 설정
+check_PROGRAMS = test_program
+test_program_SOURCES = test_program.c
+test_program_LDADD = -lcheck
+
+# 라이브러리 빌드 설정
+lib_LTLIBRARIES = libgcc.la
+libgcc_la_SOURCES = libgcc.c
+
+# libtool 버전 불일치 문제 해결을 위한 재생성 규칙 추가
+autogen:
+	rm -rf aclocal.m4 autom4te.cache config.status config.cache config.log ltmain.sh libtool
+	rm -rf ../gcc-14.2.0/build-aux ../gcc-14.2.0/m4
+	libtoolize --force --copy
+	aclocal --force -I ../gcc-14.2.0/m4
+	autoconf --force
+	automake --add-missing --force-missing
+	if [ -f configure.ac ]; then sed -i 's/LT_INIT.*/LT_INIT([disable-static])/' configure.ac; fi
+	./configure --prefix=/usr/local
+
+# clean 규칙 추가
+clean:
+	rm -f gcc.exe main.o gcc.o driver.o some_other_file.o main.c gcc.c driver.c some_other_file.c aclocal.m4 libtool config.status config.cache ltmain.sh
+
+빌드
+rm -f config.cache && 
+ unset CFLAGS && 
+unset CXXFLAGS &&
+unset LDFLAGS &&
+unset AR &&
+unset CXX &&
+export CXX='x86_64-w64-mingw32-g++ -std=c++11' &&
+export CXXFLAGS='-I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/c/msys64/mingw64/include -O2 -DDEBUG -DVERSION="1.0.0"' &&
+export AR='/mingw64/x86_64-w64-mingw32/bin/ar.exe' &&
+cd /c/gcc-14.2.0 && 
+libtoolize --copy --force && 
+aclocal --force && 
+autoconf && 
+automake --add-missing --copy && 
+autoreconf -ivf && 
+sed -i '/if test ! -r "\$srcdir\/\$ac_unique_file"; then/i srcdir=\/c\/gcc-14.2.0' configure 
+sed -i 's/ -V -qversion -version/ --version/g' configure 
+sed -i 's/ -V -qversion/ --version/g' configure 
+sed -i 's/$NM -V/$NM --version/g' configure 
+sed -i 's/$CC -V/$CC --version/g' configure && 
+sed -i -e '/#include <stdbit.h>/d' \
+       -e 's/static_assert (__STDC_ENDIAN_LITTLE__ != __STDC_ENDIAN_BIG__);/\
+#ifndef __STDC_ENDIAN_LITTLE__\n\
+  #define __STDC_ENDIAN_LITTLE__ 1\n\
+  #define __STDC_ENDIAN_BIG__ 0\n\
+#endif\n\
+static_assert(__STDC_ENDIAN_LITTLE__ != __STDC_ENDIAN_BIG__, "Endianness conflict detected");/' \
+       -e 's/static typeof (1 + 1L) two/static long int two/' \
+       configure
+sed -i -e '/for ac_header in dlfcn.h/,/done/d' \
+       -e '/#if HAVE_DLFCN_H/,/#endif/d' \
+       configure 
+cd /c/gcc-build && 
+/c/gcc-14.2.0/configure --disable-sanity-checks --disable-dlfcn --disable-shared \
+    --build=x86_64-w64-mingw32 --host=x86_64-w64-mingw32 \
+    --srcdir=/c/gcc-14.2.0 --prefix=/usr/local --enable-languages=c,c++,fortran,lto,objc && 
+make 
+
+오류
+libtool: Version mismatch error.  This is libtool 2.5.4, but the
+libtool: definition of this LT_INIT comes from libtool 2.5.3.
+libtool: You should recreate aclocal.m4 with macros from libtool 2.5.4
+libtool: and run autoconf again.
+
+수정
+2.5.3 이들어가는 파일을 검색
+nayou@nayoungkim MINGW64 /c/gcc-build
+# grep -rn "=2.5.3" /c/gcc-14.2.0/
+/c/gcc-14.2.0/back/ltmain.sh:34:VERSION=2.5.3
+/c/gcc-14.2.0/back/ltmain.sh:35:package_revision=2.5.3
+/c/gcc-14.2.0/back-2024-12-30/ltmain.sh:34:VERSION=2.5.3
+/c/gcc-14.2.0/back-2024-12-30/ltmain.sh:35:package_revision=2.5.3
+/c/gcc-14.2.0/C/ltmain.sh:34:VERSION=2.5.3
+/c/gcc-14.2.0/C/ltmain.sh:35:package_revision=2.5.3
+/c/gcc-14.2.0/gcc/d/dmd/dsymbolsem.d:2421:        // https://issues.dlang.org/show_bug.cgi?id=22593
+/c/gcc-14.2.0/gcc/d/dmd/iasmgcc.d:557:        // https://issues.dlang.org/show_bug.cgi?id=20593
+/c/gcc-14.2.0/gcc/d/dmd/initsem.d:389:                     * https://issues.dlang.org/show_bug.cgi?id=22513
+/c/gcc-14.2.0/gcc/testsuite/gdc.dg/asm5.d:1:// https://issues.dlang.org/show_bug.cgi?id=20593
+/c/gcc-14.2.0/gcc/testsuite/gdc.test/compilable/test22593.d:1:// https://issues.dlang.org/show_bug.cgi?id=22593
+/c/gcc-14.2.0/gcc/testsuite/gdc.test/compilable/test23533.d:1:// https://issues.dlang.org/show_bug.cgi?id=23533
+/c/gcc-14.2.0/gcc/testsuite/gdc.test/fail_compilation/testrvaluecpctor.d:1:// https://issues.dlang.org/show_bug.cgi?id=22593
+/c/gcc-14.2.0/gcc/testsuite/gdc.test/runnable/mars1.d:2379:// https://issues.dlang.org/show_bug.cgi?id=21513
+/c/gcc-14.2.0/libphobos/testsuite/libphobos.config/test22523.d:1:// https://issues.dlang.org/show_bug.cgi?id=22523
+/c/gcc-14.2.0/ltmain.sh:34:VERSION=2.5.3
+/c/gcc-14.2.0/ltmain.sh:35:package_revision=2.5.3
+/c/gcc-14.2.0/lto-plugin/build/libtool:40:macro_version=2.5.3
+/c/gcc-14.2.0/lto-plugin/build/libtool:41:macro_revision=2.5.3
+/c/gcc-14.2.0/lto-plugin/build/libtool:550:VERSION=2.5.3
+/c/gcc-14.2.0/lto-plugin/build/libtool:551:package_revision=2.5.3
+
+nayou@nayoungkim MINGW64 /c/gcc-build
+# grep -rn "=2.5.3" /c/gcc-build/
+/c/gcc-build/libtool:40:macro_version=2.5.3
+/c/gcc-build/libtool:41:macro_revision=2.5.3
+
+2.5.3 이들어가는 파일을 삭제 후 빌드
+nayou@nayoungkim MINGW64 /c/gcc-build
+# rm -rf /c/gcc-14.2.0/ltmain.sh
+rm -rf /c/gcc-14.2.0/C/ltmain.sh
+rm -rf /c/gcc-14.2.0/back/ltmain.sh
+rm -rf /c/gcc-14.2.0/back-2024-12-30/ltmain.sh
+rm -rf /c/gcc-14.2.0/lto-plugin/build/libtool
+rm -rf /c/gcc-14.2.0/m4
+rm -rf /c/gcc-14.2.0/build-aux
+
+nayou@nayoungkim MINGW64 /c/gcc-build
+# rm -rf /c/gcc-build/libtool
+rm -rf /c/gcc-build/libltdl
+rm -rf /c/gcc-build/autom4te.cache
+rm -rf /c/gcc-build/config.status
+rm -rf /c/gcc-build/config.cache
+rm -rf /c/gcc-build/config.log
+rm -rf /c/gcc-build/ltmain.sh
+
+libtool: Version mismatch error.  This is libtool 2.5.4, but the
+libtool: definition of this LT_INIT comes from libtool 2.5.3.
+libtool: You should recreate aclocal.m4 with macros from libtool 2.5.4
+libtool: and run autoconf again.
+make: *** [Makefile:685: gcc.exe] 오류 63
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
