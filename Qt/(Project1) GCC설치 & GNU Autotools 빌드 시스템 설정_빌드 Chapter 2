@@ -3468,18 +3468,80 @@ libtool: You should recreate aclocal.m4 with macros from libtool 2.5.4
 libtool: and run autoconf again.
 make: *** [Makefile:685: gcc.exe] 오류 63
 
+make전에 대치
+/c/gcc-14.2.0/configure --disable-sanity-checks --disable-dlfcn --disable-shared \
+    --build=x86_64-w64-mingw32 --host=x86_64-w64-mingw32 \
+    --srcdir=/c/gcc-14.2.0 --prefix=/usr/local --enable-languages=c,c++,fortran,lto,objc && 
+sed -i 's/macro_version=2.5.3/macro_version=2.5.4/' /c/gcc-build/libtool &&
+sed -i 's/macro_revision=2.5.3/macro_revision=2.5.4/' /c/gcc-build/libtool &&
+make 
 
+오류
+/usr/bin/bash ./libtool  --tag=CC   --mode=link x86_64-w64-mingw32-gcc -std=gnu23 -std=c11 -Wno-c23-extensions -g -O2 -std=c23 -nostartfiles -static-libgcc -static-libstdc++ -mconsole -Wl,--exclude-libs,libmingw32.a C:/msys64/mingw64/lib/../lib/crt1.o  -o gcc.exe main.o gcc.o driver.o some_other_file.o -lm
+libtool: link: x86_64-w64-mingw32-gcc -std=gnu23 -std=c11 -Wno-c23-extensions -g -O2 -std=c23 -nostartfiles -static-libgcc -static-libstdc++ -mconsole -Wl,--exclude-libs -Wl,libmingw32.a C:/msys64/mingw64/lib/../lib/crt1.o -o gcc.exe main.o gcc.o driver.o some_other_file.o
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/msys64/mingw64/lib/../lib/libmingw32.a(lib64_libmingw32_a-crtexewin.o): in function `main':
+C:/M/B/src/mingw-w64/mingw-w64-crt/crt/crtexewin.c:67:(.text.startup+0xc5): undefined reference to `WinMain'
+collect2.exe: error: ld returned 1 exit status
+make: *** [Makefile:689: gcc.exe] 오류 1
 
+수정
+링커(ld.exe)가 WinMain 함수를 찾지 못해서 발생
+WinMain은 Windows GUI 애플리케이션에서 사용되는 엔트리 포인트이지만, 현재 빌드 중인 GCC 자체는 콘솔 애플리케이션이므로 WinMain이 필요하지 않음
+즉, 잘못된 링커 옵션이 사용되었거나, 잘못된 라이브러리가 포함되었을 가능성이 큼
+/c/gcc-14.2.0/Makefile.am 수정
+# 링커 플래그 설정 (WinMain 오류 방지)
+#AM_LDFLAGS = -nostartfiles -static-libgcc -static-libstdc++ -mconsole -Wl,--exclude-libs,libmingw32.a $(shell gcc -print-file-name=crt1.o)
+# 링커 플래그 설정 (WinMain 오류 방지)
+AM_LDFLAGS = -nostartfiles -static-libgcc -static-libstdc++ -mconsole -Wl,--exclude-libs,libmingw32.a
 
+오류
+/usr/bin/bash ./libtool  --tag=CC   --mode=link x86_64-w64-mingw32-gcc -std=gnu23 -std=c11 -Wno-c23-extensions -g -O2 -std=c23 -nostartfiles -static-libgcc -static-libstdc++ -mconsole -Wl,--exclude-libs,libmingw32.a  -o gcc.exe main.o gcc.o driver.o some_other_file.o -lm
+libtool: link: x86_64-w64-mingw32-gcc -std=gnu23 -std=c11 -Wno-c23-extensions -g -O2 -std=c23 -nostartfiles -static-libgcc -static-libstdc++ -mconsole -Wl,--exclude-libs -Wl,libmingw32.a -o gcc.exe main.o gcc.o driver.o some_other_file.o
+make: *** 'ld_tool.o'에서 필요한 'ld_tool.c' 타겟을 만들 규칙이 없습니다.  멈춤.
 
+수정
+nayou@nayoungkim MINGW64 /c/gcc-build
+# echo -e '#include <stdio.h>\nint main() { return 0; }' > ld_tool.c
 
+오류
+x86_64-w64-mingw32-gcc -std=gnu23 -DPACKAGE_NAME=\"gcc\" -DPACKAGE_TARNAME=\"gcc-14.2.0\" -DPACKAGE_VERSION=\"14.2.0\" -DPACKAGE_STRING=\"gcc\ 14.2.0\" -DPACKAGE_BUGREPORT=\"gcc-help@gcc.gnu.org\" -DPACKAGE_URL=\"\" -DPACKAGE=\"gcc-14.2.0\" -DVERSION=\"14.2.0\" -DSTDC_HEADERS=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STRINGS_H=1 -DHAVE_INTTYPES_H=1 -DHAVE_STDINT_H=1 -DHAVE_UNISTD_H=1 -DLT_OBJDIR=\".libs/\" -DMY_PACKAGE_VERSION=\"14.2.0\" -DLT_OBJDIR=\".libs/\" -I. -I/c/gcc-14.2.0  -I/c/gcc-14.2.0/include -I./include -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -std=c11 -Wno-c23-extensions -g -O2 -std=c23 -MT ld_tool.o -MD -MP -MF .deps/ld_tool.Tpo -c -o ld_tool.o ld_tool.c
+mv -f .deps/ld_tool.Tpo .deps/ld_tool.Po
+/usr/bin/bash ./libtool  --tag=CC   --mode=link x86_64-w64-mingw32-gcc -std=gnu23 -std=c11 -Wno-c23-extensions -g -O2 -std=c23 -nostartfiles -static-libgcc -static-libstdc++ -mconsole -Wl,--exclude-libs,libmingw32.a  -o ld_tool.exe ld_tool.o -lm
+libtool: link: x86_64-w64-mingw32-gcc -std=gnu23 -std=c11 -Wno-c23-extensions -g -O2 -std=c23 -nostartfiles -static-libgcc -static-libstdc++ -mconsole -Wl,--exclude-libs -Wl,libmingw32.a -o ld_tool.exe ld_tool.o
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/msys64/mingw64/lib/../lib/libmingw32.a(lib64_libmingw32_a-gccmain.o): in function `__do_global_ctors':
+C:/M/B/src/mingw-w64/mingw-w64-crt/crt/gccmain.c:47:(.text+0x99): undefined reference to `atexit'
+collect2.exe: error: ld returned 1 exit status
+make: *** [Makefile:693: ld_tool.exe] 오류 1
 
+수정
+링커가 atexit() 함수를 찾지 못하고 있음 
+=> libc.a 및 libmingwex.a를 강제로 포함
+/c/gcc-14.2.0/Makefile.am 수정
+# 링커 플래그 설정 (WinMain 오류 방지)
+#AM_LDFLAGS = -nostartfiles -static-libgcc -static-libstdc++ -mconsole -Wl,--exclude-libs,libmingw32.a
+AM_LDFLAGS = -nostartfiles -static-libgcc -static-libstdc++ -mconsole -Wl,--exclude-libs,libmingw32.a -lc -lmingwex
 
+오류
+C:/M/B/src/mingw-w64/mingw-w64-crt/crt/gccmain.c:47:(.text+0x99): undefined reference to `atexit'
+collect2.exe: error: ld returned 1 exit status
+make: *** [Makefile:693: ld_tool.exe] 오류 1
 
+수정
+atexit 함수가 정의되지 않았다는 링커 오류
+/c/gcc-14.2.0/Makefile.am 수정
+# 링커 플래그 설정 (WinMain 오류 방지)
+AM_LDFLAGS = -static-libgcc -static-libstdc++ -mconsole -Wl,--exclude-libs,libmingw32.a -lc -lmingwex -lmingw32
+# LDADD에서 GUI 라이브러리 제거
+LDADD = -lm
 
+오류
+make: *** 'libgcc.lo'에서 필요한 'libgcc.c' 타겟을 만들 규칙이 없습니다.  멈춤.
 
-
-
+수정
+/c/gcc-14.2.0/Makefile.am 수정
+# 라이브러리 빌드 설정
+#lib_LTLIBRARIES = libgcc.la
+#libgcc_la_SOURCES = libgcc.c
 
 
 
