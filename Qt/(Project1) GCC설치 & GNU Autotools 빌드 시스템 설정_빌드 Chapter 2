@@ -3539,14 +3539,346 @@ make: *** 'libgcc.lo'에서 필요한 'libgcc.c' 타겟을 만들 규칙이 없�
 
 수정
 /c/gcc-14.2.0/Makefile.am 수정
+-mconsole : 콘솔 애플리케이션을 위한 링커 플래그 
+-mwindows : Windows GUI 애플리케이션을 빌드하려고 시도
+# 링커 플래그 설정 (WinMain 오류 방지)
+AM_LDFLAGS = -static-libgcc -static-libstdc++ -mconsole -Wl,--exclude-libs,libmingw32.a -lc -lmingwex -lmingw32
+
 # 라이브러리 빌드 설정
 #lib_LTLIBRARIES = libgcc.la
 #libgcc_la_SOURCES = libgcc.c
 
+/c/gcc-build/main.c 수정
+#include <stdio.h>
+
+int main() {
+    printf("Hello, Console!\n");
+    return 0;
+}
+
+오류
+x86_64-w64-mingw32-gcc -std=gnu23 -c main.c -o main.o -g -O2 -std=c23
+/usr/bin/bash ./libtool  --tag=CC   --mode=link x86_64-w64-mingw32-gcc -std=gnu23 -std=c11 -Wno-c23-extensions -g -O2 -std=c23 -static-libgcc -static-libstdc++ -mconsole -Wl,--exclude-libs,libmingw32.a -lc -lmingwex -lmingw32  -o gcc.exe main.o gcc.o driver.o some_other_file.o -lm
+libtool: link: x86_64-w64-mingw32-gcc -std=gnu23 -std=c11 -Wno-c23-extensions -g -O2 -std=c23 -static-libgcc -static-libstdc++ -mconsole -Wl,--exclude-libs -Wl,libmingw32.a -o gcc.exe main.o gcc.o driver.o some_other_file.o  -lmingwex -lmingw32
+x86_64-w64-mingw32-gcc -std=gnu23 -o gcc.exe main.o gcc.o driver.o some_other_file.o  -lm
+
+수정
+중복된 표준 지정 (-std=gnu23, -std=c11, -std=c23)
+-std=gnu23, -std=c11, -std=c23가 한꺼번에 포함됨 → 하나만 사용해야 함
+링커 오류 (WinMain 관련)
+-mconsole을 추가했지만, 여전히 WinMain을 찾으려 함
+-nostartfiles를 추가해야 실행 시작 코드에서 WinMain을 요구하지 않음
+라이브러리 순서 문제
+-lmingwex, -lmingw32, -lm 등의 라이브러리 순서가 중요함
+-lm을 먼저 사용해야 올바르게 링크됨
+# -nostartfiles 추가 → WinMain 의존성 제거, -lm을 앞쪽으로 이동 → 수학 라이브러리 정상 연결
+AM_LDFLAGS = -static-libgcc -static-libstdc++ -mconsole -nostartfiles -Wl,--exclude-libs,libmingw32.a -lm -lmingwex -lmingw32
+
+/c/gcc-14.2.0/configure.ac 수정
+# 2025-02-14 중복된 -std= 플래그를 정리
+CFLAGS="-std=c23 -g -O2"
+LDFLAGS="-static-libgcc -static-libstdc++ -mconsole -nostartfiles -Wl,--exclude-libs,libmingw32.a -lm -lmingwex -lmingw32"
+
+오류
 
 
+수정
+GCC를 빌드하려면 GMP(4.2+), MPFR(3.1.0+), MPC(0.8.0+) 라이브러리가 필요 
+현재 시스템에 해당 라이브러리들이 없거나, 경로가 올바르게 설정되지 않음
 
+GMP, MPFR, MPC 다운로드 및 설치
+MSYS2 패키지 관리자를 최신 상태로 업데이트
+nayou@nayoungkim MINGW64 /c/gcc-build
+# pacman -Syu
 
+MSYS2를 이용한 설치
+nayou@nayoungkim MINGW64 /c/gcc-build
+# pacman -S mingw-w64-x86_64-gmp mingw-w64-x86_64-mpfr mingw-w64-x86_64-mpc
 
+설치확인
+nayou@nayoungkim MINGW64 /c/gcc-build
+# ls /mingw64/include/gmp.h
+ls /mingw64/include/mpfr.h
+ls /mingw64/include/mpc.h
+ls /mingw64/lib/libgmp.*
+ls /mingw64/lib/libmpfr.*
+ls /mingw64/lib/libmpc.*
+/mingw64/include/gmp.h
+/mingw64/include/mpfr.h
+/mingw64/include/mpc.h
+/mingw64/lib/libgmp.a  /mingw64/lib/libgmp.dll.a
+/mingw64/lib/libmpfr.a  /mingw64/lib/libmpfr.dll.a
+/mingw64/lib/libmpc.a  /mingw64/lib/libmpc.dll.a
 
+GMP (GNU Multiple Precision Arithmetic Library : 다중 정밀도 산술 라이브러리)
+nayou@nayoungkim MINGW64 /c/gcc-build
+# pacman -Qi mingw-w64-x86_64-gmp
+이름               : mingw-w64-x86_64-gmp
+버전               : 6.3.0-2
+설명               : A free library for arbitrary precision arithmetic (mingw-w64)
+아키텍처           : any
+URL                : https://gmplib.org/
+라이선스           : LGPL3  GPL
+모음들             : 없음
+다음을 제공        : 없음
+다음에 의존        : 없음
+선택 의존성        : 없음
+다음이 요구        : mingw-w64-x86_64-gcc  mingw-w64-x86_64-gdb  mingw-w64-x86_64-isl
+                     mingw-w64-x86_64-mpc  mingw-w64-x86_64-mpfr
+다음의 선택 의존성 : 없음
+다음과 충돌        : 없음
+다음을 대체        : 없음
+설치된 크기        : 2.98 MiB
+꾸러미 만든이      : CI (msys2/msys2-autobuild/0852421d/6195286796)
+빌드 날짜          : 2023년 09월 15일 금 오후 4:41:18
+설치 날짜          : 2025년 02월 14일 금 오후 7:29:15
+설치 이유          : 다른 꾸러미의 의존 요소로 설치했습니다
+설치 스크립트      : 아니요
+유효검사자         : SHA-256 합  서명
+
+nayou@nayoungkim MINGW64 /c/gcc-build
+# find /mingw64/ -name "libgmp*"
+find /mingw64/ -name "gmp.h"
+/mingw64/bin/libgmp-10.dll
+/mingw64/bin/libgmpxx-4.dll
+/mingw64/lib/libgmp.a
+/mingw64/lib/libgmp.dll.a
+/mingw64/lib/libgmpxx.a
+/mingw64/lib/libgmpxx.dll.a
+/mingw64/include/gmp.h
+
+MPFR (Multiple Precision Floating-Point Reliable Library : 다중 정밀도 부동소수점 신뢰성 라이브러리)
+nayou@nayoungkim MINGW64 /c/gcc-build
+# pacman -Qi mingw-w64-x86_64-mpfr
+이름               : mingw-w64-x86_64-mpfr
+버전               : 4.2.1-2
+설명               : Multiple-precision floating-point library (mingw-w64)
+아키텍처           : any
+URL                : 없음
+라이선스           : spdx:LGPL-3.0-or-later
+모음들             : 없음
+다음을 제공        : 없음
+다음에 의존        : mingw-w64-x86_64-gcc-libs  mingw-w64-x86_64-gmp
+선택 의존성        : 없음
+다음이 요구        : mingw-w64-x86_64-gcc  mingw-w64-x86_64-gdb  mingw-w64-x86_64-mpc
+다음의 선택 의존성 : 없음
+다음과 충돌        : 없음
+다음을 대체        : 없음
+설치된 크기        : 2.26 MiB
+꾸러미 만든이      : CI (msys2/msys2-autobuild/0852421d/6172671101)
+빌드 날짜          : 2023년 09월 13일 수 오후 9:51:26
+설치 날짜          : 2025년 02월 14일 금 오후 7:29:15
+설치 이유          : 다른 꾸러미의 의존 요소로 설치했습니다
+설치 스크립트      : 아니요
+유효검사자         : SHA-256 합  서명
+
+nayou@nayoungkim MINGW64 /c/gcc-build
+# find /mingw64/ -name "mpfr.h"
+find /mingw64/ -name "libmpfr*"
+/mingw64/include/mpfr.h
+/mingw64/bin/libmpfr-6.dll
+/mingw64/lib/libmpfr.a
+/mingw64/lib/libmpfr.dll.a
+
+MPC (Multiple Precision Complex Library : 다중 정밀도 복소수 라이브러리)
+nayou@nayoungkim MINGW64 /c/gcc-build
+# pacman -Qi mingw-w64-x86_64-mpc
+이름               : mingw-w64-x86_64-mpc
+버전               : 1.3.1-2
+설명               : Multiple precision complex arithmetic library (mingw-w64)
+아키텍처           : any
+URL                : http://www.multiprecision.org
+라이선스           : LGPL
+모음들             : 없음
+다음을 제공        : 없음
+다음에 의존        : mingw-w64-x86_64-gmp  mingw-w64-x86_64-mpfr
+선택 의존성        : 없음
+다음이 요구        : mingw-w64-x86_64-gcc
+다음의 선택 의존성 : 없음
+다음과 충돌        : 없음
+다음을 대체        : 없음
+설치된 크기        : 523.55 KiB
+꾸러미 만든이      : CI (msys2/msys2-autobuild/0852421d/6172671101)
+빌드 날짜          : 2023년 09월 13일 수 오후 9:57:43
+설치 날짜          : 2025년 02월 14일 금 오후 7:29:15
+설치 이유          : 다른 꾸러미의 의존 요소로 설치했습니다
+설치 스크립트      : 아니요
+유효검사자         : SHA-256 합  서명
+
+nayou@nayoungkim MINGW64 /c/gcc-build
+# find /mingw64/ -name "mpc.h"
+find /mingw64/ -name "libmpc*"
+/mingw64/include/mpc.h
+/mingw64/bin/libmpc-3.dll
+/mingw64/lib/libmpc.a
+/mingw64/lib/libmpc.dll.a
+
+환경변수설정
+export C_INCLUDE_PATH="/mingw64/include"
+export CPLUS_INCLUDE_PATH="/mingw64/include"
+export LIBRARY_PATH="/mingw64/lib"
+export LD_LIBRARY_PATH="/mingw64/lib"
+export PKG_CONFIG_PATH="/mingw64/lib/pkgconfig"
+
+빌드옵션설정추가
+/c/gcc-14.2.0/configure --disable-sanity-checks --disable-dlfcn --disable-shared \
+    --build=x86_64-w64-mingw32 --host=x86_64-w64-mingw32 \
+    --srcdir=/c/gcc-14.2.0 \
+    --prefix=/mingw64 \
+    --with-gmp=/c/msys64/mingw64 \
+    --with-mpfr=/c/msys64/mingw64 \
+    --with-mpc=/c/msys64/mingw64 \
+    --enable-languages=c,c++,fortran,lto,objc
+
+오류
+nayou@nayoungkim MINGW64 /c/gcc-build
+# cat config.log | grep -i "gmp\|mpfr\|mpc"
+  $ /c/gcc-14.2.0/configure --disable-sanity-checks --disable-dlfcn --disable-shared --build=x86_64-w64-mingw32 --host=x86_64-w64-mingw32 --srcdir=/c/gcc-14.2.0 --prefix=/mingw64 --with-gmp=/c/msys64/mingw64 --with-mpfr=/c/msys64/mingw64 --with-mpc=/c/msys64/mingw64 --enable-languages=c,c++,fortran,lto,objc
+Configured with: ../gcc-14.2.0/configure --prefix=/mingw64 --with-local-prefix=/mingw64/local --build=x86_64-w64-mingw32 --host=x86_64-w64-mingw32 --target=x86_64-w64-mingw32 --with-native-system-header-dir=/mingw64/include --libexecdir=/mingw64/lib --enable-bootstrap --enable-checking=release --with-arch=nocona --with-tune=generic --enable-languages=c,lto,c++,fortran,ada,objc,obj-c++,rust,jit --enable-shared --enable-static --enable-libatomic --enable-threads=posix --enable-graphite --enable-fully-dynamic-string --enable-libstdcxx-filesystem-ts --enable-libstdcxx-time --disable-libstdcxx-pch --enable-lto --enable-libgomp --disable-libssp --disable-multilib --disable-rpath --disable-win32-registry --disable-nls --disable-werror --disable-symvers --with-libiconv --with-system-zlib --with-gmp=/mingw64 --with-mpfr=/mingw64 --with-mpc=/mingw64 --with-isl=/mingw64 --with-pkgversion='Rev2, Built by MSYS2 project' --with-bugurl=https://github.com/msys2/MINGW-packages/issues --with-gnu-as --with-gnu-ld --disable-libstdcxx-debug --enable-plugin --with-boot-ldflags=-static-libstdc++ --with-stage1-ldflags=-static-libstdc++
+Configured with: ../gcc-14.2.0/configure --prefix=/mingw64 --with-local-prefix=/mingw64/local --build=x86_64-w64-mingw32 --host=x86_64-w64-mingw32 --target=x86_64-w64-mingw32 --with-native-system-header-dir=/mingw64/include --libexecdir=/mingw64/lib --enable-bootstrap --enable-checking=release --with-arch=nocona --with-tune=generic --enable-languages=c,lto,c++,fortran,ada,objc,obj-c++,rust,jit --enable-shared --enable-static --enable-libatomic --enable-threads=posix --enable-graphite --enable-fully-dynamic-string --enable-libstdcxx-filesystem-ts --enable-libstdcxx-time --disable-libstdcxx-pch --enable-lto --enable-libgomp --disable-libssp --disable-multilib --disable-rpath --disable-win32-registry --disable-nls --disable-werror --disable-symvers --with-libiconv --with-system-zlib --with-gmp=/mingw64 --with-mpfr=/mingw64 --with-mpc=/mingw64 --with-isl=/mingw64 --with-pkgversion='Rev2, Built by MSYS2 project' --with-bugurl=https://github.com/msys2/MINGW-packages/issues --with-gnu-as --with-gnu-ld --disable-libstdcxx-debug --enable-plugin --with-boot-ldflags=-static-libstdc++ --with-stage1-ldflags=-static-libstdc++
+Configured with: ../gcc-14.2.0/configure --prefix=/mingw64 --with-local-prefix=/mingw64/local --build=x86_64-w64-mingw32 --host=x86_64-w64-mingw32 --target=x86_64-w64-mingw32 --with-native-system-header-dir=/mingw64/include --libexecdir=/mingw64/lib --enable-bootstrap --enable-checking=release --with-arch=nocona --with-tune=generic --enable-languages=c,lto,c++,fortran,ada,objc,obj-c++,rust,jit --enable-shared --enable-static --enable-libatomic --enable-threads=posix --enable-graphite --enable-fully-dynamic-string --enable-libstdcxx-filesystem-ts --enable-libstdcxx-time --disable-libstdcxx-pch --enable-lto --enable-libgomp --disable-libssp --disable-multilib --disable-rpath --disable-win32-registry --disable-nls --disable-werror --disable-symvers --with-libiconv --with-system-zlib --with-gmp=/mingw64 --with-mpfr=/mingw64 --with-mpc=/mingw64 --with-isl=/mingw64 --with-pkgversion='Rev2, Built by MSYS2 project' --with-bugurl=https://github.com/msys2/MINGW-packages/issues --with-gnu-as --with-gnu-ld --disable-libstdcxx-debug --enable-plugin --with-boot-ldflags=-static-libstdc++ --with-stage1-ldflags=-static-libstdc++
+configure:22876: checking for the correct version of gmp.h
+configure:22930: checking for the correct version of mpfr.h
+configure:22983: checking for the correct version of mpc.h
+configure:23035: checking for the correct version of the gmp/mpfr libraries
+configure:23059: x86_64-w64-mingw32-gcc -std=gnu23 -o conftest.exe -std=c23 -g -O2 -I/c/msys64/mingw64/include -I/c/msys64/mingw64/include -I/c/msys64/mingw64/include   -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -static-libgcc -static-libstdc++ -mconsole -nostartfiles -Wl,--exclude-libs,libmingw32.a -lm -lmingwex -lmingw32 conftest.c  -L/c/msys64/mingw64/lib -L/c/msys64/mingw64/lib -L/c/msys64/mingw64/lib -lmpc -lmpfr -lgmp >&5
+| #include <mpfr.h>
+|     mpfr_t n;
+|     mpfr_t x;
+|     mpfr_init (n);
+|     mpfr_init (x);
+|     mpfr_atan2 (n, n, x, MPFR_RNDN);
+|     mpfr_erfc (n, x, MPFR_RNDN);
+|     mpfr_subnormalize (x, t, MPFR_RNDN);
+|     mpfr_clear(n);
+|     mpfr_clear(x);
+configure:23114: error: Building GCC requires GMP 4.2+, MPFR 3.1.0+ and MPC 0.8.0+.
+Try the --with-gmp, --with-mpfr and/or --with-mpc options to specify
+you obtained GMP, MPFR and/or MPC from a vendor distribution package,
+configdirs='gettext libiberty opcodes bfd readline tcl tk itcl libgui zlib libbacktrace libcpp libcody libdecnumber gmp mpfr mpc isl libiconv libctf libsframe libgrust texinfo flex bison binutils gas ld fixincludes gcc cgen sid sim gdb gdbserver gprof etc expect dejagnu m4 utils guile fastjar gnattools libcc1 gm2tools gotools c++tools'
+extra_isl_gmp_configure_flags=''
+extra_mpc_gmp_configure_flags=''
+extra_mpc_mpfr_configure_flags=''
+extra_mpfr_configure_flags=''
+gmpinc='-I/c/msys64/mingw64/include -I/c/msys64/mingw64/include -I/c/msys64/mingw64/include '
+gmplibs='-L/c/msys64/mingw64/lib -L/c/msys64/mingw64/lib -L/c/msys64/mingw64/lib -lmpc -lmpfr -lgmp'
+
+수정
+GMP, MPFR, MPC 라이브러리 및 헤더 파일을 찾을 수 없다 
+
+gmp.h, mpfr.h, mpc.h의 존재 확인
+nayou@nayoungkim MINGW64 /c/gcc-build
+# ls /mingw64/include/gmp.h
+ls /mingw64/include/mpfr.h
+ls /mingw64/include/mpc.h
+/mingw64/include/gmp.h
+/mingw64/include/mpfr.h
+/mingw64/include/mpc.h
+
+정확한 라이브러리 경로 및 파일 확인
+nayou@nayoungkim MINGW64 /c/gcc-build
+# ls /mingw64/lib/libgmp.*
+ls /mingw64/lib/libmpfr.*
+ls /mingw64/lib/libmpc.*
+/mingw64/lib/libgmp.a  /mingw64/lib/libgmp.dll.a
+/mingw64/lib/libmpfr.a  /mingw64/lib/libmpfr.dll.a
+/mingw64/lib/libmpc.a  /mingw64/lib/libmpc.dll.a
+
+환경변수설정(항목별 최상단으로 위치옮김)
+export C_INCLUDE_PATH=/c/msys64/mingw64/include
+export CPLUS_INCLUDE_PATH=/c/msys64/mingw64/include
+export LIBRARY_PATH=/c/msys64/mingw64/lib
+export LD_LIBRARY_PATH="/mingw64/lib"
+
+빌드명령어수정
+/c/gcc-14.2.0/configure --disable-sanity-checks --disable-dlfcn --disable-shared \
+    --build=x86_64-w64-mingw32 --host=x86_64-w64-mingw32 \
+    --srcdir=/c/gcc-14.2.0 \
+    --prefix=/mingw64 \
+    --with-gmp=/mingw64 \
+    --with-mpfr=/mingw64 \
+    --with-mpc=/mingw64 \
+    --enable-languages=c,c++,fortran,lto,objc
+
+오류
+nayou@nayoungkim MINGW64 /c/gcc-build
+# cat config.log | grep -i 'gmp\|mpfr\|mpc'
+  $ /c/gcc-14.2.0/configure --disable-sanity-checks --disable-dlfcn --disable-shared --build=x86_64-w64-mingw32 --host=x86_64-w64-mingw32 --srcdir=/c/gcc-14.2.0 --prefix=/mingw64 --with-gmp=/mingw64 --with-mpfr=/mingw64 --with-mpc=/mingw64 --enable-languages=c,c++,fortran,lto,objc
+Configured with: ../gcc-14.2.0/configure --prefix=/mingw64 --with-local-prefix=/mingw64/local --build=x86_64-w64-mingw32 --host=x86_64-w64-mingw32 --target=x86_64-w64-mingw32 --with-native-system-header-dir=/mingw64/include --libexecdir=/mingw64/lib --enable-bootstrap --enable-checking=release --with-arch=nocona --with-tune=generic --enable-languages=c,lto,c++,fortran,ada,objc,obj-c++,rust,jit --enable-shared --enable-static --enable-libatomic --enable-threads=posix --enable-graphite --enable-fully-dynamic-string --enable-libstdcxx-filesystem-ts --enable-libstdcxx-time --disable-libstdcxx-pch --enable-lto --enable-libgomp --disable-libssp --disable-multilib --disable-rpath --disable-win32-registry --disable-nls --disable-werror --disable-symvers --with-libiconv --with-system-zlib --with-gmp=/mingw64 --with-mpfr=/mingw64 --with-mpc=/mingw64 --with-isl=/mingw64 --with-pkgversion='Rev2, Built by MSYS2 project' --with-bugurl=https://github.com/msys2/MINGW-packages/issues --with-gnu-as --with-gnu-ld --disable-libstdcxx-debug --enable-plugin --with-boot-ldflags=-static-libstdc++ --with-stage1-ldflags=-static-libstdc++
+Configured with: ../gcc-14.2.0/configure --prefix=/mingw64 --with-local-prefix=/mingw64/local --build=x86_64-w64-mingw32 --host=x86_64-w64-mingw32 --target=x86_64-w64-mingw32 --with-native-system-header-dir=/mingw64/include --libexecdir=/mingw64/lib --enable-bootstrap --enable-checking=release --with-arch=nocona --with-tune=generic --enable-languages=c,lto,c++,fortran,ada,objc,obj-c++,rust,jit --enable-shared --enable-static --enable-libatomic --enable-threads=posix --enable-graphite --enable-fully-dynamic-string --enable-libstdcxx-filesystem-ts --enable-libstdcxx-time --disable-libstdcxx-pch --enable-lto --enable-libgomp --disable-libssp --disable-multilib --disable-rpath --disable-win32-registry --disable-nls --disable-werror --disable-symvers --with-libiconv --with-system-zlib --with-gmp=/mingw64 --with-mpfr=/mingw64 --with-mpc=/mingw64 --with-isl=/mingw64 --with-pkgversion='Rev2, Built by MSYS2 project' --with-bugurl=https://github.com/msys2/MINGW-packages/issues --with-gnu-as --with-gnu-ld --disable-libstdcxx-debug --enable-plugin --with-boot-ldflags=-static-libstdc++ --with-stage1-ldflags=-static-libstdc++
+Configured with: ../gcc-14.2.0/configure --prefix=/mingw64 --with-local-prefix=/mingw64/local --build=x86_64-w64-mingw32 --host=x86_64-w64-mingw32 --target=x86_64-w64-mingw32 --with-native-system-header-dir=/mingw64/include --libexecdir=/mingw64/lib --enable-bootstrap --enable-checking=release --with-arch=nocona --with-tune=generic --enable-languages=c,lto,c++,fortran,ada,objc,obj-c++,rust,jit --enable-shared --enable-static --enable-libatomic --enable-threads=posix --enable-graphite --enable-fully-dynamic-string --enable-libstdcxx-filesystem-ts --enable-libstdcxx-time --disable-libstdcxx-pch --enable-lto --enable-libgomp --disable-libssp --disable-multilib --disable-rpath --disable-win32-registry --disable-nls --disable-werror --disable-symvers --with-libiconv --with-system-zlib --with-gmp=/mingw64 --with-mpfr=/mingw64 --with-mpc=/mingw64 --with-isl=/mingw64 --with-pkgversion='Rev2, Built by MSYS2 project' --with-bugurl=https://github.com/msys2/MINGW-packages/issues --with-gnu-as --with-gnu-ld --disable-libstdcxx-debug --enable-plugin --with-boot-ldflags=-static-libstdc++ --with-stage1-ldflags=-static-libstdc++
+configure:22876: checking for the correct version of gmp.h
+configure:22930: checking for the correct version of mpfr.h
+configure:22983: checking for the correct version of mpc.h
+configure:23035: checking for the correct version of the gmp/mpfr libraries
+configure:23059: x86_64-w64-mingw32-gcc -std=gnu23 -o conftest.exe -std=c23 -g -O2 -I/mingw64/include -I/mingw64/include -I/mingw64/include   -I/c/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++ -I/mingw64/include -I/usr/share/gettext -I/mingw64/include/glib-2.0 -O2 -static-libgcc -static-libstdc++ -mconsole -nostartfiles -Wl,--exclude-libs,libmingw32.a -lm -lmingwex -lmingw32 conftest.c  -L/mingw64/lib -L/mingw64/lib -L/mingw64/lib -lmpc -lmpfr -lgmp >&5
+| #include <mpfr.h>
+|     mpfr_t n;
+|     mpfr_t x;
+|     mpfr_init (n);
+|     mpfr_init (x);
+|     mpfr_atan2 (n, n, x, MPFR_RNDN);
+|     mpfr_erfc (n, x, MPFR_RNDN);
+|     mpfr_subnormalize (x, t, MPFR_RNDN);
+|     mpfr_clear(n);
+|     mpfr_clear(x);
+configure:23114: error: Building GCC requires GMP 4.2+, MPFR 3.1.0+ and MPC 0.8.0+.
+Try the --with-gmp, --with-mpfr and/or --with-mpc options to specify
+you obtained GMP, MPFR and/or MPC from a vendor distribution package,
+configdirs='gettext libiberty opcodes bfd readline tcl tk itcl libgui zlib libbacktrace libcpp libcody libdecnumber gmp mpfr mpc isl libiconv libctf libsframe libgrust texinfo flex bison binutils gas ld fixincludes gcc cgen sid sim gdb gdbserver gprof etc expect dejagnu m4 utils guile fastjar gnattools libcc1 gm2tools gotools c++tools'
+extra_isl_gmp_configure_flags=''
+extra_mpc_gmp_configure_flags=''
+extra_mpc_mpfr_configure_flags=''
+extra_mpfr_configure_flags=''
+gmpinc='-I/mingw64/include -I/mingw64/include -I/mingw64/include '
+gmplibs='-L/mingw64/lib -L/mingw64/lib -L/mingw64/lib -lmpc -lmpfr -lgmp'
+
+수정
+GMP, MPFR, MPC 라이브러리들이 올바르게 설정되었지만, 여전히 버전 관련 오류가 발생 
+GMP 4.2+, MPFR 3.1.0+, MPC 0.8.0+ 버전이 필요하다고 명시 
+
+nayou@nayoungkim MINGW64 /c/gcc-build
+# pkg-config --modversion gmp
+6.3.0
+
+nayou@nayoungkim MINGW64 /c/gcc-build
+# pkg-config --modversion mpfr
+4.2.1
+
+nayou@nayoungkim MINGW64 /c/gcc-build
+# pacman -Qi mingw-w64-x86_64-mpc
+이름               : mingw-w64-x86_64-mpc
+버전               : 1.3.1-2
+
+nayou@nayoungkim MINGW64 /c/gcc-build
+# ls /mingw64/lib | grep libmpc
+libmpc.a
+libmpc.dll.a
+
+GMP: 6.3.0 버전이므로 요구 사항인 4.2+를 만족
+MPFR: 4.2.1 버전이므로 요구 사항인 3.1.0+를 만족
+MPC: 1.3.1 버전이므로 0.8.0+를 만족
+
+MPC 다운로드 재설치(find /mingw64 -name "mpc.pc" 누락)
+https://www.multiprecision.org/mpc/download.html
+버전 1.3.0 
+mpc-1.3.1.tar.gz
+nayou@nayoungkim MINGW64 /c/Users/nayou/Downloads
+# tar -xvzf mpc-1.3.1.tar.gz
+nayou@nayoungkim MINGW64 /c/Users/nayou/Downloads
+# cd mpc-1.3.1/mpc-1.3.1
+nayou@nayoungkim MINGW64 /c/Users/nayou/Downloads/mpc-1.3.1/mpc-1.3.1
+#./configure --prefix=/mingw64
+
+오류
+In file included from get_x.c:25:
+C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++/complex.h:29:10: fatal error: bits/c++config.h: No such file or directory
+   29 | #include <bits/c++config.h>
+      |          ^~~~~~~~~~~~~~~~~~
+compilation terminated.
+make[2]: *** [Makefile:593: get_x.lo] 오류 1
+make[2]: 디렉터리 '/c/Users/nayou/Downloads/mpc-1.3.1/mpc-1.3.1/src' 나감
+make[1]: *** [Makefile:473: all-recursive] 오류 1
+make[1]: 디렉터리 '/c/Users/nayou/Downloads/mpc-1.3.1/mpc-1.3.1' 나감
+make: *** [Makefile:384: all] 오류 2
 
