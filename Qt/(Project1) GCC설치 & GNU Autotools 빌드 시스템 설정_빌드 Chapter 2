@@ -4239,9 +4239,21 @@ nayou@nayoungkim MINGW64 /c/Users/nayou/Downloads/mingw-w64-master/mingw-w64-mas
 /mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++/tr1/fenv.h
 /mingw64/x86_64-w64-mingw32/include/fenv.h
 
-pacman -S mingw-w64-x86_64-headers
-CFLAGS="-D__USE_MINGW_ANSI_STDIO=1"
-mingw-w64-crt/misc/feclearexcept.c
+nayou@nayoungkim MINGW64 /c/Users/nayou/Downloads/mingw-w64-master/mingw-w64-master/build
+# pacman -S mingw-w64-x86_64-headers
+
+nayou@nayoungkim MINGW64 /c/Users/nayou/Downloads/mingw-w64-master/mingw-w64-master/build
+# export CFLAGS="$CFLAGS -D__USE_MINGW_ANSI_STDIO=1"
+export CFLAGS="$CFLAGS -I/mingw64/x86_64-w64-mingw32/include"
+export LDFLAGS="$LDFLAGS -L/mingw64/x86_64-w64-mingw32/lib"
+
+nayou@nayoungkim MINGW64 /c/Users/nayou/Downloads/mingw-w64-master/mingw-w64-master/build
+# notepad /c/Users/nayou/Downloads/mingw-w64-master/mingw-w64-master/mingw-w64-crt/misc/feclearexcept.c
+#define __USE_MINGW_ANSI_STDIO 1
 #include <fenv.h>
+
+nayou@nayoungkim MINGW64 /c/Users/nayou/Downloads/mingw-w64-master/mingw-w64-master/build
+# ../configure --prefix=/mingw64 --with-headers=/mingw64/include --host=x86_64-w64-mingw32 --target=x86_64-w64-mingw32 && \
+make && make install
 
 
