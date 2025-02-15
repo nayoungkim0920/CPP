@@ -4140,20 +4140,108 @@ nayou@nayoungkim MINGW64 /c/gcc-build
 # pkg-config --modversion mpc
 1.3.1
 
+빌드
+오류
+configure: error: libc library not found
 
+수정
+nayou@nayoungkim MINGW64 /c/gcc-build
+# pacman -S mingw-w64-x86_64-crt
+export PKG_CONFIG_PATH=/mingw64/lib/pkgconfig
 
+명령어로 mingw64 환경 전환
+nayou@nayoungkim MINGW64 /c/gcc-build
+# export MSYSTEM=MINGW64
+export MSYS2_PATH_TYPE=inherit
+/usr/bin/bash.exe
 
+glibc와 관련된 패키지, mingw-w64 툴체인과 관련된 다른 필수 패키지를 설치
+pacman -S mingw-w64-x86_64-gcc
+pacman -S mingw-w64-x86_64-glibc => pacman -S mingw-w64-x86_64-runtime 패키지없음
+pacman -S base-devel
+pacman -S mingw-w64-x86_64-toolchain
+pacman -S mingw-w64-x86_64-crt-git
+pacman -S msys2-runtime
+pacman -S mingw-w64-x86_64-binutils
 
+nayou@nayoungkim MINGW64 /c/gcc-build
+# pacman -S mingw-w64-x86_64-glibc
+오류: 대상이 없습니다: mingw-w64-x86_64-glibc
 
+패키지목록 찾기
+nayou@nayoungkim MINGW64 /c/gcc-build
+# pacman -Ss mingw-w64
 
+nayou@nayoungkim MINGW64 /c/gcc-build
+# pacman -Ss glibc
+msys/rpcsvc-proto 1.4.4-1
+    rpcsvc protocol definitions from glibc.
 
+오류
+In file included from ../../mingw-w64-crt/complex/_cabs.c:46:
+C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++/complex.h:29:10: fatal error: bits/c++config.h: No such file or directory
+   29 | #include <bits/c++config.h>
+      |          ^~~~~~~~~~~~~~~~~~
+compilation terminated.
+make[3]: *** [Makefile:32766: complex/lib32_libmingwex_a-_cabs.o] 오류 1
+make[3]: 디렉터리 '/c/Users/nayou/Downloads/mingw-w64-master/mingw-w64-master/build/mingw-w64-crt' 나감
+make[2]: *** [Makefile:14948: all] 오류 2
+make[2]: 디렉터리 '/c/Users/nayou/Downloads/mingw-w64-master/mingw-w64-master/build/mingw-w64-crt' 나감
+make[1]: *** [Makefile:367: all-recursive] 오류 1
+make[1]: 디렉터리 '/c/Users/nayou/Downloads/mingw-w64-master/mingw-w64-master/build' 나감
+make: *** [Makefile:308: all] 오류 2
 
+수정
+nayou@nayoungkim MINGW64 /c/Users/nayou/Downloads/mpc-1.3.1/mpc-1.3.1
+# export CPLUS_INCLUDE_PATH="/mingw64/include/c++/14.2.0:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32:/mingw64/include"
+export CPATH="$CPLUS_INCLUDE_PATH"
+make clean
+make -j$(nproc)
 
+오류
+../../mingw-w64-crt/gdtoa/dtoa.c: In function '__dtoa':
+../../mingw-w64-crt/gdtoa/dtoa.c:366:42: warning: 'j2' may be used uninitialized [-Wmaybe-uninitialized]
+  366 |                         if (k0 < 0 && j2 >= 307) {
+      |                                       ~~~^~~~~~
+../../mingw-w64-crt/gdtoa/dtoa.c:112:20: note: 'j2' was declared here
+  112 |                 j, j2, k, k0, k_check, leftright, m2, m5, s2, s5,
+      |                    ^~
+../../mingw-w64-crt/misc/feclearexcept.c:41:5: warning: no previous prototype for 'feclearexcept' [-Wmissing-prototypes]
+   41 | int feclearexcept (int excepts)
+      |     ^~~~~~~~~~~~~
+../../mingw-w64-crt/misc/feclearexcept.c: In function 'feclearexcept':
+../../mingw-w64-crt/misc/feclearexcept.c:43:3: error: unknown type name 'fenv_t'
+   43 |   fenv_t _env;
+      |   ^~~~~~
+../../mingw-w64-crt/misc/feclearexcept.c:56:18: error: 'FE_ALL_EXCEPT' undeclared (first use in this function)
+   56 |   if (excepts == FE_ALL_EXCEPT)
+      |                  ^~~~~~~~~~~~~
+../../mingw-w64-crt/misc/feclearexcept.c:56:18: note: each undeclared identifier is reported only once for each function it appears in
+../../mingw-w64-crt/misc/feclearexcept.c:63:11: error: request for member '__status_word' in something not a structure or union
+   63 |       _env.__status_word &= ~(excepts & FE_ALL_EXCEPT);
+      |           ^
+make[3]: *** [Makefile:34292: misc/lib32_libmingwex_a-feclearexcept.o] 오류 1
+make[3]: 디렉터리 '/c/Users/nayou/Downloads/mingw-w64-master/mingw-w64-master/build/mingw-w64-crt' 나감
+make[2]: *** [Makefile:14948: all] 오류 2
+make[2]: 디렉터리 '/c/Users/nayou/Downloads/mingw-w64-master/mingw-w64-master/build/mingw-w64-crt' 나감
+make[1]: *** [Makefile:367: all-recursive] 오류 1
+make[1]: 디렉터리 '/c/Users/nayou/Downloads/mingw-w64-master/mingw-w64-master/build' 나감
+make: *** [Makefile:308: all] 오류 2
 
+수정
+nayou@nayoungkim MINGW64 /c/Users/nayou/Downloads/mingw-w64-master/mingw-w64-master/build
+# find /mingw64 -name "fenv.h"
+/mingw64/include/c++/14.2.0/fenv.h
+/mingw64/include/c++/14.2.0/tr1/fenv.h
+/mingw64/include/c++/v1/fenv.h
+/mingw64/include/fenv.h
+/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++/fenv.h
+/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/include/c++/tr1/fenv.h
+/mingw64/x86_64-w64-mingw32/include/fenv.h
 
-
-
-
-
+pacman -S mingw-w64-x86_64-headers
+CFLAGS="-D__USE_MINGW_ANSI_STDIO=1"
+mingw-w64-crt/misc/feclearexcept.c
+#include <fenv.h>
 
 
