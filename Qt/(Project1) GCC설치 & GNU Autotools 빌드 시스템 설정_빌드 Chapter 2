@@ -3882,3 +3882,278 @@ make[1]: *** [Makefile:473: all-recursive] 오류 1
 make[1]: 디렉터리 '/c/Users/nayou/Downloads/mpc-1.3.1/mpc-1.3.1' 나감
 make: *** [Makefile:384: all] 오류 2
 
+수정
+nayou@nayoungkim MINGW64 /c/Users/nayou/Downloads/mpc-1.3.1/mpc-1.3.1
+# gcc --version
+g++ --version
+gcc.exe (Rev2, Built by MSYS2 project) 14.2.0
+Copyright (C) 2024 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+g++.exe (Rev2, Built by MSYS2 project) 14.2.0
+Copyright (C) 2024 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+nayou@nayoungkim MINGW64 /c/Users/nayou/Downloads/mpc-1.3.1/mpc-1.3.1
+# where gcc
+where g++
+C:\msys64\mingw64\bin\gcc.exe
+C:\msys64\usr\bin\gcc.exe
+C:\Users\nayou\vcpkg\downloads\tools\perl\5.38.0.1\c\bin\gcc.exe
+C:\msys64\mingw64-backup-11.2.0\bin\gcc.exe
+C:\msys64\mingw64\bin\g++.exe
+C:\msys64\usr\bin\g++.exe
+C:\Users\nayou\vcpkg\downloads\tools\perl\5.38.0.1\c\bin\g++.exe
+C:\msys64\mingw64-backup-11.2.0\bin\g++.exe
+
+nayou@nayoungkim MINGW64 /c/Users/nayou/Downloads/mpc-1.3.1/mpc-1.3.1
+# ls /mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/c++config.h
+/mingw64/include/c++/14.2.0/x86_64-w64-mingw32/bits/c++config.h
+
+nayou@nayoungkim MINGW64 /c/Users/nayou/Downloads/mpc-1.3.1/mpc-1.3.1
+# export CPLUS_INCLUDE_PATH="/mingw64/include/c++/14.2.0:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32:/mingw64/include"
+export CPATH="$CPLUS_INCLUDE_PATH"
+make clean
+make -j$(nproc)
+
+오류
+make[2]: *** [Makefile:476: libmpc.la] 오류 1
+make[2]: 디렉터리 '/c/Users/nayou/Downloads/mpc-1.3.1/mpc-1.3.1/src' 나감
+make[1]: *** [Makefile:473: all-recursive] 오류 1
+make[1]: 디렉터리 '/c/Users/nayou/Downloads/mpc-1.3.1/mpc-1.3.1' 나감
+make: *** [Makefile:384: all] 오류 2
+
+수정
+GMP 및 MPFR이 올바르게 설치되지 않았거나 라이브러리 경로를 찾지 못하는 경우 오류가 발생
+GMP, MPFR, MPC 라이브러리 설치 확인
+nayou@nayoungkim MINGW64 /c/Users/nayou/Downloads/mpc-1.3.1/mpc-1.3.1
+# ls /mingw64/include/gmp.h
+ls /mingw64/include/mpfr.h
+ls /mingw64/include/mpc.h
+/mingw64/include/gmp.h
+/mingw64/include/mpfr.h
+/mingw64/include/mpc.h
+
+nayou@nayoungkim MINGW64 /c/Users/nayou/Downloads/mpc-1.3.1/mpc-1.3.1
+# pacman -S mingw-w64-x86_64-gmp
+pacman -S mingw-w64-x86_64-mpfr
+pacman -S mingw-w64-x86_64-mpc
+
+빌드
+./configure --prefix=/mingw64 --with-gmp=/mingw64 --with-mpfr=/mingw64 \
+    CC=/mingw64/bin/gcc CXX=/mingw64/bin/g++ \
+    CXXFLAGS="-I/mingw64/include -L/mingw64/lib"
+
+make -j$(nproc)
+make install
+
+오류
+make  all-recursive
+make[1]: 디렉터리 '/c/Users/nayou/Downloads/mpc-1.3.1/mpc-1.3.1' 들어감
+Making all in src
+make[2]: 디렉터리 '/c/Users/nayou/Downloads/mpc-1.3.1/mpc-1.3.1/src' 들어감
+/usr/bin/bash ../libtool  --tag=CC   --mode=link /mingw64/bin/gcc  -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -I/mingw64/include/libiberty -I/usr/include -I/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/plugin/include -I/c/gcc-14.2.0/include -O2 -w -std=c11 -D_GNU_SOURCE -D__USE_MINGW_ANSI_STDIO=1 -no-undefined -version-info 6:1:3 -L/mingw64/lib -L/mingw64/lib -L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0 -L/mingw64/lib -L/usr/lib -L/mingw64/x86_64-w64-mingw32/lib -L/c/libidn2/gettext-0.22.5/libtextstyle/lib -Wl,-rpath,/mingw64/bin -o libmpc.la -rpath /mingw64/lib abs.lo acos.lo acosh.lo add.lo add_fr.lo add_si.lo add_ui.lo agm.lo arg.lo asin.lo asinh.lo atan.lo atanh.lo clear.lo cmp.lo cmp_abs.lo cmp_si_si.lo conj.lo cos.lo cosh.lo div_2si.lo div_2ui.lo div.lo div_fr.lo div_ui.lo dot.lo eta.lo exp.lo fma.lo fr_div.lo fr_sub.lo get_prec2.lo get_prec.lo get_version.lo get_x.lo imag.lo init2.lo init3.lo inp_str.lo log.lo log10.lo mem.lo mul_2si.lo mul_2ui.lo mul.lo mul_fr.lo mul_i.lo mul_si.lo mul_ui.lo neg.lo norm.lo out_str.lo pow.lo pow_fr.lo pow_ld.lo pow_d.lo pow_si.lo pow_ui.lo pow_z.lo proj.lo real.lo rootofunity.lo urandom.lo set.lo set_prec.lo set_str.lo set_x.lo set_x_x.lo sin.lo sin_cos.lo sinh.lo sqr.lo sqrt.lo strtoc.lo sub.lo sub_fr.lo sub_ui.lo sum.lo swap.lo tan.lo tanh.lo uceil_log2.lo ui_div.lo ui_ui_sub.lo radius.lo balls.lo  -lmpfr -lgmp -lm
+libtool: link: rm -fr  .libs/libmpc.dll.a
+libtool: link: /mingw64/bin/gcc -shared  .libs/abs.o .libs/acos.o .libs/acosh.o .libs/add.o .libs/add_fr.o .libs/add_si.o .libs/add_ui.o .libs/agm.o .libs/arg.o .libs/asin.o .libs/asinh.o .libs/atan.o .libs/atanh.o .libs/clear.o .libs/cmp.o .libs/cmp_abs.o .libs/cmp_si_si.o .libs/conj.o .libs/cos.o .libs/cosh.o .libs/div_2si.o .libs/div_2ui.o .libs/div.o .libs/div_fr.o .libs/div_ui.o .libs/dot.o .libs/eta.o .libs/exp.o .libs/fma.o .libs/fr_div.o .libs/fr_sub.o .libs/get_prec2.o .libs/get_prec.o .libs/get_version.o .libs/get_x.o .libs/imag.o .libs/init2.o .libs/init3.o .libs/inp_str.o .libs/log.o .libs/log10.o .libs/mem.o .libs/mul_2si.o .libs/mul_2ui.o .libs/mul.o .libs/mul_fr.o .libs/mul_i.o .libs/mul_si.o .libs/mul_ui.o .libs/neg.o .libs/norm.o .libs/out_str.o .libs/pow.o .libs/pow_fr.o .libs/pow_ld.o .libs/pow_d.o .libs/pow_si.o .libs/pow_ui.o .libs/pow_z.o .libs/proj.o .libs/real.o .libs/rootofunity.o .libs/urandom.o .libs/set.o .libs/set_prec.o .libs/set_str.o .libs/set_x.o .libs/set_x_x.o .libs/sin.o .libs/sin_cos.o .libs/sinh.o .libs/sqr.o .libs/sqrt.o .libs/strtoc.o .libs/sub.o .libs/sub_fr.o .libs/sub_ui.o .libs/sum.o .libs/swap.o .libs/tan.o .libs/tanh.o .libs/uceil_log2.o .libs/ui_div.o .libs/ui_ui_sub.o .libs/radius.o .libs/balls.o   -L/mingw64/lib -L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0 -L/usr/lib -L/mingw64/x86_64-w64-mingw32/lib -L/c/libidn2/gettext-0.22.5/libtextstyle/lib -lmpfr -lgmp  -O2 -Wl,-rpath -Wl,/mingw64/bin   -o .libs/libmpc-3.dll -Wl,--enable-auto-image-base -Xlinker --out-implib -Xlinker .libs/libmpc.dll.a
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: .libs/acos.o:acos.c:(.rdata$.refptr._impure_ptr[.refptr._impure_ptr]+0x0): undefined reference to `_impure_ptr'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: .libs/inp_str.o:inp_str.c:(.rdata$.refptr._ctype_[.refptr._ctype_]+0x0): undefined reference to `_ctype_'
+collect2.exe: error: ld returned 1 exit status
+make[2]: *** [Makefile:476: libmpc.la] 오류 1
+make[2]: 디렉터리 '/c/Users/nayou/Downloads/mpc-1.3.1/mpc-1.3.1/src' 나감
+make[1]: *** [Makefile:473: all-recursive] 오류 1
+make[1]: 디렉터리 '/c/Users/nayou/Downloads/mpc-1.3.1/mpc-1.3.1' 나감
+make: *** [Makefile:384: all] 오류 2
+Making install in src
+make[1]: 디렉터리 '/c/Users/nayou/Downloads/mpc-1.3.1/mpc-1.3.1/src' 들어감
+/usr/bin/bash ../libtool  --tag=CC   --mode=link /mingw64/bin/gcc  -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -I/mingw64/include/libiberty -I/usr/include -I/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/plugin/include -I/c/gcc-14.2.0/include -O2 -w -std=c11 -D_GNU_SOURCE -D__USE_MINGW_ANSI_STDIO=1 -no-undefined -version-info 6:1:3 -L/mingw64/lib -L/mingw64/lib -L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0 -L/mingw64/lib -L/usr/lib -L/mingw64/x86_64-w64-mingw32/lib -L/c/libidn2/gettext-0.22.5/libtextstyle/lib -Wl,-rpath,/mingw64/bin -o libmpc.la -rpath /mingw64/lib abs.lo acos.lo acosh.lo add.lo add_fr.lo add_si.lo add_ui.lo agm.lo arg.lo asin.lo asinh.lo atan.lo atanh.lo clear.lo cmp.lo cmp_abs.lo cmp_si_si.lo conj.lo cos.lo cosh.lo div_2si.lo div_2ui.lo div.lo div_fr.lo div_ui.lo dot.lo eta.lo exp.lo fma.lo fr_div.lo fr_sub.lo get_prec2.lo get_prec.lo get_version.lo get_x.lo imag.lo init2.lo init3.lo inp_str.lo log.lo log10.lo mem.lo mul_2si.lo mul_2ui.lo mul.lo mul_fr.lo mul_i.lo mul_si.lo mul_ui.lo neg.lo norm.lo out_str.lo pow.lo pow_fr.lo pow_ld.lo pow_d.lo pow_si.lo pow_ui.lo pow_z.lo proj.lo real.lo rootofunity.lo urandom.lo set.lo set_prec.lo set_str.lo set_x.lo set_x_x.lo sin.lo sin_cos.lo sinh.lo sqr.lo sqrt.lo strtoc.lo sub.lo sub_fr.lo sub_ui.lo sum.lo swap.lo tan.lo tanh.lo uceil_log2.lo ui_div.lo ui_ui_sub.lo radius.lo balls.lo  -lmpfr -lgmp -lm
+libtool: link: rm -fr  .libs/libmpc.dll.a
+libtool: link: /mingw64/bin/gcc -shared  .libs/abs.o .libs/acos.o .libs/acosh.o .libs/add.o .libs/add_fr.o .libs/add_si.o .libs/add_ui.o .libs/agm.o .libs/arg.o .libs/asin.o .libs/asinh.o .libs/atan.o .libs/atanh.o .libs/clear.o .libs/cmp.o .libs/cmp_abs.o .libs/cmp_si_si.o .libs/conj.o .libs/cos.o .libs/cosh.o .libs/div_2si.o .libs/div_2ui.o .libs/div.o .libs/div_fr.o .libs/div_ui.o .libs/dot.o .libs/eta.o .libs/exp.o .libs/fma.o .libs/fr_div.o .libs/fr_sub.o .libs/get_prec2.o .libs/get_prec.o .libs/get_version.o .libs/get_x.o .libs/imag.o .libs/init2.o .libs/init3.o .libs/inp_str.o .libs/log.o .libs/log10.o .libs/mem.o .libs/mul_2si.o .libs/mul_2ui.o .libs/mul.o .libs/mul_fr.o .libs/mul_i.o .libs/mul_si.o .libs/mul_ui.o .libs/neg.o .libs/norm.o .libs/out_str.o .libs/pow.o .libs/pow_fr.o .libs/pow_ld.o .libs/pow_d.o .libs/pow_si.o .libs/pow_ui.o .libs/pow_z.o .libs/proj.o .libs/real.o .libs/rootofunity.o .libs/urandom.o .libs/set.o .libs/set_prec.o .libs/set_str.o .libs/set_x.o .libs/set_x_x.o .libs/sin.o .libs/sin_cos.o .libs/sinh.o .libs/sqr.o .libs/sqrt.o .libs/strtoc.o .libs/sub.o .libs/sub_fr.o .libs/sub_ui.o .libs/sum.o .libs/swap.o .libs/tan.o .libs/tanh.o .libs/uceil_log2.o .libs/ui_div.o .libs/ui_ui_sub.o .libs/radius.o .libs/balls.o   -L/mingw64/lib -L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0 -L/usr/lib -L/mingw64/x86_64-w64-mingw32/lib -L/c/libidn2/gettext-0.22.5/libtextstyle/lib -lmpfr -lgmp  -O2 -Wl,-rpath -Wl,/mingw64/bin   -o .libs/libmpc-3.dll -Wl,--enable-auto-image-base -Xlinker --out-implib -Xlinker .libs/libmpc.dll.a
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: .libs/acos.o:acos.c:(.rdata$.refptr._impure_ptr[.refptr._impure_ptr]+0x0): undefined reference to `_impure_ptr'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: .libs/inp_str.o:inp_str.c:(.rdata$.refptr._ctype_[.refptr._ctype_]+0x0): undefined reference to `_ctype_'
+collect2.exe: error: ld returned 1 exit status
+make[1]: *** [Makefile:476: libmpc.la] 오류 1
+make[1]: 디렉터리 '/c/Users/nayou/Downloads/mpc-1.3.1/mpc-1.3.1/src' 나감
+make: *** [Makefile:473: install-recursive] 오류 1
+
+수정
+"undefined reference to _impure_ptr' 및 ctype'” 오류는
+Mingw-w64 환경에서 Newlib 또는 C 라이브러리(glibc 대체 라이브러리)가 올바르게 연결되지 않을 때 발생 
+undefined reference to '_impure_ptr' → Newlib 또는 MinGW-w64의 libmingwex.a가 올바르게 링크되지 않음 
+undefined reference to '_ctype_' → C 라이브러리(libc.a 또는 libmingwex.a)가 누락되었거나, 잘못된 버전을 사용 중 
+
+nayou@nayoungkim MINGW64 /c/Users/nayou/Downloads/mpc-1.3.1/mpc-1.3.1
+# pacman -S mingw-w64-x86_64-gcc
+pacman -S mingw-w64-x86_64-gcc-libs
+pacman -S mingw-w64-x86_64-crt
+pacman -S mingw-w64-x86_64-libwinpthread-git
+
+오류
+y1/1) 업그레이드 중 mingw-w64-x86_64-crt-git             [-----------------------------]   0%
+(1/1) 업그레이드 중 mingw-w64-x86_64-crt-git             [#############################] 100%
+의존성 해결 중...
+꾸러미 충돌을 찾는 중...
+오류: 트랜잭션 준비에 실패했습니다(의존성이 만족되지 못하였습니다.)
+:: mingw-w64-x86_64-libwinpthread-git(12.0.0.r487.g9e8f2a7b5-1) 설치로 의존성 'mingw-w64-x86_64-libwinpthread-git=12.0.0.r473.gce0d0bfb7'(mingw-w64-x86_64-winpthreads-git가 요구)가 깨집니다
+
+수정
+충돌하는 패키지 제거 후 다시 설치 
+nayou@nayoungkim MINGW64 /c/Users/nayou/Downloads/mpc-1.3.1/mpc-1.3.1
+# pacman -Rdd mingw-w64-x86_64-libwinpthread-git
+pacman -S mingw-w64-x86_64-libwinpthread-git
+다시 업그레이드
+nayou@nayoungkim MINGW64 /c/Users/nayou/Downloads/mpc-1.3.1/mpc-1.3.1
+# pacman -S mingw-w64-x86_64-crt-git
+MSYS2 전체 패키지 업데이트 
+nayou@nayoungkim MINGW64 /c/Users/nayou/Downloads/mpc-1.3.1/mpc-1.3.1
+# pacman -Syu
+nayou@nayoungkim MINGW64 /c/Users/nayou/Downloads/mpc-1.3.1/mpc-1.3.1
+# pacman -S mingw-w64-x86_64-gcc
+pacman -S mingw-w64-x86_64-gcc-libs
+pacman -S mingw-w64-x86_64-crt
+pacman -S mingw-w64-x86_64-winpthreads-git
+nayou@nayoungkim MINGW64 /c/Users/nayou/Downloads/mpc-1.3.1/mpc-1.3.1
+# make clean
+make -j$(nproc)
+
+오류
+collect2.exe: error: ld returned 1 exit status
+make[2]: *** [Makefile:476: libmpc.la] 오류 1
+make[2]: 디렉터리 '/c/Users/nayou/Downloads/mpc-1.3.1/mpc-1.3.1/src' 나감
+make[1]: *** [Makefile:473: all-recursive] 오류 1
+make[1]: 디렉터리 '/c/Users/nayou/Downloads/mpc-1.3.1/mpc-1.3.1' 나감
+make: *** [Makefile:384: all] 오류 2
+
+수정
+libmpc.la를 빌드할 때 libmpfr.a 및 libgmp.a를 올바르게 찾지 못하는 경우 발생
+LDFLAGS 또는 CPLUS_INCLUDE_PATH가 올바르게 설정되지 않음
+
+nayou@nayoungkim MINGW64 /c/Users/nayou/Downloads/mpc-1.3.1/mpc-1.3.1
+# ls /mingw64/include/gmp.h
+ls /mingw64/include/mpfr.h
+ls /mingw64/include/mpc.h
+/mingw64/include/gmp.h
+/mingw64/include/mpfr.h
+/mingw64/include/mpc.h
+
+nayou@nayoungkim MINGW64 /c/Users/nayou/Downloads/mpc-1.3.1/mpc-1.3.1
+# export LDFLAGS="-L/mingw64/lib -L/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0 -lmpfr -lgmp -lmpc -lm"
+export LIBRARY_PATH=/mingw64/lib:/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0:/mingw64/x86_64-w64-mingw32/lib:/usr/lib
+export LD_LIBRARY_PATH=/mingw64/lib:/mingw64/bin:/mingw64/x86_64-w64-mingw32/lib:/mingw64/bin
+
+
+/c/Users/nayou/Downloads/mpc-1.3.1/mpc-1.3.1/Makefile.am 수정
+libmpc_la_LIBADD = -lgmp -lmpfr
+
+./configure --prefix=/mingw64 --with-gmp=/mingw64 --with-mpfr=/mingw64 \
+    CC=/mingw64/bin/gcc CXX=/mingw64/bin/g++ \
+    CXXFLAGS="-I/mingw64/include" \
+    LDFLAGS="-L/mingw64/lib -lmpfr -lgmp -lmpc -lm"
+
+make V=1
+make install
+
+오류
+collect2.exe: error: ld returned 1 exit status
+make[2]: *** [Makefile:476: libmpc.la] 오류 1
+make[2]: 디렉터리 '/c/Users/nayou/Downloads/mpc-1.3.1/mpc-1.3.1/src' 나감
+make[1]: *** [Makefile:473: all-recursive] 오류 1
+make[1]: 디렉터리 '/c/Users/nayou/Downloads/mpc-1.3.1/mpc-1.3.1' 나감
+make: *** [Makefile:384: all] 오류 2
+
+nayou@nayoungkim MINGW64 /c/Users/nayou/Downloads/mpc-1.3.1/mpc-1.3.1
+# cat config.log | grep -i "ld"
+  $ ./configure --prefix=/mingw64 --with-gmp=/mingw64 --with-mpfr=/mingw64 CC=/mingw64/bin/gcc CXX=/mingw64/bin/g++ CXXFLAGS=-I/mingw64/include LDFLAGS=-L/mingw64/lib -lmpfr -lgmp -lmpc -lm
+| if test -z "$build_alias"; then
+|   build_alias="${MSYSTEM_CHOST}"  && \
+|     ${as_echo-echo} "$config_site_me:${as_lineno-$LINENO}: default build_alias set to $build_alias" >&5
+config.site:13: default build_alias set to x86_64-w64-mingw32
+configure:2431: checking whether build environment is sane
+configure:2955: checking build system type
+Configured with: ../gcc-14.2.0/configure --prefix=/mingw64 --with-local-prefix=/mingw64/local --build=x86_64-w64-mingw32 --host=x86_64-w64-mingw32 --target=x86_64-w64-mingw32 --with-native-system-header-dir=/mingw64/include --libexecdir=/mingw64/lib --enable-bootstrap --enable-checking=release --with-arch=nocona --with-tune=generic --enable-languages=c,lto,c++,fortran,ada,objc,obj-c++,rust,jit --enable-shared --enable-static --e드
+
+./configure --prefix=/mingw64 --with-gmp=/mingw64 --with-mpfr=/mingw64 --with-mpc=/mingw64 CC=/mingw64/bin/gcc CXX=/mingw64/bin/g++ CXXFLAGS=-I/mingw64/include LDFLAGS=-L/mingw64/lib -lmpfr -lgmp -lmpc -lm ac_cv_header_ctype_h=no
+make V=1
+make install
+
+오류
+nayou@nayoungkim MINGW64 /c/Users/nayou/Downloads/mpc-1.3.1/mpc-1.3.1
+# ./configure --prefix=/mingw64 --with-gmp=/mingw64 --with-mpfr=/mingw64 --with-mpc=/mingw64 CC=/mingw64/bin/gcc CXX=/mingw64/bin/g++ CXXFLAGS=-I/mingw64/include LDFLAGS=-L/mingw64/lib -lmpfr -lgmp -lmpc -lm ac_cv_header_ctype_h=no
+make V=1
+make install
+configure: error: unrecognized option: `-lmpfr'
+Try `./configure --help' for more information
+make  all-recursive
+make[1]: 디렉터리 '/c/Users/nayou/Downloads/mpc-1.3.1/mpc-1.3.1' 들어감
+Making all in src
+make[2]: 디렉터리 '/c/Users/nayou/Downloads/mpc-1.3.1/mpc-1.3.1/src' 들어감
+/usr/bin/bash ../libtool  --tag=CC   --mode=link /mingw64/bin/gcc  -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -I/mingw64/include/libiberty -I/usr/include -I/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/plugin/include -I/c/gcc-14.2.0/include -O2 -w -std=c11 -D_GNU_SOURCE -D__USE_MINGW_ANSI_STDIO=1 -no-undefined -version-info 6:1:3 -L/mingw64/lib -L/mingw64/lib -L/mingw64/lib -lmpfr -lgmp -lmpc -lm -o libmpc.la -rpath /mingw64/lib abs.lo acos.lo acosh.lo add.lo add_fr.lo add_si.lo add_ui.lo agm.lo arg.lo asin.lo asinh.lo atan.lo atanh.lo clear.lo cmp.lo cmp_abs.lo cmp_si_si.lo conj.lo cos.lo cosh.lo div_2si.lo div_2ui.lo div.lo div_fr.lo div_ui.lo dot.lo eta.lo exp.lo fma.lo fr_div.lo fr_sub.lo get_prec2.lo get_prec.lo get_version.lo get_x.lo imag.lo init2.lo init3.lo inp_str.lo log.lo log10.lo mem.lo mul_2si.lo mul_2ui.lo mul.lo mul_fr.lo mul_i.lo mul_si.lo mul_ui.lo neg.lo norm.lo out_str.lo pow.lo pow_fr.lo pow_ld.lo pow_d.lo pow_si.lo pow_ui.lo pow_z.lo proj.lo real.lo rootofunity.lo urandom.lo set.lo set_prec.lo set_str.lo set_x.lo set_x_x.lo sin.lo sin_cos.lo sinh.lo sqr.lo sqrt.lo strtoc.lo sub.lo sub_fr.lo sub_ui.lo sum.lo swap.lo tan.lo tanh.lo uceil_log2.lo ui_div.lo ui_ui_sub.lo radius.lo balls.lo  -lmpfr -lgmp -lm
+libtool: link: rm -fr  .libs/libmpc.dll.a
+libtool: link: /mingw64/bin/gcc -shared  .libs/abs.o .libs/acos.o .libs/acosh.o .libs/add.o .libs/add_fr.o .libs/add_si.o .libs/add_ui.o .libs/agm.o .libs/arg.o .libs/asin.o .libs/asinh.o .libs/atan.o .libs/atanh.o .libs/clear.o .libs/cmp.o .libs/cmp_abs.o .libs/cmp_si_si.o .libs/conj.o .libs/cos.o .libs/cosh.o .libs/div_2si.o .libs/div_2ui.o .libs/div.o .libs/div_fr.o .libs/div_ui.o .libs/dot.o .libs/eta.o .libs/exp.o .libs/fma.o .libs/fr_div.o .libs/fr_sub.o .libs/get_prec2.o .libs/get_prec.o .libs/get_version.o .libs/get_x.o .libs/imag.o .libs/init2.o .libs/init3.o .libs/inp_str.o .libs/log.o .libs/log10.o .libs/mem.o .libs/mul_2si.o .libs/mul_2ui.o .libs/mul.o .libs/mul_fr.o .libs/mul_i.o .libs/mul_si.o .libs/mul_ui.o .libs/neg.o .libs/norm.o .libs/out_str.o .libs/pow.o .libs/pow_fr.o .libs/pow_ld.o .libs/pow_d.o .libs/pow_si.o .libs/pow_ui.o .libs/pow_z.o .libs/proj.o .libs/real.o .libs/rootofunity.o .libs/urandom.o .libs/set.o .libs/set_prec.o .libs/set_str.o .libs/set_x.o .libs/set_x_x.o .libs/sin.o .libs/sin_cos.o .libs/sinh.o .libs/sqr.o .libs/sqrt.o .libs/strtoc.o .libs/sub.o .libs/sub_fr.o .libs/sub_ui.o .libs/sum.o .libs/swap.o .libs/tan.o .libs/tanh.o .libs/uceil_log2.o .libs/ui_div.o .libs/ui_ui_sub.o .libs/radius.o .libs/balls.o   -L/mingw64/lib -lmpc -lmpfr -lgmp  -O2   -o .libs/libmpc-3.dll -Wl,--enable-auto-image-base -Xlinker --out-implib -Xlinker .libs/libmpc.dll.a
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: .libs/acos.o:acos.c:(.rdata$.refptr._impure_ptr[.refptr._impure_ptr]+0x0): undefined reference to `_impure_ptr'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: .libs/inp_str.o:inp_str.c:(.rdata$.refptr._ctype_[.refptr._ctype_]+0x0): undefined reference to `_ctype_'
+collect2.exe: error: ld returned 1 exit status
+make[2]: *** [Makefile:476: libmpc.la] 오류 1
+make[2]: 디렉터리 '/c/Users/nayou/Downloads/mpc-1.3.1/mpc-1.3.1/src' 나감
+make[1]: *** [Makefile:473: all-recursive] 오류 1
+make[1]: 디렉터리 '/c/Users/nayou/Downloads/mpc-1.3.1/mpc-1.3.1' 나감
+make: *** [Makefile:384: all] 오류 2
+Making install in src
+make[1]: 디렉터리 '/c/Users/nayou/Downloads/mpc-1.3.1/mpc-1.3.1/src' 들어감
+/usr/bin/bash ../libtool  --tag=CC   --mode=link /mingw64/bin/gcc  -I/mingw64/include -I/c/libidn2/gettext-0.22.5/libtextstyle/lib -I/mingw64/include/libiberty -I/usr/include -I/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/plugin/include -I/c/gcc-14.2.0/include -O2 -w -std=c11 -D_GNU_SOURCE -D__USE_MINGW_ANSI_STDIO=1 -no-undefined -version-info 6:1:3 -L/mingw64/lib -L/mingw64/lib -L/mingw64/lib -lmpfr -lgmp -lmpc -lm -o libmpc.la -rpath /mingw64/lib abs.lo acos.lo acosh.lo add.lo add_fr.lo add_si.lo add_ui.lo agm.lo arg.lo asin.lo asinh.lo atan.lo atanh.lo clear.lo cmp.lo cmp_abs.lo cmp_si_si.lo conj.lo cos.lo cosh.lo div_2si.lo div_2ui.lo div.lo div_fr.lo div_ui.lo dot.lo eta.lo exp.lo fma.lo fr_div.lo fr_sub.lo get_prec2.lo get_prec.lo get_version.lo get_x.lo imag.lo init2.lo init3.lo inp_str.lo log.lo log10.lo mem.lo mul_2si.lo mul_2ui.lo mul.lo mul_fr.lo mul_i.lo mul_si.lo mul_ui.lo neg.lo norm.lo out_str.lo pow.lo pow_fr.lo pow_ld.lo pow_d.lo pow_si.lo pow_ui.lo pow_z.lo proj.lo real.lo rootofunity.lo urandom.lo set.lo set_prec.lo set_str.lo set_x.lo set_x_x.lo sin.lo sin_cos.lo sinh.lo sqr.lo sqrt.lo strtoc.lo sub.lo sub_fr.lo sub_ui.lo sum.lo swap.lo tan.lo tanh.lo uceil_log2.lo ui_div.lo ui_ui_sub.lo radius.lo balls.lo  -lmpfr -lgmp -lm
+libtool: link: rm -fr  .libs/libmpc.dll.a
+libtool: link: /mingw64/bin/gcc -shared  .libs/abs.o .libs/acos.o .libs/acosh.o .libs/add.o .libs/add_fr.o .libs/add_si.o .libs/add_ui.o .libs/agm.o .libs/arg.o .libs/asin.o .libs/asinh.o .libs/atan.o .libs/atanh.o .libs/clear.o .libs/cmp.o .libs/cmp_abs.o .libs/cmp_si_si.o .libs/conj.o .libs/cos.o .libs/cosh.o .libs/div_2si.o .libs/div_2ui.o .libs/div.o .libs/div_fr.o .libs/div_ui.o .libs/dot.o .libs/eta.o .libs/exp.o .libs/fma.o .libs/fr_div.o .libs/fr_sub.o .libs/get_prec2.o .libs/get_prec.o .libs/get_version.o .libs/get_x.o .libs/imag.o .libs/init2.o .libs/init3.o .libs/inp_str.o .libs/log.o .libs/log10.o .libs/mem.o .libs/mul_2si.o .libs/mul_2ui.o .libs/mul.o .libs/mul_fr.o .libs/mul_i.o .libs/mul_si.o .libs/mul_ui.o .libs/neg.o .libs/norm.o .libs/out_str.o .libs/pow.o .libs/pow_fr.o .libs/pow_ld.o .libs/pow_d.o .libs/pow_si.o .libs/pow_ui.o .libs/pow_z.o .libs/proj.o .libs/real.o .libs/rootofunity.o .libs/urandom.o .libs/set.o .libs/set_prec.o .libs/set_str.o .libs/set_x.o .libs/set_x_x.o .libs/sin.o .libs/sin_cos.o .libs/sinh.o .libs/sqr.o .libs/sqrt.o .libs/strtoc.o .libs/sub.o .libs/sub_fr.o .libs/sub_ui.o .libs/sum.o .libs/swap.o .libs/tan.o .libs/tanh.o .libs/uceil_log2.o .libs/ui_div.o .libs/ui_ui_sub.o .libs/radius.o .libs/balls.o   -L/mingw64/lib -lmpc -lmpfr -lgmp  -O2   -o .libs/libmpc-3.dll -Wl,--enable-auto-image-base -Xlinker --out-implib -Xlinker .libs/libmpc.dll.a
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: .libs/acos.o:acos.c:(.rdata$.refptr._impure_ptr[.refptr._impure_ptr]+0x0): undefined reference to `_impure_ptr'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: .libs/inp_str.o:inp_str.c:(.rdata$.refptr._ctype_[.refptr._ctype_]+0x0): undefined reference to `_ctype_'
+collect2.exe: error: ld returned 1 exit status
+make[1]: *** [Makefile:476: libmpc.la] 오류 1
+make[1]: 디렉터리 '/c/Users/nayou/Downloads/mpc-1.3.1/mpc-1.3.1/src' 나감
+make: *** [Makefile:473: install-recursive] 오류 1
+
+수정
+MinGW에서 C 표준 라이브러리(libc)가 제대로 링크되지 않아서 발생 
+
+빌드
+./configure --prefix=/mingw64 --with-gmp=/mingw64 --with-mpfr=/mingw64 --with-mpc=/mingw64 CC=/mingw64/bin/gcc CXX=/mingw64/bin/g++ CXXFLAGS=-I/mingw64/include LDFLAGS=-L/mingw64/lib -lmpfr -lgmp -lmpc -lm ac_cv_header_ctype_h=no
+make V=1
+make install
+
+mpc.pc 수동 생성
+nayou@nayoungkim MINGW64 /c/gcc-build
+# touch /mingw64/lib/pkgconfig/mpc.pc
+
+nayou@nayoungkim MINGW64 /c/gcc-build
+# notepad /mingw64/lib/pkgconfig/mpc.pc
+prefix=/mingw64
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${exec_prefix}/include
+
+Name: mpc
+Description: The multiple precision complex floating-point library
+Version: 1.3.1
+Cflags: -I${includedir}
+Libs: -L${libdir} -lmpc
+
+nayou@nayoungkim MINGW64 /c/gcc-build
+# pkg-config --modversion mpc
+1.3.1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
