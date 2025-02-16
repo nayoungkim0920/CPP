@@ -4252,8 +4252,369 @@ nayou@nayoungkim MINGW64 /c/Users/nayou/Downloads/mingw-w64-master/mingw-w64-mas
 #define __USE_MINGW_ANSI_STDIO 1
 #include <fenv.h>
 
+빌드
 nayou@nayoungkim MINGW64 /c/Users/nayou/Downloads/mingw-w64-master/mingw-w64-master/build
-# ../configure --prefix=/mingw64 --with-headers=/mingw64/include --host=x86_64-w64-mingw32 --target=x86_64-w64-mingw32 && \
-make && make install
+# ../configure --prefix=/mingw64 --host=x86_64-w64-mingw32 --target=x86_64-w64-mingw32 && \
+make clean && make -j$(nproc) && make install
 
+오류
+make[3]: *** [Makefile:29994: libsrc/lib32_libbits_a-bits.o] 오류 1
+make[3]: *** 끝나지 않은 작업을 기다리고 있습니다....
+In file included from C:\msys64\mingw64\include/windows.h:114,
+                 from ../../mingw-w64-crt/libsrc/dinput_private.h:16,
+                 from ../../mingw-w64-crt/libsrc/dinput_kbd.c:13:
+C:\msys64\mingw64\include/stralign.h: In function 'ua_wcscpy':
+C:\msys64\mingw64\include/stralign.h:37:77: error: implicit declaration of function 'wcscpy'; did you mean 'ua_wcscpy'? [-Wimplicit-function-declaration]
+   37 |   __CRT_INLINE PUWSTR ua_wcscpy(PUWSTR Destination,PCUWSTR Source) { return wcscpy(Destination,Source); }
+      |                                                                             ^~~~~~
+      |                                                                             ua_wcscpy
+C:\msys64\mingw64\include/stralign.h:37:77: error: returning 'int' from a function with return type 'PUWSTR' {aka 'short unsigned int *'} makes pointer from integer without a cast [-Wint-conversion]
+   37 |   __CRT_INLINE PUWSTR ua_wcscpy(PUWSTR Destination,PCUWSTR Source) { return wcscpy(Destination,Source); }
+      |                                                                             ^~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from C:\msys64\mingw64\include/windows.h:114,
+                 from ../../mingw-w64-crt/libsrc/dinput_private.h:16,
+                 from ../../mingw-w64-crt/libsrc/dinput_joy.c:13:
+C:\msys64\mingw64\include/stralign.h: In function 'ua_wcscpy':
+C:\msys64\mingw64\include/stralign.h:37:77: error: implicit declaration of function 'wcscpy'; did you mean 'ua_wcscpy'? [-Wimplicit-function-declaration]
+   37 |   __CRT_INLINE PUWSTR ua_wcscpy(PUWSTR Destination,PCUWSTR Source) { return wcscpy(Destination,Source); }
+      |                                                                             ^~~~~~
+      |                                                                             ua_wcscpy
+C:\msys64\mingw64\include/stralign.h:37:77: error: returning 'int' from a function with return type 'PUWSTR' {aka 'short unsigned int *'} makes pointer from integer without a cast [-Wint-conversion]
+   37 |   __CRT_INLINE PUWSTR ua_wcscpy(PUWSTR Destination,PCUWSTR Source) { return wcscpy(Destination,Source); }
+      |                                                                             ^~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from C:\msys64\mingw64\include/windows.h:114,
+                 from ../../mingw-w64-crt/libsrc/dinput_private.h:16,
+                 from ../../mingw-w64-crt/libsrc/dinput_joy2.c:13:
+C:\msys64\mingw64\include/stralign.h: In function 'ua_wcscpy':
+C:\msys64\mingw64\include/stralign.h:37:77: error: implicit declaration of function 'wcscpy'; did you mean 'ua_wcscpy'? [-Wimplicit-function-declaration]
+   37 |   __CRT_INLINE PUWSTR ua_wcscpy(PUWSTR Destination,PCUWSTR Source) { return wcscpy(Destination,Source); }
+      |                                                                             ^~~~~~
+      |                                                                             ua_wcscpy
+C:\msys64\mingw64\include/stralign.h:37:77: error: returning 'int' from a function with return type 'PUWSTR' {aka 'short unsigned int *'} makes pointer from integer without a cast [-Wint-conversion]
+   37 |   __CRT_INLINE PUWSTR ua_wcscpy(PUWSTR Destination,PCUWSTR Source) { return wcscpy(Destination,Source); }
+      |                                                                             ^~~~~~~~~~~~~~~~~~~~~~~~~~
+make[3]: *** [Makefile:30918: libsrc/lib32_libdinput_a-dinput_joy.o] 오류 1
+make[3]: *** [Makefile:30904: libsrc/lib32_libdinput_a-dinput_kbd.o] 오류 1
+make[3]: *** [Makefile:30932: libsrc/lib32_libdinput_a-dinput_joy2.o] 오류 1
+In file included from C:\msys64\mingw64\include/windows.h:114,
+                 from ../../mingw-w64-crt/libsrc/dinput_private.h:16,
+                 from ../../mingw-w64-crt/libsrc/dinput_mouse.c:13:
+C:\msys64\mingw64\include/stralign.h: In function 'ua_wcscpy':
+C:\msys64\mingw64\include/stralign.h:37:77: error: implicit declaration of function 'wcscpy'; did you mean 'ua_wcscpy'? [-Wimplicit-function-declaration]
+   37 |   __CRT_INLINE PUWSTR ua_wcscpy(PUWSTR Destination,PCUWSTR Source) { return wcscpy(Destination,Source); }
+      |                                                                             ^~~~~~
+      |                                                                             ua_wcscpy
+C:\msys64\mingw64\include/stralign.h:37:77: error: returning 'int' from a function with return type 'PUWSTR' {aka 'short unsigned int *'} makes pointer from integer without a cast [-Wint-conversion]
+   37 |   __CRT_INLINE PUWSTR ua_wcscpy(PUWSTR Destination,PCUWSTR Source) { return wcscpy(Destination,Source); }
+      |                                                                             ^~~~~~~~~~~~~~~~~~~~~~~~~~
+make[3]: *** [Makefile:30946: libsrc/lib32_libdinput_a-dinput_mouse.o] 오류 1
+In file included from C:\msys64\mingw64\include/windows.h:114,
+                 from ../../mingw-w64-crt/libsrc/dinput_private.h:16,
+                 from ../../mingw-w64-crt/libsrc/dinput_joy.c:13:
+C:\msys64\mingw64\include/stralign.h: In function 'ua_wcscpy':
+C:\msys64\mingw64\include/stralign.h:37:77: error: implicit declaration of function 'wcscpy'; did you mean 'ua_wcscpy'? [-Wimplicit-function-declaration]
+   37 |   __CRT_INLINE PUWSTR ua_wcscpy(PUWSTR Destination,PCUWSTR Source) { return wcscpy(Destination,Source); }
+      |                                                                             ^~~~~~
+      |                                                                             ua_wcscpy
+C:\msys64\mingw64\include/stralign.h:37:77: error: returning 'int' from a function with return type 'PUWSTR' {aka 'short unsigned int *'} makes pointer from integer without a cast [-Wint-conversion]
+   37 |   __CRT_INLINE PUWSTR ua_wcscpy(PUWSTR Destination,PCUWSTR Source) { return wcscpy(Destination,Source); }
+      |                                                                             ^~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from C:\msys64\mingw64\include/windows.h:114,
+                 from ../../mingw-w64-crt/libsrc/dinput_private.h:16,
+                 from ../../mingw-w64-crt/libsrc/dinput_joy2.c:13:
+C:\msys64\mingw64\include/stralign.h: In function 'ua_wcscpy':
+C:\msys64\mingw64\include/stralign.h:37:77: error: implicit declaration of function 'wcscpy'; did you mean 'ua_wcscpy'? [-Wimplicit-function-declaration]
+   37 |   __CRT_INLINE PUWSTR ua_wcscpy(PUWSTR Destination,PCUWSTR Source) { return wcscpy(Destination,Source); }
+      |                                                                             ^~~~~~
+      |                                                                             ua_wcscpy
+C:\msys64\mingw64\include/stralign.h:37:77: error: returning 'int' from a function with return type 'PUWSTR' {aka 'In file included from short unsigned int *C:\msys64\mingw64\include/windows.h:114'} makes pointer from integer without a cast [,
+                 from                                                               ]
+   37 |   __CRT_INLINE PUWSTR ua_wcscpy(PUWSTR Destination,PCUWSTR Source) { return ,
+                 from wcscpy(Destination,Source)../../mingw-w64-crt/libsrc/dinput_mouse2.c:13; }
+                                                                                    :
 
+ In function 'ua_wcscpy':
+C:\msys64\mingw64\include/stralign.h:37:77: error: implicit declaration of function 'wcscpy'; did you mean 'ua_wcscpy'? [-Wimplicit-function-declaration]
+   37 |   __CRT_INLINE PUWSTR ua_wcscpy(PUWSTR Destination,PCUWSTR Source) { return wcscpy(Destination,Source); }
+      |                                                                             ^~~~~~
+      |                                                                             ua_wcscpy
+C:\msys64\mingw64\include/stralign.h:37:77: error: returning 'int' from a function with return type 'PUWSTR' {aka 'short unsigned int *'} makes pointer from integer without a cast [-Wint-conversion]
+   37 |   __CRT_INLINE PUWSTR ua_wcscpy(PUWSTR Destination,PCUWSTR Source) { return wcscpy(Destination,Source); }
+      |                                                                             ^~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from C:\msys64\mingw64\include/windows.h:114,
+                 from ../../mingw-w64-crt/libsrc/dinput_private.h:16,
+                 from ../../mingw-w64-crt/libsrc/dinput_mouse.c:13:
+C:\msys64\mingw64\include/stralign.h: In function 'ua_wcscpy':
+C:\msys64\mingw64\include/stralign.h:37:77: error: implicit declaration of function 'wcscpy'; did you mean 'ua_wcscpy'? [-Wimplicit-function-declaration]
+   37 |   __CRT_INLINE PUWSTR ua_wcscpy(PUWSTR Destination,PCUWSTR Source) { return wcscpy(Destination,Source); }
+      |                                                                             ^~~~~~
+      |                                                                             ua_wcscpy
+C:\msys64\mingw64\include/stralign.h:37:77: error: returning 'int' from a function with return type 'PUWSTR' {aka 'short unsigned int *'} makes pointer from integer without a cast [-Wint-conversion]
+   37 |   __CRT_INLINE PUWSTR ua_wcscpy(PUWSTR Destination,PCUWSTR Source) { return wcscpy(Destination,Source); }
+      |                                                                             ^~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from C:\msys64\mingw64\include/windows.h:114,
+                 from ../../mingw-w64-crt/libsrc/dinput_private.h:16,
+                 from ../../mingw-w64-crt/libsrc/dinput_mouse2.c:13:
+C:\msys64\mingw64\include/stralign.h: In function 'ua_wcscpy':
+C:\msys64\mingw64\include/stralign.h:37:77: error: implicit declaration of function 'wcscpy'; did you mean 'ua_wcscpy'? [-Wimplicit-function-declaration]
+   37 |   __CRT_INLINE PUWSTR ua_wcscpy(PUWSTR Destination,PCUWSTR Source) { return wcscpy(Destination,Source); }
+      |                                                                             ^~~~~~
+      |                                                                             ua_wcscpy
+C:\msys64\mingw64\include/stralign.h:37:77: error: returning 'int' from a function with return type 'PUWSTR' {aka 'short unsigned int *'} makes pointer from integer without a cast [-Wint-conversion]
+   37 |   __CRT_INLINE PUWSTR ua_wcscpy(PUWSTR Destination,PCUWSTR Source) { return wcscpy(Destination,Source); }
+      |                                                                             ^~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from C:\msys64\mingw64\include/windows.h:114,
+                 from ../../mingw-w64-crt/libsrc/dinput_private.h:16,
+                 from ../../mingw-w64-crt/libsrc/dinput_kbd.c:13:
+C:\msys64\mingw64\include/stralign.h: In function 'ua_wcscpy':
+C:\msys64\mingw64\include/stralign.h:37:77: error: implicit declaration of function 'wcscpy'; did you mean 'ua_wcscpy'? [-Wimplicit-function-declaration]
+   37 |   __CRT_INLINE PUWSTR ua_wcscpy(PUWSTR Destination,PCUWSTR Source) { return wcscpy(Destination,Source); }
+      |                                                                             ^~~~~~
+      |                                                                             ua_wcscpy
+C:\msys64\mingw64\include/stralign.h:37:77: error: returning 'int' from a function with return type 'PUWSTR' {aka 'short unsigned int *'} makes pointer from integer without a cast [-Wint-conversion]
+   37 |   __CRT_INLINE PUWSTR ua_wcscpy(PUWSTR Destination,PCUWSTR Source) { return wcscpy(Destination,Source); }
+      |                                                                             ^~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from C:\msys64\mingw64\include/windows.h:114,
+                 from ../../mingw-w64-crt/libsrc/dmoguids.c:15:
+C:\msys64\mingw64\include/stralign.h: In function 'ua_wcscpy':
+C:\msys64\mingw64\include/stralign.h:37:77: error: implicit declaration of function 'wcscpy'; did you mean 'ua_wcscpy'? [-Wimplicit-function-declaration]
+   37 |   __CRT_INLINE PUWSTR ua_wcscpy(PUWSTR Destination,PCUWSTR Source) { return wcscpy(Destination,Source); }
+      |                                                                             ^~~~~~
+      |                                                                             ua_wcscpy
+C:\msys64\mingw64\include/stralign.h:37:77: error: returning 'int' from a function with return type 'PUWSTR' {aka 'short unsigned int *'} makes pointer from integer without a cast [-Wint-conversion]
+   37 |   __CRT_INLINE PUWSTR ua_wcscpy(PUWSTR Destination,PCUWSTR Source) { return wcscpy(Destination,Source); }
+      |                                                                             ^~~~~~~~~~~~~~~~~~~~~~~~~~
+make[3]: *** [Makefile:30974: libsrc/lib32_libdinput8_a-dinput_joy.o] 오류 1
+make[3]: *** [Makefile:31030: libsrc/lib32_libdinput8_a-dinput_kbd.o] 오류 1
+make[3]: *** [Makefile:31002: libsrc/lib32_libdinput8_a-dinput_mouse.o] 오류 1
+make[3]: *** [Makefile:30988: libsrc/lib32_libdinput8_a-dinput_joy2.o] 오류 1
+make[3]: *** [Makefile:30960: libsrc/lib32_libdinput_a-dinput_mouse2.o] 오류 1
+make[3]: *** [Makefile:31016: libsrc/lib32_libdinput8_a-dinput_mouse2.o] 오류 1
+make[3]: *** [Makefile:31072: libsrc/lib32_libdmoguids_a-dmoguids.o] 오류 1
+make[3]: 디렉터리 '/c/Users/nayou/Downloads/mingw-w64-master/mingw-w64-master/build/mingw-w64-crt' 나감
+make[2]: *** [Makefile:14948: all] 오류 2
+make[2]: 디렉터리 '/c/Users/nayou/Downloads/mingw-w64-master/mingw-w64-master/build/mingw-w64-crt' 나감
+make[1]: *** [Makefile:367: all-recursive] 오류 1
+make[1]: 디렉터리 '/c/Users/nayou/Downloads/mingw-w64-master/mingw-w64-master/build' 나감
+make: *** [Makefile:308: all] 오류 2
+
+수정
+wcscpy 함수의 암시적 선언(implicit declaration) 오류 발생
+wcscpy의 반환 타입과 PUWSTR(short unsigned int *)의 불일치
+make[3]: *** [Makefile:29994: libsrc/lib32_libbits_a-bits.o] 오류 1 등 다수의 컴파일 오류
+
+nayou@nayoungkim MINGW64 /c/Users/nayou/Downloads/mingw-w64-master/mingw-w64-master/build
+# ls /mingw64/include/wchar.h
+/mingw64/include/wchar.h
+
+nayou@nayoungkim MINGW64 /c/Users/nayou/Downloads/mingw-w64-master/mingw-w64-master/build
+# grep -R "wcscpy" /mingw64/include/wchar.h
+  wchar_t *__cdecl wcscpy(wchar_t * __restrict__ _Dest,const wchar_t * __restrict__ _Source) __MINGW_ATTRIB_DEPRECATED_SEC_WARN;
+
+nayou@nayoungkim MINGW64 /c/Users/nayou/Downloads/mingw-w64-master/mingw-w64-master/build
+# notepad /mingw64/include/stralign.h
+#ifndef __STRALIGN_H_
+#define __STRALIGN_H_
+
+#include <wchar.h>  // `wcscpy`를 인식하려면 필요
+
+#ifndef _STRALIGN_USE_SECURE_CRT
+#define _STRALIGN_USE_SECURE_CRT 0
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#ifndef WSTR_ALIGNED
+#if defined (__x86_64__) || defined (__arm__)
+#define WSTR_ALIGNED(s) TRUE
+#else
+#define WSTR_ALIGNED(s) (((DWORD_PTR)(s) & 1) == 0)
+#endif
+#endif
+
+#if defined(_X86_)
+#define ua_wcscpy wcscpy /*추가*/
+#else /* not _X86_ : */
+
+  // 이 부분에서는 아키텍처에 맞는 `ua_wcscpy`를 정의
+#ifndef __CRT__NO_INLINE
+__CRT_INLINE PUWSTR ua_wcscpy(PUWSTR Destination, PCUWSTR Source) { /*추가*/
+    if (WSTR_ALIGNED(Source) && WSTR_ALIGNED(Destination)) {
+        return wcscpy(Destination, Source);
+    }
+    return uaw_wcscpy(Destination, Source);
+}
+#endif /* !__CRT__NO_INLINE */
+
+#endif /* _X86_ */
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* __STRALIGN_H_ */
+
+MSYS2 패키지 업데이트
+pacman -Syu
+pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-make mingw-w64-x86_64-headers
+
+빌드
+nayou@nayoungkim MINGW64 /c/Users/nayou/Downloads/mingw-w64-master/mingw-w64-master/build
+# ../configure --prefix=/mingw64 --host=x86_64-w64-mingw32 --target=x86_64-w64-mingw32 && \
+make clean && make V=1 && make install
+
+오류
+In file included from C:\msys64\mingw64\include/winnt.h:16,
+                 from C:\msys64\mingw64\include/minwindef.h:163,
+                 from C:\msys64\mingw64\include/windef.h:9,
+                 from C:\msys64\mingw64\include/windows.h:69,
+                 from ../../mingw-w64-crt/libsrc/amstrmid.c:1:
+C:\msys64\mingw64\include/float.h:297:57: error: expected ';', ',' or ')' before numeric constant
+  297 | _CRTIMP double __cdecl __MINGW_NOTHROW _chgsign (double _X);
+      |                                                         ^~
+make[3]: *** [Makefile:29980: libsrc/lib32_libamstrmid_a-amstrmid.o] 오류 1
+make[3]: 디렉터리 '/c/Users/nayou/Downloads/mingw-w64-master/mingw-w64-master/build/mingw-w64-crt' 나감
+make[2]: *** [Makefile:14948: all] 오류 2
+make[2]: 디렉터리 '/c/Users/nayou/Downloads/mingw-w64-master/mingw-w64-master/build/mingw-w64-crt' 나감
+make[1]: *** [Makefile:367: all-recursive] 오류 1
+make[1]: 디렉터리 '/c/Users/nayou/Downloads/mingw-w64-master/mingw-w64-master/build' 나감
+make: *** [Makefile:308: all] 오류 2
+
+수정
+MinGW-w64의 float.h 파일에서 발생, windows.h 헤더와의 충돌 때문에 발생 
+헤더 파일을 포함하는 순서를 수정하거나 필요한 매크로를 정의하는 방법 
+nayou@nayoungkim MINGW64 /c/Users/nayou/Downloads/mingw-w64-master/mingw-w64-master/build
+# notepad ../mingw-w64-crt/libsrc/amstrmid.c
+#define _CRTIMP
+#define __MINGW_NOTHROW
+#include <float.h>
+#include <windows.h>
+
+nayou@nayoungkim MINGW64 /c/Users/nayou/Downloads/mingw-w64-master/mingw-w64-master/build
+# notepad /mingw64/include/float.h
+#ifndef _SIGN_DEFINED
+#define _SIGN_DEFINED
+
+#ifndef __MINGW_NOTHROW
+#define __MINGW_NOTHROW // 매크로가 미리 정의되지 않았다면 추가
+#endif
+
+_CRTIMP double __cdecl __MINGW_NOTHROW _chgsign (double _X);
+
+nayou@nayoungkim MINGW64 /c/Users/nayou/Downloads/mingw-w64-master/mingw-w64-master/build
+# pacman -S mingw-w64-x86_64-crt-git
+pacman -S mingw-w64-x86_64-toolchain
+
+오류
+In file included from C:/msys64/usr/include/sys/select.h:15,
+                 from C:/msys64/usr/include/sys/types.h:50,
+                 from ../../mingw-w64-crt/profile/mcount.c:42:
+C:/msys64/usr/include/sys/_timeval.h:42:25: error: conflicting types for 'time_t'; have  __int_least64_t' {aka 'long long int'}
+   42 | typedef _TIME_T_        time_t;
+      |                         ^~~~~~
+In file included from C:\msys64\mingw64\include/crtdefs.h:10,
+                 from C:\msys64\mingw64\include/stddef.h:7,
+                 from C:/msys64/usr/include/sys/cdefs.h:47,
+                 from C:/msys64/usr/include/sys/types.h:21:
+C:\msys64\mingw64\include/corecrt.h:136:20: note: previous declaration of 'time_t' with type 'time_t' {aka 'long int'}
+  136 | typedef __time32_t time_t;
+      |                    ^~~~~~
+In file included from ../../mingw-w64-crt/profile/gmon.h:47,
+                 from ../../mingw-w64-crt/profile/mcount.c:43:
+C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/plugin/include/profile.h:42:11: error: expected '=', ',', ';', 'asm' or '__attribute__' before '<' token
+   42 | extern vec<gcov_type> bb_gcov_counts;
+      |           ^
+C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/plugin/include/profile.h:43:16: error: expected '=', ',', ';', 'asm' or '__attribute__' before '<' token
+   43 | extern hash_map<edge,gcov_type> *edge_gcov_counts;
+      |                ^
+C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/plugin/include/profile.h:45:18: error: expected '=', ',', ';', 'asm' or '__attribute__' before '&' token
+   45 | inline gcov_type &
+      |                  ^
+C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/plugin/include/profile.h:55:18: error: expected '=', ',', ';', 'asm' or '__attribute__' before '&' token
+   55 | inline gcov_type &
+      |                  ^
+C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/plugin/include/profile.h:69:8: error:
+ unknown type name 'gcov_type'
+   69 | extern gcov_type sum_edge_counts (vec<edge, va_gc> *edges);
+      |        ^~~~~~~~~
+C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/plugin/include/profile.h:69:38: error: expected ')' before '<' token
+   69 | extern gcov_type sum_edge_counts (vec<edge, va_gc> *edges);
+      |                                      ^
+      |                                      )
+C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/plugin/include/profile.h:71:1: error: parameter names (without types) in function declaration [-Wdeclaration-missing-parameter-type]
+   71 | extern void init_node_map (bool);
+      | ^~~~~~
+../../mingw-w64-crt/profile/mcount.c:61:1: error: type defaults to 'int' in declaration of '_MCOUNT_DECL' [-Wimplicit-int]
+   61 | _MCOUNT_DECL (size_t, size_t);
+      | ^~~~~~~~~~~~
+../../mingw-w64-crt/profile/mcount.c:63:1: error: return type defaults to 'int' [-Wimplicit-int]
+   63 | _MCOUNT_DECL (size_t frompc, size_t selfpc)
+      | ^~~~~~~~~~~~
+../../mingw-w64-crt/profile/mcount.c: In function '_MCOUNT_DECL':
+../../mingw-w64-crt/profile/mcount.c:76:17: error: 'return' with no value, in function returning non-void [-Wreturn-mismatch]
+   76 |                 return;
+      |                 ^~~~~~
+../../mingw-w64-crt/profile/mcount.c:63:1: note: declared here
+   63 | _MCOUNT_DECL (size_t frompc, size_t selfpc)
+      | ^~~~~~~~~~~~
+../../mingw-w64-crt/profile/mcount.c:166:9: error: 'return' with no value, in function returning non-void [-Wreturn-mismatch]
+  166 |         return;
+      |         ^~~~~~
+../../mingw-w64-crt/profile/mcount.c:63:1: note: declared here
+   63 | _MCOUNT_DECL (size_t frompc, size_t selfpc)
+      | ^~~~~~~~~~~~
+../../mingw-w64-crt/profile/mcount.c:169:9: error: 'return' with no value, in function returning non-void [-Wreturn-mismatch]
+  169 |         return;
+      |         ^~~~~~
+../../mingw-w64-crt/profile/mcount.c:63:1: note: declared here
+   63 | _MCOUNT_DECL (size_t frompc, size_t selfpc)
+      | ^~~~~~~~~~~~
+../../mingw-w64-crt/profile/mcount.c: At top level:
+../../mingw-w64-crt/profile/mcount.c:176:1: error: expected '=', ',', ';', 'asm' or '__attribute__' at end of input
+  176 | MCOUNT
+      | ^~~~~~
+make[3]: *** [Makefile:31170: profile/lib32_libgmon_a-mcount.o] 오류 1
+make[3]: 디렉터리 '/c/Users/nayou/Downloads/mingw-w64-master/mingw-w64-master/build/mingw-w64-crt' 나감
+make[2]: *** [Makefile:14948: all] 오류 2
+make[2]: 디렉터리 '/c/Users/nayou/Downloads/mingw-w64-master/mingw-w64-master/build/mingw-w64-crt' 나감
+make[1]: *** [Makefile:367: all-recursive] 오류 1
+make[1]: 디렉터리 '/c/Users/nayou/Downloads/mingw-w64-master/mingw-w64-master/build' 나감
+make: *** [Makefile:308: all] 오류 2
+
+수정
+/usr/include/sys/_timeval.h 수정
+#ifndef _TIMEVAL_TIME_T_DEFINED
+#define _TIMEVAL_TIME_T_DEFINED
+typedef _TIME_T_ time_t;
+#endif
+
+/mingw64/include/corecrt.h 수정
+#ifndef _CORECRT_TIME_T_DEFINED
+#define _CORECRT_TIME_T_DEFINED
+typedef __time32_t time_t;
+#endif
+
+/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/plugin/include/profile.h 수정
+/*extern vec<gcov_type> bb_gcov_counts;
+extern hash_map<edge,gcov_type> *edge_gcov_counts;*/
+#ifdef __cplusplus
+#include <vector>
+#include <unordered_map>
+using std::vector;
+using std::unordered_map;
+
+extern vector<gcov_type> bb_gcov_counts;
+extern unordered_map<edge, gcov_type> *edge_gcov_counts;
+#else
+#warning "profile.h requires C++ compiler"
+#endif
+
+nayou@nayoungkim MINGW64 /c/Users/nayou/Downloads/mingw-w64-master/mingw-w64-master/build
+# notepad ../mingw-w64-crt/profile/mcount.c
+#ifndef MCOUNT
+#define MCOUNT() ((void)0)  // 빈 매크로로 정의
+#endif
+//_MCOUNT_DECL (size_t frompc, size_t selfpc)
+void _MCOUNT_DECL(size_t frompc, size_t selfpc)
