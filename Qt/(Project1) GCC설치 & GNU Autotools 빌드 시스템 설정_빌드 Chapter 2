@@ -4585,16 +4585,32 @@ make: *** [Makefile:308: all] 오류 2
 
 수정
 /usr/include/sys/_timeval.h 수정
+#if !defined(__time_t_defined) && !defined(_TIME_T_DECLARED)
 #ifndef _TIMEVAL_TIME_T_DEFINED
 #define _TIMEVAL_TIME_T_DEFINED
+#ifndef _CORECRT_TIME_T_DEFINED  // corecrt.h에서 정의되지 않았을 경우만 정의
 typedef _TIME_T_ time_t;
+#endif
+#endif
+#define __time_t_defined
+#define _TIME_T_DECLARED
 #endif
 
 /mingw64/include/corecrt.h 수정
+#ifndef _TIME_T_DEFINED
+#define _TIME_T_DEFINED
+#ifdef _USE_32BIT_TIME_T
 #ifndef _CORECRT_TIME_T_DEFINED
 #define _CORECRT_TIME_T_DEFINED
 typedef __time32_t time_t;
 #endif
+#else
+#ifndef _CORECRT_TIME_T_DEFINED
+#define _CORECRT_TIME_T_DEFINED
+typedef __time64_t time_t;
+#endif
+#endif
+#endif /* _TIME_T_DEFINED */
 
 /mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/plugin/include/profile.h 수정
 /*extern vec<gcov_type> bb_gcov_counts;
@@ -4618,3 +4634,8 @@ nayou@nayoungkim MINGW64 /c/Users/nayou/Downloads/mingw-w64-master/mingw-w64-mas
 #endif
 //_MCOUNT_DECL (size_t frompc, size_t selfpc)
 void _MCOUNT_DECL(size_t frompc, size_t selfpc)
+
+빌드
+nayou@nayoungkim MINGW64 /c/Users/nayou/Downloads/mingw-w64-master/mingw-w64-master/build
+# ../configure --prefix=/mingw64 --host=x86_64-w64-mingw32 --target=x86_64-w64-mingw32 && \
+make clean && make V=1 && make install
