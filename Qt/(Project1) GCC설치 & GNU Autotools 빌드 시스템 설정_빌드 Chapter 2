@@ -4195,8 +4195,49 @@ make: *** [Makefile:308: all] 오류 2
 nayou@nayoungkim MINGW64 /c/Users/nayou/Downloads/mpc-1.3.1/mpc-1.3.1
 # export CPLUS_INCLUDE_PATH="/mingw64/include/c++/14.2.0:/mingw64/include/c++/14.2.0/x86_64-w64-mingw32:/mingw64/include"
 export CPATH="$CPLUS_INCLUDE_PATH"
+=> CPATH는 모든 C/C++ 헤더 검색 경로를 전역으로 변경하는 환경 변수 => namesapce인식불가 에러 발생
+=> unset CPATH
+=> 다른방법을 찾아야함
+export CXXFLAGS="-I/mingw64/include/c++/14.2.0/x86_64-w64-mingw32"
 make clean
 make -j$(nproc)
+
+환경변수목록에 등록한 목록이 뜨는지 확인해야함
+g++ 명령어 실행 시 -I 옵션을 사용해 명시적으로 경로를 추가
+g++ -E -Wp,-v -I/mingw64/include/c++/14.2.0/x86_64-w64-mingw32 - < /dev/null
+
+echo | g++ -E -Wp,-v -I/mingw64/include/c++/14.2.0/x86_64-w64-mingw32 -
+
+nayou@nayoungkim MINGW64 /c/Users/nayou/Downloads/mingw-w64-master/mingw-w64-master/build
+# echo | g++ -E -Wp,-v -
+ignoring duplicate directory "C:\msys64\mingw64\include"
+ignoring duplicate directory "C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../include"
+ignoring duplicate directory "C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/include"
+ignoring duplicate directory "C:/msys64/mingw64/lib/gcc/../../lib/gcc/x86_64-w64-mingw32/14.2.0/include"
+ignoring nonexistent directory "D:/a/msys64/mingw64/include"
+ignoring nonexistent directory "/mingw64/include"
+ignoring duplicate directory "C:/msys64/mingw64/lib/gcc/../../lib/gcc/x86_64-w64-mingw32/14.2.0/include-fixed"
+ignoring duplicate directory "C:/msys64/mingw64/lib/gcc/../../lib/gcc/x86_64-w64-mingw32/14.2.0/../../../../x86_64-w64-mingw32/include"
+ignoring nonexistent directory "D:/a/msys64/mingw64/include"
+#include "..." search starts here:
+#include <...> search starts here:
+ C:\msys64\mingw64\include
+ C:\msys64\mingw64\x86_64-w64-mingw32\include
+ C:\msys64\usr\share\gettext
+ C:\msys64\mingw64\include\glib-2.0
+ C:\msys64\mingw64-backup-11.2.0\include\libltdl
+ C:\libidn2\gettext-0.22.5\libtextstyle\lib
+ C:\gnulib\lib
+ C:\gnulib
+ C:\libidn2\gettext-0.22.5\libtextstyle
+ C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/include
+ C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/14.2.0/include-fixed
+End of search list.
+# 0 "<stdin>"
+# 0 "<built-in>"
+# 0 "<command-line>"
+# 1 "<stdin>"
+
 
 오류
 ../../mingw-w64-crt/gdtoa/dtoa.c: In function '__dtoa':
@@ -4636,6 +4677,121 @@ nayou@nayoungkim MINGW64 /c/Users/nayou/Downloads/mingw-w64-master/mingw-w64-mas
 void _MCOUNT_DECL(size_t frompc, size_t selfpc)
 
 빌드
-nayou@nayoungkim MINGW64 /c/Users/nayou/Downloads/mingw-w64-master/mingw-w64-master/build
+nayou@nayoungkim MINGW64 
 # ../configure --prefix=/mingw64 --host=x86_64-w64-mingw32 --target=x86_64-w64-mingw32 && \
+make clean && make V=1 && make install
+
+오류
+In file included from ../../mingw-w64-crt/profile/gmon.h:47,
+                 from ../../mingw-w64-crt/profile/mcount.c:47:
+C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/plugin/include/profile.h:56:18: error: expected '=', ',', ';', 'asm' or '__attribute__' before '&' token
+   56 | inline gcov_type &
+      |                  ^
+C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/plugin/include/profile.h:66:18: error: expected '=', ',', ';', 'asm' or '__attribute__' before '&' token
+   66 | inline gcov_type &
+      |                  ^
+C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/plugin/include/profile.h:80:8: error: unknown type name 'gcov_type'
+   80 | extern gcov_type sum_edge_counts (vec<edge, va_gc> *edges);
+      |        ^~~~~~~~~
+C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/plugin/include/profile.h:80:38: error: expected ')' before '<' token
+   80 | extern gcov_type sum_edge_counts (vec<edge, va_gc> *edges);
+      |                                      ^
+      |                                      )
+C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/plugin/include/profile.h:82:1: error: parameter names (without types) in function declaration [-Wdeclaration-missing-parameter-type]
+   82 | extern void init_node_map (bool);
+      | ^~~~~~
+../../mingw-w64-crt/profile/mcount.c:65:1: error: type defaults to 'int' in declaration of '_MCOUNT_DECL' [-Wimplicit-int]
+   65 | _MCOUNT_DECL (size_t, size_t);
+      | ^~~~~~~~~~~~
+../../mingw-w64-crt/profile/mcount.c:68:6: error: conflicting types for '_MCOUNT_DECL'; have  void(size_t,  size_t)' {aka 'void(unsigned int,  unsigned int)'}
+   68 | void _MCOUNT_DECL(size_t frompc, size_t selfpc)
+      |      ^~~~~~~~~~~~
+../../mingw-w64-crt/profile/mcount.c:65:1: note: previous declaration of '_MCOUNT_DECL' with type 'int(size_t,  size_t)' {aka 'int(unsigned int,  unsigned int)'}
+   65 | _MCOUNT_DECL (size_t, size_t);
+      | ^~~~~~~~~~~~
+../../mingw-w64-crt/profile/mcount.c:181:1: error: expected '=', ',', ';', 'asm' or '__attribute__' at end of input
+  181 | MCOUNT
+      | ^~~~~~
+make[3]: *** [Makefile:31170: profile/lib32_libgmon_a-mcount.o] 오류 1
+make[3]: 디렉터리 '/c/Users/nayou/Downloads/mingw-w64-master/mingw-w64-master/build/mingw-w64-crt' 나감
+make[2]: *** [Makefile:14948: all] 오류 2
+make[2]: 디렉터리 '/c/Users/nayou/Downloads/mingw-w64-master/mingw-w64-master/build/mingw-w64-crt' 나감
+make[1]: *** [Makefile:367: all-recursive] 오류 1
+make[1]: 디렉터리 '/c/Users/nayou/Downloads/mingw-w64-master/mingw-w64-master/build' 나감
+make: *** [Makefile:308: all] 오류 2
+
+수정
+/mingw64/lib/gcc/x86_64-w64-mingw32/14.2.0/plugin/include/profile.h 수정
+#ifndef GCOV_TYPE_DEFINED
+#define GCOV_TYPE_DEFINED
+#include <stdint.h>
+typedef uint64_t gcov_type;
+#endif
+
+#include <vector>
+extern gcov_type sum_edge_counts(std::vector<edge> *edges);
+
+nayou@nayoungkim MINGW64 /c/Users/nayou/Downloads/mingw-w64-master/mingw-w64-master/build
+# notepad ../mingw-w64-crt/profile/mcount.c
+#ifndef _MCOUNT_DECL
+#define _MCOUNT_DECL(frompc, selfpc) void _MCOUNT_DECL(size_t frompc, size_t selfpc)
+#endif
+
+#ifndef MCOUNT
+#define MCOUNT() do { } while (0)
+#endif
+
+빌드
+nayou@nayoungkim MINGW64 
+# ../configure --prefix=/mingw64 --build=$(gcc -dumpmachine) --host=x86_64-w64-mingw32 --target=x86_64-w64-mingw32 && \
+ make clean && make V=1 && make install
+
+오류
+checking whether we are cross compiling... configure: error: in '/c/Users/nayou/Downloads/mingw-w64-master/mingw-w64-master/build/mingw-w64-crt':
+configure: error: cannot run C compiled programs.
+If you meant to cross compile, use '--host'.
+See 'config.log' for more details
+configure: error: ../../mingw-w64-crt/configure failed for mingw-w64-crt
+
+수정
+nayou@nayoungkim MINGW64 /c/Users/nayou/Downloads/mingw-w64-master/mingw-w64-master/build
+# gcc -dumpmachine
+x86_64-w64-mingw32
+
+빌드명령어 수정
+../configure --prefix=/mingw64 --build=x86_64-w64-mingw32 \
+--host=x86_64-w64-mingw32 --target=x86_64-w64-mingw32 --disable-bootstrap && \
+make clean && make V=1 && make install
+
+MinGW 실행 파일이 실행 가능한 상태인지 확인
+nayou@nayoungkim MINGW64 /c/Users/nayou/Downloads/mingw-w64-master/mingw-w64-master/build
+# ls -l /mingw64/bin/x86_64-w64-mingw32-gcc
+-rwxr-xr-x 3 nayou nayou 2914487 11월  4 06:18 /mingw64/bin/x86_64-w64-mingw32-gcc
+
+실행 권한 추가
+chmod +x /mingw64/bin/x86_64-w64-mingw32-gcc
+
+오류
+config.log 확인
+configure: error: ../../mingw-w64-crt/configure failed for mingw-w64-crt
+checking whether we are cross compiling... configure: error: in '/c/Users/nayou/Downloads/mingw-w64-master/mingw-w64-master/build/mingw-w64-crt':
+configure: error: cannot run C compiled programs.
+If you meant to cross compile, use '--host'.
+
+수정
+TMPDIR 및 CC 환경 변수 수정 일부 configure 스크립트는 일시적인 실행 파일을 /tmp 디렉터리에 저장한 후 실행합니다. 그러나 MinGW 환경에서 /tmp가 올바르게 설정되지 않았을 경우 실행이 불가능할 수 있음 
+환경변수설정
+export TMPDIR=/c/Users/nayou/AppData/Local/Temp
+mkdir -p $TMPDIR
+
+실행테스트
+echo 'int main() { return 0; }' > test.c
+x86_64-w64-mingw32-gcc test.c -o test.exe
+./test.exe
+
+빌드명령어 수정(--disable-multilib : 크로스 컴파일을 하지 않는다고 선언, --disable-werror, ac_cv_prog_cc_works=yes : 테스트 실행 비활성화)
+rm -rf config.cache && \
+../configure --prefix=/mingw64 --host=x86_64-w64-mingw32 --build=x86_64-w64-mingw32 \
+--target=x86_64-w64-mingw32 --disable-multilib --disable-werror ac_cv_prog_cc_works=yes \
+ac_cv_prog_cc_works=yes ac_cv_prog_cc_cross=yes ac_cv_func_malloc_0_nonnull=yes && \
 make clean && make V=1 && make install
