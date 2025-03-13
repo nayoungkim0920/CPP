@@ -1,4 +1,4 @@
-# 이미지프로세싱처리별 속도비교 및 객체인식 속도 비교 
+# 이미지프로세싱처리별 속도비교 및 이미지프로세싱처리별 객체인식 속도 비교 
 
 (OpenCV/IPP/NPP/CUDA/CUDAKernel/GStreamer)
 
