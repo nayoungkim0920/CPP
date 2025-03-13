@@ -6,15 +6,15 @@ Date. 2024-08-06
 
 1) 목표 : 이미지프로세싱처리별 속도를 비교하고 각 처리별 객체인식 속도를 비교한다.
 
-2) 기능 : Open, Save, Exit,
+2) 기능
 
-         Grayscale, Gaussian Blur, Canny Edges, Median Filter, Sobel Filter, Laplacian Filter,
+2-1) File : Open, Save, Exit
 
-         Bilateral Filter,
+2-2) Filters : Grayscale, Gaussian Blur, Canny Edges, Median Filter, Sobel Filter, Laplacian Filter, Bilateral Filter
 
-         Rotate, Zoom in, Zoom Out, Undo, Redo, First
+2-3) Edit : Rotate, Zoom in, Zoom Out, Undo, Redo, First
 
-         처리속도/입출력정보
+2-4) Output : 처리속도/입출력정보
 
 3) 개발도구
 
