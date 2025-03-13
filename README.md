@@ -21,9 +21,9 @@ Date. 2024-08-06
 3-1) 도구 : Visual Studio 2019, Visual C++, CMAKE 3.14, QT 6.7.1, GCC 14.2.0
 
 3-2) LIB/SDK/API : OpenCV, CUDA 12.1, CUDNN v9.1, GSteramer 1.0, Torch, flatbuffers, Protobuf, GLS
-                   VulkanSDK 1.3.290.0, ipp 2021.11, IPLIB, Abseil, CAFFE2, ONNX Runtime, cuSPARSELt
+                   VulkanSDK 1.3.290.0, ipp 2021.11, IPLIB, Abseil, CAFFE2, cuSPARSELt
 
-3-3) 객체인식 : ONNX 
+3-3) 객체인식 : ONNX, ONNX Runtime
 
 4) 화면
 
